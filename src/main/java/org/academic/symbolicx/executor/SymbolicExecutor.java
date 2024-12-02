@@ -96,6 +96,18 @@ public class SymbolicExecutor {
         // At this point, the state encodes a path condition that leads to this point
         if (cfg.getAllSuccessors(stmt).isEmpty()) {
             System.out.println("Final state: " + state);
+            // Check if the path condition is satisfiable
+            Solver solver = ctx.mkSolver();
+            solver.add(state.getPathCondition());
+            Status status = solver.check();
+            if (status == Status.SATISFIABLE) {
+                System.out.println("Path condition is satisfiable");
+                Model model = solver.getModel();
+                System.out.println("Model: " + model);
+            } else if (status == Status.UNKNOWN)
+                System.out.println("Path condition is unknown");
+            else
+                System.out.println("Path condition is unsatisfiable");
         }
     }
 }

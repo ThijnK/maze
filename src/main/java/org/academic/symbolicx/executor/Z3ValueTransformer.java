@@ -8,6 +8,8 @@ import sootup.core.jimple.basic.*;
 import sootup.core.jimple.common.constant.*;
 import sootup.core.jimple.common.expr.JAddExpr;
 import sootup.core.jimple.common.expr.JEqExpr;
+import sootup.core.jimple.common.expr.JGeExpr;
+import sootup.core.jimple.common.expr.JGtExpr;
 import sootup.core.jimple.common.expr.JLeExpr;
 import sootup.core.jimple.common.expr.JLtExpr;
 import sootup.core.jimple.common.expr.JNegExpr;
@@ -50,6 +52,20 @@ public class Z3ValueTransformer extends AbstractValueVisitor<Expr<?>> {
         Expr<?> leftExpr = transform(expr.getOp1());
         Expr<?> rightExpr = transform(expr.getOp2());
         setResult(ctx.mkEq(leftExpr, rightExpr));
+    }
+
+    @Override
+    public void caseGeExpr(@Nonnull JGeExpr expr) {
+        ArithExpr<?> leftExpr = (ArithExpr<?>) transform(expr.getOp1());
+        ArithExpr<?> rightExpr = (ArithExpr<?>) transform(expr.getOp2());
+        setResult(ctx.mkGe(leftExpr, rightExpr));
+    }
+
+    @Override
+    public void caseGtExpr(@Nonnull JGtExpr expr) {
+        ArithExpr<?> leftExpr = (ArithExpr<?>) transform(expr.getOp1());
+        ArithExpr<?> rightExpr = (ArithExpr<?>) transform(expr.getOp2());
+        setResult(ctx.mkGt(leftExpr, rightExpr));
     }
 
     @Override
