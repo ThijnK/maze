@@ -75,7 +75,6 @@
             <groupId>com.microsoft</groupId>
             <artifactId>z3</artifactId>
             <version>4.13.3</version>
-            <scope>compile</scope>
         </dependency>
     </dependencies>
 
