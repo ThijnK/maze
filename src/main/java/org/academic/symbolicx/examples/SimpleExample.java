@@ -15,6 +15,15 @@ public class SimpleExample {
         }
     }
 
+    // A method that checks the sign of a number
+    public String checkSign(int number) {
+        if (number > 0) {
+            return "Positive";
+        } else {
+            return "Negative";
+        }
+    }
+
     // A method with a loop that sums numbers from 1 to n
     public int sumUpTo(int n) {
         int sum = 0;

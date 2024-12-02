@@ -3,42 +3,47 @@ package org.academic.symbolicx.executor;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.microsoft.z3.*;
+
 public class SymbolicState {
-    private Map<String, String> symbolicVariables;
-    private StringBuilder pathCondition;
+    private Map<String, Expr<?>> symbolicVariables;
+    private Context ctx;
+    private BoolExpr pathCondition;
 
-    public SymbolicState() {
+    public SymbolicState(Context ctx) {
         this.symbolicVariables = new HashMap<>();
-        this.pathCondition = new StringBuilder("true"); // Default path condition
+        this.ctx = ctx;
+        this.pathCondition = ctx.mkTrue();
     }
 
-    public SymbolicState(Map<String, String> symbolicVariables, StringBuilder pathCondition) {
+    public SymbolicState(Context ctx, Map<String, Expr<?>> symbolicVariables, BoolExpr pathCondition) {
         this.symbolicVariables = new HashMap<>(symbolicVariables);
-        this.pathCondition = new StringBuilder(pathCondition);
+        this.ctx = ctx;
+        this.pathCondition = pathCondition;
     }
 
-    public void setVariable(String var, String expression) {
+    public void setVariable(String var, Expr<?> expression) {
         symbolicVariables.put(var, expression);
     }
 
-    public String getVariable(String var) {
-        return symbolicVariables.getOrDefault(var, var); // Default to itself if not found
+    public Expr<?> getVariable(String var) {
+        return symbolicVariables.getOrDefault(var, null);
     }
 
-    public void addPathCondition(String condition) {
-        if (pathCondition.toString().equals("true")) {
-            pathCondition = new StringBuilder(condition);
+    public void addPathCondition(BoolExpr condition) {
+        if (pathCondition.isTrue()) {
+            pathCondition = condition;
         } else {
-            pathCondition.append(" && ").append(condition);
+            pathCondition = ctx.mkAnd(pathCondition, condition);
         }
     }
 
-    public String getPathCondition() {
-        return pathCondition.toString();
+    public BoolExpr getPathCondition() {
+        return pathCondition;
     }
 
     public SymbolicState clone() {
-        SymbolicState newState = new SymbolicState(symbolicVariables, pathCondition);
+        SymbolicState newState = new SymbolicState(ctx, symbolicVariables, pathCondition);
         return newState;
     }
 
