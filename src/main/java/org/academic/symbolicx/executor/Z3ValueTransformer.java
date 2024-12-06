@@ -14,6 +14,7 @@ import sootup.core.jimple.common.expr.JLeExpr;
 import sootup.core.jimple.common.expr.JLtExpr;
 import sootup.core.jimple.common.expr.JNegExpr;
 import sootup.core.jimple.common.expr.JRemExpr;
+import sootup.core.jimple.common.ref.JParameterRef;
 import sootup.core.jimple.visitor.AbstractValueVisitor;
 import sootup.core.types.PrimitiveType.*;
 import sootup.core.types.ArrayType;
@@ -21,9 +22,11 @@ import sootup.core.types.Type;
 
 public class Z3ValueTransformer extends AbstractValueVisitor<Expr<?>> {
     Context ctx;
+    SymbolicState state;
 
-    public Z3ValueTransformer(Context ctx) {
+    public Z3ValueTransformer(Context ctx, SymbolicState state) {
         this.ctx = ctx;
+        this.state = state;
     }
 
     public Expr<?> transform(Value value) {
@@ -116,34 +119,34 @@ public class Z3ValueTransformer extends AbstractValueVisitor<Expr<?>> {
 
     @Override
     public void caseLocal(@Nonnull Local local) {
-        Type sootType = local.getType();
-        Sort z3Sort;
-
-        if (sootType instanceof IntType) {
-            z3Sort = ctx.mkIntSort();
-        } else if (sootType instanceof BooleanType) {
-            z3Sort = ctx.mkBoolSort();
-        } else if (sootType instanceof DoubleType || sootType instanceof FloatType) {
-            z3Sort = ctx.mkRealSort();
-        } else if (sootType instanceof ArrayType) {
-            Sort elementSort = determineElementSort(((ArrayType) sootType).getElementType());
-            z3Sort = ctx.mkArraySort(ctx.mkIntSort(), elementSort);
-        } else {
-            throw new IllegalArgumentException("Unsupported type: " + sootType);
-        }
-
-        setResult(ctx.mkConst(local.getName(), z3Sort));
+        setResult(state.getVariable(local.getName()));
     }
 
-    private Sort determineElementSort(Type elementType) {
-        if (elementType instanceof IntType) {
+    @Override
+    public void caseParameterRef(@Nonnull JParameterRef ref) {
+        Sort z3Sort = determineSort(ref.getType());
+        // Create a symbolic value for the parameter
+        setResult(ctx.mkConst("p" + ref.getIndex(), z3Sort));
+    }
+
+    /**
+     * Determine the Z3 sort for the given element type.
+     */
+    private Sort determineSort(Type sootType) {
+        if (sootType instanceof IntType) {
             return ctx.mkIntSort();
-        } else if (elementType instanceof BooleanType) {
+        } else if (sootType instanceof BooleanType) {
             return ctx.mkBoolSort();
-        } else if (elementType instanceof DoubleType || elementType instanceof FloatType) {
+        } else if (sootType instanceof DoubleType || sootType instanceof FloatType) {
             return ctx.mkRealSort();
-        } else {
-            throw new IllegalArgumentException("Unsupported array element type: " + elementType);
+        } else if (sootType instanceof ArrayType) {
+            Sort elementSort = determineSort(((ArrayType) sootType).getElementType());
+            // TODO: will arrays always be indexed by ints?
+            return ctx.mkArraySort(ctx.mkIntSort(), elementSort);
+        }
+        // TODO: add other types
+        else {
+            throw new IllegalArgumentException("Unsupported type: " + sootType);
         }
     }
 

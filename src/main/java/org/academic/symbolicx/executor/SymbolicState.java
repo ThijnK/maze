@@ -31,11 +31,10 @@ public class SymbolicState {
     }
 
     public void addPathCondition(BoolExpr condition) {
-        if (pathCondition.isTrue()) {
+        if (pathCondition.isTrue())
             pathCondition = condition;
-        } else {
+        else
             pathCondition = ctx.mkAnd(pathCondition, condition);
-        }
     }
 
     public BoolExpr getPathCondition() {
