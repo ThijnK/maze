@@ -37,7 +37,7 @@ public class SymbolicExecutor {
         System.out.println("Exploring: " + stmt);
         System.out.println("Current state: " + state);
 
-        Z3ValueTransformer transformer = new Z3ValueTransformer(ctx, state);
+        ValueToZ3Transformer transformer = new ValueToZ3Transformer(ctx, state);
 
         // Handle cases for conditional branching statements
         if (stmt instanceof JIfStmt) {
