@@ -22,6 +22,7 @@ public class SymbolicExecutor {
         Stmt entry = cfg.getStartingStmt();
         SymbolicState initialState = new SymbolicState(ctx, entry);
 
+        Solver solver = ctx.mkSolver();
         List<SymbolicState> worklist = new ArrayList<SymbolicState>();
         worklist.add(initialState);
 
@@ -31,7 +32,7 @@ public class SymbolicExecutor {
             SymbolicState state = worklist.remove(0);
 
             if (state.isFinalState(cfg)) {
-                printFinalState(state, ctx);
+                printFinalState(state, solver);
                 continue;
             }
             if (state.incrementDepth() >= MAX_DEPTH) {
@@ -123,11 +124,11 @@ public class SymbolicExecutor {
         return newStates;
     }
 
-    private void printFinalState(SymbolicState state, Context ctx) {
+    private void printFinalState(SymbolicState state, Solver solver) {
         System.out.println("Final state: " + state);
-        Solver solver = ctx.mkSolver();
         solver.add(state.getPathCondition());
         Status status = solver.check();
+        solver.reset();
         if (status == Status.SATISFIABLE) {
             System.out.println("Path condition is satisfiable");
             Model model = solver.getModel();
