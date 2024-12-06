@@ -30,78 +30,93 @@ public class SymbolicExecutor {
 
     private void exploreCFG(StmtGraph<?> cfg, Stmt stmt, SymbolicState state, int depth, Context ctx)
             throws InterruptedException {
-        if (depth >= MAX_DEPTH)
+        if (depth++ >= MAX_DEPTH)
             return;
-        depth++;
 
         System.out.println("Exploring: " + stmt);
         System.out.println("Current state: " + state);
 
         ValueToZ3Transformer transformer = new ValueToZ3Transformer(ctx, state);
 
-        // Handle cases for conditional branching statements
-        if (stmt instanceof JIfStmt) {
-            List<Stmt> succs = cfg.getAllSuccessors(stmt);
-            AbstractConditionExpr cond = ((JIfStmt) stmt).getCondition();
+        if (stmt instanceof JIfStmt)
+            handleIfStmt(cfg, (JIfStmt) stmt, state, depth, ctx, transformer);
+        else if (stmt instanceof JSwitchStmt)
+            handleSwitchStmt(cfg, (JSwitchStmt) stmt, state, depth, ctx, transformer);
+        else
+            handleOtherStmts(cfg, stmt, state, depth, ctx, transformer);
 
-            // True branch
-            SymbolicState newState = state.clone();
-            BoolExpr condExpr = (BoolExpr) transformer.transform(cond);
-            newState.addPathCondition(condExpr);
-            exploreCFG(cfg, succs.get(0), newState, depth, ctx);
+        if (cfg.getAllSuccessors(stmt).isEmpty())
+            printFinalState(state, ctx);
+    }
 
-            // False branch
-            state.addPathCondition(ctx.mkNot(condExpr));
-            exploreCFG(cfg, succs.get(1), state, depth, ctx);
-        } else if (stmt instanceof JSwitchStmt) {
-            List<Stmt> succs = cfg.getAllSuccessors(stmt);
-            JSwitchStmt switchStmt = (JSwitchStmt) stmt;
-            String var = switchStmt.getKey().toString();
-            List<IntConstant> values = switchStmt.getValues();
+    private void handleIfStmt(StmtGraph<?> cfg, JIfStmt stmt, SymbolicState state, int depth, Context ctx,
+            ValueToZ3Transformer transformer) throws InterruptedException {
+        List<Stmt> succs = cfg.getAllSuccessors(stmt);
+        AbstractConditionExpr cond = stmt.getCondition();
 
-            for (int i = 0; i < succs.size(); i++) {
-                SymbolicState newState = i == succs.size() - 1 ? state : state.clone();
-                // FIXME: probably not entirely correct
-                newState.addPathCondition(
-                        ctx.mkEq(ctx.mkConst(var, ctx.mkIntSort()), ctx.mkInt(values.get(i).getValue())));
-                exploreCFG(cfg, succs.get(i), newState, depth, ctx);
-            }
-        } else {
-            // In case of assign statement update variable
-            if (stmt instanceof JAssignStmt) {
-                JAssignStmt assignStmt = (JAssignStmt) stmt;
-                Expr<?> rightExpr = transformer.transform(assignStmt.getRightOp());
-                state.setVariable(assignStmt.getLeftOp().toString(), rightExpr);
-            } else if (stmt instanceof JIdentityStmt) {
-                // Identity statements are for method parameters, this, and exceptions
-                JIdentityStmt identStmt = (JIdentityStmt) stmt;
-                Expr<?> rightExpr = transformer.transform(identStmt.getRightOp());
-                state.setVariable(identStmt.getLeftOp().toString(), rightExpr);
-            }
+        // True branch
+        SymbolicState newState = state.clone();
+        BoolExpr condExpr = (BoolExpr) transformer.transform(cond);
+        newState.addPathCondition(condExpr);
+        exploreCFG(cfg, succs.get(0), newState, depth, ctx);
 
-            List<Stmt> succs = cfg.getAllSuccessors(stmt);
-            for (int i = 0; i < succs.size(); i++) {
-                SymbolicState newState = i == succs.size() - 1 ? state : state.clone();
-                exploreCFG(cfg, succs.get(i), newState, depth, ctx);
-            }
+        // False branch
+        state.addPathCondition(ctx.mkNot(condExpr));
+        exploreCFG(cfg, succs.get(1), state, depth, ctx);
+    }
+
+    private void handleSwitchStmt(StmtGraph<?> cfg, JSwitchStmt stmt, SymbolicState state, int depth, Context ctx,
+            ValueToZ3Transformer transformer) throws InterruptedException {
+        List<Stmt> succs = cfg.getAllSuccessors(stmt);
+        String var = stmt.getKey().toString();
+        List<IntConstant> values = stmt.getValues();
+
+        for (int i = 0; i < succs.size(); i++) {
+            SymbolicState newState = i == succs.size() - 1 ? state : state.clone();
+            newState.addPathCondition(
+                    ctx.mkEq(ctx.mkConst(var, ctx.mkIntSort()), ctx.mkInt(values.get(i).getValue())));
+            exploreCFG(cfg, succs.get(i), newState, depth, ctx);
+        }
+    }
+
+    private void handleOtherStmts(StmtGraph<?> cfg, Stmt stmt, SymbolicState state, int depth, Context ctx,
+            ValueToZ3Transformer transformer) throws InterruptedException {
+        if (stmt instanceof JAssignStmt) {
+            handleAssignStmt((JAssignStmt) stmt, state, transformer);
+        } else if (stmt instanceof JIdentityStmt) {
+            handleIdentityStmt((JIdentityStmt) stmt, state, transformer);
         }
 
-        // Print the final state when reaching the end of the CFG
-        // At this point, the state encodes a path condition that leads to this point
-        if (cfg.getAllSuccessors(stmt).isEmpty()) {
-            System.out.println("Final state: " + state);
-            // Check if the path condition is satisfiable
-            Solver solver = ctx.mkSolver();
-            solver.add(state.getPathCondition());
-            Status status = solver.check();
-            if (status == Status.SATISFIABLE) {
-                System.out.println("Path condition is satisfiable");
-                Model model = solver.getModel();
-                System.out.println("Model: " + model);
-            } else if (status == Status.UNKNOWN)
-                System.out.println("Path condition is unknown");
-            else
-                System.out.println("Path condition is unsatisfiable");
+        List<Stmt> succs = cfg.getAllSuccessors(stmt);
+        for (int i = 0; i < succs.size(); i++) {
+            SymbolicState newState = i == succs.size() - 1 ? state : state.clone();
+            exploreCFG(cfg, succs.get(i), newState, depth, ctx);
+        }
+    }
+
+    private void handleAssignStmt(JAssignStmt stmt, SymbolicState state, ValueToZ3Transformer transformer) {
+        Expr<?> rightExpr = transformer.transform(stmt.getRightOp());
+        state.setVariable(stmt.getLeftOp().toString(), rightExpr);
+    }
+
+    private void handleIdentityStmt(JIdentityStmt stmt, SymbolicState state, ValueToZ3Transformer transformer) {
+        Expr<?> rightExpr = transformer.transform(stmt.getRightOp());
+        state.setVariable(stmt.getLeftOp().toString(), rightExpr);
+    }
+
+    private void printFinalState(SymbolicState state, Context ctx) {
+        System.out.println("Final state: " + state);
+        Solver solver = ctx.mkSolver();
+        solver.add(state.getPathCondition());
+        Status status = solver.check();
+        if (status == Status.SATISFIABLE) {
+            System.out.println("Path condition is satisfiable");
+            Model model = solver.getModel();
+            System.out.println("Model: " + model);
+        } else if (status == Status.UNKNOWN) {
+            System.out.println("Path condition is unknown");
+        } else {
+            System.out.println("Path condition is unsatisfiable");
         }
     }
 }

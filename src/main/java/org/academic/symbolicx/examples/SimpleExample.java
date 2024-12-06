@@ -1,8 +1,10 @@
 package org.academic.symbolicx.examples;
 
 public class SimpleExample {
+    int b = 0;
+
     // A simple method that takes two integers and returns their sum
-    public int add(int a, int b) {
+    public int add(int a) {
         return a + b;
     }
 

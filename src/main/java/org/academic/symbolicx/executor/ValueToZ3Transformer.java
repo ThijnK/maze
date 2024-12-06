@@ -254,7 +254,7 @@ public class ValueToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
     // #endregion
 
     /**
-     * Determine the Z3 sort for the given element type.
+     * Determine the Z3 sort for the given Soot type.
      */
     private Sort determineSort(Type sootType) {
         if (sootType instanceof IntType) {
