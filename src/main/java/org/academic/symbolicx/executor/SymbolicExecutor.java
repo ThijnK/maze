@@ -1,5 +1,6 @@
 package org.academic.symbolicx.executor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.microsoft.z3.*;
@@ -14,94 +15,112 @@ public class SymbolicExecutor {
     // Limit the depth of symbolic execution to avoid infinite loops
     private final int MAX_DEPTH = 20;
 
+    /**
+     * Execute the symbolic execution on the given control flow graph.
+     */
     public void execute(StmtGraph<?> cfg, Context ctx) {
-        SymbolicState initialState = new SymbolicState(ctx);
-        try {
-            exploreCFG(cfg, cfg.getStartingStmt(), initialState, ctx);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        Stmt entry = cfg.getStartingStmt();
+        SymbolicState initialState = new SymbolicState(ctx, entry);
+
+        List<SymbolicState> worklist = new ArrayList<SymbolicState>();
+        worklist.add(initialState);
+
+        // TODO: implement different search strategies
+
+        while (!worklist.isEmpty()) {
+            SymbolicState state = worklist.remove(0);
+
+            if (state.isFinalState(cfg)) {
+                printFinalState(state, ctx);
+                continue;
+            }
+            if (state.incrementDepth() >= MAX_DEPTH) {
+                // TODO: handle as final state?
+                continue;
+            }
+
+            List<SymbolicState> newStates = step(cfg, state, ctx);
+            worklist.addAll(newStates);
         }
     }
 
-    private void exploreCFG(StmtGraph<?> cfg, Stmt stmt, SymbolicState state, Context ctx)
-            throws InterruptedException {
-        exploreCFG(cfg, stmt, state, 0, ctx);
-    }
-
-    private void exploreCFG(StmtGraph<?> cfg, Stmt stmt, SymbolicState state, int depth, Context ctx)
-            throws InterruptedException {
-        if (depth++ >= MAX_DEPTH)
-            return;
-
-        System.out.println("Exploring: " + stmt);
-        System.out.println("Current state: " + state);
-
+    /**
+     * Execute a single step of symbolic execution on the given control flow graph.
+     * 
+     * @param cfg   The control flow graph
+     * @param state The current symbolic state
+     * @param ctx   The Z3 context
+     */
+    public List<SymbolicState> step(StmtGraph<?> cfg, SymbolicState state, Context ctx) {
+        // FIXME: probably better way of sharing transformers
         ValueToZ3Transformer transformer = new ValueToZ3Transformer(ctx, state);
+        Stmt stmt = state.getCurrentStmt();
 
         if (stmt instanceof JIfStmt)
-            handleIfStmt(cfg, (JIfStmt) stmt, state, depth, ctx, transformer);
+            return handleIfStmt(cfg, (JIfStmt) stmt, state, ctx, transformer);
         else if (stmt instanceof JSwitchStmt)
-            handleSwitchStmt(cfg, (JSwitchStmt) stmt, state, depth, ctx, transformer);
+            return handleSwitchStmt(cfg, (JSwitchStmt) stmt, state, ctx, transformer);
         else
-            handleOtherStmts(cfg, stmt, state, depth, ctx, transformer);
-
-        if (cfg.getAllSuccessors(stmt).isEmpty())
-            printFinalState(state, ctx);
+            return handleOtherStmts(cfg, stmt, state, ctx, transformer);
     }
 
-    private void handleIfStmt(StmtGraph<?> cfg, JIfStmt stmt, SymbolicState state, int depth, Context ctx,
-            ValueToZ3Transformer transformer) throws InterruptedException {
+    private List<SymbolicState> handleIfStmt(StmtGraph<?> cfg, JIfStmt stmt, SymbolicState state, Context ctx,
+            ValueToZ3Transformer transformer) {
         List<Stmt> succs = cfg.getAllSuccessors(stmt);
         AbstractConditionExpr cond = stmt.getCondition();
+        List<SymbolicState> newStates = new ArrayList<SymbolicState>();
 
         // True branch
-        SymbolicState newState = state.clone();
+        SymbolicState newState = state.clone(succs.get(0));
         BoolExpr condExpr = (BoolExpr) transformer.transform(cond);
         newState.addPathCondition(condExpr);
-        exploreCFG(cfg, succs.get(0), newState, depth, ctx);
+        newStates.add(newState);
 
         // False branch
         state.addPathCondition(ctx.mkNot(condExpr));
-        exploreCFG(cfg, succs.get(1), state, depth, ctx);
+        state.setCurrentStmt(succs.get(1));
+        newStates.add(state);
+
+        return newStates;
     }
 
-    private void handleSwitchStmt(StmtGraph<?> cfg, JSwitchStmt stmt, SymbolicState state, int depth, Context ctx,
-            ValueToZ3Transformer transformer) throws InterruptedException {
+    private List<SymbolicState> handleSwitchStmt(StmtGraph<?> cfg, JSwitchStmt stmt, SymbolicState state, Context ctx,
+            ValueToZ3Transformer transformer) {
         List<Stmt> succs = cfg.getAllSuccessors(stmt);
         String var = stmt.getKey().toString();
         List<IntConstant> values = stmt.getValues();
+        List<SymbolicState> newStates = new ArrayList<SymbolicState>();
 
         for (int i = 0; i < succs.size(); i++) {
             SymbolicState newState = i == succs.size() - 1 ? state : state.clone();
+            // FIXME: check this implementation
             newState.addPathCondition(
                     ctx.mkEq(ctx.mkConst(var, ctx.mkIntSort()), ctx.mkInt(values.get(i).getValue())));
-            exploreCFG(cfg, succs.get(i), newState, depth, ctx);
+            newState.setCurrentStmt(succs.get(i));
+            newStates.add(newState);
         }
+
+        return newStates;
     }
 
-    private void handleOtherStmts(StmtGraph<?> cfg, Stmt stmt, SymbolicState state, int depth, Context ctx,
-            ValueToZ3Transformer transformer) throws InterruptedException {
-        if (stmt instanceof JAssignStmt) {
-            handleAssignStmt((JAssignStmt) stmt, state, transformer);
-        } else if (stmt instanceof JIdentityStmt) {
-            handleIdentityStmt((JIdentityStmt) stmt, state, transformer);
+    private List<SymbolicState> handleOtherStmts(StmtGraph<?> cfg, Stmt stmt, SymbolicState state, Context ctx,
+            ValueToZ3Transformer transformer) {
+        // Handle assignments (Assign, Identity)
+        if (stmt instanceof AbstractDefinitionStmt) {
+            AbstractDefinitionStmt defStmt = (AbstractDefinitionStmt) stmt;
+            Expr<?> rightExpr = transformer.transform(defStmt.getRightOp());
+            state.setVariable(defStmt.getLeftOp().toString(), rightExpr);
         }
 
+        List<SymbolicState> newStates = new ArrayList<SymbolicState>();
         List<Stmt> succs = cfg.getAllSuccessors(stmt);
         for (int i = 0; i < succs.size(); i++) {
             SymbolicState newState = i == succs.size() - 1 ? state : state.clone();
-            exploreCFG(cfg, succs.get(i), newState, depth, ctx);
+            newState.setCurrentStmt(succs.get(i));
+            newStates.add(newState);
         }
-    }
 
-    private void handleAssignStmt(JAssignStmt stmt, SymbolicState state, ValueToZ3Transformer transformer) {
-        Expr<?> rightExpr = transformer.transform(stmt.getRightOp());
-        state.setVariable(stmt.getLeftOp().toString(), rightExpr);
-    }
-
-    private void handleIdentityStmt(JIdentityStmt stmt, SymbolicState state, ValueToZ3Transformer transformer) {
-        Expr<?> rightExpr = transformer.transform(stmt.getRightOp());
-        state.setVariable(stmt.getLeftOp().toString(), rightExpr);
+        return newStates;
     }
 
     private void printFinalState(SymbolicState state, Context ctx) {
