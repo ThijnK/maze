@@ -60,7 +60,7 @@ public class SymbolicExecutor {
             List<IntConstant> values = switchStmt.getValues();
 
             for (int i = 0; i < succs.size(); i++) {
-                SymbolicState newState = i == 0 ? state : state.clone();
+                SymbolicState newState = i == succs.size() - 1 ? state : state.clone();
                 // FIXME: probably not entirely correct
                 newState.addPathCondition(
                         ctx.mkEq(ctx.mkConst(var, ctx.mkIntSort()), ctx.mkInt(values.get(i).getValue())));
@@ -81,7 +81,7 @@ public class SymbolicExecutor {
 
             List<Stmt> succs = cfg.getAllSuccessors(stmt);
             for (int i = 0; i < succs.size(); i++) {
-                SymbolicState newState = i == 0 ? state : state.clone();
+                SymbolicState newState = i == succs.size() - 1 ? state : state.clone();
                 exploreCFG(cfg, succs.get(i), newState, depth, ctx);
             }
         }
