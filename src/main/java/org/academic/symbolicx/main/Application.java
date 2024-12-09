@@ -14,7 +14,7 @@ public class Application {
     public static void main(String[] args) {
         try {
             StmtGraph<?> cfg = CFGGenerator.generateCFG("org.academic.symbolicx.examples.SimpleExample",
-                    "checkSign");
+                    "executionTree");
             // Get a URL to the CFG in the WebEditor
             String urlToWebeditor = DotExporter.createUrlToWebeditor(cfg);
             System.out.println("CFG: " + urlToWebeditor);
