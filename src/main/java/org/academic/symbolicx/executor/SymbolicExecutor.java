@@ -3,7 +3,10 @@ package org.academic.symbolicx.executor;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.academic.symbolicx.main.Application;
 import org.academic.symbolicx.strategy.SearchStrategy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.microsoft.z3.*;
 
@@ -14,6 +17,7 @@ import sootup.core.jimple.common.stmt.*;
 import sootup.core.jimple.javabytecode.stmt.JSwitchStmt;
 
 public class SymbolicExecutor {
+    private static final Logger logger = LoggerFactory.getLogger(Application.class);
     // Limit the depth of symbolic execution to avoid infinite loops
     private final int MAX_DEPTH = 20;
 
@@ -119,21 +123,17 @@ public class SymbolicExecutor {
     }
 
     private void printFinalState(SymbolicState state, Solver solver) {
-        System.out.println("Final state: " + state);
+        logger.debug("Final state: " + state);
         solver.add(state.getPathCondition());
         Status status = solver.check();
         solver.reset();
+        logger.debug("Path condition " + status.toString());
         if (status == Status.SATISFIABLE) {
-            System.out.println("Path condition is satisfiable");
             try {
-                System.out.println("Model: " + solver.getModel());
+                logger.debug("Model: " + solver.getModel());
             } catch (Z3Exception e) {
-                System.out.println("Error: " + e.getMessage());
+                logger.error("Z3: " + e.getMessage());
             }
-        } else if (status == Status.UNKNOWN) {
-            System.out.println("Path condition is unknown");
-        } else {
-            System.out.println("Path condition is unsatisfiable");
         }
     }
 }

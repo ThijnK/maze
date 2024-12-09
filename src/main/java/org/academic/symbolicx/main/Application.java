@@ -4,6 +4,8 @@ import org.academic.symbolicx.cfg.CFGGenerator;
 import org.academic.symbolicx.executor.SymbolicExecutor;
 import org.academic.symbolicx.strategy.SearchStrategy;
 import org.academic.symbolicx.strategy.SearchStrategyFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.microsoft.z3.Context;
 
@@ -14,18 +16,20 @@ import sootup.core.util.DotExporter;
 // To specify a search strategy: mvn clean install exec:java -Dexec.args="DFS"
 
 public class Application {
+    private static final Logger logger = LoggerFactory.getLogger(Application.class);
+
     public static void main(String[] args) {
         try {
             String strategyName = args.length > 0 ? args[0] : "";
             SearchStrategy searchStrategy = SearchStrategyFactory.getStrategy(strategyName);
 
-            System.out.println("Using search strategy: " + searchStrategy.getClass().getSimpleName());
+            logger.info("Using search strategy: " + searchStrategy.getClass().getSimpleName());
 
             StmtGraph<?> cfg = CFGGenerator.generateCFG("org.academic.symbolicx.examples.SimpleExample",
                     "executionTree");
             // Get a URL to the CFG in the WebEditor
             String urlToWebeditor = DotExporter.createUrlToWebeditor(cfg);
-            System.out.println("CFG: " + urlToWebeditor);
+            logger.info("CFG: " + urlToWebeditor);
 
             Context ctx = new Context();
             SymbolicExecutor executor = new SymbolicExecutor();
