@@ -6,6 +6,9 @@ import java.util.Queue;
 
 import org.academic.symbolicx.executor.SymbolicState;
 
+/**
+ * A search strategy that explores states in a breadth-first manner.
+ */
 public class BFSSearchStrategy extends SearchStrategy {
     private Queue<SymbolicState> queue;
 

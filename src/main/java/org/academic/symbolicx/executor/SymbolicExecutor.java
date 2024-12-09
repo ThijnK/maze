@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.academic.symbolicx.strategy.DFSSearchStrategy;
+import org.academic.symbolicx.strategy.RandomPathSearchStrategy;
 import org.academic.symbolicx.strategy.SearchStrategy;
 
 import com.microsoft.z3.*;
@@ -31,12 +32,9 @@ public class SymbolicExecutor {
 
         SymbolicState current;
         while ((current = searchStrategy.next()) != null) {
-            if (current.isFinalState(cfg)) {
+            if (current.isFinalState(cfg) || current.incrementDepth() >= MAX_DEPTH) {
                 printFinalState(current, solver);
-                continue;
-            }
-            if (current.incrementDepth() >= MAX_DEPTH) {
-                // TODO: handle as final state?
+                searchStrategy.remove(current);
                 continue;
             }
 

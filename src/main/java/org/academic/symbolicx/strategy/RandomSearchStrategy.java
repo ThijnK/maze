@@ -6,6 +6,9 @@ import java.util.Random;
 
 import org.academic.symbolicx.executor.SymbolicState;
 
+/**
+ * A search strategy that explores states in a uniformly random manner.
+ */
 public class RandomSearchStrategy extends SearchStrategy {
     private List<SymbolicState> states;
     private Random random;

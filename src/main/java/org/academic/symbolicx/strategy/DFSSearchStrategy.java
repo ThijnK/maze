@@ -5,6 +5,9 @@ import java.util.Stack;
 
 import org.academic.symbolicx.executor.SymbolicState;
 
+/**
+ * A search strategy that explores states in a depth-first manner.
+ */
 public class DFSSearchStrategy extends SearchStrategy {
     private Stack<SymbolicState> stack;
 

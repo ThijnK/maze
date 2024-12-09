@@ -15,7 +15,8 @@ public abstract class SearchStrategy {
     /**
      * Get the next symbolic state to explore.
      * 
-     * @return The next symbolic state to explore
+     * @return The next symbolic state to explore, or null if there are no more
+     *         states to explore
      */
     public abstract SymbolicState next();
 
@@ -27,4 +28,16 @@ public abstract class SearchStrategy {
      * @param newStates The new symbolic states to add
      */
     public abstract void add(List<SymbolicState> newStates);
+
+    /**
+     * Remove a symbolic state from the search strategy.
+     * Used to remove final states from the search strategy.
+     * Optional method, can be left unimplemented, as it may not be needed by all
+     * search strategies.
+     * 
+     * @param state The symbolic state to remove
+     */
+    public void remove(SymbolicState state) {
+        // Default implementation does nothing
+    }
 }
