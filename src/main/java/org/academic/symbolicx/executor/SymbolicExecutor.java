@@ -41,7 +41,7 @@ public class SymbolicExecutor {
             }
 
             List<SymbolicState> newStates = step(cfg, current, ctx);
-            searchStrategy.add(current, newStates);
+            searchStrategy.add(newStates);
         }
     }
 

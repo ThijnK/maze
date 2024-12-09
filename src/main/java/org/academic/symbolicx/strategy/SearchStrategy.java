@@ -21,9 +21,10 @@ public abstract class SearchStrategy {
 
     /**
      * Add new symbolic states to the search strategy.
+     * In case a strategy needs to know the parent state, keep track of the current
+     * state inside the strategy, and update it in the next() method.
      * 
-     * @param parent    The parent symbolic state
      * @param newStates The new symbolic states to add
      */
-    public abstract void add(SymbolicState parent, List<SymbolicState> newStates);
+    public abstract void add(List<SymbolicState> newStates);
 }

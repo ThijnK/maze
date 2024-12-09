@@ -1,34 +1,35 @@
 package org.academic.symbolicx.strategy;
 
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Stack;
+import java.util.Queue;
 
 import org.academic.symbolicx.executor.SymbolicState;
 
-public class DFSSearchStrategy extends SearchStrategy {
-    private Stack<SymbolicState> stack;
+public class BFSSearchStrategy extends SearchStrategy {
+    private Queue<SymbolicState> queue;
 
-    public DFSSearchStrategy() {
-        stack = new Stack<>();
+    public BFSSearchStrategy() {
+        queue = new LinkedList<>();
     }
 
     @Override
     public void init(SymbolicState initialState) {
-        stack.push(initialState);
+        queue.add(initialState);
     }
 
     @Override
     public SymbolicState next() {
-        if (stack.isEmpty()) {
+        if (queue.isEmpty()) {
             return null;
         }
-        return stack.pop();
+        return queue.remove();
     }
 
     @Override
     public void add(List<SymbolicState> newStates) {
         for (SymbolicState state : newStates) {
-            stack.push(state);
+            queue.add(state);
         }
     }
 }
