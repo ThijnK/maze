@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.academic.symbolicx.strategy.DFSSearchStrategy;
-import org.academic.symbolicx.strategy.RandomPathSearchStrategy;
 import org.academic.symbolicx.strategy.SearchStrategy;
 
 import com.microsoft.z3.*;
@@ -70,14 +69,14 @@ public class SymbolicExecutor {
         List<SymbolicState> newStates = new ArrayList<SymbolicState>();
 
         // True branch
-        SymbolicState newState = state.clone(succs.get(0));
+        SymbolicState newState = state.clone(succs.get(1));
         BoolExpr condExpr = (BoolExpr) transformer.transform(cond);
         newState.addPathCondition(condExpr);
         newStates.add(newState);
 
         // False branch
         state.addPathCondition(ctx.mkNot(condExpr));
-        state.setCurrentStmt(succs.get(1));
+        state.setCurrentStmt(succs.get(0));
         newStates.add(state);
 
         return newStates;
