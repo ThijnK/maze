@@ -3,6 +3,9 @@ package org.academic.symbolicx.executor;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.academic.symbolicx.strategy.DFSSearchStrategy;
+import org.academic.symbolicx.strategy.SearchStrategy;
+
 import com.microsoft.z3.*;
 
 import sootup.core.graph.*;
@@ -21,27 +24,24 @@ public class SymbolicExecutor {
     public void execute(StmtGraph<?> cfg, Context ctx) {
         Stmt entry = cfg.getStartingStmt();
         SymbolicState initialState = new SymbolicState(ctx, entry);
-
         Solver solver = ctx.mkSolver();
-        List<SymbolicState> worklist = new ArrayList<SymbolicState>();
-        worklist.add(initialState);
 
-        // TODO: implement different search strategies
+        SearchStrategy searchStrategy = new DFSSearchStrategy();
+        searchStrategy.init(initialState);
 
-        while (!worklist.isEmpty()) {
-            SymbolicState state = worklist.remove(0);
-
-            if (state.isFinalState(cfg)) {
-                printFinalState(state, solver);
+        SymbolicState current;
+        while ((current = searchStrategy.next()) != null) {
+            if (current.isFinalState(cfg)) {
+                printFinalState(current, solver);
                 continue;
             }
-            if (state.incrementDepth() >= MAX_DEPTH) {
+            if (current.incrementDepth() >= MAX_DEPTH) {
                 // TODO: handle as final state?
                 continue;
             }
 
-            List<SymbolicState> newStates = step(cfg, state, ctx);
-            worklist.addAll(newStates);
+            List<SymbolicState> newStates = step(cfg, current, ctx);
+            searchStrategy.add(current, newStates);
         }
     }
 
@@ -131,8 +131,11 @@ public class SymbolicExecutor {
         solver.reset();
         if (status == Status.SATISFIABLE) {
             System.out.println("Path condition is satisfiable");
-            Model model = solver.getModel();
-            System.out.println("Model: " + model);
+            try {
+                System.out.println("Model: " + solver.getModel());
+            } catch (Z3Exception e) {
+                System.out.println("Error: " + e.getMessage());
+            }
         } else if (status == Status.UNKNOWN) {
             System.out.println("Path condition is unknown");
         } else {
