@@ -3,7 +3,6 @@ package org.academic.symbolicx.executor;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.academic.symbolicx.strategy.DFSSearchStrategy;
 import org.academic.symbolicx.strategy.SearchStrategy;
 
 import com.microsoft.z3.*;
@@ -21,13 +20,11 @@ public class SymbolicExecutor {
     /**
      * Execute the symbolic execution on the given control flow graph.
      */
-    public void execute(StmtGraph<?> cfg, Context ctx) {
+    public void execute(StmtGraph<?> cfg, Context ctx, SearchStrategy searchStrategy) {
         Stmt entry = cfg.getStartingStmt();
         SymbolicState initialState = new SymbolicState(ctx, entry);
-        Solver solver = ctx.mkSolver();
-
-        SearchStrategy searchStrategy = new DFSSearchStrategy();
         searchStrategy.init(initialState);
+        Solver solver = ctx.mkSolver();
 
         SymbolicState current;
         while ((current = searchStrategy.next()) != null) {
