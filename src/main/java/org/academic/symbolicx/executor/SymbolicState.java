@@ -12,21 +12,29 @@ public class SymbolicState {
     private Stmt currentStmt;
     private int currentDepth;
 
+    // TODO: maybe we don't want this map to be inside of the SymbolicState (avoid
+    // overhead in cloning etc.)
+    /** Reverse mapping from symbolic parameter value to variable names */
+    private Map<String, String> parameterValues;
+
     private Map<String, Expr<?>> symbolicVariables;
     private Context ctx;
     private BoolExpr pathCondition;
 
     public SymbolicState(Context ctx, Stmt stmt) {
         this.currentStmt = stmt;
+        this.parameterValues = new HashMap<>();
         this.symbolicVariables = new HashMap<>();
         this.ctx = ctx;
         this.pathCondition = ctx.mkTrue();
     }
 
-    public SymbolicState(Context ctx, Stmt stmt, int depth, Map<String, Expr<?>> symbolicVariables,
+    public SymbolicState(Context ctx, Stmt stmt, int depth, Map<String, String> parameterValues,
+            Map<String, Expr<?>> symbolicVariables,
             BoolExpr pathCondition) {
         this.currentStmt = stmt;
         this.currentDepth = depth;
+        this.parameterValues = parameterValues; // Reference is fine, as the parameter values can be shared
         this.symbolicVariables = new HashMap<>(symbolicVariables);
         this.ctx = ctx;
         this.pathCondition = pathCondition;
@@ -52,6 +60,14 @@ public class SymbolicState {
         return symbolicVariables.getOrDefault(var, null);
     }
 
+    public void setParameterValue(String parameter, String value) {
+        parameterValues.put(parameter, value);
+    }
+
+    public String getParameterValue(String parameter) {
+        return parameterValues.getOrDefault(parameter, null);
+    }
+
     public void addPathCondition(BoolExpr condition) {
         if (pathCondition.isTrue())
             pathCondition = condition;
@@ -68,7 +84,7 @@ public class SymbolicState {
     }
 
     public SymbolicState clone(Stmt stmt) {
-        return new SymbolicState(ctx, stmt, currentDepth, symbolicVariables, pathCondition);
+        return new SymbolicState(ctx, stmt, currentDepth, parameterValues, symbolicVariables, pathCondition);
     }
 
     public SymbolicState clone() {

@@ -2,9 +2,11 @@ package org.academic.symbolicx.executor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.academic.symbolicx.main.Application;
 import org.academic.symbolicx.strategy.SearchStrategy;
+import org.academic.symbolicx.util.Tuple;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,7 +26,8 @@ public class SymbolicExecutor {
     /**
      * Execute the symbolic execution on the given control flow graph.
      */
-    public void execute(StmtGraph<?> cfg, Context ctx, SearchStrategy searchStrategy) {
+    public List<Tuple<SymbolicState, Model>> execute(StmtGraph<?> cfg, Context ctx, SearchStrategy searchStrategy) {
+        List<Tuple<SymbolicState, Model>> results = new ArrayList<>();
         Stmt entry = cfg.getStartingStmt();
         SymbolicState initialState = new SymbolicState(ctx, entry);
         searchStrategy.init(initialState);
@@ -33,14 +36,19 @@ public class SymbolicExecutor {
         SymbolicState current;
         while ((current = searchStrategy.next()) != null) {
             if (current.isFinalState(cfg) || current.incrementDepth() >= MAX_DEPTH) {
-                printFinalState(current, solver);
+                Optional<Model> model = checkFinalState(current, solver);
                 searchStrategy.remove(current);
+                if (model.isPresent()) {
+                    results.add(new Tuple<>(current, model.get()));
+                }
                 continue;
             }
 
             List<SymbolicState> newStates = step(cfg, current, ctx);
             searchStrategy.add(newStates);
         }
+
+        return results;
     }
 
     /**
@@ -108,7 +116,13 @@ public class SymbolicExecutor {
         if (stmt instanceof AbstractDefinitionStmt) {
             AbstractDefinitionStmt defStmt = (AbstractDefinitionStmt) stmt;
             Expr<?> rightExpr = transformer.transform(defStmt.getRightOp());
-            state.setVariable(defStmt.getLeftOp().toString(), rightExpr);
+            String leftVar = defStmt.getLeftOp().toString();
+            state.setVariable(leftVar, rightExpr);
+
+            // In case of identity (e.g. parameter assignment), also record reverse mapping
+            if (defStmt instanceof JIdentityStmt && rightExpr != null) {
+                state.setParameterValue(rightExpr.toString(), leftVar);
+            }
         }
 
         List<SymbolicState> newStates = new ArrayList<SymbolicState>();
@@ -122,18 +136,23 @@ public class SymbolicExecutor {
         return newStates;
     }
 
-    private void printFinalState(SymbolicState state, Solver solver) {
+    /**
+     * Check if a given final state is satisfiable, and if so, return the model.
+     * 
+     * @param state  The final symbolic state
+     * @param solver The Z3 solver instance
+     * @return The model if the state is satisfiable, otherwise null
+     */
+    private Optional<Model> checkFinalState(SymbolicState state, Solver solver) {
         logger.debug("Final state: " + state);
         solver.add(state.getPathCondition());
         Status status = solver.check();
         logger.debug("Path condition " + status.toString());
+        Optional<Model> model = Optional.empty();
         if (status == Status.SATISFIABLE) {
-            try {
-                logger.debug("Model: " + solver.getModel());
-            } catch (Z3Exception e) {
-                logger.error("Z3: " + e.getMessage());
-            }
+            model = Optional.ofNullable(solver.getModel());
         }
         solver.reset();
+        return model;
     }
 }
