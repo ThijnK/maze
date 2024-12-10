@@ -126,7 +126,6 @@ public class SymbolicExecutor {
         logger.debug("Final state: " + state);
         solver.add(state.getPathCondition());
         Status status = solver.check();
-        solver.reset();
         logger.debug("Path condition " + status.toString());
         if (status == Status.SATISFIABLE) {
             try {
@@ -135,5 +134,6 @@ public class SymbolicExecutor {
                 logger.error("Z3: " + e.getMessage());
             }
         }
+        solver.reset();
     }
 }
