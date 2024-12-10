@@ -1,9 +1,13 @@
 package org.academic.symbolicx.strategy;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class SearchStrategyFactory {
+    private final static Logger logger = LoggerFactory.getLogger(SearchStrategyFactory.class);
+
     public static SearchStrategy getStrategy(String name) {
         switch (name) {
-            case "": // Default to DFS
             case "DFS":
             case "DFSSearchStrategy":
                 return new DFSSearchStrategy();
@@ -17,7 +21,8 @@ public class SearchStrategyFactory {
             case "RandomPathSearchStrategy":
                 return new RandomPathSearchStrategy();
             default:
-                throw new IllegalArgumentException("Unknown search strategy: " + name);
+                logger.warn("Unknown search strategy: " + name + ", using default strategy: DFS");
+                return new DFSSearchStrategy();
         }
     }
 }
