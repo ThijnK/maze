@@ -4,6 +4,8 @@ import com.microsoft.z3.Expr;
 import com.microsoft.z3.FuncDecl;
 import com.microsoft.z3.Model;
 
+import sootup.java.core.JavaSootMethod;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,7 +17,7 @@ import org.slf4j.LoggerFactory;
 public class JUnitTestCaseGenerator {
     private static final Logger logger = LoggerFactory.getLogger(JUnitTestCaseGenerator.class);
 
-    public void generateTestCases(List<Tuple<SymbolicState, Model>> models, String className, String methodName) {
+    public void generateTestCases(List<Tuple<SymbolicState, Model>> models, JavaSootMethod method) {
         logger.info("Generating JUnit test cases...");
         for (Tuple<SymbolicState, Model> tuple : models) {
             SymbolicState state = tuple.getX();
@@ -31,8 +33,10 @@ public class JUnitTestCaseGenerator {
             }
 
             // FIXME: better way to get class name and method name
-            testCase.append(String.format("   %s cut = new %s();\n", className, className));
-            testCase.append(String.format("   cut.%s(", methodName));
+            String className = method.getDeclaringClassType().getClassName();
+            String methodName = method.getName();
+            testCase.append(String.format("    %s cut = new %s();\n", className, className));
+            testCase.append(String.format("    cut.%s(", methodName));
             // FIXME: determine order of parameters, should be able to get that from method
             // signature
             testCase.append(String.join(", ", parameters));
