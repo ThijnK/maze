@@ -69,7 +69,6 @@ public class SymbolicExecutor {
      * @param ctx   The Z3 context
      */
     public List<SymbolicState> step(StmtGraph<?> cfg, SymbolicState state, Context ctx) {
-        // FIXME: probably better way of sharing transformers
         ValueToZ3Transformer transformer = new ValueToZ3Transformer(ctx, state);
         Stmt stmt = state.getCurrentStmt();
 

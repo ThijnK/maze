@@ -35,12 +35,12 @@ public class TestCaseGenerator {
                 parameters.add(param);
             }
 
-            // FIXME: better way to get class name and method name
+            // TODO: better way to get class name and method name
             String className = method.getDeclaringClassType().getClassName();
             String methodName = method.getName();
             testCase.append(String.format("    %s cut = new %s();\n", className, className));
             testCase.append(String.format("    cut.%s(", methodName));
-            // FIXME: determine order of parameters, should be able to get that from method
+            // TODO: determine order of parameters, should be able to get that from method
             // signature
             testCase.append(String.join(", ", parameters));
             testCase.append(");\n}\n");

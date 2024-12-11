@@ -170,7 +170,7 @@ public class ValueToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
 
     @Override
     public void caseLongConstant(@Nonnull LongConstant constant) {
-        // FIXME: need to use bitvectors to represent longs
+        // TODO: need to use bitvectors to represent longs
         setResult(ctx.mkInt(constant.getValue()));
     }
 
@@ -203,7 +203,7 @@ public class ValueToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
 
     @Override
     public void caseNullConstant(@Nonnull NullConstant constant) {
-        // FIXME null is represented as 0
+        // TODO null is represented as 0
         setResult(ctx.mkInt(0));
     }
 
@@ -249,10 +249,10 @@ public class ValueToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
 
     @Override
     public void caseInstanceFieldRef(@Nonnull JInstanceFieldRef ref) {
-        // FIXME: don't get the field value from SootUp, even if it's a constant
+        // TODO: don't get the field value from SootUp, even if it's a constant
         // for now, just make it symbolic
         FieldSignature sig = ref.getFieldSignature();
-        // FIXME: symbolic value of the name of the field (may be wrong)
+        // TODO: symbolic value of the name of the field (may be wrong)
         setResult(ctx.mkConst(sig.getName(), determineSort(sig.getType())));
     }
 
@@ -284,7 +284,7 @@ public class ValueToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
             // TODO: will arrays always be indexed by ints?
             return ctx.mkArraySort(ctx.mkIntSort(), elementSort);
         } else if (sootType instanceof ClassType) {
-            // FIXME: how to represent arbitrary classes including Strings?
+            // TODO: how to represent arbitrary classes including Strings?
             return ctx.mkIntSort();
         }
         // TODO: add other types

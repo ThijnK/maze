@@ -26,8 +26,6 @@ public class SymbolicState {
     private Stmt currentStmt;
     private int currentDepth;
 
-    // TODO: maybe we don't want this map to be inside of the SymbolicState (avoid
-    // overhead in cloning etc.)
     /** Reverse mapping from symbolic parameter value to variable names */
     private Map<String, String> parameterValues;
 
