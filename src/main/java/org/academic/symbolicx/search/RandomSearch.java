@@ -1,19 +1,19 @@
-package org.academic.symbolicx.strategy;
+package org.academic.symbolicx.search;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import org.academic.symbolicx.executor.SymbolicState;
+import org.academic.symbolicx.execution.SymbolicState;
 
 /**
  * A search strategy that explores states in a uniformly random manner.
  */
-public class RandomSearchStrategy extends SearchStrategy {
+public class RandomSearch extends SearchStrategy {
     private List<SymbolicState> states;
     private Random random;
 
-    public RandomSearchStrategy() {
+    public RandomSearch() {
         states = new ArrayList<>();
         random = new Random();
     }

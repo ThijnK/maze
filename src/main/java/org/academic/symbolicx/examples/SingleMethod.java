@@ -1,5 +1,8 @@
 package org.academic.symbolicx.examples;
 
+/**
+ * A simple example class with a single simple method.
+ */
 public class SingleMethod {
     /**
      * A simple method that demonstrates a more complex execution tree.

@@ -1,17 +1,17 @@
-package org.academic.symbolicx.strategy;
+package org.academic.symbolicx.search;
 
 import java.util.List;
 import java.util.Stack;
 
-import org.academic.symbolicx.executor.SymbolicState;
+import org.academic.symbolicx.execution.SymbolicState;
 
 /**
  * A search strategy that explores states in a depth-first manner.
  */
-public class DFSSearchStrategy extends SearchStrategy {
+public class DFSSearch extends SearchStrategy {
     private Stack<SymbolicState> stack;
 
-    public DFSSearchStrategy() {
+    public DFSSearch() {
         stack = new Stack<>();
     }
 

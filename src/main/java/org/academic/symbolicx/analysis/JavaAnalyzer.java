@@ -11,19 +11,27 @@ import sootup.java.core.JavaSootMethod;
 import sootup.java.core.types.JavaClassType;
 import sootup.java.core.views.JavaView;
 
-public class JavaAnalysis {
-    public static Set<JavaSootMethod> getMethods(String className) {
-        AnalysisInputLocation inputLocation = new JavaClassPathAnalysisInputLocation("target/classes");
-        JavaView view = new JavaView(inputLocation);
-        JavaIdentifierFactory identifierFactory = view.getIdentifierFactory();
+public class JavaAnalyzer {
+    private final AnalysisInputLocation inputLocation;
+    private final JavaView view;
 
+    public JavaAnalyzer(String classPath) {
+        inputLocation = new JavaClassPathAnalysisInputLocation(classPath);
+        view = new JavaView(inputLocation);
+    }
+
+    public JavaAnalyzer() {
+        this("target/classes");
+    }
+
+    public Set<JavaSootMethod> getMethods(String className) {
+        JavaIdentifierFactory identifierFactory = view.getIdentifierFactory();
         JavaClassType classType = identifierFactory.getClassType(className);
         JavaSootClass sootClass = view.getClass(classType).get();
-
         return sootClass.getMethods();
     }
 
-    public static StmtGraph<?> getCFG(JavaSootMethod method) {
+    public StmtGraph<?> getCFG(JavaSootMethod method) {
         return method.getBody().getStmtGraph();
     }
 }

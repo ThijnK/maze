@@ -1,4 +1,4 @@
-package org.academic.symbolicx.executor;
+package org.academic.symbolicx.execution;
 
 import java.util.HashMap;
 import java.util.Map;

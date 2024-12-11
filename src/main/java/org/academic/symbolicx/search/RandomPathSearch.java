@@ -1,33 +1,34 @@
-package org.academic.symbolicx.strategy;
+package org.academic.symbolicx.search;
 
 import java.util.List;
 import java.util.Random;
 
-import org.academic.symbolicx.executor.SymbolicState;
+import org.academic.symbolicx.execution.SymbolicState;
+import org.academic.symbolicx.util.Tree;
 
 /**
  * A search strategy that keeps track of the execution tree and selects the next
  * state to explore by walking the tree from the root to one of the leaves,
  * randomly selecting the branch to follow at each node.
  * 
- * Whereas the {@link RandomSearchStrategy} selects the next state to explore
+ * Whereas the {@link RandomSearch} selects the next state to explore
  * uniformly at random from the set of all states, this search strategy gives
  * preference to states that are closer to the root of the execution tree, and
  * thus have a lower path length. This helps to keep the path conditions shorter
  * and more manageable.
  */
-public class RandomPathSearchStrategy extends SearchStrategy {
-    private ExecutionTree<SymbolicState> tree;
-    private ExecutionTree.TreeNode<SymbolicState> current;
+public class RandomPathSearch extends SearchStrategy {
+    private Tree<SymbolicState> tree;
+    private Tree.TreeNode<SymbolicState> current;
     private Random random;
 
-    public RandomPathSearchStrategy() {
+    public RandomPathSearch() {
         random = new Random();
     }
 
     @Override
     public void init(SymbolicState initialState) {
-        tree = new ExecutionTree<>(initialState);
+        tree = new Tree<>(initialState);
     }
 
     @Override
@@ -36,7 +37,7 @@ public class RandomPathSearchStrategy extends SearchStrategy {
         // follow at each node
         current = tree.getRoot();
         while (current != null && !current.isLeaf()) {
-            List<ExecutionTree.TreeNode<SymbolicState>> children = current.getChildren();
+            List<Tree.TreeNode<SymbolicState>> children = current.getChildren();
             current = children.get(random.nextInt(children.size()));
         }
         return current != null ? current.getValue() : null;
@@ -55,7 +56,7 @@ public class RandomPathSearchStrategy extends SearchStrategy {
         if (current.getValue().equals(state)) {
             tree.removePath(current);
         } else {
-            ExecutionTree.TreeNode<SymbolicState> node = tree.findNode(state);
+            Tree.TreeNode<SymbolicState> node = tree.findNode(state);
             if (node != null) {
                 tree.removePath(node);
             }

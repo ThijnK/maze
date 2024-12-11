@@ -1,8 +1,8 @@
-package org.academic.symbolicx.strategy;
+package org.academic.symbolicx.search;
 
 import java.util.List;
 
-import org.academic.symbolicx.executor.SymbolicState;
+import org.academic.symbolicx.execution.SymbolicState;
 
 public abstract class SearchStrategy {
     /**

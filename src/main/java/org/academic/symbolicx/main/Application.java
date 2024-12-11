@@ -3,12 +3,12 @@ package org.academic.symbolicx.main;
 import java.util.List;
 import java.util.Set;
 
-import org.academic.symbolicx.analysis.JavaAnalysis;
-import org.academic.symbolicx.executor.SymbolicExecutor;
-import org.academic.symbolicx.executor.SymbolicState;
-import org.academic.symbolicx.generator.JUnitTestCaseGenerator;
-import org.academic.symbolicx.strategy.SearchStrategy;
-import org.academic.symbolicx.strategy.SearchStrategyFactory;
+import org.academic.symbolicx.analysis.JavaAnalyzer;
+import org.academic.symbolicx.execution.SymbolicExecutor;
+import org.academic.symbolicx.execution.SymbolicState;
+import org.academic.symbolicx.generation.TestCaseGenerator;
+import org.academic.symbolicx.search.SearchStrategy;
+import org.academic.symbolicx.search.SearchStrategyFactory;
 import org.academic.symbolicx.util.Tuple;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,14 +34,15 @@ public class Application {
             SearchStrategy searchStrategy = SearchStrategyFactory.getStrategy(strategyName);
             logger.info("Using search strategy: " + searchStrategy.getClass().getSimpleName());
 
+            JavaAnalyzer analyzer = new JavaAnalyzer();
             Context ctx = new Context();
             SymbolicExecutor executor = new SymbolicExecutor();
-            JUnitTestCaseGenerator generator = new JUnitTestCaseGenerator();
+            TestCaseGenerator generator = new TestCaseGenerator();
 
-            Set<JavaSootMethod> methods = JavaAnalysis.getMethods(className);
+            Set<JavaSootMethod> methods = analyzer.getMethods(className);
             for (JavaSootMethod method : methods) {
                 logger.info("Processing method: " + method.getName());
-                StmtGraph<?> cfg = JavaAnalysis.getCFG(method);
+                StmtGraph<?> cfg = analyzer.getCFG(method);
                 String urlToWebeditor = DotExporter.createUrlToWebeditor(cfg);
                 logger.info("CFG: " + urlToWebeditor);
 

@@ -1,5 +1,8 @@
 package org.academic.symbolicx.examples;
 
+/**
+ * A simple class with some simple example methods.
+ */
 public class SimpleExample {
     /**
      * A simple method that checks the sign of a number.

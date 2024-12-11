@@ -1,4 +1,4 @@
-package org.academic.symbolicx.generator;
+package org.academic.symbolicx.generation;
 
 import com.microsoft.z3.Expr;
 import com.microsoft.z3.FuncDecl;
@@ -9,13 +9,13 @@ import sootup.java.core.JavaSootMethod;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.academic.symbolicx.executor.SymbolicState;
+import org.academic.symbolicx.execution.SymbolicState;
 import org.academic.symbolicx.util.Tuple;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class JUnitTestCaseGenerator {
-    private static final Logger logger = LoggerFactory.getLogger(JUnitTestCaseGenerator.class);
+public class TestCaseGenerator {
+    private static final Logger logger = LoggerFactory.getLogger(TestCaseGenerator.class);
 
     public void generateTestCases(List<Tuple<SymbolicState, Model>> models, JavaSootMethod method) {
         logger.info("Generating JUnit test cases...");

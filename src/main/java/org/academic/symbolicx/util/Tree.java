@@ -1,4 +1,4 @@
-package org.academic.symbolicx.strategy;
+package org.academic.symbolicx.util;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,7 +9,7 @@ import java.util.List;
  *
  * @param <T> The type of value held in each node.
  */
-public class ExecutionTree<T> {
+public class Tree<T> {
 
     /**
      * Represents a node in the execution tree.
@@ -72,7 +72,7 @@ public class ExecutionTree<T> {
 
     private TreeNode<T> root;
 
-    public ExecutionTree(T rootValue) {
+    public Tree(T rootValue) {
         this.root = new TreeNode<>(rootValue, null);
     }
 

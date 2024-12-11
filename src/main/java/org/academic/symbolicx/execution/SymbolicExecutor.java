@@ -1,11 +1,11 @@
-package org.academic.symbolicx.executor;
+package org.academic.symbolicx.execution;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import org.academic.symbolicx.main.Application;
-import org.academic.symbolicx.strategy.SearchStrategy;
+import org.academic.symbolicx.search.SearchStrategy;
 import org.academic.symbolicx.util.Tuple;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
