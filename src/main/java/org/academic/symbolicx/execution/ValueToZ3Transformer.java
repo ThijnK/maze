@@ -38,6 +38,9 @@ import sootup.core.types.PrimitiveType.*;
 import sootup.core.types.ArrayType;
 import sootup.core.types.Type;
 
+/**
+ * Transforms a Jimple value ({@link Value}) to a Z3 expression.
+ */
 public class ValueToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
     Context ctx;
     SymbolicState state;
@@ -47,6 +50,12 @@ public class ValueToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
         this.state = state;
     }
 
+    /**
+     * Transform the given Jimple value to a Z3 expression.
+     * 
+     * @param value The Jimple value to transform
+     * @return The Z3 expression representing the Jimple value
+     */
     public Expr<?> transform(Value value) {
         value.accept(this);
         Expr<?> res = getResult();
@@ -255,6 +264,12 @@ public class ValueToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
 
     /**
      * Determine the Z3 sort for the given Soot type.
+     * 
+     * @param sootType The Soot type
+     * @return The Z3 sort
+     * @throws IllegalArgumentException If the type is not supported
+     * @see Sort
+     * @see Type
      */
     private Sort determineSort(Type sootType) {
         if (sootType instanceof IntType) {

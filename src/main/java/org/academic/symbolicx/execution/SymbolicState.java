@@ -8,6 +8,20 @@ import com.microsoft.z3.*;
 import sootup.core.graph.StmtGraph;
 import sootup.core.jimple.common.stmt.Stmt;
 
+/**
+ * Represents a symbolic state in the symbolic execution engine.
+ * 
+ * <p>
+ * A symbolic state consists of:
+ * <ul>
+ * <li>The current statement being executed</li>
+ * <li>The current depth of the symbolic execution</li>
+ * <li>A mapping from symbolic parameter values to variable names</li>
+ * <li>A mapping from variable names to symbolic values</li>
+ * <li>The path condition of the execution path leading to this state</li>
+ * </ul>
+ * </p>
+ */
 public class SymbolicState {
     private Stmt currentStmt;
     private int currentDepth;
@@ -68,7 +82,12 @@ public class SymbolicState {
         return parameterValues.getOrDefault(parameter, null);
     }
 
-    public void addPathCondition(BoolExpr condition) {
+    /**
+     * Adds a new path constraint to the current path condition.
+     * 
+     * @param condition The new path constraint to add
+     */
+    public void addPathConstraint(BoolExpr condition) {
         if (pathCondition.isTrue())
             pathCondition = condition;
         else

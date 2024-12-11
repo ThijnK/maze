@@ -3,9 +3,18 @@ package org.academic.symbolicx.search;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Factory class for creating search strategies.
+ */
 public class SearchStrategyFactory {
     private final static Logger logger = LoggerFactory.getLogger(SearchStrategyFactory.class);
 
+    /**
+     * Returns a search strategy based on the given name.
+     * 
+     * @param name The name of the search strategy
+     * @return A search strategy
+     */
     public static SearchStrategy getStrategy(String name) {
         switch (name) {
             case "DFS":

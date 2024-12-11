@@ -14,6 +14,9 @@ import org.academic.symbolicx.util.Tuple;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Generates JUnit test cases from a given Z3 model and symbolic state.
+ */
 public class TestCaseGenerator {
     private static final Logger logger = LoggerFactory.getLogger(TestCaseGenerator.class);
 
@@ -46,7 +49,12 @@ public class TestCaseGenerator {
         }
     }
 
-    /** Z3 Sort to java type as a String */
+    /**
+     * Get the Java type of the given Z3 expression.
+     * 
+     * @param value The Z3 expression
+     * @return The Java type of the Z3 expression as a string
+     */
     private String getJavaType(Expr<?> value) {
         if (value.isInt())
             return "int";

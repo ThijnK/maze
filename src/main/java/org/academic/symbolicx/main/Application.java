@@ -20,15 +20,32 @@ import sootup.core.graph.StmtGraph;
 import sootup.core.util.DotExporter;
 import sootup.java.core.JavaSootMethod;
 
-// To run the app (with default search strategy): mvn clean install exec:java
-// To specify a search strategy: mvn clean install exec:java -Dexec.args="DFS"
-
+/**
+ * The main class of the application.
+ * 
+ * <p>
+ * To run the application, execute the following command:
+ * 
+ * <pre>
+ * mvn clean install exec:java
+ * </pre>
+ * </p>
+ * 
+ * <p>
+ * To specify a search strategy, execute the following command:
+ * 
+ * <pre>
+ * mvn clean install exec:java -Dexec.args="DFS"
+ * </pre>
+ * </p>
+ */
 public class Application {
     private static final Logger logger = LoggerFactory.getLogger(Application.class);
 
-    public static void main(String[] args) {
-        String className = "org.academic.symbolicx.examples.SingleMethod";
+    // Temporary specification of which class to run the app on
+    private static final String className = "org.academic.symbolicx.examples.SingleMethod";
 
+    public static void main(String[] args) {
         try {
             String strategyName = args.length > 0 ? args[0] : "";
             SearchStrategy searchStrategy = SearchStrategyFactory.getStrategy(strategyName);

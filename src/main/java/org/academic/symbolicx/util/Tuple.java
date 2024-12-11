@@ -1,5 +1,8 @@
 package org.academic.symbolicx.util;
 
+/**
+ * Represents a tuple of two values x and y.
+ */
 public class Tuple<X, Y> {
     public final X x;
     public final Y y;

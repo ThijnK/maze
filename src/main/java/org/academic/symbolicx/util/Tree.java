@@ -2,6 +2,7 @@ package org.academic.symbolicx.util;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Represents a generic execution tree where each node can hold value of any
@@ -80,29 +81,42 @@ public class Tree<T> {
         return root;
     }
 
-    public TreeNode<T> findNode(T value) {
+    public Optional<TreeNode<T>> findNode(T value) {
         return findNode(root, value);
     }
 
-    public TreeNode<T> findNode(TreeNode<T> current, T value) {
+    /**
+     * Finds the node with the given value in the tree.
+     * 
+     * @param current The current node to search from
+     * @param value   The value to search for
+     * @return The node with the given value or null if not found
+     */
+    public Optional<TreeNode<T>> findNode(TreeNode<T> current, T value) {
         if (current == null) {
-            return null;
+            return Optional.empty();
         }
 
         if (current.getValue().equals(value)) {
-            return current;
+            return Optional.ofNullable(current);
         }
 
         for (TreeNode<T> child : current.getChildren()) {
-            TreeNode<T> result = findNode(child, value);
-            if (result != null) {
+            Optional<TreeNode<T>> result = findNode(child, value);
+            if (result.isPresent()) {
                 return result;
             }
         }
 
-        return null;
+        return Optional.empty();
     }
 
+    /**
+     * Removes the path from the given start node in both directions (up and down)
+     * by removing the start node and all its children.
+     * 
+     * @param startNode The node to start removing the path from
+     */
     public void removePath(TreeNode<T> startNode) {
         if (startNode == null) {
             return;

@@ -1,6 +1,7 @@
 package org.academic.symbolicx.search;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 
 import org.academic.symbolicx.execution.SymbolicState;
@@ -56,9 +57,9 @@ public class RandomPathSearch extends SearchStrategy {
         if (current.getValue().equals(state)) {
             tree.removePath(current);
         } else {
-            Tree.TreeNode<SymbolicState> node = tree.findNode(state);
-            if (node != null) {
-                tree.removePath(node);
+            Optional<Tree.TreeNode<SymbolicState>> node = tree.findNode(state);
+            if (node.isPresent()) {
+                tree.removePath(node.get());
             }
         }
     }
