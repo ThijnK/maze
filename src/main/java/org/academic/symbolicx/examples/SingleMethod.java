@@ -5,16 +5,30 @@ package org.academic.symbolicx.examples;
  */
 public class SingleMethod {
 
-    public int switchString(String x) {
-        switch (x) {
-            case "zero":
-                return 0;
-            case "one":
-                return 1;
-            case "two":
-                return 2;
-            default:
-                return -1;
+    /**
+     * A simple method that checks the sign of a number.
+     * 
+     * @param number The number to check
+     * @return "Positive" if the number is positive, "Negative" otherwise
+     */
+    public String checkSign(int number) {
+        if (number < 0) {
+            return "Negative";
+        } else {
+            return "Positive";
         }
     }
+
+    // public int switchString(String x) {
+    // switch (x) {
+    // case "zero":
+    // return 0;
+    // case "one":
+    // return 1;
+    // case "two":
+    // return 2;
+    // default:
+    // return -1;
+    // }
+    // }
 }
