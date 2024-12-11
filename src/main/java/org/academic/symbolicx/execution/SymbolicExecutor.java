@@ -125,15 +125,26 @@ public class SymbolicExecutor {
     private List<SymbolicState> handleSwitchStmt(StmtGraph<?> cfg, JSwitchStmt stmt, SymbolicState state, Context ctx,
             ValueToZ3Transformer transformer) {
         List<Stmt> succs = cfg.getAllSuccessors(stmt);
-        String var = stmt.getKey().toString();
+        Expr<?> var = state.getVariable(stmt.getKey().toString());
         List<IntConstant> values = stmt.getValues();
         List<SymbolicState> newStates = new ArrayList<SymbolicState>();
 
+        BoolExpr defaultCaseConstraint = null;
         for (int i = 0; i < succs.size(); i++) {
             SymbolicState newState = i == succs.size() - 1 ? state : state.clone();
-            // FIXME: check this implementation
-            newState.addPathConstraint(
-                    ctx.mkEq(ctx.mkConst(var, ctx.mkIntSort()), ctx.mkInt(values.get(i).getValue())));
+
+            // A successor beyond the number of values in the switch statement is the
+            // default case
+            if (i < values.size()) {
+                BoolExpr constraint = ctx.mkEq(var, ctx.mkInt(values.get(i).getValue()));
+                newState.addPathConstraint(constraint);
+                // Default case constraint is the negation of all other constraints
+                defaultCaseConstraint = defaultCaseConstraint != null
+                        ? ctx.mkAnd(defaultCaseConstraint, ctx.mkNot(constraint))
+                        : ctx.mkNot(constraint);
+            } else {
+                newState.addPathConstraint(defaultCaseConstraint);
+            }
             newState.setCurrentStmt(succs.get(i));
             newStates.add(newState);
         }

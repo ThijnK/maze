@@ -36,6 +36,7 @@ import sootup.core.jimple.visitor.AbstractValueVisitor;
 import sootup.core.signatures.FieldSignature;
 import sootup.core.types.PrimitiveType.*;
 import sootup.core.types.ArrayType;
+import sootup.core.types.ClassType;
 import sootup.core.types.Type;
 
 /**
@@ -267,7 +268,7 @@ public class ValueToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
      * 
      * @param sootType The Soot type
      * @return The Z3 sort
-     * @throws IllegalArgumentException If the type is not supported
+     * @throws UnsupportedOperationException If the type is not supported
      * @see Sort
      * @see Type
      */
@@ -282,10 +283,13 @@ public class ValueToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
             Sort elementSort = determineSort(((ArrayType) sootType).getElementType());
             // TODO: will arrays always be indexed by ints?
             return ctx.mkArraySort(ctx.mkIntSort(), elementSort);
+        } else if (sootType instanceof ClassType) {
+            // FIXME: how to represent arbitrary classes including Strings?
+            return ctx.mkIntSort();
         }
         // TODO: add other types
         else {
-            throw new IllegalArgumentException("Unsupported type: " + sootType);
+            throw new UnsupportedOperationException("Unsupported type: " + sootType);
         }
     }
 }
