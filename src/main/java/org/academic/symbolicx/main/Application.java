@@ -58,6 +58,11 @@ public class Application {
 
             Set<JavaSootMethod> methods = analyzer.getMethods(className);
             for (JavaSootMethod method : methods) {
+                // For now, skip the <init> method
+                if (method.getName().equals("<init>")) {
+                    continue;
+                }
+
                 logger.info("Processing method: " + method.getName());
                 StmtGraph<?> cfg = analyzer.getCFG(method);
                 String urlToWebeditor = DotExporter.createUrlToWebeditor(cfg);

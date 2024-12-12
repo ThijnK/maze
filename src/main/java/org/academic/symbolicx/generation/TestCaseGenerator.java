@@ -4,9 +4,12 @@ import com.microsoft.z3.Expr;
 import com.microsoft.z3.FuncDecl;
 import com.microsoft.z3.Model;
 
+import sootup.core.types.ClassType;
 import sootup.java.core.JavaSootMethod;
 
 import javax.lang.model.element.Modifier;
+
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,49 +26,51 @@ import com.palantir.javapoet.*;
 public class TestCaseGenerator {
     private static final Logger logger = LoggerFactory.getLogger(TestCaseGenerator.class);
 
-    // TODO: add imports
-
     public void generateTestCases(List<Tuple<SymbolicState, Model>> models, JavaSootMethod method) {
         logger.info("Generating JUnit test cases...");
 
-        String cutName = method.getDeclaringClassType().getClassName();
+        ClassType cutType = method.getDeclaringClassType();
+        String cutName = cutType.getClassName();
         TypeSpec.Builder classBuilder = TypeSpec.classBuilder(cutName + "Test")
                 .addModifiers(Modifier.PUBLIC);
-        // TODO: deal with <init> method (not a valid name for a test method)
         String testMethodName = "test" + capitalizeFirstLetter(method.getName());
 
-        for (int i = 0; i < models.size(); i++) {
-            Tuple<SymbolicState, Model> tuple = models.get(i);
-            SymbolicState state = tuple.getX();
-            Model model = tuple.getY();
+        try {
+            Class<?> cut = Class.forName(cutType.getFullyQualifiedName());
+            System.out.println(cut);
 
-            MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder(testMethodName + (i + 1))
-                    .addModifiers(Modifier.PUBLIC)
-                    .addAnnotation(Test.class)
-                    .returns(void.class);
+            for (int i = 0; i < models.size(); i++) {
+                Tuple<SymbolicState, Model> tuple = models.get(i);
+                SymbolicState state = tuple.getX();
+                Model model = tuple.getY();
 
-            List<String> parameters = new ArrayList<>();
-            for (FuncDecl<?> decl : model.getConstDecls()) {
-                String param = state.getParameterValue(decl.getName().toString());
-                Expr<?> value = model.getConstInterp(decl);
-                // TODO: convert expression to Java code as a string
-                methodBuilder.addStatement("$T $S = $S", getJavaType(value), param, value.toString());
-                parameters.add(param);
+                MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder(testMethodName + (i + 1))
+                        .addModifiers(Modifier.PUBLIC)
+                        .addAnnotation(Test.class)
+                        .returns(void.class);
+
+                List<String> parameters = new ArrayList<>();
+                for (FuncDecl<?> decl : model.getConstDecls()) {
+                    String param = state.getParameterValue(decl.getName().toString());
+                    Expr<?> value = model.getConstInterp(decl);
+                    methodBuilder.addStatement("$T $L = $L", getJavaType(value), param, value.toString());
+                    parameters.add(param);
+                }
+
+                // TODO: constructor may need arguments as well (deal with <init> method)
+                // TODO: somehow get the type of the actual class under test, so it imports it
+                methodBuilder.addStatement("$T cut = new $T()", cut, cut);
+                // TODO: correctly order the parameters
+                methodBuilder.addStatement("cut.$L($L)", method.getName(), String.join(", ", parameters));
+                classBuilder.addMethod(methodBuilder.build());
             }
 
-            methodBuilder.addStatement("$T cut = new $T()", cutName, cutName);
-            // TODO: correctly order the parameters
-            methodBuilder.addStatement("cut.$S($S)", method.getName(), String.join(", ", parameters));
-            classBuilder.addMethod(methodBuilder.build());
-        }
+            String packageName = "tests";
+            JavaFile javaFile = JavaFile
+                    .builder(packageName, classBuilder.build())
+                    .build();
+            javaFile.writeToPath(Path.of("src/test/java"));
 
-        // TODO: pacakge name may have to be changed, because it's not the exact package
-        // name of the CUT, but rather a package name for the test cases
-        JavaFile javaFile = JavaFile
-                .builder(method.getDeclaringClassType().getPackageName().toString(), classBuilder.build())
-                .build();
-        try {
-            javaFile.writeTo(System.out);
         } catch (Exception e) {
             logger.error("Failed to generate JUnit test cases: " + e.getMessage());
         }
