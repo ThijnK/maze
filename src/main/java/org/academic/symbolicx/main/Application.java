@@ -1,5 +1,6 @@
 package org.academic.symbolicx.main;
 
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Set;
 
@@ -17,6 +18,7 @@ import com.microsoft.z3.Model;
 import sootup.core.graph.StmtGraph;
 import sootup.core.util.DotExporter;
 import sootup.java.core.JavaSootMethod;
+import sootup.java.core.types.JavaClassType;
 
 /**
  * The main class of the application.
@@ -41,7 +43,7 @@ public class Application {
     private static final Logger logger = LoggerFactory.getLogger(Application.class);
 
     // Temporary specification of which class to run the app on
-    private static final String className = "org.academic.symbolicx.examples.SingleMethod";
+    private static final String className = "org.academic.symbolicx.examples.SimpleExample";
 
     public static void main(String[] args) {
         try {
@@ -52,9 +54,10 @@ public class Application {
             JavaAnalyzer analyzer = new JavaAnalyzer();
             Context ctx = new Context();
             SymbolicExecutor executor = new SymbolicExecutor();
-            TestCaseGenerator generator = new TestCaseGenerator();
 
-            Set<JavaSootMethod> methods = analyzer.getMethods(className);
+            JavaClassType classType = analyzer.getClassType(className);
+            Set<JavaSootMethod> methods = analyzer.getMethods(classType);
+            TestCaseGenerator generator = new TestCaseGenerator(classType);
             for (JavaSootMethod method : methods) {
                 // For now, skip the <init> method
                 if (method.getName().equals("<init>")) {
@@ -67,8 +70,10 @@ public class Application {
                 logger.info("CFG: " + urlToWebeditor);
 
                 List<Model> models = executor.execute(cfg, ctx, searchStrategy);
-                generator.generateTestCases(models, method);
+                generator.generateMethodTestCases(models, method);
             }
+
+            generator.writeToFile(Path.of("src/test/java"));
 
             ctx.close();
         } catch (Exception e) {

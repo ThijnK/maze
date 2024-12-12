@@ -4,8 +4,8 @@ import com.microsoft.z3.Expr;
 import com.microsoft.z3.FuncDecl;
 import com.microsoft.z3.Model;
 
-import sootup.core.types.ClassType;
 import sootup.java.core.JavaSootMethod;
+import sootup.java.core.types.JavaClassType;
 
 import javax.lang.model.element.Modifier;
 
@@ -19,55 +19,78 @@ import org.slf4j.LoggerFactory;
 import com.palantir.javapoet.*;
 
 /**
- * Generates JUnit test cases from a given Z3 model and symbolic state.
+ * Generates JUnit test cases from a given Z3 model and symbolic state for a
+ * single class under test.
  */
 public class TestCaseGenerator {
     private static final Logger logger = LoggerFactory.getLogger(TestCaseGenerator.class);
 
-    public void generateTestCases(List<Model> models, JavaSootMethod method) {
-        logger.info("Generating JUnit test cases...");
+    String testClassName;
+    TypeSpec.Builder classBuilder;
+    Class<?> cutType;
 
-        ClassType cutType = method.getDeclaringClassType();
-        String testClassName = cutType.getClassName() + "Test";
-        TypeSpec.Builder classBuilder = TypeSpec.classBuilder(testClassName)
+    public TestCaseGenerator(JavaClassType classType) throws ClassNotFoundException {
+        testClassName = classType.getClassName() + "Test";
+        classBuilder = TypeSpec.classBuilder(testClassName)
                 .addModifiers(Modifier.PUBLIC);
+        cutType = Class.forName(classType.getFullyQualifiedName());
+    }
+
+    /**
+     * Generates JUnit test cases for the given method based on the given models.
+     * 
+     * Each model represents a different input for the method, and thus will result
+     * in a separate test case.
+     * 
+     * @param models The models to generate test cases for
+     * @param method The method to generate test cases for
+     */
+    public void generateMethodTestCases(List<Model> models, JavaSootMethod method) {
+        logger.info("Generating JUnit test cases...");
         String testMethodName = "test" + capitalizeFirstLetter(method.getName());
 
-        try {
-            Class<?> cut = Class.forName(cutType.getFullyQualifiedName());
+        for (int i = 0; i < models.size(); i++) {
+            Model model = models.get(i);
 
-            for (int i = 0; i < models.size(); i++) {
-                Model model = models.get(i);
+            MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder(testMethodName + (i + 1))
+                    .addModifiers(Modifier.PUBLIC)
+                    .addAnnotation(Test.class)
+                    .returns(void.class);
 
-                MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder(testMethodName + (i + 1))
-                        .addModifiers(Modifier.PUBLIC)
-                        .addAnnotation(Test.class)
-                        .returns(void.class);
-
-                List<String> parameters = new ArrayList<>();
-                for (FuncDecl<?> decl : model.getConstDecls()) {
-                    String var = decl.getName().toString();
-                    Expr<?> value = model.getConstInterp(decl);
-                    methodBuilder.addStatement("$T $L = $L", getJavaType(value), var, value.toString());
-                    if (var.startsWith("p")) {
-                        parameters.add(var);
-                    }
+            List<String> parameters = new ArrayList<>();
+            for (FuncDecl<?> decl : model.getConstDecls()) {
+                String var = decl.getName().toString();
+                Expr<?> value = model.getConstInterp(decl);
+                methodBuilder.addStatement("$T $L = $L", getJavaType(value), var, value.toString());
+                if (var.startsWith("p")) {
+                    parameters.add(var);
                 }
-                // Sort the parameters to ensure they are in the correct order expected by the
-                // method
-                List<String> sortedParameters = parameters.stream().sorted().toList();
-
-                // TODO: constructor may need arguments as well (deal with <init> method)
-                methodBuilder.addStatement("$T cut = new $T()", cut, cut);
-                methodBuilder.addStatement("cut.$L($L)", method.getName(), String.join(", ", sortedParameters));
-                classBuilder.addMethod(methodBuilder.build());
             }
+            // Sort the parameters to ensure they are in the correct order expected by the
+            // method
+            List<String> sortedParameters = parameters.stream().sorted().toList();
 
+            // TODO: constructor may need arguments as well (deal with <init> method)
+            methodBuilder.addStatement("$T cut = new $T()", cutType, cutType);
+            methodBuilder.addStatement("cut.$L($L)", method.getName(), String.join(", ", sortedParameters));
+            classBuilder.addMethod(methodBuilder.build());
+        }
+    }
+
+    /**
+     * Writes the generated JUnit test cases for the current class to a file at the
+     * given path.
+     * 
+     * @param path The path to write the test cases to
+     */
+    public void writeToFile(Path path) {
+        try {
             String packageName = "tests";
             JavaFile javaFile = JavaFile
                     .builder(packageName, classBuilder.build())
+                    .addFileComment("Auto-generated by SymbolicX")
                     .build();
-            javaFile.writeToPath(Path.of("src/test/java"));
+            javaFile.writeToPath(path);
             logger.info("JUnit test cases written to src/test/java/" + packageName + "/" + testClassName + ".java");
         } catch (Exception e) {
             logger.error("Failed to generate JUnit test cases: " + e.getMessage());

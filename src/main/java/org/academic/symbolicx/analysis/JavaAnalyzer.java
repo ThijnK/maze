@@ -33,16 +33,25 @@ public class JavaAnalyzer {
     }
 
     /**
-     * Returns the methods of a class as a set of {@link JavaSootMethod} objects.
+     * Returns the {@link ClassType} of a class given its fully qualified name.
      * 
      * @param className The fully qualified name of the class (e.g.,
      *                  "org.academic.symbolicx.examples.SimpleExample")
+     * @return The {@link ClassType} of the class
+     */
+    public JavaClassType getClassType(String className) {
+        JavaIdentifierFactory identifierFactory = view.getIdentifierFactory();
+        return identifierFactory.getClassType(className);
+    }
+
+    /**
+     * Returns the methods of a class as a set of {@link JavaSootMethod} objects.
+     * 
+     * @param classType The class for which to return the methods
      * @return A set of {@link JavaSootMethod} objects representing the methods of
      *         the class
      */
-    public Set<JavaSootMethod> getMethods(String className) {
-        JavaIdentifierFactory identifierFactory = view.getIdentifierFactory();
-        JavaClassType classType = identifierFactory.getClassType(className);
+    public Set<JavaSootMethod> getMethods(JavaClassType classType) {
         JavaSootClass sootClass = view.getClass(classType).get();
         return sootClass.getMethods();
     }
