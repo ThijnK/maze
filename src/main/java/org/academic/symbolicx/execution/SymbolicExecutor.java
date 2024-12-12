@@ -2,13 +2,8 @@ package org.academic.symbolicx.execution;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
-import org.academic.symbolicx.main.Application;
 import org.academic.symbolicx.search.SearchStrategy;
-import org.academic.symbolicx.util.Tuple;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.microsoft.z3.*;
 
@@ -22,7 +17,6 @@ import sootup.core.jimple.javabytecode.stmt.JSwitchStmt;
  * Provides symbolic execution capabilities.
  */
 public class SymbolicExecutor {
-    private static final Logger logger = LoggerFactory.getLogger(Application.class);
     // Limit the depth of symbolic execution to avoid infinite loops
     private final int MAX_DEPTH = 20;
 
@@ -33,24 +27,19 @@ public class SymbolicExecutor {
      * @param cfg            The control flow graph of the method to analyze
      * @param ctx            The Z3 context
      * @param searchStrategy The search strategy to use
-     * @return A list of tuples ({@link Tuple}), each containing a symbolic state
-     *         and a model
+     * @return A list of final symbolic states
      */
-    public List<Model> execute(StmtGraph<?> cfg, Context ctx, SearchStrategy searchStrategy) {
-        List<Model> results = new ArrayList<>();
+    public List<SymbolicState> execute(StmtGraph<?> cfg, Context ctx, SearchStrategy searchStrategy) {
+        List<SymbolicState> finalStates = new ArrayList<>();
         Stmt entry = cfg.getStartingStmt();
         SymbolicState initialState = new SymbolicState(ctx, entry);
         searchStrategy.init(initialState);
-        Solver solver = ctx.mkSolver();
 
         SymbolicState current;
         while ((current = searchStrategy.next()) != null) {
             if (current.isFinalState(cfg) || current.incrementDepth() >= MAX_DEPTH) {
-                Optional<Model> model = checkFinalState(current, solver);
+                finalStates.add(current);
                 searchStrategy.remove(current);
-                if (model.isPresent()) {
-                    results.add(model.get());
-                }
                 continue;
             }
 
@@ -58,7 +47,7 @@ public class SymbolicExecutor {
             searchStrategy.add(newStates);
         }
 
-        return results;
+        return finalStates;
     }
 
     /**
@@ -180,25 +169,5 @@ public class SymbolicExecutor {
         }
 
         return newStates;
-    }
-
-    /**
-     * Check if a given final state is satisfiable, and if so, return the Z3 model.
-     * 
-     * @param state  The final symbolic state
-     * @param solver The Z3 solver instance
-     * @return The Z3 model if the state is satisfiable, otherwise null
-     */
-    private Optional<Model> checkFinalState(SymbolicState state, Solver solver) {
-        logger.debug("Final state: " + state);
-        solver.add(state.getPathCondition());
-        Status status = solver.check();
-        logger.debug("Path condition " + status.toString());
-        Optional<Model> model = Optional.empty();
-        if (status == Status.SATISFIABLE) {
-            model = Optional.ofNullable(solver.getModel());
-        }
-        solver.reset();
-        return model;
     }
 }

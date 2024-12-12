@@ -6,9 +6,12 @@ import java.util.Set;
 
 import org.academic.symbolicx.analysis.JavaAnalyzer;
 import org.academic.symbolicx.execution.SymbolicExecutor;
+import org.academic.symbolicx.execution.SymbolicState;
+import org.academic.symbolicx.execution.SymbolicStateValidator;
 import org.academic.symbolicx.generation.TestCaseGenerator;
 import org.academic.symbolicx.search.SearchStrategy;
 import org.academic.symbolicx.search.SearchStrategyFactory;
+import org.academic.symbolicx.util.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,6 +57,7 @@ public class Application {
             JavaAnalyzer analyzer = new JavaAnalyzer();
             Context ctx = new Context();
             SymbolicExecutor executor = new SymbolicExecutor();
+            SymbolicStateValidator validator = new SymbolicStateValidator(ctx);
 
             JavaClassType classType = analyzer.getClassType(className);
             Set<JavaSootMethod> methods = analyzer.getMethods(classType);
@@ -69,8 +73,9 @@ public class Application {
                 String urlToWebeditor = DotExporter.createUrlToWebeditor(cfg);
                 logger.info("CFG: " + urlToWebeditor);
 
-                List<Model> models = executor.execute(cfg, ctx, searchStrategy);
-                generator.generateMethodTestCases(models, method);
+                List<SymbolicState> finalStates = executor.execute(cfg, ctx, searchStrategy);
+                List<Pair<Model, SymbolicState>> results = validator.validate(finalStates);
+                generator.generateMethodTestCases(results, method);
             }
 
             generator.writeToFile(Path.of("src/test/java"));

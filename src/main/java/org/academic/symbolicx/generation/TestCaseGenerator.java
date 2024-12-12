@@ -13,6 +13,8 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.academic.symbolicx.execution.SymbolicState;
+import org.academic.symbolicx.util.Pair;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,12 +47,13 @@ public class TestCaseGenerator {
      * @param models The models to generate test cases for
      * @param method The method to generate test cases for
      */
-    public void generateMethodTestCases(List<Model> models, JavaSootMethod method) {
+    public void generateMethodTestCases(List<Pair<Model, SymbolicState>> results, JavaSootMethod method) {
         logger.info("Generating JUnit test cases...");
         String testMethodName = "test" + capitalizeFirstLetter(method.getName());
 
-        for (int i = 0; i < models.size(); i++) {
-            Model model = models.get(i);
+        for (int i = 0; i < results.size(); i++) {
+            Model model = results.get(i).getFirst();
+            SymbolicState state = results.get(i).getSecond();
 
             MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder(testMethodName + (i + 1))
                     .addModifiers(Modifier.PUBLIC)
@@ -113,6 +116,7 @@ public class TestCaseGenerator {
             return double.class;
         if (value.isString())
             return String.class;
+        // TODO: handle other types
         return Object.class;
     }
 
