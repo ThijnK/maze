@@ -1,8 +1,10 @@
-package org.academic.symbolicx.execution;
+package org.academic.symbolicx.transform;
 
 import java.util.function.BiFunction;
 
 import javax.annotation.Nonnull;
+
+import org.academic.symbolicx.execution.SymbolicState;
 
 import com.microsoft.z3.*;
 
@@ -42,11 +44,11 @@ import sootup.core.types.Type;
 /**
  * Transforms a Jimple value ({@link Value}) to a Z3 expression.
  */
-public class ValueToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
+public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
     Context ctx;
     SymbolicState state;
 
-    public ValueToZ3Transformer(Context ctx, SymbolicState state) {
+    public JimpleToZ3Transformer(Context ctx, SymbolicState state) {
         this.ctx = ctx;
         this.state = state;
     }

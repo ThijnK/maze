@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.academic.symbolicx.search.SearchStrategy;
+import org.academic.symbolicx.transform.JimpleToZ3Transformer;
 
 import com.microsoft.z3.*;
 
@@ -58,7 +59,7 @@ public class SymbolicExecutor {
      * @param ctx   The Z3 context
      */
     public List<SymbolicState> step(StmtGraph<?> cfg, SymbolicState state, Context ctx) {
-        ValueToZ3Transformer transformer = new ValueToZ3Transformer(ctx, state);
+        JimpleToZ3Transformer transformer = new JimpleToZ3Transformer(ctx, state);
         Stmt stmt = state.getCurrentStmt();
 
         if (stmt instanceof JIfStmt)
@@ -80,7 +81,7 @@ public class SymbolicExecutor {
      * @return A list of new symbolic states after executing the if statement
      */
     private List<SymbolicState> handleIfStmt(StmtGraph<?> cfg, JIfStmt stmt, SymbolicState state, Context ctx,
-            ValueToZ3Transformer transformer) {
+            JimpleToZ3Transformer transformer) {
         List<Stmt> succs = cfg.getAllSuccessors(stmt);
         AbstractConditionExpr cond = stmt.getCondition();
         List<SymbolicState> newStates = new ArrayList<SymbolicState>();
@@ -111,7 +112,7 @@ public class SymbolicExecutor {
      * @return A list of new symbolic states after executing the switch statement
      */
     private List<SymbolicState> handleSwitchStmt(StmtGraph<?> cfg, JSwitchStmt stmt, SymbolicState state, Context ctx,
-            ValueToZ3Transformer transformer) {
+            JimpleToZ3Transformer transformer) {
         List<Stmt> succs = cfg.getAllSuccessors(stmt);
         Expr<?> var = state.getVariable(stmt.getKey().toString());
         List<IntConstant> values = stmt.getValues();
@@ -151,7 +152,7 @@ public class SymbolicExecutor {
      * @return A list of new symbolic states after executing the statement
      */
     private List<SymbolicState> handleOtherStmts(StmtGraph<?> cfg, Stmt stmt, SymbolicState state, Context ctx,
-            ValueToZ3Transformer transformer) {
+            JimpleToZ3Transformer transformer) {
         // Handle assignments (Assign, Identity)
         if (stmt instanceof AbstractDefinitionStmt) {
             AbstractDefinitionStmt defStmt = (AbstractDefinitionStmt) stmt;
