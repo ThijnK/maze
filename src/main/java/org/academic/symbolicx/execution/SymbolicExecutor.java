@@ -36,8 +36,8 @@ public class SymbolicExecutor {
      * @return A list of tuples ({@link Tuple}), each containing a symbolic state
      *         and a model
      */
-    public List<Tuple<SymbolicState, Model>> execute(StmtGraph<?> cfg, Context ctx, SearchStrategy searchStrategy) {
-        List<Tuple<SymbolicState, Model>> results = new ArrayList<>();
+    public List<Model> execute(StmtGraph<?> cfg, Context ctx, SearchStrategy searchStrategy) {
+        List<Model> results = new ArrayList<>();
         Stmt entry = cfg.getStartingStmt();
         SymbolicState initialState = new SymbolicState(ctx, entry);
         searchStrategy.init(initialState);
@@ -49,7 +49,7 @@ public class SymbolicExecutor {
                 Optional<Model> model = checkFinalState(current, solver);
                 searchStrategy.remove(current);
                 if (model.isPresent()) {
-                    results.add(new Tuple<>(current, model.get()));
+                    results.add(model.get());
                 }
                 continue;
             }
@@ -169,11 +169,6 @@ public class SymbolicExecutor {
             Expr<?> rightExpr = transformer.transform(defStmt.getRightOp());
             String leftVar = defStmt.getLeftOp().toString();
             state.setVariable(leftVar, rightExpr);
-
-            // In case of identity (e.g. parameter assignment), also record reverse mapping
-            if (defStmt instanceof JIdentityStmt && rightExpr != null) {
-                state.setParameterValue(rightExpr.toString(), leftVar);
-            }
         }
 
         List<SymbolicState> newStates = new ArrayList<SymbolicState>();

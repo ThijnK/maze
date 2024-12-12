@@ -5,11 +5,9 @@ import java.util.Set;
 
 import org.academic.symbolicx.analysis.JavaAnalyzer;
 import org.academic.symbolicx.execution.SymbolicExecutor;
-import org.academic.symbolicx.execution.SymbolicState;
 import org.academic.symbolicx.generation.TestCaseGenerator;
 import org.academic.symbolicx.search.SearchStrategy;
 import org.academic.symbolicx.search.SearchStrategyFactory;
-import org.academic.symbolicx.util.Tuple;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,7 +66,7 @@ public class Application {
                 String urlToWebeditor = DotExporter.createUrlToWebeditor(cfg);
                 logger.info("CFG: " + urlToWebeditor);
 
-                List<Tuple<SymbolicState, Model>> models = executor.execute(cfg, ctx, searchStrategy);
+                List<Model> models = executor.execute(cfg, ctx, searchStrategy);
                 generator.generateTestCases(models, method);
             }
 

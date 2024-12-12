@@ -11,8 +11,8 @@ public class SingleMethod {
      * @param number The number to check
      * @return "Positive" if the number is positive, "Negative" otherwise
      */
-    public String checkSign(int number) {
-        if (number < 0) {
+    public String checkSign(int a, int b, int c, int d, int e, int f) {
+        if (a + b + c + d + e + f < 0) {
             return "Negative";
         } else {
             return "Positive";

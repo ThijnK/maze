@@ -13,8 +13,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.academic.symbolicx.execution.SymbolicState;
-import org.academic.symbolicx.util.Tuple;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,23 +24,20 @@ import com.palantir.javapoet.*;
 public class TestCaseGenerator {
     private static final Logger logger = LoggerFactory.getLogger(TestCaseGenerator.class);
 
-    public void generateTestCases(List<Tuple<SymbolicState, Model>> models, JavaSootMethod method) {
+    public void generateTestCases(List<Model> models, JavaSootMethod method) {
         logger.info("Generating JUnit test cases...");
 
         ClassType cutType = method.getDeclaringClassType();
-        String cutName = cutType.getClassName();
-        TypeSpec.Builder classBuilder = TypeSpec.classBuilder(cutName + "Test")
+        String testClassName = cutType.getClassName() + "Test";
+        TypeSpec.Builder classBuilder = TypeSpec.classBuilder(testClassName)
                 .addModifiers(Modifier.PUBLIC);
         String testMethodName = "test" + capitalizeFirstLetter(method.getName());
 
         try {
             Class<?> cut = Class.forName(cutType.getFullyQualifiedName());
-            System.out.println(cut);
 
             for (int i = 0; i < models.size(); i++) {
-                Tuple<SymbolicState, Model> tuple = models.get(i);
-                SymbolicState state = tuple.getX();
-                Model model = tuple.getY();
+                Model model = models.get(i);
 
                 MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder(testMethodName + (i + 1))
                         .addModifiers(Modifier.PUBLIC)
@@ -51,17 +46,20 @@ public class TestCaseGenerator {
 
                 List<String> parameters = new ArrayList<>();
                 for (FuncDecl<?> decl : model.getConstDecls()) {
-                    String param = state.getParameterValue(decl.getName().toString());
+                    String var = decl.getName().toString();
                     Expr<?> value = model.getConstInterp(decl);
-                    methodBuilder.addStatement("$T $L = $L", getJavaType(value), param, value.toString());
-                    parameters.add(param);
+                    methodBuilder.addStatement("$T $L = $L", getJavaType(value), var, value.toString());
+                    if (var.startsWith("p")) {
+                        parameters.add(var);
+                    }
                 }
+                // Sort the parameters to ensure they are in the correct order expected by the
+                // method
+                List<String> sortedParameters = parameters.stream().sorted().toList();
 
                 // TODO: constructor may need arguments as well (deal with <init> method)
-                // TODO: somehow get the type of the actual class under test, so it imports it
                 methodBuilder.addStatement("$T cut = new $T()", cut, cut);
-                // TODO: correctly order the parameters
-                methodBuilder.addStatement("cut.$L($L)", method.getName(), String.join(", ", parameters));
+                methodBuilder.addStatement("cut.$L($L)", method.getName(), String.join(", ", sortedParameters));
                 classBuilder.addMethod(methodBuilder.build());
             }
 
@@ -70,7 +68,7 @@ public class TestCaseGenerator {
                     .builder(packageName, classBuilder.build())
                     .build();
             javaFile.writeToPath(Path.of("src/test/java"));
-
+            logger.info("JUnit test cases written to src/test/java/" + packageName + "/" + testClassName + ".java");
         } catch (Exception e) {
             logger.error("Failed to generate JUnit test cases: " + e.getMessage());
         }

@@ -16,7 +16,6 @@ import sootup.core.jimple.common.stmt.Stmt;
  * <ul>
  * <li>The current statement being executed</li>
  * <li>The current depth of the symbolic execution</li>
- * <li>A mapping from symbolic parameter values to variable names</li>
  * <li>A mapping from variable names to symbolic values</li>
  * <li>The path condition of the execution path leading to this state</li>
  * </ul>
@@ -26,27 +25,21 @@ public class SymbolicState {
     private Stmt currentStmt;
     private int currentDepth;
 
-    /** Reverse mapping from symbolic parameter value to variable names */
-    private Map<String, String> parameterValues;
-
     private Map<String, Expr<?>> symbolicVariables;
     private Context ctx;
     private BoolExpr pathCondition;
 
     public SymbolicState(Context ctx, Stmt stmt) {
         this.currentStmt = stmt;
-        this.parameterValues = new HashMap<>();
         this.symbolicVariables = new HashMap<>();
         this.ctx = ctx;
         this.pathCondition = ctx.mkTrue();
     }
 
-    public SymbolicState(Context ctx, Stmt stmt, int depth, Map<String, String> parameterValues,
-            Map<String, Expr<?>> symbolicVariables,
+    public SymbolicState(Context ctx, Stmt stmt, int depth, Map<String, Expr<?>> symbolicVariables,
             BoolExpr pathCondition) {
         this.currentStmt = stmt;
         this.currentDepth = depth;
-        this.parameterValues = parameterValues; // Reference is fine, as the parameter values can be shared
         this.symbolicVariables = new HashMap<>(symbolicVariables);
         this.ctx = ctx;
         this.pathCondition = pathCondition;
@@ -72,14 +65,6 @@ public class SymbolicState {
         return symbolicVariables.getOrDefault(var, null);
     }
 
-    public void setParameterValue(String parameter, String value) {
-        parameterValues.put(parameter, value);
-    }
-
-    public String getParameterValue(String parameter) {
-        return parameterValues.getOrDefault(parameter, null);
-    }
-
     /**
      * Adds a new path constraint to the current path condition.
      * 
@@ -101,7 +86,7 @@ public class SymbolicState {
     }
 
     public SymbolicState clone(Stmt stmt) {
-        return new SymbolicState(ctx, stmt, currentDepth, parameterValues, symbolicVariables, pathCondition);
+        return new SymbolicState(ctx, stmt, currentDepth, symbolicVariables, pathCondition);
     }
 
     public SymbolicState clone() {
