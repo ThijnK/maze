@@ -31,9 +31,24 @@ public class SymbolicExecutor {
      * @return A list of final symbolic states
      */
     public List<SymbolicState> execute(StmtGraph<?> cfg, Context ctx, SearchStrategy searchStrategy) {
+        SymbolicState initialState = new SymbolicState(ctx, cfg.getStartingStmt());
+        return execute(cfg, ctx, searchStrategy, initialState);
+    }
+
+    /**
+     * Run symbolic execution on the given control flow graph, using the given
+     * search strategy and initial symbolic state.
+     * 
+     * @param cfg            The control flow graph of the method to analyze
+     * @param ctx            The Z3 context
+     * @param searchStrategy The search strategy to use
+     * @param initialState   The initial symbolic state
+     * @return A list of final symbolic states
+     */
+    public List<SymbolicState> execute(StmtGraph<?> cfg, Context ctx, SearchStrategy searchStrategy,
+            SymbolicState initialState) {
+        initialState.setCurrentStmt(cfg.getStartingStmt());
         List<SymbolicState> finalStates = new ArrayList<>();
-        Stmt entry = cfg.getStartingStmt();
-        SymbolicState initialState = new SymbolicState(ctx, entry);
         searchStrategy.init(initialState);
 
         SymbolicState current;
@@ -57,6 +72,7 @@ public class SymbolicExecutor {
      * @param cfg   The control flow graph
      * @param state The current symbolic state
      * @param ctx   The Z3 context
+     * @return A list of new symbolic states after executing the current statement
      */
     public List<SymbolicState> step(StmtGraph<?> cfg, SymbolicState state, Context ctx) {
         JimpleToZ3Transformer transformer = new JimpleToZ3Transformer(ctx, state);
