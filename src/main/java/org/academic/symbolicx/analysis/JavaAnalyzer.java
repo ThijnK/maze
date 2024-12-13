@@ -2,8 +2,13 @@ package org.academic.symbolicx.analysis;
 
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import sootup.core.graph.StmtGraph;
 import sootup.core.inputlocation.AnalysisInputLocation;
+import sootup.core.types.ClassType;
+import sootup.core.util.DotExporter;
 import sootup.java.bytecode.inputlocation.JavaClassPathAnalysisInputLocation;
 import sootup.java.core.JavaIdentifierFactory;
 import sootup.java.core.JavaSootClass;
@@ -20,6 +25,8 @@ import sootup.java.core.views.JavaView;
  * </p>
  */
 public class JavaAnalyzer {
+    private static final Logger logger = LoggerFactory.getLogger(JavaAnalyzer.class);
+
     private final AnalysisInputLocation inputLocation;
     private final JavaView view;
 
@@ -64,6 +71,9 @@ public class JavaAnalyzer {
      * @return The control flow graph of the method
      */
     public StmtGraph<?> getCFG(JavaSootMethod method) {
-        return method.getBody().getStmtGraph();
+        StmtGraph<?> cfg = method.getBody().getStmtGraph();
+        String urlToWebeditor = DotExporter.createUrlToWebeditor(cfg);
+        logger.info("CFG: " + urlToWebeditor);
+        return cfg;
     }
 }

@@ -19,7 +19,6 @@ import com.microsoft.z3.Context;
 import com.microsoft.z3.Model;
 
 import sootup.core.graph.StmtGraph;
-import sootup.core.util.DotExporter;
 import sootup.java.core.JavaSootMethod;
 import sootup.java.core.types.JavaClassType;
 
@@ -70,8 +69,6 @@ public class Application {
 
                 logger.info("Processing method: " + method.getName());
                 StmtGraph<?> cfg = analyzer.getCFG(method);
-                String urlToWebeditor = DotExporter.createUrlToWebeditor(cfg);
-                logger.info("CFG: " + urlToWebeditor);
 
                 List<SymbolicState> finalStates = executor.execute(cfg, ctx, searchStrategy);
                 List<Pair<Model, SymbolicState>> results = validator.validate(finalStates);
