@@ -22,11 +22,11 @@ import sootup.core.jimple.common.stmt.Stmt;
  * </p>
  */
 public class SymbolicState {
+    private Context ctx;
     private Stmt currentStmt;
     private int currentDepth;
 
     private Map<String, Expr<?>> symbolicVariables;
-    private Context ctx;
     private BoolExpr pathCondition;
 
     public SymbolicState(Context ctx, Stmt stmt) {

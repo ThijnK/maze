@@ -35,7 +35,6 @@ import sootup.core.jimple.common.ref.JParameterRef;
 import sootup.core.jimple.common.ref.JStaticFieldRef;
 import sootup.core.jimple.common.ref.JThisRef;
 import sootup.core.jimple.visitor.AbstractValueVisitor;
-import sootup.core.signatures.FieldSignature;
 import sootup.core.types.PrimitiveType.*;
 import sootup.core.types.ArrayType;
 import sootup.core.types.ClassType;
@@ -245,17 +244,15 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
 
     @Override
     public void caseStaticFieldRef(@Nonnull JStaticFieldRef ref) {
-        // TODO Auto-generated method stub
-        super.caseStaticFieldRef(ref);
+        // Note: ref.toString() will be e.g. "<org.a.s.e.SingleMethod: int x>"
+        // (but not abbreviated)
+        setResult(state.getVariable(ref.toString()));
     }
 
     @Override
     public void caseInstanceFieldRef(@Nonnull JInstanceFieldRef ref) {
-        // TODO: don't get the field value from SootUp, even if it's a constant
-        // for now, just make it symbolic
-        FieldSignature sig = ref.getFieldSignature();
-        // TODO: symbolic value of the name of the field (may be wrong)
-        setResult(ctx.mkConst(sig.getName(), determineSort(sig.getType())));
+        // Note: ref.toString() will be e.g. "this.<org.a.s.e.SingleMethod: int x>"
+        setResult(state.getVariable(ref.toString()));
     }
 
     @Override
