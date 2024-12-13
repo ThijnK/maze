@@ -53,7 +53,7 @@ public class TestCaseGenerator {
 
         for (int i = 0; i < results.size(); i++) {
             Model model = results.get(i).getFirst();
-            SymbolicState state = results.get(i).getSecond();
+            // SymbolicState state = results.get(i).getSecond();
 
             MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder(testMethodName + (i + 1))
                     .addModifiers(Modifier.PUBLIC)
@@ -76,6 +76,9 @@ public class TestCaseGenerator {
             // TODO: constructor may need arguments as well (deal with <init> method)
             methodBuilder.addStatement("$T cut = new $T()", cutType, cutType);
             methodBuilder.addStatement("cut.$L($L)", method.getName(), String.join(", ", sortedParameters));
+
+            // TODO: add an assert for the path condition (convert Z3 expression to Java)
+
             classBuilder.addMethod(methodBuilder.build());
         }
     }
