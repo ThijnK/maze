@@ -72,7 +72,7 @@ public class Application {
 
                 List<SymbolicState> finalStates = executor.execute(cfg, ctx, searchStrategy);
                 List<Pair<Model, SymbolicState>> results = validator.validate(finalStates);
-                generator.generateMethodTestCases(results, method);
+                generator.generateMethodTestCases(results, method, ctx);
             }
 
             generator.writeToFile(Path.of("src/test/java"));

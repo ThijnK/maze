@@ -1,7 +1,10 @@
 package org.academic.symbolicx.generation;
 
+import com.microsoft.z3.BitVecExpr;
+import com.microsoft.z3.Context;
 import com.microsoft.z3.Expr;
 import com.microsoft.z3.FuncDecl;
+import com.microsoft.z3.IntExpr;
 import com.microsoft.z3.Model;
 
 import sootup.core.types.Type;
@@ -50,7 +53,7 @@ public class TestCaseGenerator {
      * @param models The models to generate test cases for
      * @param method The method to generate test cases for
      */
-    public void generateMethodTestCases(List<Pair<Model, SymbolicState>> results, JavaSootMethod method) {
+    public void generateMethodTestCases(List<Pair<Model, SymbolicState>> results, JavaSootMethod method, Context ctx) {
         logger.info("Generating JUnit test cases...");
         String testMethodName = "test" + capitalizeFirstLetter(method.getName());
 
@@ -64,13 +67,22 @@ public class TestCaseGenerator {
                     .returns(void.class);
 
             // First build a map of parameters for which Z3 provided the value
-            Map<String, String> knownParams = new HashMap<>();
+            Map<String, Expr<?>> knownParams = new HashMap<>();
             for (FuncDecl<?> decl : model.getConstDecls()) {
                 String var = decl.getName().toString();
                 Expr<?> value = model.getConstInterp(decl);
+
+                if (value.isBV()) {
+                    // TODO: may have to handle booleans differently
+                    // Convert unsigned bit vector to signed
+                    BitVecExpr bvValue = (BitVecExpr) value;
+                    IntExpr signedValue = ctx.mkBV2Int(bvValue, true); // true for signed
+                    value = model.evaluate(signedValue, true);
+                }
+
                 if (var.startsWith("p")) {
-                    // TODO: check if value.toString() always works
-                    knownParams.put(var, value.toString());
+
+                    knownParams.put(var, value);
                 }
             }
 
@@ -82,7 +94,10 @@ public class TestCaseGenerator {
                 params.add(var);
                 // TODO: what happens with object types?
                 if (knownParams.containsKey(var)) {
-                    methodBuilder.addStatement("$L $L = $L", paramTypes.get(j), var, knownParams.get(var));
+                    // TODO: handle type incompatibility, e.g. boolean as BV to actual bolean, BV to
+                    // char, etc.
+                    // can use the type of the parameter paramTypes[j] to determine how to convert
+                    methodBuilder.addStatement("$L $L = $L", paramTypes.get(j), var, knownParams.get(var).toString());
                 } else {
                     methodBuilder.addStatement("$L $L = $L", paramTypes.get(j), var,
                             getDefaultValue(paramTypes.get(j)));
