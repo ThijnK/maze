@@ -4,6 +4,7 @@ import com.microsoft.z3.Expr;
 import com.microsoft.z3.FuncDecl;
 import com.microsoft.z3.Model;
 
+import sootup.core.types.Type;
 import sootup.java.core.JavaSootMethod;
 import sootup.java.core.types.JavaClassType;
 
@@ -11,7 +12,9 @@ import javax.lang.model.element.Modifier;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.academic.symbolicx.execution.SymbolicState;
 import org.academic.symbolicx.util.Pair;
@@ -60,22 +63,35 @@ public class TestCaseGenerator {
                     .addAnnotation(Test.class)
                     .returns(void.class);
 
-            List<String> parameters = new ArrayList<>();
+            // First build a map of parameters for which Z3 provided the value
+            Map<String, String> knownParams = new HashMap<>();
             for (FuncDecl<?> decl : model.getConstDecls()) {
                 String var = decl.getName().toString();
                 Expr<?> value = model.getConstInterp(decl);
-                methodBuilder.addStatement("$T $L = $L", getJavaType(value), var, value.toString());
                 if (var.startsWith("p")) {
-                    parameters.add(var);
+                    // TODO: check if value.toString() always works
+                    knownParams.put(var, value.toString());
                 }
             }
-            // Sort the parameters to ensure they are in the correct order expected by the
-            // method
-            List<String> sortedParameters = parameters.stream().sorted().toList();
+
+            // Next, build a list of parameters and define their values
+            List<String> params = new ArrayList<>();
+            List<Type> paramTypes = method.getParameterTypes();
+            for (int j = 0; j < paramTypes.size(); j++) {
+                String var = "p" + j;
+                params.add(var);
+                // TODO: what happens with object types?
+                if (knownParams.containsKey(var)) {
+                    methodBuilder.addStatement("$L $L = $L", paramTypes.get(j), var, knownParams.get(var));
+                } else {
+                    methodBuilder.addStatement("$L $L = $L", paramTypes.get(j), var,
+                            getDefaultValue(paramTypes.get(j)));
+                }
+            }
 
             // TODO: constructor may need arguments as well (deal with <init> method)
             methodBuilder.addStatement("$T cut = new $T()", cutType, cutType);
-            methodBuilder.addStatement("cut.$L($L)", method.getName(), String.join(", ", sortedParameters));
+            methodBuilder.addStatement("cut.$L($L)", method.getName(), String.join(", ", params));
 
             // TODO: add an assert for the path condition (convert Z3 expression to Java)
 
@@ -104,23 +120,34 @@ public class TestCaseGenerator {
     }
 
     /**
-     * Get the Java type of the given Z3 expression.
+     * Gets the default value for the given type.
+     * Useful when solver does not provide a value for a parameter (in cases where
+     * the parameter does not affect the execution path).
      * 
-     * @param value The Z3 expression
-     * @return The Java type of the Z3 expression as a string
+     * @param type The SootUp type
+     * @return The default value for the given type as a string
      */
-    private Class<?> getJavaType(Expr<?> value) {
-        if (value.isInt())
-            return int.class;
-        ;
-        if (value.isBool())
-            return boolean.class;
-        if (value.isReal())
-            return double.class;
-        if (value.isString())
-            return String.class;
-        // TODO: handle other types
-        return Object.class;
+    private String getDefaultValue(Type type) {
+        switch (type.toString()) {
+            case "int":
+                return "0";
+            case "boolean":
+                return "false";
+            case "char":
+                return "'\\u0000'";
+            case "byte":
+                return "(byte) 0";
+            case "short":
+                return "(short) 0";
+            case "long":
+                return "0L";
+            case "float":
+                return "0.0f";
+            case "double":
+                return "0.0";
+            default:
+                return "null";
+        }
     }
 
     private String capitalizeFirstLetter(String str) {
