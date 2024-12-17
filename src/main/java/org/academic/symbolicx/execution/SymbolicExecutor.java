@@ -174,6 +174,7 @@ public class SymbolicExecutor {
             AbstractDefinitionStmt defStmt = (AbstractDefinitionStmt) stmt;
             Expr<?> rightExpr = transformer.transform(defStmt.getRightOp());
             String leftVar = defStmt.getLeftOp().toString();
+            // TODO: handle leftVar as array (ctx.mkStore())
             state.setVariable(leftVar, rightExpr);
         }
 

@@ -19,6 +19,7 @@ import sootup.core.jimple.common.expr.JEqExpr;
 import sootup.core.jimple.common.expr.JGeExpr;
 import sootup.core.jimple.common.expr.JGtExpr;
 import sootup.core.jimple.common.expr.JLeExpr;
+import sootup.core.jimple.common.expr.JLengthExpr;
 import sootup.core.jimple.common.expr.JLtExpr;
 import sootup.core.jimple.common.expr.JMulExpr;
 import sootup.core.jimple.common.expr.JNeExpr;
@@ -102,8 +103,8 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
             return ctx.mkRealSort();
         } else if (sootType instanceof ArrayType) {
             Sort elementSort = determineSort(((ArrayType) sootType).getElementType());
-            // TODO: will arrays always be indexed by ints?
-            return ctx.mkArraySort(ctx.mkIntSort(), elementSort);
+            Sort indexSort = ctx.mkBitVecSort(Type.getValueBitSize(IntType.getInstance()));
+            return ctx.mkArraySort(indexSort, elementSort);
         } else if (sootType instanceof ClassType) {
             // TODO: how to represent arbitrary classes including Strings?
             return ctx.mkIntSort();
@@ -283,8 +284,8 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
 
     @Override
     public void caseArrayRef(@Nonnull JArrayRef ref) {
-        // TODO Auto-generated method stub
-        super.caseArrayRef(ref);
+        ArrayExpr<BitVecSort, ?> array = (ArrayExpr<BitVecSort, ?>) state.getVariable(ref.getBase().toString());
+        setResult(ctx.mkSelect(array, (BitVecExpr) transform(ref.getIndex())));
     }
 
     @Override
@@ -319,6 +320,12 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
         // TODO: handle casts
         // expr.getType() is the type being cast to
         setResult(innerExpr);
+    }
+
+    @Override
+    public void caseLengthExpr(@Nonnull JLengthExpr expr) {
+        // Introduce a symbolic variable to represent the length of the array
+        setResult(ctx.mkConst(expr.getOp() + "len", ctx.mkBitVecSort(Type.getValueBitSize(IntType.getInstance()))));
     }
     // #endregion
 }
