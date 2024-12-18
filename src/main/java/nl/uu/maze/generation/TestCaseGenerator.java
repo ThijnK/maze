@@ -38,7 +38,7 @@ public class TestCaseGenerator {
     Class<?> clazz;
 
     public TestCaseGenerator(Class<?> clazz) throws ClassNotFoundException {
-        testClassName = clazz.getName() + "Test";
+        testClassName = clazz.getSimpleName() + "Test";
         classBuilder = TypeSpec.classBuilder(testClassName)
                 .addModifiers(Modifier.PUBLIC);
         this.clazz = clazz;
