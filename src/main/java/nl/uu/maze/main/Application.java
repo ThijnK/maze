@@ -55,12 +55,13 @@ public class Application {
 
             JavaAnalyzer analyzer = new JavaAnalyzer();
             Context ctx = new Context();
-            SymbolicExecutor executor = new SymbolicExecutor();
+            SymbolicExecutor symbolic = new SymbolicExecutor();
             SymbolicStateValidator validator = new SymbolicStateValidator(ctx);
 
             JavaClassType classType = analyzer.getClassType(className);
             Set<JavaSootMethod> methods = analyzer.getMethods(classType);
-            TestCaseGenerator generator = new TestCaseGenerator(classType);
+            Class<?> clazz = analyzer.getJavaClass(classType);
+            TestCaseGenerator generator = new TestCaseGenerator(clazz);
             for (JavaSootMethod method : methods) {
                 // For now, skip the <init> method
                 if (method.getName().equals("<init>")) {
@@ -70,7 +71,7 @@ public class Application {
                 logger.info("Processing method: " + method.getName());
                 StmtGraph<?> cfg = analyzer.getCFG(method);
 
-                List<SymbolicState> finalStates = executor.execute(cfg, ctx, searchStrategy);
+                List<SymbolicState> finalStates = symbolic.execute(cfg, ctx, searchStrategy);
                 List<Pair<Model, SymbolicState>> results = validator.validate(finalStates);
                 generator.generateMethodTestCases(results, method, ctx);
             }

@@ -9,7 +9,6 @@ import com.microsoft.z3.Model;
 
 import sootup.core.types.Type;
 import sootup.java.core.JavaSootMethod;
-import sootup.java.core.types.JavaClassType;
 
 import javax.lang.model.element.Modifier;
 
@@ -36,13 +35,13 @@ public class TestCaseGenerator {
 
     String testClassName;
     TypeSpec.Builder classBuilder;
-    Class<?> cutType;
+    Class<?> clazz;
 
-    public TestCaseGenerator(JavaClassType classType) throws ClassNotFoundException {
-        testClassName = classType.getClassName() + "Test";
+    public TestCaseGenerator(Class<?> clazz) throws ClassNotFoundException {
+        testClassName = clazz.getName() + "Test";
         classBuilder = TypeSpec.classBuilder(testClassName)
                 .addModifiers(Modifier.PUBLIC);
-        cutType = Class.forName(classType.getFullyQualifiedName());
+        this.clazz = clazz;
     }
 
     /**
@@ -106,7 +105,7 @@ public class TestCaseGenerator {
             }
 
             // TODO: constructor may need arguments as well (deal with <init> method)
-            methodBuilder.addStatement("$T cut = new $T()", cutType, cutType);
+            methodBuilder.addStatement("$T cut = new $T()", clazz, clazz);
             methodBuilder.addStatement("cut.$L($L)", method.getName(), String.join(", ", params));
 
             // TODO: add an assert for the path condition (convert Z3 expression to Java)

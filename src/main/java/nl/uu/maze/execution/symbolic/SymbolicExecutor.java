@@ -20,6 +20,8 @@ public class SymbolicExecutor {
     // Limit the depth of symbolic execution to avoid infinite loops
     private final int MAX_DEPTH = 20;
 
+    // TODO: store the Z3 context and search strategy as fields?
+
     /**
      * Run symbolic execution on the given control flow graph, using the given
      * search strategy.

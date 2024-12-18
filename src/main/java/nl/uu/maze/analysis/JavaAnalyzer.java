@@ -1,5 +1,7 @@
 package nl.uu.maze.analysis;
 
+import java.lang.reflect.Method;
+import java.util.List;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -8,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import sootup.core.graph.StmtGraph;
 import sootup.core.inputlocation.AnalysisInputLocation;
 import sootup.core.types.ClassType;
+import sootup.core.types.Type;
 import sootup.core.util.DotExporter;
 import sootup.java.bytecode.inputlocation.JavaClassPathAnalysisInputLocation;
 import sootup.java.core.JavaIdentifierFactory;
@@ -49,6 +52,47 @@ public class JavaAnalyzer {
     public JavaClassType getClassType(String className) {
         JavaIdentifierFactory identifierFactory = view.getIdentifierFactory();
         return identifierFactory.getClassType(className);
+    }
+
+    /**
+     * Returns the Java class of a SootUp class type.
+     * 
+     * @param classType The class type for which to return the Java class
+     * @return The Java class
+     * @throws ClassNotFoundException If the class cannot be found
+     */
+    public Class<?> getJavaClass(ClassType classType) throws ClassNotFoundException {
+        return Class.forName(classType.getFullyQualifiedName());
+    }
+
+    /**
+     * Returns the Java method of a given SootUp method.
+     * 
+     * @param method The method for which to return the Java method
+     * @param clazz  The Java class in which the method is defined
+     * @return The Java method
+     * @throws NoSuchMethodException If the method cannot be found
+     */
+    public Method getJavaMethod(JavaSootMethod method, Class<?> clazz) throws NoSuchMethodException {
+        List<Type> parameterTypes = method.getParameterTypes();
+        Class<?>[] parameterClasses = parameterTypes.stream().map(type -> type.getClass()).toArray(Class<?>[]::new);
+        return clazz.getMethod(method.getName(), parameterClasses);
+    }
+
+    /**
+     * Returns the Java method of a given SootUp method.
+     * If you already have the Java class of the method, use the other
+     * {@link #getJavaMethod(JavaSootMethod, Class)} method instead.
+     * 
+     * @param method The method for which to return the Java method
+     * @return The Java method
+     * @throws ClassNotFoundException If the class cannot be found
+     * @throws NoSuchMethodException  If the method cannot be found
+     */
+    public Method getJavaMethod(JavaSootMethod method) throws ClassNotFoundException, NoSuchMethodException {
+        ClassType classType = method.getDeclaringClassType();
+        Class<?> clazz = getJavaClass(classType);
+        return getJavaMethod(method, clazz);
     }
 
     /**
