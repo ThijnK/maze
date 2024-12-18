@@ -1,6 +1,8 @@
 package nl.uu.maze.execution.symbolic;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.microsoft.z3.*;
@@ -27,22 +29,22 @@ public class SymbolicState {
     private int currentDepth;
 
     private Map<String, Expr<?>> symbolicVariables;
-    private BoolExpr pathCondition;
+    private List<BoolExpr> pathConstraints;
 
     public SymbolicState(Context ctx, Stmt stmt) {
         this.currentStmt = stmt;
         this.symbolicVariables = new HashMap<>();
         this.ctx = ctx;
-        this.pathCondition = ctx.mkTrue();
+        this.pathConstraints = new ArrayList<>();
     }
 
     public SymbolicState(Context ctx, Stmt stmt, int depth, Map<String, Expr<?>> symbolicVariables,
-            BoolExpr pathCondition) {
+            List<BoolExpr> pathConstraints) {
         this.currentStmt = stmt;
         this.currentDepth = depth;
         this.symbolicVariables = new HashMap<>(symbolicVariables);
         this.ctx = ctx;
-        this.pathCondition = pathCondition;
+        this.pathConstraints = new ArrayList<>(pathConstraints);
     }
 
     public int incrementDepth() {
@@ -68,17 +70,23 @@ public class SymbolicState {
     /**
      * Adds a new path constraint to the current path condition.
      * 
-     * @param condition The new path constraint to add
+     * @param constraint The new path constraint to add
      */
-    public void addPathConstraint(BoolExpr condition) {
-        if (pathCondition.isTrue())
-            pathCondition = condition;
-        else
-            pathCondition = ctx.mkAnd(pathCondition, condition);
+    public void addPathConstraint(BoolExpr constraint) {
+        pathConstraints.add(constraint);
     }
 
+    /**
+     * Returns the path condition of the current state as the conjunction of all
+     * path constraints.
+     * 
+     * @return The path condition as a Z3 BoolExpr
+     */
     public BoolExpr getPathCondition() {
-        return pathCondition;
+        if (pathConstraints.isEmpty()) {
+            return ctx.mkTrue();
+        }
+        return ctx.mkAnd(pathConstraints.toArray(new BoolExpr[pathConstraints.size()]));
     }
 
     public boolean isFinalState(StmtGraph<?> cfg) {
@@ -86,7 +94,7 @@ public class SymbolicState {
     }
 
     public SymbolicState clone(Stmt stmt) {
-        return new SymbolicState(ctx, stmt, currentDepth, symbolicVariables, pathCondition);
+        return new SymbolicState(ctx, stmt, currentDepth, symbolicVariables, pathConstraints);
     }
 
     public SymbolicState clone() {
@@ -95,6 +103,6 @@ public class SymbolicState {
 
     @Override
     public String toString() {
-        return "State: " + symbolicVariables + ", PathCondition: " + pathCondition;
+        return "State: " + symbolicVariables + ", PC: " + getPathCondition();
     }
 }
