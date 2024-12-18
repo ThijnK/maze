@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import org.academic.symbolicx.execution.SymbolicState;
+import org.academic.symbolicx.execution.symbolic.SymbolicState;
 
 /**
  * A search strategy that explores states in a uniformly random manner.

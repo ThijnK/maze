@@ -2,7 +2,7 @@ package org.academic.symbolicx.search;
 
 import java.util.List;
 
-import org.academic.symbolicx.execution.SymbolicState;
+import org.academic.symbolicx.execution.symbolic.SymbolicState;
 
 public abstract class SearchStrategy {
     /**

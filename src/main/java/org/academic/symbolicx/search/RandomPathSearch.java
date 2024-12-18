@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 
-import org.academic.symbolicx.execution.SymbolicState;
+import org.academic.symbolicx.execution.symbolic.SymbolicState;
 import org.academic.symbolicx.util.Tree;
 
 /**

@@ -5,9 +5,9 @@ import java.util.List;
 import java.util.Set;
 
 import org.academic.symbolicx.analysis.JavaAnalyzer;
-import org.academic.symbolicx.execution.SymbolicExecutor;
-import org.academic.symbolicx.execution.SymbolicState;
-import org.academic.symbolicx.execution.SymbolicStateValidator;
+import org.academic.symbolicx.execution.symbolic.SymbolicExecutor;
+import org.academic.symbolicx.execution.symbolic.SymbolicState;
+import org.academic.symbolicx.execution.symbolic.SymbolicStateValidator;
 import org.academic.symbolicx.generation.TestCaseGenerator;
 import org.academic.symbolicx.search.SearchStrategy;
 import org.academic.symbolicx.search.SearchStrategyFactory;

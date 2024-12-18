@@ -1,4 +1,4 @@
-package org.academic.symbolicx.execution;
+package org.academic.symbolicx.execution.symbolic;
 
 import java.util.List;
 import java.util.ArrayList;

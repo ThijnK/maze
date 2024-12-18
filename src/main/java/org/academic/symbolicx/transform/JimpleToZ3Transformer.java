@@ -4,7 +4,7 @@ import java.util.function.BiFunction;
 
 import javax.annotation.Nonnull;
 
-import org.academic.symbolicx.execution.SymbolicState;
+import org.academic.symbolicx.execution.symbolic.SymbolicState;
 
 import com.microsoft.z3.*;
 

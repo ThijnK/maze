@@ -19,7 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.academic.symbolicx.execution.SymbolicState;
+import org.academic.symbolicx.execution.symbolic.SymbolicState;
 import org.academic.symbolicx.util.Pair;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;

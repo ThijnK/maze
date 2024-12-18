@@ -5,7 +5,7 @@ import com.microsoft.z3.BoolExpr;
 public class Z3ToJavaTransformer {
 
     public String transform(BoolExpr expr) {
-        // TODO: implement this, maybe make it a visitor pattern
+        // TODO: implement this (if applicable), maybe make it a visitor pattern
         return expr.toString();
     }
 

@@ -30,7 +30,7 @@ public class SearchStrategyFactory {
             case "RandomPathSearchStrategy":
                 return new RandomPathSearch();
             default:
-                logger.warn("Unknown search strategy: " + name + ", using default strategy: DFS");
+                logger.warn("Unknown search strategy: " + name + ", defaulting to DFS");
                 return new DFSSearch();
         }
     }
