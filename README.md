@@ -1,4 +1,4 @@
-# Symbolicx
+# Maze
 
 ## Installing Z3
 

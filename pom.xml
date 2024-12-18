@@ -4,13 +4,13 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.academic</groupId>
-    <artifactId>symbolicx</artifactId>
+    <groupId>nl.uu</groupId>
+    <artifactId>maze</artifactId>
     <version>1.0-SNAPSHOT</version>
 
-    <name>symbolicx</name>
-    <description>Symbolic execution engine for automated test generation.</description>
-    <url>https://github.com/yourusername/symbolicx</url>
+    <name>maze</name>
+    <description>Concolic execution engine for automated test generation.</description>
+    <url>https://github.com/ThijnK/maze</url>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -123,7 +123,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <mainClass>org.academic.symbolicx.main.Application</mainClass>
+                    <mainClass>nl.uu.main.Application</mainClass>
                 </configuration>
             </plugin>
 
