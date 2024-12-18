@@ -55,7 +55,7 @@ public class Application {
 
             JavaAnalyzer analyzer = new JavaAnalyzer();
             Context ctx = new Context();
-            SymbolicExecutor symbolic = new SymbolicExecutor();
+            SymbolicExecutor symbolic = new SymbolicExecutor(ctx, searchStrategy);
             SymbolicStateValidator validator = new SymbolicStateValidator(ctx);
 
             JavaClassType classType = analyzer.getClassType(className);
@@ -71,7 +71,7 @@ public class Application {
                 logger.info("Processing method: " + method.getName());
                 StmtGraph<?> cfg = analyzer.getCFG(method);
 
-                List<SymbolicState> finalStates = symbolic.execute(cfg, ctx, searchStrategy);
+                List<SymbolicState> finalStates = symbolic.execute(cfg);
                 List<Pair<Model, SymbolicState>> results = validator.validate(finalStates);
                 generator.generateMethodTestCases(results, method, ctx);
             }

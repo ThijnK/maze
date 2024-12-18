@@ -20,7 +20,13 @@ public class SymbolicExecutor {
     // Limit the depth of symbolic execution to avoid infinite loops
     private final int MAX_DEPTH = 20;
 
-    // TODO: store the Z3 context and search strategy as fields?
+    private Context ctx;
+    private SearchStrategy searchStrategy;
+
+    public SymbolicExecutor(Context ctx, SearchStrategy searchStrategy) {
+        this.ctx = ctx;
+        this.searchStrategy = searchStrategy;
+    }
 
     /**
      * Run symbolic execution on the given control flow graph, using the given
@@ -31,23 +37,21 @@ public class SymbolicExecutor {
      * @param searchStrategy The search strategy to use
      * @return A list of final symbolic states
      */
-    public List<SymbolicState> execute(StmtGraph<?> cfg, Context ctx, SearchStrategy searchStrategy) {
+    public List<SymbolicState> execute(StmtGraph<?> cfg) {
         SymbolicState initialState = new SymbolicState(ctx, cfg.getStartingStmt());
-        return execute(cfg, ctx, searchStrategy, initialState);
+        // Note: pass around the symbolic states to allow parallelization
+        return execute(cfg, initialState);
     }
 
     /**
      * Run symbolic execution on the given control flow graph, using the given
      * search strategy and initial symbolic state.
      * 
-     * @param cfg            The control flow graph of the method to analyze
-     * @param ctx            The Z3 context
-     * @param searchStrategy The search strategy to use
-     * @param initialState   The initial symbolic state
+     * @param cfg          The control flow graph of the method to analyze
+     * @param initialState The initial symbolic state
      * @return A list of final symbolic states
      */
-    public List<SymbolicState> execute(StmtGraph<?> cfg, Context ctx, SearchStrategy searchStrategy,
-            SymbolicState initialState) {
+    public List<SymbolicState> execute(StmtGraph<?> cfg, SymbolicState initialState) {
         initialState.setCurrentStmt(cfg.getStartingStmt());
         List<SymbolicState> finalStates = new ArrayList<>();
         searchStrategy.init(initialState);
@@ -60,7 +64,7 @@ public class SymbolicExecutor {
                 continue;
             }
 
-            List<SymbolicState> newStates = step(cfg, current, ctx);
+            List<SymbolicState> newStates = step(cfg, current);
             searchStrategy.add(newStates);
         }
 
@@ -75,16 +79,17 @@ public class SymbolicExecutor {
      * @param ctx   The Z3 context
      * @return A list of new symbolic states after executing the current statement
      */
-    public List<SymbolicState> step(StmtGraph<?> cfg, SymbolicState state, Context ctx) {
+    public List<SymbolicState> step(StmtGraph<?> cfg, SymbolicState state) {
+        // TODO: try to reuse transformer, while still allowing parallelization
         JimpleToZ3Transformer transformer = new JimpleToZ3Transformer(ctx, state);
         Stmt stmt = state.getCurrentStmt();
 
         if (stmt instanceof JIfStmt)
-            return handleIfStmt(cfg, (JIfStmt) stmt, state, ctx, transformer);
+            return handleIfStmt(cfg, (JIfStmt) stmt, state, transformer);
         else if (stmt instanceof JSwitchStmt)
-            return handleSwitchStmt(cfg, (JSwitchStmt) stmt, state, ctx, transformer);
+            return handleSwitchStmt(cfg, (JSwitchStmt) stmt, state, transformer);
         else
-            return handleOtherStmts(cfg, stmt, state, ctx, transformer);
+            return handleOtherStmts(cfg, stmt, state, transformer);
     }
 
     /**
@@ -97,7 +102,7 @@ public class SymbolicExecutor {
      * @param transformer The transformer to convert Jimple values to Z3 expressions
      * @return A list of new symbolic states after executing the if statement
      */
-    private List<SymbolicState> handleIfStmt(StmtGraph<?> cfg, JIfStmt stmt, SymbolicState state, Context ctx,
+    private List<SymbolicState> handleIfStmt(StmtGraph<?> cfg, JIfStmt stmt, SymbolicState state,
             JimpleToZ3Transformer transformer) {
         List<Stmt> succs = cfg.getAllSuccessors(stmt);
         AbstractConditionExpr cond = stmt.getCondition();
@@ -128,7 +133,7 @@ public class SymbolicExecutor {
      * @param transformer The transformer to convert Jimple values to Z3 expressions
      * @return A list of new symbolic states after executing the switch statement
      */
-    private List<SymbolicState> handleSwitchStmt(StmtGraph<?> cfg, JSwitchStmt stmt, SymbolicState state, Context ctx,
+    private List<SymbolicState> handleSwitchStmt(StmtGraph<?> cfg, JSwitchStmt stmt, SymbolicState state,
             JimpleToZ3Transformer transformer) {
         List<Stmt> succs = cfg.getAllSuccessors(stmt);
         Expr<?> var = state.getVariable(stmt.getKey().toString());
@@ -168,7 +173,7 @@ public class SymbolicExecutor {
      * @param transformer The transformer to convert Jimple values to Z3 expressions
      * @return A list of new symbolic states after executing the statement
      */
-    private List<SymbolicState> handleOtherStmts(StmtGraph<?> cfg, Stmt stmt, SymbolicState state, Context ctx,
+    private List<SymbolicState> handleOtherStmts(StmtGraph<?> cfg, Stmt stmt, SymbolicState state,
             JimpleToZ3Transformer transformer) {
         // Handle assignments (Assign, Identity)
         if (stmt instanceof AbstractDefinitionStmt) {
