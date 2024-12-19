@@ -3,6 +3,7 @@ package nl.uu.maze.analysis;
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -158,8 +159,11 @@ public class JavaAnalyzer {
      *         the class
      */
     public Set<JavaSootMethod> getMethods(JavaClassType classType) {
-        JavaSootClass sootClass = view.getClass(classType).get();
-        return sootClass.getMethods();
+        Optional<JavaSootClass> sootClass = view.getClass(classType);
+        if (sootClass.isEmpty()) {
+            throw new IllegalArgumentException("Class not found: " + classType.getFullyQualifiedName());
+        }
+        return sootClass.get().getMethods();
     }
 
     /**

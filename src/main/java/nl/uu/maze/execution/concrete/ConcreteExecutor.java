@@ -2,6 +2,7 @@ package nl.uu.maze.execution.concrete;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.Random;
 
 import org.slf4j.Logger;
@@ -30,15 +31,20 @@ public class ConcreteExecutor {
      */
     public void execute(Class<?> clazz, Method method) {
         try {
-            // Create an instance of the class
-            Object instance = createInstance(clazz);
-            if (instance == null) {
-                logger.error("Failed to create instance of class: " + clazz.getName());
-                return;
+            // Create an instance of the class if the method is not static
+            Object instance;
+            if (Modifier.isStatic(method.getModifiers())) {
+                instance = null;
+            } else {
+                instance = createInstance(clazz);
+                if (instance == null) {
+                    logger.error("Failed to create instance of class: " + clazz.getName());
+                    return;
+                }
             }
 
             Object[] args = generateArgs(method.getParameterTypes());
-            logger.debug("Executing method: " + method.getName() + " with args: " + printArgs(args));
+            logger.debug("Executing method " + method.getName() + " with args: " + printArgs(args));
             Object result = method.invoke(instance, args);
             logger.debug("Retval: " + (result == null ? "null" : result.toString()));
         } catch (Exception e) {

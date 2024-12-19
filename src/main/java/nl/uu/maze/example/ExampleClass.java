@@ -5,14 +5,8 @@ package nl.uu.maze.example;
  */
 public class ExampleClass {
 
-    private boolean isPositive;
-
-    public ExampleClass(int x) {
-        isPositive = x > 0;
-    }
-
-    public void print() {
-        if (isPositive) {
+    public static void print(int x) {
+        if (x > 0) {
             System.out.println("Positive");
         } else {
             System.out.println("Negative");
