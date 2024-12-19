@@ -1,4 +1,4 @@
-package org.academic.tests;
+package nl.uu.tests.maze;
 
 import static org.junit.jupiter.api.Assertions.*;
 import java.lang.reflect.Method;
@@ -8,33 +8,34 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import nl.uu.maze.analysis.JavaAnalyzer;
-import nl.uu.maze.examples.SimpleExample;
 import sootup.core.types.*;
 import sootup.core.types.PrimitiveType.*;
 import sootup.java.core.JavaSootMethod;
 import sootup.java.core.types.JavaClassType;
 
 public class JavaAnalyzerTest {
+    private static final String classPath = "target/test-classes";
+    private static final String className = "nl.uu.tests.maze.ExampleClass";
 
     private JavaAnalyzer analyzer;
 
     @BeforeEach
     public void setUp() {
-        analyzer = new JavaAnalyzer("target/classes");
+        analyzer = new JavaAnalyzer(classPath);
     }
 
     @Test
     public void testGetClassType() {
-        JavaClassType classType = analyzer.getClassType("nl.uu.maze.examples.SimpleExample");
+        JavaClassType classType = analyzer.getClassType(className);
         assertNotNull(classType);
-        assertEquals("nl.uu.maze.examples.SimpleExample", classType.getFullyQualifiedName());
+        assertEquals(className, classType.getFullyQualifiedName());
     }
 
     @Test
     public void testGetJavaClass_ClassType() throws ClassNotFoundException {
-        ClassType classType = analyzer.getClassType("nl.uu.maze.examples.SimpleExample");
+        ClassType classType = analyzer.getClassType(className);
         Class<?> clazz = analyzer.getJavaClass(classType);
-        assertEquals(SimpleExample.class, clazz);
+        assertEquals(ExampleClass.class, clazz);
     }
 
     @Test
@@ -104,17 +105,18 @@ public class JavaAnalyzerTest {
 
     @Test
     public void testGetJavaMethod() throws ClassNotFoundException, NoSuchMethodException {
-        JavaClassType classType = analyzer.getClassType("nl.uu.maze.examples.SimpleExample");
+        JavaClassType classType = analyzer.getClassType(className);
+        System.out.println(classType);
         Set<JavaSootMethod> methods = analyzer.getMethods(classType);
         JavaSootMethod method = methods.stream().filter(m -> m.getName().equals("checkSign")).findFirst().get();
         Method javaMethod = analyzer.getJavaMethod(method);
         assertNotNull(javaMethod);
-        assertEquals(SimpleExample.class.getMethod("checkSign", int.class), javaMethod);
+        assertEquals(ExampleClass.class.getMethod("checkSign", int.class), javaMethod);
     }
 
     @Test
     public void testGetMethods() {
-        JavaClassType classType = analyzer.getClassType("nl.uu.maze.examples.SimpleExample");
+        JavaClassType classType = analyzer.getClassType(className);
         Set<JavaSootMethod> methods = analyzer.getMethods(classType);
         assertNotNull(methods);
         assertFalse(methods.isEmpty());
@@ -122,7 +124,7 @@ public class JavaAnalyzerTest {
 
     @Test
     public void testGetCFG() {
-        JavaClassType classType = analyzer.getClassType("nl.uu.maze.examples.SimpleExample");
+        JavaClassType classType = analyzer.getClassType(className);
         Set<JavaSootMethod> methods = analyzer.getMethods(classType);
         JavaSootMethod method = methods.stream().filter(m -> m.getName().equals("checkSign")).findFirst().get();
         assertNotNull(analyzer.getCFG(method));
