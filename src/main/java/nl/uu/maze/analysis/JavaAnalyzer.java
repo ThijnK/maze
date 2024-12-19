@@ -1,5 +1,6 @@
 package nl.uu.maze.analysis;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Set;
@@ -9,8 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import sootup.core.graph.StmtGraph;
 import sootup.core.inputlocation.AnalysisInputLocation;
-import sootup.core.types.ClassType;
-import sootup.core.types.Type;
+import sootup.core.types.*;
 import sootup.core.util.DotExporter;
 import sootup.java.bytecode.inputlocation.JavaClassPathAnalysisInputLocation;
 import sootup.java.core.JavaIdentifierFactory;
@@ -55,14 +55,62 @@ public class JavaAnalyzer {
     }
 
     /**
-     * Returns the Java class of a SootUp class type.
+     * Returns the Java class of a SootUp type.
      * 
-     * @param classType The class type for which to return the Java class
+     * @param type The type for which to return the Java class
      * @return The Java class
-     * @throws ClassNotFoundException If the class cannot be found
+     * @throws ClassNotFoundException If a class cannot be found
      */
-    public Class<?> getJavaClass(ClassType classType) throws ClassNotFoundException {
-        return Class.forName(classType.getFullyQualifiedName());
+    public Class<?> getJavaClass(Type type) throws ClassNotFoundException {
+        if (type instanceof ClassType) {
+            return getJavaClass((ClassType) type);
+        } else if (type instanceof PrimitiveType) {
+            return getJavaClass((PrimitiveType) type);
+        } else if (type instanceof ArrayType) {
+            return getJavaClass((ArrayType) type);
+        } else if (type instanceof VoidType) {
+            return void.class;
+        } else if (type instanceof NullType) {
+            return null;
+        }
+
+        // Default to Object.class for ReferenceType and UnknownType
+        return Object.class;
+    }
+
+    /** Returns the Java class of a SootUp class type. */
+    private Class<?> getJavaClass(ClassType type) throws ClassNotFoundException {
+        return Class.forName(type.getFullyQualifiedName());
+    }
+
+    /** Returns the Java class of a SootUp primitive type. */
+    private Class<?> getJavaClass(PrimitiveType type) {
+        switch (type.getName()) {
+            case "int":
+                return int.class;
+            case "double":
+                return double.class;
+            case "float":
+                return float.class;
+            case "long":
+                return long.class;
+            case "short":
+                return short.class;
+            case "byte":
+                return byte.class;
+            case "char":
+                return char.class;
+            case "boolean":
+                return boolean.class;
+            default:
+                throw new IllegalArgumentException("Unsupported primitive type: " + type.getName());
+        }
+    }
+
+    /** Returns the Java class of a SootUp array type. */
+    private Class<?> getJavaClass(ArrayType type) throws ClassNotFoundException {
+        Class<?> elementType = getJavaClass(type.getElementType());
+        return Array.newInstance(elementType, 0).getClass();
     }
 
     /**
@@ -71,11 +119,18 @@ public class JavaAnalyzer {
      * @param method The method for which to return the Java method
      * @param clazz  The Java class in which the method is defined
      * @return The Java method
-     * @throws NoSuchMethodException If the method cannot be found
+     * @throws ClassNotFoundException If a class cannot be found
+     * @throws NoSuchMethodException  If the method cannot be found
      */
-    public Method getJavaMethod(JavaSootMethod method, Class<?> clazz) throws NoSuchMethodException {
+    public Method getJavaMethod(JavaSootMethod method, Class<?> clazz)
+            throws ClassNotFoundException, NoSuchMethodException {
         List<Type> parameterTypes = method.getParameterTypes();
-        Class<?>[] parameterClasses = parameterTypes.stream().map(type -> type.getClass()).toArray(Class<?>[]::new);
+        Class<?>[] parameterClasses = new Class[parameterTypes.size()];
+        for (int i = 0; i < parameterTypes.size(); i++) {
+            Type type = parameterTypes.get(i);
+            parameterClasses[i] = getJavaClass(type);
+        }
+
         return clazz.getMethod(method.getName(), parameterClasses);
     }
 
