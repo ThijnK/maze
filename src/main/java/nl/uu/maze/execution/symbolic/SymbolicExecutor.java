@@ -17,7 +17,7 @@ import sootup.core.jimple.javabytecode.stmt.JSwitchStmt;
  * Provides symbolic execution capabilities.
  */
 public class SymbolicExecutor {
-    // Limit the depth of symbolic execution to avoid infinite loops
+    /** Max path length for symbolic execution */
     private final int MAX_DEPTH = 20;
 
     private Context ctx;

@@ -5,20 +5,14 @@ package nl.uu.maze.example;
  */
 public class ExampleClass {
 
-    public class InnerClass {
-        int x;
+    private boolean isPositive;
 
-        public InnerClass(int x) {
-            this.x = x;
-        }
-
-        public int getX() {
-            return x;
-        }
+    public ExampleClass(int x) {
+        isPositive = x > 0;
     }
 
-    public ExampleClass(InnerClass inner) {
-        if (inner.getX() > 0) {
+    public void print() {
+        if (isPositive) {
             System.out.println("Positive");
         } else {
             System.out.println("Negative");
