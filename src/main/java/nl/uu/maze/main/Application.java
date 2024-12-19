@@ -14,7 +14,7 @@ import nl.uu.maze.analysis.JavaAnalyzer;
 import nl.uu.maze.execution.symbolic.SymbolicExecutor;
 import nl.uu.maze.execution.symbolic.SymbolicState;
 import nl.uu.maze.execution.symbolic.SymbolicStateValidator;
-import nl.uu.maze.generation.TestCaseGenerator;
+import nl.uu.maze.generation.JUnitTestGenerator;
 import nl.uu.maze.search.SearchStrategy;
 import nl.uu.maze.search.SearchStrategyFactory;
 import nl.uu.maze.util.Pair;
@@ -61,7 +61,7 @@ public class Application {
             JavaClassType classType = analyzer.getClassType(className);
             Set<JavaSootMethod> methods = analyzer.getMethods(classType);
             Class<?> clazz = analyzer.getJavaClass(classType);
-            TestCaseGenerator generator = new TestCaseGenerator(clazz);
+            JUnitTestGenerator generator = new JUnitTestGenerator(clazz);
             for (JavaSootMethod method : methods) {
                 // For now, skip the <init> method
                 if (method.getName().equals("<init>")) {

@@ -30,14 +30,14 @@ import nl.uu.maze.util.Pair;
  * Generates JUnit test cases from a given Z3 model and symbolic state for a
  * single class under test.
  */
-public class TestCaseGenerator {
-    private static final Logger logger = LoggerFactory.getLogger(TestCaseGenerator.class);
+public class JUnitTestGenerator {
+    private static final Logger logger = LoggerFactory.getLogger(JUnitTestGenerator.class);
 
     String testClassName;
     TypeSpec.Builder classBuilder;
     Class<?> clazz;
 
-    public TestCaseGenerator(Class<?> clazz) throws ClassNotFoundException {
+    public JUnitTestGenerator(Class<?> clazz) throws ClassNotFoundException {
         testClassName = clazz.getSimpleName() + "Test";
         classBuilder = TypeSpec.classBuilder(testClassName)
                 .addModifiers(Modifier.PUBLIC);
