@@ -17,6 +17,7 @@ import nl.uu.maze.execution.symbolic.SymbolicExecutor;
 import nl.uu.maze.execution.symbolic.SymbolicState;
 import nl.uu.maze.execution.symbolic.SymbolicStateValidator;
 import nl.uu.maze.generation.JUnitTestGenerator;
+import nl.uu.maze.instrument.BytecodeInstrumenter;
 import nl.uu.maze.search.SearchStrategy;
 import nl.uu.maze.search.SearchStrategyFactory;
 import nl.uu.maze.util.Pair;
@@ -65,6 +66,7 @@ public class Application {
             JavaClassType classType = analyzer.getClassType(className);
             Set<JavaSootMethod> methods = analyzer.getMethods(classType);
             Class<?> clazz = analyzer.getJavaClass(classType);
+            Class<?> instrumented = BytecodeInstrumenter.instrument(classPath, className);
             JUnitTestGenerator generator = new JUnitTestGenerator(clazz);
             for (JavaSootMethod method : methods) {
                 // For now, skip the <init> method
@@ -74,7 +76,7 @@ public class Application {
 
                 logger.info("Processing method: " + method.getName());
 
-                concrete.execute(clazz, analyzer.getJavaMethod(method, clazz));
+                concrete.execute(instrumented, analyzer.getJavaMethod(method, instrumented));
 
                 // StmtGraph<?> cfg = analyzer.getCFG(method);
                 // List<SymbolicState> finalStates = symbolic.execute(cfg);
