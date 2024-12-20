@@ -20,9 +20,6 @@ public class ConcreteExecutor {
         rand = new Random();
     }
 
-    // For inspiration:
-    // https://github.com/osl/jcute/blob/master/src/cute/RunOnce.java
-
     /**
      * Run concrete execution on the given method.
      * 
