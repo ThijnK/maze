@@ -10,7 +10,7 @@ public class TraceLogger {
 
     static {
         try {
-            FileWriter fw = new FileWriter(FILE_PATH, true);
+            FileWriter fw = new FileWriter(FILE_PATH, false);
             pw = new PrintWriter(fw);
         } catch (IOException e) {
             e.printStackTrace();
