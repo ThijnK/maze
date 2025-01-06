@@ -6,14 +6,19 @@ import java.io.PrintWriter;
 
 public class TraceLogger {
     private static final String FILE_PATH = "logs/trace.log";
+    private static PrintWriter pw;
 
-    // TODO: could probably be made more efficient
-    public static void log(String message) {
-        try (FileWriter fw = new FileWriter(FILE_PATH, true);
-                PrintWriter pw = new PrintWriter(fw)) {
-            pw.println(message);
+    static {
+        try {
+            FileWriter fw = new FileWriter(FILE_PATH, true);
+            pw = new PrintWriter(fw);
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public static void log(String message) {
+        pw.println(message);
+        pw.flush();
     }
 }

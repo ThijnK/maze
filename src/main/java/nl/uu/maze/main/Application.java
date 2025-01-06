@@ -84,7 +84,7 @@ public class Application {
                 // generator.generateMethodTestCases(results, method, ctx);
             }
 
-            generator.writeToFile(Path.of("src/test/java"));
+            // generator.writeToFile(Path.of("src/test/java"));
 
             ctx.close();
         } catch (Exception e) {
