@@ -85,12 +85,33 @@ public class BytecodeInstrumenter {
             super(api, methodVisitor, access, name, descriptor);
         }
 
-        // To handle if statements
+        // TODO: separate trace file per method? adjust TraceLogger to allow this?
+
+        // Instrument if statements to log the branch taken
         @Override
         public void visitJumpInsn(int opcode, Label label) {
             if (isConditionalJump(opcode)) {
-                logMessage("Branch " + opcodeToString(opcode));
-                logCondition(opcode);
+                instrumentTraceLog("Branch " + opcodeToString(opcode));
+                if (requiresTwoOperands(opcode)) {
+                    mv.visitInsn(Opcodes.DUP2);
+                } else {
+                    mv.visitInsn(Opcodes.DUP);
+                }
+
+                Label trueLabel = new Label();
+                Label falseLabel = new Label();
+                Label continueLabel = new Label();
+
+                mv.visitJumpInsn(opcode, trueLabel);
+                mv.visitLabel(falseLabel);
+                instrumentTraceLog("Condition FALSE");
+                mv.visitJumpInsn(Opcodes.GOTO, continueLabel);
+
+                mv.visitLabel(trueLabel);
+                instrumentTraceLog("Condition TRUE");
+                mv.visitJumpInsn(Opcodes.GOTO, continueLabel);
+
+                mv.visitLabel(continueLabel);
             }
 
             super.visitJumpInsn(opcode, label);
@@ -105,51 +126,60 @@ public class BytecodeInstrumenter {
             return opcode >= Opcodes.IF_ICMPEQ && opcode <= Opcodes.IFNONNULL;
         }
 
-        // To handle switch statements
+        // Handle sparse int switch statements (lookup switch)
         @Override
         public void visitLookupSwitchInsn(Label dflt, int[] keys, Label[] labels) {
-            // TODO Auto-generated method stub
-            // Should keep in memory some mapping between keys and labels
-            // Then at the next label, log the branch taken based on the key
+            instrumentTraceLog("Switch (lookup)");
+            mv.visitInsn(Opcodes.DUP);
+            Label[] dummyLbls = createDummyLabels(labels.length);
+            Label dummyDflt = new Label();
+            mv.visitLookupSwitchInsn(dummyDflt, keys, dummyLbls);
+            Label continueLabel = new Label();
+            for (int i = 0; i < keys.length; i++) {
+                mv.visitLabel(dummyLbls[i]);
+                instrumentTraceLog("Case " + keys[i] + " " + i);
+                mv.visitJumpInsn(Opcodes.GOTO, continueLabel);
+            }
+            mv.visitLabel(dummyDflt);
+            instrumentTraceLog("Case default");
+            mv.visitLabel(continueLabel);
+
             super.visitLookupSwitchInsn(dflt, keys, labels);
         }
 
+        // Handle dense int switch statements (table switch)
         @Override
         public void visitTableSwitchInsn(int min, int max, Label dflt, Label... labels) {
-            // Bytecode instruction for dense int switch: maps [min, max] to jump labels
+            instrumentTraceLog("Switch (table)");
+            mv.visitInsn(Opcodes.DUP);
+            Label[] dummyLbls = createDummyLabels(labels.length);
+            Label dummyDflt = new Label();
+            mv.visitTableSwitchInsn(min, max, dummyDflt, dummyLbls);
+            Label continueLabel = new Label();
+            for (int i = min; i <= max; i++) {
+                mv.visitLabel(dummyLbls[i - min]);
+                instrumentTraceLog("Case " + i + " " + (i - min));
+                mv.visitJumpInsn(Opcodes.GOTO, continueLabel);
+            }
+            mv.visitLabel(dummyDflt);
+            instrumentTraceLog("Case default");
+            mv.visitLabel(continueLabel);
 
-            // TODO Auto-generated method stub
             super.visitTableSwitchInsn(min, max, dflt, labels);
         }
 
         /** Insert code to log a symbolic trace message */
-        protected void logMessage(String message) {
+        private void instrumentTraceLog(String message) {
             mv.visitLdcInsn(message);
             mv.visitMethodInsn(Opcodes.INVOKESTATIC, LOGGER_CLASS_PATH, "log", "(Ljava/lang/String;)V", false);
         }
 
-        /** Insert code to evaluate and log a branch condition */
-        protected void logCondition(int opcode) {
-            if (requiresTwoOperands(opcode)) {
-                mv.visitInsn(Opcodes.DUP2);
-            } else {
-                mv.visitInsn(Opcodes.DUP);
+        private Label[] createDummyLabels(int size) {
+            Label[] labels = new Label[size];
+            for (int i = 0; i < size; i++) {
+                labels[i] = new Label();
             }
-
-            Label trueLabel = new Label();
-            Label falseLabel = new Label();
-            Label continueLabel = new Label();
-
-            mv.visitJumpInsn(opcode, trueLabel);
-            mv.visitLabel(falseLabel);
-            logMessage("Condition FALSE");
-            mv.visitJumpInsn(Opcodes.GOTO, continueLabel);
-
-            mv.visitLabel(trueLabel);
-            logMessage("Condition TRUE");
-            mv.visitJumpInsn(Opcodes.GOTO, continueLabel);
-
-            mv.visitLabel(continueLabel);
+            return labels;
         }
 
         private String opcodeToString(int opcode) {
