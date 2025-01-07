@@ -3,6 +3,7 @@ package nl.uu.maze.instrument;
 import org.objectweb.asm.*;
 import org.objectweb.asm.commons.AdviceAdapter;
 import org.objectweb.asm.util.TraceClassVisitor;
+import org.objectweb.asm.util.Printer;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -40,6 +41,7 @@ public class BytecodeInstrumenter {
         return classLoader.defineClass(className, instrumentedBytes);
     }
 
+    /** Write bytecode of a class to a file in human-readable format (opcodes) */
     private static void writeOpcodesToFile(byte[] classBytes) throws IOException {
         ClassReader classReader = new ClassReader(classBytes);
         try (PrintWriter writer = new PrintWriter(new FileWriter("logs/opcodes.txt"))) {
@@ -91,7 +93,7 @@ public class BytecodeInstrumenter {
         @Override
         public void visitJumpInsn(int opcode, Label label) {
             if (isConditionalJump(opcode)) {
-                instrumentTraceLog("Branch " + opcodeToString(opcode));
+                instrumentTraceLog("Branch " + Printer.OPCODES[opcode]);
                 if (requiresTwoOperands(opcode)) {
                     mv.visitInsn(Opcodes.DUP2);
                 } else {
@@ -180,45 +182,6 @@ public class BytecodeInstrumenter {
                 labels[i] = new Label();
             }
             return labels;
-        }
-
-        private String opcodeToString(int opcode) {
-            switch (opcode) {
-                case Opcodes.IFEQ:
-                    return "IFEQ";
-                case Opcodes.IFNE:
-                    return "IFNE";
-                case Opcodes.IFLT:
-                    return "IFLT";
-                case Opcodes.IFGE:
-                    return "IFGE";
-                case Opcodes.IFGT:
-                    return "IFGT";
-                case Opcodes.IFLE:
-                    return "IFLE";
-                case Opcodes.IF_ICMPEQ:
-                    return "IF_ICMPEQ";
-                case Opcodes.IF_ICMPNE:
-                    return "IF_ICMPNE";
-                case Opcodes.IF_ICMPLT:
-                    return "IF_ICMPLT";
-                case Opcodes.IF_ICMPGE:
-                    return "IF_ICMPGE";
-                case Opcodes.IF_ICMPGT:
-                    return "IF_ICMPGT";
-                case Opcodes.IF_ICMPLE:
-                    return "IF_ICMPLE";
-                case Opcodes.IF_ACMPEQ:
-                    return "IF_ACMPEQ";
-                case Opcodes.IF_ACMPNE:
-                    return "IF_ACMPNE";
-                case Opcodes.IFNULL:
-                    return "IFNULL";
-                case Opcodes.IFNONNULL:
-                    return "IFNONNULL";
-                default:
-                    return "UNKNOWN";
-            }
         }
     }
 }
