@@ -16,6 +16,13 @@ public class BytecodeInstrumenter {
     private static final String LOGGER_CLASS = TraceLogger.class.getName();
     private static final String LOGGER_CLASS_PATH = LOGGER_CLASS.replace('.', '/');
 
+    /**
+     * Instrument a class file to log symbolic traces.
+     * 
+     * @param classPath The path to the class file
+     * @param className The name of the class
+     * @return The instrumented class
+     */
     public static Class<?> instrument(String classPath, String className) throws IOException {
         String classString = className.replace(".", "/");
         String classFile = classPath + '/' + classString + ".class";
@@ -40,7 +47,7 @@ public class BytecodeInstrumenter {
         return classLoader.defineClass(className, instrumentedBytes);
     }
 
-    /** Write bytecode of a class to a file in human-readable format (opcodes) */
+    /** Write bytecode of a class to a file in human-readable format (opcodes). */
     private static void writeOpcodesToFile(byte[] classBytes) throws IOException {
         ClassReader classReader = new ClassReader(classBytes);
         try (PrintWriter writer = new PrintWriter(new FileWriter("logs/opcodes.txt"))) {
@@ -57,7 +64,7 @@ public class BytecodeInstrumenter {
         private final Map<String, Class<?>> classes = new HashMap<>();
 
         /**
-         * Register a class that is already loaded in the JVM to this class loader
+         * Register a class that is already loaded in the JVM to this class loader.
          * 
          * @param clazz The class to register
          */
@@ -72,7 +79,7 @@ public class BytecodeInstrumenter {
         }
 
         /**
-         * Define a class from a byte array
+         * Define a class from a byte array.
          * 
          * @param name       The name of the class
          * @param classBytes The byte array containing the class data
@@ -83,7 +90,7 @@ public class BytecodeInstrumenter {
         }
     }
 
-    /** Class visitor that instruments the class to log symbolic traces */
+    /** Class visitor that instruments the class to log symbolic traces. */
     static class SymbolicTraceClassVisitor extends ClassVisitor {
         public SymbolicTraceClassVisitor(ClassVisitor classVisitor) {
             super(Opcodes.ASM9, classVisitor);
@@ -141,7 +148,7 @@ public class BytecodeInstrumenter {
         }
 
         /**
-         * Check if the opcode is a conditional jump (if statement)
+         * Check if the opcode is a conditional jump (if statement).
          * 
          * @param opcode The opcode to check
          * @return True if the opcode is a conditional jump, false otherwise
@@ -153,7 +160,7 @@ public class BytecodeInstrumenter {
 
         /**
          * Check if an opcode for a conditional jump requires two operands (two values
-         * on the stack)
+         * on the stack).
          * 
          * @param opcode The conditional opcode to check
          * @return True if the opcode requires two operands, false otherwise
@@ -226,7 +233,7 @@ public class BytecodeInstrumenter {
         }
 
         /**
-         * Instrument code to log a symbolic trace message
+         * Instrument code to log a symbolic trace message.
          * 
          * @param message The message to log
          * @see TraceLogger#log(String)
