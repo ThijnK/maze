@@ -50,9 +50,18 @@ public class BytecodeInstrumenter {
         }
     }
 
+    /**
+     * Custom class loader that allows us to define classes from byte arrays, and to
+     * register classes that are already loaded in the JVM.
+     */
     static class BytecodeClassLoader extends ClassLoader {
         private final Map<String, Class<?>> classes = new HashMap<>();
 
+        /**
+         * Register a class that is already loaded in the JVM to this class loader
+         * 
+         * @param clazz The class to register
+         */
         public void registerClass(Class<?> clazz) {
             classes.put(clazz.getName(), clazz);
         }
@@ -63,11 +72,19 @@ public class BytecodeInstrumenter {
             return clazz != null ? clazz : super.findClass(name);
         }
 
-        public Class<?> defineClass(String name, byte[] b) {
-            return defineClass(name, b, 0, b.length);
+        /**
+         * Define a class from a byte array
+         * 
+         * @param name       The name of the class
+         * @param classBytes The byte array containing the class data
+         * @return The defined class
+         */
+        public Class<?> defineClass(String name, byte[] classBytes) {
+            return defineClass(name, classBytes, 0, classBytes.length);
         }
     }
 
+    /** Class visitor that instruments the class to log symbolic traces */
     static class SymbolicTraceClassVisitor extends ClassVisitor {
         public SymbolicTraceClassVisitor(ClassVisitor classVisitor) {
             super(Opcodes.ASM9, classVisitor);
@@ -81,6 +98,7 @@ public class BytecodeInstrumenter {
         }
     }
 
+    /** Method visitor that instruments the method to log symbolic traces */
     static class SymbolicTraceMethodVisitor extends AdviceAdapter {
         protected SymbolicTraceMethodVisitor(int api, MethodVisitor methodVisitor, int access, String name,
                 String descriptor) {
@@ -94,6 +112,9 @@ public class BytecodeInstrumenter {
         public void visitJumpInsn(int opcode, Label label) {
             if (isConditionalJump(opcode)) {
                 instrumentTraceLog("Branch " + Printer.OPCODES[opcode]);
+
+                // Duplicate the value(s) on the stack to keep the original value(s) for the
+                // actual jump
                 if (requiresTwoOperands(opcode)) {
                     mv.visitInsn(Opcodes.DUP2);
                 } else {
@@ -104,6 +125,7 @@ public class BytecodeInstrumenter {
                 Label falseLabel = new Label();
                 Label continueLabel = new Label();
 
+                // Insert a duplicate of the jump which logs the branch taken
                 mv.visitJumpInsn(opcode, trueLabel);
                 mv.visitLabel(falseLabel);
                 instrumentTraceLog("Condition FALSE");
@@ -113,26 +135,44 @@ public class BytecodeInstrumenter {
                 instrumentTraceLog("Condition TRUE");
                 mv.visitJumpInsn(Opcodes.GOTO, continueLabel);
 
+                // Continue with the original jump
                 mv.visitLabel(continueLabel);
             }
 
             super.visitJumpInsn(opcode, label);
         }
 
+        /**
+         * Check if the opcode is a conditional jump (if statement)
+         * 
+         * @param opcode The opcode to check
+         * @return True if the opcode is a conditional jump, false otherwise
+         */
         private boolean isConditionalJump(int opcode) {
             return (opcode >= Opcodes.IFEQ && opcode <= Opcodes.IF_ACMPNE) || opcode == Opcodes.IFNULL
                     || opcode == Opcodes.IFNONNULL;
         }
 
+        /**
+         * Check if an opcode for a conditional jump requires two operands (two values
+         * on the stack)
+         * 
+         * @param opcode The conditional opcode to check
+         * @return True if the opcode requires two operands, false otherwise
+         */
         private boolean requiresTwoOperands(int opcode) {
-            return opcode >= Opcodes.IF_ICMPEQ && opcode <= Opcodes.IFNONNULL;
+            return opcode >= Opcodes.IF_ICMPEQ && opcode <= Opcodes.IF_ACMPNE;
         }
 
         // Handle sparse int switch statements (lookup switch)
         @Override
         public void visitLookupSwitchInsn(Label dflt, int[] keys, Label[] labels) {
             instrumentTraceLog("Switch (lookup)");
+
+            // Duplicate the value to keep the original value for the actual jump
             mv.visitInsn(Opcodes.DUP);
+
+            // Create a copy of the switch statement with dummy labels that log the case
             Label[] dummyLbls = createDummyLabels(labels.length);
             Label dummyDflt = new Label();
             mv.visitLookupSwitchInsn(dummyDflt, keys, dummyLbls);
@@ -144,6 +184,8 @@ public class BytecodeInstrumenter {
             }
             mv.visitLabel(dummyDflt);
             instrumentTraceLog("Case default");
+
+            // Continue with the original switch statement
             mv.visitLabel(continueLabel);
 
             super.visitLookupSwitchInsn(dflt, keys, labels);
@@ -153,11 +195,17 @@ public class BytecodeInstrumenter {
         @Override
         public void visitTableSwitchInsn(int min, int max, Label dflt, Label... labels) {
             instrumentTraceLog("Switch (table)");
+
+            // Duplicate the value to keep the original value for the actual jump
             mv.visitInsn(Opcodes.DUP);
+
+            // Create a copy of the switch statement with dummy labels that log the case
             Label[] dummyLbls = createDummyLabels(labels.length);
             Label dummyDflt = new Label();
             mv.visitTableSwitchInsn(min, max, dummyDflt, dummyLbls);
             Label continueLabel = new Label();
+            // Notice the slight difference with a lookup switch: the keys are just the
+            // values from min to max
             for (int i = min; i <= max; i++) {
                 mv.visitLabel(dummyLbls[i - min]);
                 instrumentTraceLog("Case " + i + " " + (i - min));
@@ -165,17 +213,30 @@ public class BytecodeInstrumenter {
             }
             mv.visitLabel(dummyDflt);
             instrumentTraceLog("Case default");
+
+            // Continue with the original switch statement
             mv.visitLabel(continueLabel);
 
             super.visitTableSwitchInsn(min, max, dflt, labels);
         }
 
-        /** Insert code to log a symbolic trace message */
+        /**
+         * Instrument code to log a symbolic trace message
+         * 
+         * @param message The message to log
+         * @see TraceLogger#log(String)
+         */
         private void instrumentTraceLog(String message) {
             mv.visitLdcInsn(message);
             mv.visitMethodInsn(Opcodes.INVOKESTATIC, LOGGER_CLASS_PATH, "log", "(Ljava/lang/String;)V", false);
         }
 
+        /**
+         * Create an array of dummy labels
+         * 
+         * @param size The size of the array
+         * @return An array of dummy labels
+         */
         private Label[] createDummyLabels(int size) {
             Label[] labels = new Label[size];
             for (int i = 0; i < size; i++) {
