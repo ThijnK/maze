@@ -7,6 +7,7 @@ import com.microsoft.z3.FuncDecl;
 import com.microsoft.z3.IntExpr;
 import com.microsoft.z3.Model;
 
+import sootup.core.model.MethodModifier;
 import sootup.core.types.Type;
 import sootup.java.core.JavaSootMethod;
 
@@ -104,9 +105,16 @@ public class JUnitTestGenerator {
                 }
             }
 
-            // TODO: constructor may need arguments as well (deal with <init> method)
-            methodBuilder.addStatement("$T cut = new $T()", clazz, clazz);
-            methodBuilder.addStatement("cut.$L($L)", method.getName(), String.join(", ", params));
+            // For static methods, just call the method
+            if (method.isStatic()) {
+                methodBuilder.addStatement("$T.$L($L)", clazz, method.getName(), String.join(", ", params));
+            }
+            // For instance methods, create an instance of the class and call the method
+            else {
+                // TODO: constructor may need arguments as well (deal with <init> method)
+                methodBuilder.addStatement("$T cut = new $T()", clazz, clazz);
+                methodBuilder.addStatement("cut.$L($L)", method.getName(), String.join(", ", params));
+            }
 
             // TODO: add an assert for the path condition (convert Z3 expression to Java)
 
