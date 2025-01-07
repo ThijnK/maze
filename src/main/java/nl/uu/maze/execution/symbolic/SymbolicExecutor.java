@@ -22,10 +22,12 @@ public class SymbolicExecutor {
 
     private Context ctx;
     private SearchStrategy searchStrategy;
+    private JimpleToZ3Transformer transformer;
 
     public SymbolicExecutor(Context ctx, SearchStrategy searchStrategy) {
         this.ctx = ctx;
         this.searchStrategy = searchStrategy;
+        this.transformer = new JimpleToZ3Transformer(ctx);
     }
 
     /**
@@ -76,41 +78,35 @@ public class SymbolicExecutor {
      * 
      * @param cfg   The control flow graph
      * @param state The current symbolic state
-     * @param ctx   The Z3 context
      * @return A list of new symbolic states after executing the current statement
      */
     public List<SymbolicState> step(StmtGraph<?> cfg, SymbolicState state) {
-        // TODO: try to reuse transformer, while still allowing parallelization
-        JimpleToZ3Transformer transformer = new JimpleToZ3Transformer(ctx, state);
         Stmt stmt = state.getCurrentStmt();
 
         if (stmt instanceof JIfStmt)
-            return handleIfStmt(cfg, (JIfStmt) stmt, state, transformer);
+            return handleIfStmt(cfg, (JIfStmt) stmt, state);
         else if (stmt instanceof JSwitchStmt)
-            return handleSwitchStmt(cfg, (JSwitchStmt) stmt, state, transformer);
+            return handleSwitchStmt(cfg, (JSwitchStmt) stmt, state);
         else
-            return handleOtherStmts(cfg, stmt, state, transformer);
+            return handleOtherStmts(cfg, stmt, state);
     }
 
     /**
      * Handle if statements during symbolic execution
      * 
-     * @param cfg         The control flow graph
-     * @param stmt        The if statement as a Jimple statement ({@link JIfStmt})
-     * @param state       The current symbolic state
-     * @param ctx         The Z3 context
-     * @param transformer The transformer to convert Jimple values to Z3 expressions
+     * @param cfg   The control flow graph
+     * @param stmt  The if statement as a Jimple statement ({@link JIfStmt})
+     * @param state The current symbolic state
      * @return A list of new symbolic states after executing the if statement
      */
-    private List<SymbolicState> handleIfStmt(StmtGraph<?> cfg, JIfStmt stmt, SymbolicState state,
-            JimpleToZ3Transformer transformer) {
+    private List<SymbolicState> handleIfStmt(StmtGraph<?> cfg, JIfStmt stmt, SymbolicState state) {
         List<Stmt> succs = cfg.getAllSuccessors(stmt);
         AbstractConditionExpr cond = stmt.getCondition();
         List<SymbolicState> newStates = new ArrayList<SymbolicState>();
 
         // True branch
         SymbolicState newState = state.clone(succs.get(1));
-        BoolExpr condExpr = (BoolExpr) transformer.transform(cond);
+        BoolExpr condExpr = (BoolExpr) transformer.transform(cond, state);
         newState.addPathConstraint(condExpr);
         newStates.add(newState);
 
@@ -125,16 +121,13 @@ public class SymbolicExecutor {
     /**
      * Handle switch statements during symbolic execution
      * 
-     * @param cfg         The control flow graph
-     * @param stmt        The switch statement as a Jimple statement
-     *                    ({@link JSwitchStmt})
-     * @param state       The current symbolic state
-     * @param ctx         The Z3 context
-     * @param transformer The transformer to convert Jimple values to Z3 expressions
+     * @param cfg   The control flow graph
+     * @param stmt  The switch statement as a Jimple statement
+     *              ({@link JSwitchStmt})
+     * @param state The current symbolic state
      * @return A list of new symbolic states after executing the switch statement
      */
-    private List<SymbolicState> handleSwitchStmt(StmtGraph<?> cfg, JSwitchStmt stmt, SymbolicState state,
-            JimpleToZ3Transformer transformer) {
+    private List<SymbolicState> handleSwitchStmt(StmtGraph<?> cfg, JSwitchStmt stmt, SymbolicState state) {
         List<Stmt> succs = cfg.getAllSuccessors(stmt);
         Expr<?> var = state.getVariable(stmt.getKey().toString());
         List<IntConstant> values = stmt.getValues();
@@ -166,19 +159,16 @@ public class SymbolicExecutor {
     /**
      * Handle other types of statements during symbolic execution
      * 
-     * @param cfg         The control flow graph
-     * @param stmt        The statement to handle
-     * @param state       The current symbolic state
-     * @param ctx         The Z3 context
-     * @param transformer The transformer to convert Jimple values to Z3 expressions
+     * @param cfg   The control flow graph
+     * @param stmt  The statement to handle
+     * @param state The current symbolic state
      * @return A list of new symbolic states after executing the statement
      */
-    private List<SymbolicState> handleOtherStmts(StmtGraph<?> cfg, Stmt stmt, SymbolicState state,
-            JimpleToZ3Transformer transformer) {
+    private List<SymbolicState> handleOtherStmts(StmtGraph<?> cfg, Stmt stmt, SymbolicState state) {
         // Handle assignments (Assign, Identity)
         if (stmt instanceof AbstractDefinitionStmt) {
             AbstractDefinitionStmt defStmt = (AbstractDefinitionStmt) stmt;
-            Expr<?> rightExpr = transformer.transform(defStmt.getRightOp());
+            Expr<?> rightExpr = transformer.transform(defStmt.getRightOp(), state);
             String leftVar = defStmt.getLeftOp().toString();
             // TODO: handle leftVar as array (ctx.mkStore())
             state.setVariable(leftVar, rightExpr);

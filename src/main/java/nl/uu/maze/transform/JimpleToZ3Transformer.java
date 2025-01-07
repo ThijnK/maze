@@ -50,22 +50,30 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
     Context ctx;
     SymbolicState state;
 
-    public JimpleToZ3Transformer(Context ctx, SymbolicState state) {
+    public JimpleToZ3Transformer(Context ctx) {
         this.ctx = ctx;
-        this.state = state;
     }
 
     /**
      * Transform the given Jimple value to a Z3 expression.
      * 
      * @param value The Jimple value to transform
+     * @param state The symbolic state
      * @return The Z3 expression representing the Jimple value
+     * @implNote This method is not thread-safe! Create a new instance for each
+     *           thread.
      */
-    public Expr<?> transform(Value value) {
+    public Expr<?> transform(Value value, SymbolicState state) {
+        this.state = state;
         value.accept(this);
         Expr<?> res = getResult();
         setResult(null);
         return res;
+    }
+
+    /** Local alias for the public transform method */
+    private Expr<?> transform(Immediate immediate) {
+        return transform(immediate, state);
     }
 
     @SuppressWarnings("unchecked")
