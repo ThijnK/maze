@@ -79,7 +79,7 @@ public class Application {
                 StmtGraph<?> cfg = analyzer.getCFG(method);
 
                 SymbolicState finalState = symbolic.replay(cfg, method.getName());
-                logger.info("Final state: " + finalState);
+                logger.info("Replayed state: " + finalState);
 
                 // List<SymbolicState> finalStates = symbolic.execute(cfg);
                 // List<Pair<Model, SymbolicState>> results = validator.validate(finalStates);

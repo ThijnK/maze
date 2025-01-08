@@ -43,18 +43,10 @@ public class SymbolicExecutor {
 
         SymbolicState current = new SymbolicState(ctx, cfg.getStartingStmt());
         while (!current.isFinalState(cfg)) {
-            List<SymbolicState> newStates = step(cfg, current);
-            if (newStates.size() > 1) {
-                // If there are multiple successors, check trace to determine which one to take
-                // TODO: can be made more efficient by passing the iterator along to the step
-                // function and only creating new symbolic states for branches that will
-                // actually be followed
-                TraceManager.TraceEntry entry = iterator.next();
-                int branchIndex = entry.getValue();
-                current = newStates.get(branchIndex);
-            } else {
-                current = newStates.get(0);
-            }
+            List<SymbolicState> newStates = step(cfg, current, iterator);
+            // Note: newStates will always contain exactly one element, because we pass the
+            // iterator to the step function
+            current = newStates.get(0);
         }
         return current;
     }
@@ -95,7 +87,7 @@ public class SymbolicExecutor {
                 continue;
             }
 
-            List<SymbolicState> newStates = step(cfg, current);
+            List<SymbolicState> newStates = step(cfg, current, null);
             searchStrategy.add(newStates);
         }
 
@@ -105,17 +97,19 @@ public class SymbolicExecutor {
     /**
      * Execute a single step of symbolic execution on the given control flow graph.
      * 
-     * @param cfg   The control flow graph
-     * @param state The current symbolic state
+     * @param cfg      The control flow graph
+     * @param state    The current symbolic state
+     * @param iterator The iterator over the trace entries or <b>null</b> if not
+     *                 replaying a trace
      * @return A list of new symbolic states after executing the current statement
      */
-    private List<SymbolicState> step(StmtGraph<?> cfg, SymbolicState state) {
+    private List<SymbolicState> step(StmtGraph<?> cfg, SymbolicState state, Iterator<TraceEntry> iterator) {
         Stmt stmt = state.getCurrentStmt();
 
         if (stmt instanceof JIfStmt)
-            return handleIfStmt(cfg, (JIfStmt) stmt, state);
+            return handleIfStmt(cfg, (JIfStmt) stmt, state, iterator);
         else if (stmt instanceof JSwitchStmt)
-            return handleSwitchStmt(cfg, (JSwitchStmt) stmt, state);
+            return handleSwitchStmt(cfg, (JSwitchStmt) stmt, state, iterator);
         else
             return handleOtherStmts(cfg, stmt, state);
     }
@@ -123,27 +117,40 @@ public class SymbolicExecutor {
     /**
      * Handle if statements during symbolic execution
      * 
-     * @param cfg   The control flow graph
-     * @param stmt  The if statement as a Jimple statement ({@link JIfStmt})
-     * @param state The current symbolic state
+     * @param cfg      The control flow graph
+     * @param stmt     The if statement as a Jimple statement ({@link JIfStmt})
+     * @param state    The current symbolic state
+     * @param iterator The iterator over the trace entries or <b>null</b> if not
+     *                 replaying a trace
      * @return A list of new symbolic states after executing the if statement
      */
-    private List<SymbolicState> handleIfStmt(StmtGraph<?> cfg, JIfStmt stmt, SymbolicState state) {
+    private List<SymbolicState> handleIfStmt(StmtGraph<?> cfg, JIfStmt stmt, SymbolicState state,
+            Iterator<TraceEntry> iterator) {
         List<Stmt> succs = cfg.getAllSuccessors(stmt);
         AbstractConditionExpr cond = stmt.getCondition();
+        BoolExpr condExpr = (BoolExpr) transformer.transform(cond, state);
         List<SymbolicState> newStates = new ArrayList<SymbolicState>();
 
-        BoolExpr condExpr = (BoolExpr) transformer.transform(cond, state);
+        // If replaying a trace, follow the branch indicated by the trace
+        if (iterator != null) {
+            TraceEntry entry = iterator.next();
+            int branchIndex = entry.getValue();
+            state.addPathConstraint(branchIndex == 0 ? ctx.mkNot(condExpr) : condExpr);
+            state.setCurrentStmt(succs.get(branchIndex));
+            newStates.add(state);
+        }
+        // Otherwise, follow both branches
+        else {
+            // False branch
+            SymbolicState newState = state.clone(succs.get(0));
+            newState.addPathConstraint(ctx.mkNot(condExpr));
+            newStates.add(state);
 
-        // False branch
-        SymbolicState newState = state.clone(succs.get(0));
-        newState.addPathConstraint(ctx.mkNot(condExpr));
-        newStates.add(state);
-
-        // True branch
-        state.addPathConstraint(condExpr);
-        state.setCurrentStmt(succs.get(1));
-        newStates.add(state);
+            // True branch
+            state.addPathConstraint(condExpr);
+            state.setCurrentStmt(succs.get(1));
+            newStates.add(state);
+        }
 
         return newStates;
     }
@@ -151,36 +158,63 @@ public class SymbolicExecutor {
     /**
      * Handle switch statements during symbolic execution
      * 
-     * @param cfg   The control flow graph
-     * @param stmt  The switch statement as a Jimple statement
-     *              ({@link JSwitchStmt})
-     * @param state The current symbolic state
+     * @param cfg      The control flow graph
+     * @param stmt     The switch statement as a Jimple statement
+     *                 ({@link JSwitchStmt})
+     * @param state    The current symbolic state
+     * @param iterator The iterator over the trace entries or <b>null</b> if not
+     *                 replaying a trace
      * @return A list of new symbolic states after executing the switch statement
      */
-    private List<SymbolicState> handleSwitchStmt(StmtGraph<?> cfg, JSwitchStmt stmt, SymbolicState state) {
+    private List<SymbolicState> handleSwitchStmt(StmtGraph<?> cfg, JSwitchStmt stmt, SymbolicState state,
+            Iterator<TraceEntry> iterator) {
         List<Stmt> succs = cfg.getAllSuccessors(stmt);
         Expr<?> var = state.getVariable(stmt.getKey().toString());
         List<IntConstant> values = stmt.getValues();
         List<SymbolicState> newStates = new ArrayList<SymbolicState>();
 
-        BoolExpr defaultCaseConstraint = null;
-        for (int i = 0; i < succs.size(); i++) {
-            SymbolicState newState = i == succs.size() - 1 ? state : state.clone();
-
-            // A successor beyond the number of values in the switch statement is the
-            // default case
-            if (i < values.size()) {
-                BoolExpr constraint = ctx.mkEq(var, ctx.mkInt(values.get(i).getValue()));
-                newState.addPathConstraint(constraint);
+        // If replaying a trace, follow the branch indicated by the trace
+        if (iterator != null) {
+            TraceEntry entry = iterator.next();
+            int branchIndex = entry.getValue();
+            if (branchIndex >= values.size()) {
                 // Default case constraint is the negation of all other constraints
-                defaultCaseConstraint = defaultCaseConstraint != null
-                        ? ctx.mkAnd(defaultCaseConstraint, ctx.mkNot(constraint))
-                        : ctx.mkNot(constraint);
+                BoolExpr defaultCaseConstraint = null;
+                for (int i = 0; i < values.size(); i++) {
+                    BoolExpr constraint = ctx.mkEq(var, ctx.mkInt(values.get(i).getValue()));
+                    defaultCaseConstraint = defaultCaseConstraint != null
+                            ? ctx.mkAnd(defaultCaseConstraint, ctx.mkNot(constraint))
+                            : ctx.mkNot(constraint);
+                }
+                state.addPathConstraint(defaultCaseConstraint);
             } else {
-                newState.addPathConstraint(defaultCaseConstraint);
+                // Otherwise add constraint for the branch that was taken
+                state.addPathConstraint(ctx.mkEq(var, ctx.mkInt(values.get(branchIndex).getValue())));
             }
-            newState.setCurrentStmt(succs.get(i));
-            newStates.add(newState);
+            state.setCurrentStmt(succs.get(branchIndex));
+            newStates.add(state);
+        }
+        // Otherwise, follow all branches
+        else {
+            BoolExpr defaultCaseConstraint = null;
+            for (int i = 0; i < succs.size(); i++) {
+                SymbolicState newState = i == succs.size() - 1 ? state : state.clone();
+
+                // A successor beyond the number of values in the switch statement is the
+                // default case
+                if (i < values.size()) {
+                    BoolExpr constraint = ctx.mkEq(var, ctx.mkInt(values.get(i).getValue()));
+                    newState.addPathConstraint(constraint);
+                    // Default case constraint is the negation of all other constraints
+                    defaultCaseConstraint = defaultCaseConstraint != null
+                            ? ctx.mkAnd(defaultCaseConstraint, ctx.mkNot(constraint))
+                            : ctx.mkNot(constraint);
+                } else {
+                    newState.addPathConstraint(defaultCaseConstraint);
+                }
+                newState.setCurrentStmt(succs.get(i));
+                newStates.add(newState);
+            }
         }
 
         return newStates;
@@ -206,6 +240,8 @@ public class SymbolicExecutor {
 
         List<SymbolicState> newStates = new ArrayList<SymbolicState>();
         List<Stmt> succs = cfg.getAllSuccessors(stmt);
+        // Note: there will never be more than one successor for non-branching
+        // statements, so this for loop is here "just in case"
         for (int i = 0; i < succs.size(); i++) {
             SymbolicState newState = i == succs.size() - 1 ? state : state.clone();
             newState.setCurrentStmt(succs.get(i));
