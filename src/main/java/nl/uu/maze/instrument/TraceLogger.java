@@ -4,6 +4,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 
+/**
+ * Logs trace messages to a file.
+ */
 public class TraceLogger {
     private static PrintWriter pw;
 
