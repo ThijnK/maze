@@ -1,10 +1,15 @@
 package nl.uu.maze.execution.symbolic;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import com.microsoft.z3.*;
 
+import nl.uu.maze.instrument.TraceManager;
+import nl.uu.maze.instrument.TraceManager.TraceEntry;
 import nl.uu.maze.search.SearchStrategy;
 import nl.uu.maze.transform.JimpleToZ3Transformer;
 import sootup.core.graph.*;
@@ -28,6 +33,30 @@ public class SymbolicExecutor {
         this.ctx = ctx;
         this.searchStrategy = searchStrategy;
         this.transformer = new JimpleToZ3Transformer(ctx);
+    }
+
+    public SymbolicState replay(StmtGraph<?> cfg, String methodName)
+            throws FileNotFoundException, IOException, Exception {
+        TraceManager manager = new TraceManager();
+        manager.loadTraceFile();
+        Iterator<TraceEntry> iterator = manager.getTraceEntriesIterator(methodName);
+
+        SymbolicState current = new SymbolicState(ctx, cfg.getStartingStmt());
+        while (!current.isFinalState(cfg)) {
+            List<SymbolicState> newStates = step(cfg, current);
+            if (newStates.size() > 1) {
+                // If there are multiple successors, check trace to determine which one to take
+                // TODO: can be made more efficient by passing the iterator along to the step
+                // function and only creating new symbolic states for branches that will
+                // actually be followed
+                TraceManager.TraceEntry entry = iterator.next();
+                int branchIndex = entry.getValue();
+                current = newStates.get(branchIndex);
+            } else {
+                current = newStates.get(0);
+            }
+        }
+        return current;
     }
 
     /**
@@ -80,7 +109,7 @@ public class SymbolicExecutor {
      * @param state The current symbolic state
      * @return A list of new symbolic states after executing the current statement
      */
-    public List<SymbolicState> step(StmtGraph<?> cfg, SymbolicState state) {
+    private List<SymbolicState> step(StmtGraph<?> cfg, SymbolicState state) {
         Stmt stmt = state.getCurrentStmt();
 
         if (stmt instanceof JIfStmt)
@@ -104,15 +133,16 @@ public class SymbolicExecutor {
         AbstractConditionExpr cond = stmt.getCondition();
         List<SymbolicState> newStates = new ArrayList<SymbolicState>();
 
-        // True branch
-        SymbolicState newState = state.clone(succs.get(1));
         BoolExpr condExpr = (BoolExpr) transformer.transform(cond, state);
-        newState.addPathConstraint(condExpr);
-        newStates.add(newState);
 
         // False branch
-        state.addPathConstraint(ctx.mkNot(condExpr));
-        state.setCurrentStmt(succs.get(0));
+        SymbolicState newState = state.clone(succs.get(0));
+        newState.addPathConstraint(ctx.mkNot(condExpr));
+        newStates.add(state);
+
+        // True branch
+        state.addPathConstraint(condExpr);
+        state.setCurrentStmt(succs.get(1));
         newStates.add(state);
 
         return newStates;

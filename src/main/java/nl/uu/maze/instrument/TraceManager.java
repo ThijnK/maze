@@ -135,16 +135,13 @@ public class TraceManager {
         return traceEntries.getOrDefault(methodName, new LinkedList<>());
     }
 
-    public interface TraceIterator extends Iterator<TraceEntry> {
-    }
-
     /**
      * Get the trace entries for the specified method as an iterator.
      * 
      * @param methodName The method name
      * @return The trace entries for the method or an empty iterator if no entries
      */
-    public TraceIterator getTraceEntriesIterator(String methodName) {
-        return (TraceIterator) getTraceEntries(methodName).iterator();
+    public Iterator<TraceEntry> getTraceEntriesIterator(String methodName) {
+        return getTraceEntries(methodName).iterator();
     }
 }
