@@ -5,12 +5,11 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 public class TraceLogger {
-    private static final String FILE_PATH = "logs/trace.log";
     private static PrintWriter pw;
 
     static {
         try {
-            FileWriter fw = new FileWriter(FILE_PATH, false);
+            FileWriter fw = new FileWriter(TraceManager.FILE_PATH, false);
             pw = new PrintWriter(fw);
         } catch (IOException e) {
             e.printStackTrace();

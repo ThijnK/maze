@@ -2,6 +2,7 @@ package nl.uu.maze.main;
 
 import java.lang.reflect.Method;
 import java.nio.file.Path;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -18,6 +19,7 @@ import nl.uu.maze.execution.symbolic.SymbolicState;
 import nl.uu.maze.execution.symbolic.SymbolicStateValidator;
 import nl.uu.maze.generation.JUnitTestGenerator;
 import nl.uu.maze.instrument.BytecodeInstrumenter;
+import nl.uu.maze.instrument.TraceManager;
 import nl.uu.maze.search.SearchStrategy;
 import nl.uu.maze.search.SearchStrategyFactory;
 import nl.uu.maze.util.Pair;
