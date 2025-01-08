@@ -4,6 +4,8 @@ import org.objectweb.asm.*;
 import org.objectweb.asm.commons.AdviceAdapter;
 import org.objectweb.asm.util.TraceClassVisitor;
 
+import nl.uu.maze.instrument.TraceManager.BranchType;
+
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -133,11 +135,11 @@ public class BytecodeInstrumenter {
                 // Insert a duplicate of the jump which logs the branch taken
                 mv.visitJumpInsn(opcode, trueLabel);
                 mv.visitLabel(falseLabel);
-                instrumentTraceLog(TraceManager.BranchType.IF, 0); // 0 for false
+                instrumentTraceLog(BranchType.IF, 0); // 0 for false
                 mv.visitJumpInsn(Opcodes.GOTO, continueLabel);
 
                 mv.visitLabel(trueLabel);
-                instrumentTraceLog(TraceManager.BranchType.IF, 1); // 1 for true
+                instrumentTraceLog(BranchType.IF, 1); // 1 for true
                 mv.visitJumpInsn(Opcodes.GOTO, continueLabel);
 
                 // Continue with the original jump
@@ -182,12 +184,12 @@ public class BytecodeInstrumenter {
             Label continueLabel = new Label();
             for (int i = 0; i < keys.length; i++) {
                 mv.visitLabel(dummyLbls[i]);
-                instrumentTraceLog(TraceManager.BranchType.SWITCH, i);
+                instrumentTraceLog(BranchType.SWITCH, i);
                 mv.visitJumpInsn(Opcodes.GOTO, continueLabel);
             }
             mv.visitLabel(dummyDflt);
             // Index/value for default case is number of keys
-            instrumentTraceLog(TraceManager.BranchType.SWITCH, keys.length);
+            instrumentTraceLog(BranchType.SWITCH, keys.length);
 
             // Continue with the original switch statement
             mv.visitLabel(continueLabel);
@@ -210,12 +212,12 @@ public class BytecodeInstrumenter {
             // values from min to max
             for (int i = min; i <= max; i++) {
                 mv.visitLabel(dummyLbls[i - min]);
-                instrumentTraceLog(TraceManager.BranchType.SWITCH, i - min);
+                instrumentTraceLog(BranchType.SWITCH, i - min);
                 mv.visitJumpInsn(Opcodes.GOTO, continueLabel);
             }
             mv.visitLabel(dummyDflt);
             // Index/value for default case is number of keys
-            instrumentTraceLog(TraceManager.BranchType.SWITCH, max - min + 1);
+            instrumentTraceLog(BranchType.SWITCH, max - min + 1);
 
             // Continue with the original switch statement
             mv.visitLabel(continueLabel);
@@ -229,7 +231,7 @@ public class BytecodeInstrumenter {
          * @param message The message to log
          * @see TraceLogger#log(String)
          */
-        private void instrumentTraceLog(TraceManager.BranchType type, int value) {
+        private void instrumentTraceLog(BranchType type, int value) {
             String entry = TraceManager.TraceEntry.formatString(methodName, type, value);
             mv.visitLdcInsn(entry);
             mv.visitMethodInsn(Opcodes.INVOKESTATIC, LOGGER_CLASS_PATH, "log", "(Ljava/lang/String;)V", false);
