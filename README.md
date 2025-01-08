@@ -40,3 +40,7 @@ You'll also need some other C++ build tools, which you can install using the Vis
 
 After building the java bindings, the `build` directly should contain the files needed to run Z3, including the `com.microsoft.z3.jar` file.
 Set the environment varialbes and install into your local maven repository as described above.
+
+## License
+
+This project is licensed under the [MIT license](./LICENSE).
