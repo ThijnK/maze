@@ -116,8 +116,6 @@ public class JUnitTestGenerator {
                 methodBuilder.addStatement("cut.$L($L)", method.getName(), String.join(", ", params));
             }
 
-            // TODO: add an assert for the path condition (convert Z3 expression to Java)
-
             classBuilder.addMethod(methodBuilder.build());
         }
     }
