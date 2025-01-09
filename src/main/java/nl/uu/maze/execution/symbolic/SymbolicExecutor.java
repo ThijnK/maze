@@ -144,7 +144,7 @@ public class SymbolicExecutor {
             // False branch
             SymbolicState newState = state.clone(succs.get(0));
             newState.addPathConstraint(ctx.mkNot(condExpr));
-            newStates.add(state);
+            newStates.add(newState);
 
             // True branch
             state.addPathConstraint(condExpr);
