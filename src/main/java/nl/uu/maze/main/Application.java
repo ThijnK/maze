@@ -1,28 +1,6 @@
 package nl.uu.maze.main;
 
-import java.nio.file.Path;
-import java.util.List;
-import java.util.Set;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.microsoft.z3.Context;
-import com.microsoft.z3.Model;
-
-import nl.uu.maze.analysis.JavaAnalyzer;
-import nl.uu.maze.execution.concrete.ConcreteExecutor;
-import nl.uu.maze.execution.symbolic.SymbolicExecutor;
-import nl.uu.maze.execution.symbolic.SymbolicState;
-import nl.uu.maze.execution.symbolic.SymbolicStateValidator;
-import nl.uu.maze.generation.JUnitTestGenerator;
-import nl.uu.maze.instrument.BytecodeInstrumenter;
-import nl.uu.maze.search.SearchStrategy;
-import nl.uu.maze.search.SearchStrategyFactory;
-import nl.uu.maze.util.Pair;
-import sootup.core.graph.StmtGraph;
-import sootup.java.core.JavaSootMethod;
-import sootup.java.core.types.JavaClassType;
+import nl.uu.maze.execution.ExecutionController;
 
 /**
  * The main class of the application.
@@ -44,8 +22,6 @@ import sootup.java.core.types.JavaClassType;
  * </p>
  */
 public class Application {
-    private static final Logger logger = LoggerFactory.getLogger(Application.class);
-
     // Temporary specification of which class to run the app on
     private static final String classPath = "target/classes";
     private static final String className = "nl.uu.maze.example.ExampleClass";
@@ -53,42 +29,10 @@ public class Application {
     public static void main(String[] args) {
         try {
             String strategyName = args.length > 0 ? args[0] : "";
-            SearchStrategy searchStrategy = SearchStrategyFactory.getStrategy(strategyName);
-            logger.info("Using search strategy: " + searchStrategy.getClass().getSimpleName());
 
-            JavaAnalyzer analyzer = new JavaAnalyzer(classPath);
-            Context ctx = new Context();
-            SymbolicExecutor symbolic = new SymbolicExecutor(ctx, searchStrategy);
-            ConcreteExecutor concrete = new ConcreteExecutor();
-            SymbolicStateValidator validator = new SymbolicStateValidator(ctx);
-
-            JavaClassType classType = analyzer.getClassType(className);
-            Set<JavaSootMethod> methods = analyzer.getMethods(classType);
-            Class<?> clazz = analyzer.getJavaClass(classType);
-            Class<?> instrumented = BytecodeInstrumenter.instrument(classPath, className);
-            JUnitTestGenerator generator = new JUnitTestGenerator(clazz);
-            for (JavaSootMethod method : methods) {
-                // For now, skip the <init> method
-                if (method.getName().equals("<init>")) {
-                    continue;
-                }
-
-                logger.info("Processing method: " + method.getName());
-
-                concrete.execute(instrumented, analyzer.getJavaMethod(method, instrumented));
-                StmtGraph<?> cfg = analyzer.getCFG(method);
-
-                SymbolicState finalState = symbolic.replay(cfg, method.getName());
-                logger.info("Replayed state: " + finalState);
-
-                // List<SymbolicState> finalStates = symbolic.execute(cfg);
-                // List<Pair<Model, SymbolicState>> results = validator.validate(finalStates);
-                // generator.generateMethodTestCases(results, method, ctx);
-            }
-
-            // generator.writeToFile(Path.of("src/test/java"));
-
-            ctx.close();
+            ExecutionController controller = new ExecutionController(classPath, className, strategyName);
+            controller.runConcolic();
+            controller.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
