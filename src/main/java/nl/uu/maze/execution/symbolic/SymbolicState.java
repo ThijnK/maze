@@ -89,6 +89,14 @@ public class SymbolicState {
         return ctx.mkAnd(pathConstraints.toArray(new BoolExpr[pathConstraints.size()]));
     }
 
+    public void negateRandomPathConstraint() {
+        if (!pathConstraints.isEmpty()) {
+            int index = (int) (Math.random() * pathConstraints.size());
+            BoolExpr constraint = pathConstraints.get(index);
+            pathConstraints.set(index, ctx.mkNot(constraint));
+        }
+    }
+
     public boolean isFinalState(StmtGraph<?> cfg) {
         return cfg.getAllSuccessors(currentStmt).isEmpty();
     }

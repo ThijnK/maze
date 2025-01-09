@@ -2,6 +2,7 @@ package nl.uu.maze.execution;
 
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -91,10 +92,27 @@ public class ExecutionController {
 
             logger.info("Processing method: " + method.getName());
 
+            // Approach:
+            // 1. Execute the (instrumented) method concretely
+            // 2. Replay trace symbolically to get symbolic state
+            // 3. Negate one constraint in the path condition
+            // 4. Get Z3 model from that state
+            // 5. Generate a test case for the current model and state
+            // 6. Get Java values from the model to use as args of step 1
+            // - this requires transforming Z3 Expr to Java values
+
             StmtGraph<?> cfg = analyzer.getCFG(method);
             concrete.execute(instrumented, analyzer.getJavaMethod(method, instrumented));
             SymbolicState finalState = symbolic.replay(cfg, method.getName());
             logger.info("Replayed state: " + finalState);
+
+            // Negate one constraint in the final state's path condition
+            finalState.negateRandomPathConstraint();
+            Optional<Model> model = validator.validate(finalState);
+            // Generate a test case for current state
+            if (model.isPresent()) {
+                generator.generateMethodTestCase(model.get(), finalState, method, ctx);
+            }
         }
     }
 

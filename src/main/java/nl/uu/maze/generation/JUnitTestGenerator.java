@@ -7,7 +7,6 @@ import com.microsoft.z3.FuncDecl;
 import com.microsoft.z3.IntExpr;
 import com.microsoft.z3.Model;
 
-import sootup.core.model.MethodModifier;
 import sootup.core.types.Type;
 import sootup.java.core.JavaSootMethod;
 
@@ -43,6 +42,20 @@ public class JUnitTestGenerator {
         classBuilder = TypeSpec.classBuilder(testClassName)
                 .addModifiers(Modifier.PUBLIC);
         this.clazz = clazz;
+    }
+
+    /**
+     * Generates a single JUnit test case for the given method based on the given
+     * model and symbolic state.
+     * 
+     * @param model  The model to generate the test case for
+     * @param state  The symbolic state to generate the test case for
+     * @param method The method to generate the test case for
+     */
+    public void generateMethodTestCase(Model model, SymbolicState state, JavaSootMethod method, Context ctx) {
+        List<Pair<Model, SymbolicState>> results = new ArrayList<>();
+        results.add(new Pair<>(model, state));
+        generateMethodTestCases(results, method, ctx);
     }
 
     /**
