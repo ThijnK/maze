@@ -99,6 +99,8 @@ public class SymbolicState {
     public BoolExpr getPathCondition() {
         if (pathConstraints.isEmpty()) {
             return ctx.mkTrue();
+        } else if (pathConstraints.size() == 1) {
+            return pathConstraints.get(0);
         }
         return ctx.mkAnd(pathConstraints.toArray(new BoolExpr[pathConstraints.size()]));
     }
