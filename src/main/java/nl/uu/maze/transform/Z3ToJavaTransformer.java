@@ -26,6 +26,7 @@ public class Z3ToJavaTransformer {
         } else if (evaluated.isInt()) {
             return Integer.parseInt(evaluated.toString());
         } else if (evaluated.isReal()) {
+            // TODO: does this still work with Z3 FP
             return transformReal(evaluated, state.getSymbolicType(var));
         } else if (evaluated.isArray()) {
             return transformArray((ArrayExpr<?, ?>) evaluated);

@@ -14,6 +14,8 @@ import sootup.core.jimple.common.expr.JAddExpr;
 import sootup.core.jimple.common.expr.JAndExpr;
 import sootup.core.jimple.common.expr.JCastExpr;
 import sootup.core.jimple.common.expr.JCmpExpr;
+import sootup.core.jimple.common.expr.JCmpgExpr;
+import sootup.core.jimple.common.expr.JCmplExpr;
 import sootup.core.jimple.common.expr.JDivExpr;
 import sootup.core.jimple.common.expr.JEqExpr;
 import sootup.core.jimple.common.expr.JGeExpr;
@@ -77,13 +79,21 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
         return transform(immediate, state);
     }
 
-    @SuppressWarnings("unchecked")
-    private <T extends Expr<?>> Expr<?> transformArithExpr(AbstractBinopExpr expr,
-            BiFunction<T, T, Expr<?>> operation) {
+    /**
+     * Transform a binary arithmetic expression.
+     * 
+     * @param expr        The expression to transform
+     * @param bvOperation The operation to apply to the operands (for bit vectors)
+     * @param fpOperation The operation to apply to the operands (for floating
+     *                    points)
+     * @return The Z3 expression representing the arithmetic expression
+     */
+    private Expr<?> transformArithExpr(AbstractBinopExpr expr,
+            BiFunction<BitVecExpr, BitVecExpr, Expr<?>> bvOperation, BiFunction<FPExpr, FPExpr, Expr<?>> fpOperation) {
         Immediate op1 = expr.getOp1();
         Immediate op2 = expr.getOp2();
-        T l = (T) transform(op1);
-        T r = (T) transform(op2);
+        Expr<?> l = transform(op1);
+        Expr<?> r = transform(op2);
 
         // Ensure both operands have the same bit vector size
         if (l instanceof BitVecExpr && r instanceof BitVecExpr) {
@@ -93,13 +103,44 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
             int sizeR = bvR.getSortSize();
 
             if (sizeL > sizeR) {
-                r = (T) ctx.mkSignExt(sizeL - sizeR, bvR);
+                r = ctx.mkSignExt(sizeL - sizeR, bvR);
             } else if (sizeR > sizeL) {
-                l = (T) ctx.mkSignExt(sizeR - sizeL, bvL);
+                l = ctx.mkSignExt(sizeR - sizeL, bvL);
             }
+            return bvOperation.apply((BitVecExpr) l, (BitVecExpr) r);
+        } else if (l instanceof FPExpr && r instanceof FPExpr && fpOperation != null) {
+            return fpOperation.apply((FPExpr) l, (FPExpr) r);
         }
+        // Handle coercions between floating point and bit vector if only one operand is
+        // FP and the other is a bit vector
+        else if (l instanceof FPExpr && r instanceof BitVecExpr && fpOperation != null) {
+            FPExpr rFP = ctx.mkFPToFP((BitVecExpr) r, (FPSort) l.getSort());
+            return fpOperation.apply((FPExpr) l, rFP);
+        } else if (l instanceof BitVecExpr && r instanceof FPExpr && fpOperation != null) {
+            FPExpr lFP = ctx.mkFPToFP((BitVecExpr) l, (FPSort) r.getSort());
+            return fpOperation.apply(lFP, (FPExpr) r);
+        } else {
+            throw new UnsupportedOperationException(
+                    "Unsupported operand types: " + l.getSort() + " and " + r.getSort());
+        }
+    }
 
-        return operation.apply(l, r);
+    /**
+     * Transform a floating point comparison expression.
+     * 
+     * @param expr       The expression to transform
+     * @param valueIfNaN The value to return if either operand is NaN
+     * @return The Z3 expression representing the comparison
+     */
+    private Expr<?> transformFloatCmp(AbstractBinopExpr expr, int valueIfNaN) {
+        FPExpr op1 = (FPExpr) transform(expr.getOp1());
+        FPExpr op2 = (FPExpr) transform(expr.getOp2());
+        BoolExpr isNaN1 = ctx.mkFPIsNaN(op1);
+        BoolExpr isNaN2 = ctx.mkFPIsNaN(op2);
+
+        // Result: 1 if either is NaN, otherwise use ctx.mkFPSub
+        return ctx.mkITE(ctx.mkOr(isNaN1, isNaN2), ctx.mkFP(valueIfNaN, op1.getSort()),
+                ctx.mkFPSub(ctx.mkFPRoundNearestTiesToEven(), op1, op2));
     }
 
     /**
@@ -119,14 +160,18 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
             return ctx.mkBitVecSort(Type.getValueBitSize(IntType.getInstance()));
         } else if (sootType instanceof LongType) {
             return ctx.mkBitVecSort(Type.getValueBitSize(sootType));
-        } else if (sootType instanceof DoubleType || sootType instanceof FloatType) {
-            return ctx.mkRealSort();
+        } else if (sootType instanceof DoubleType) {
+            return ctx.mkFPSort64();
+        } else if (sootType instanceof FloatType) {
+            return ctx.mkFPSort32();
         } else if (sootType instanceof ArrayType) {
             Sort elementSort = determineSort(((ArrayType) sootType).getElementType());
             Sort indexSort = ctx.mkBitVecSort(Type.getValueBitSize(IntType.getInstance()));
             return ctx.mkArraySort(indexSort, elementSort);
         } else if (sootType instanceof ClassType) {
             // TODO: how to represent arbitrary classes including Strings?
+            // probably no need, only represent their fields as symbolic values (except
+            // maybe strings that do have to be handled here)
             return ctx.mkIntSort();
         } else if (sootType instanceof NullType) {
             return ctx.mkIntSort();
@@ -140,32 +185,32 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
     // #region Boolean expressions
     @Override
     public void caseEqExpr(@Nonnull JEqExpr expr) {
-        setResult(transformArithExpr(expr, ctx::mkEq));
+        setResult(transformArithExpr(expr, ctx::mkEq, ctx::mkFPEq));
     }
 
     @Override
     public void caseNeExpr(@Nonnull JNeExpr expr) {
-        setResult(transformArithExpr(expr, (l, r) -> ctx.mkNot(ctx.mkEq(l, r))));
+        setResult(transformArithExpr(expr, (l, r) -> ctx.mkNot(ctx.mkEq(l, r)), (l, r) -> ctx.mkNot(ctx.mkFPEq(l, r))));
     }
 
     @Override
     public void caseGeExpr(@Nonnull JGeExpr expr) {
-        setResult(transformArithExpr(expr, ctx::mkBVSGE));
+        setResult(transformArithExpr(expr, ctx::mkBVSGE, ctx::mkFPGEq));
     }
 
     @Override
     public void caseGtExpr(@Nonnull JGtExpr expr) {
-        setResult(transformArithExpr(expr, ctx::mkBVSGT));
+        setResult(transformArithExpr(expr, ctx::mkBVSGT, ctx::mkFPGt));
     }
 
     @Override
     public void caseLeExpr(@Nonnull JLeExpr expr) {
-        setResult(transformArithExpr(expr, ctx::mkBVSLE));
+        setResult(transformArithExpr(expr, ctx::mkBVSLE, ctx::mkFPLEq));
     }
 
     @Override
     public void caseLtExpr(@Nonnull JLtExpr expr) {
-        setResult(transformArithExpr(expr, ctx::mkBVSLT));
+        setResult(transformArithExpr(expr, ctx::mkBVSLT, ctx::mkFPLt));
     }
 
     @Override
@@ -177,67 +222,84 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
 
     @Override
     public void caseAndExpr(@Nonnull JAndExpr expr) {
-        setResult(transformArithExpr(expr, (l, r) -> ctx.mkBVAND((BitVecExpr) l, (BitVecExpr) r)));
+        // Note: no logical AND for floating point numbers
+        setResult(transformArithExpr(expr, ctx::mkBVAND, null));
     }
 
     @Override
     public void caseOrExpr(@Nonnull JOrExpr expr) {
-        setResult(transformArithExpr(expr, (l, r) -> ctx.mkBVOR((BitVecExpr) l, (BitVecExpr) r)));
+        setResult(transformArithExpr(expr, ctx::mkBVOR, null));
     }
 
     @Override
     public void caseXorExpr(@Nonnull JXorExpr expr) {
-        setResult(transformArithExpr(expr, (l, r) -> ctx.mkBVXOR((BitVecExpr) l, (BitVecExpr) r)));
+        setResult(transformArithExpr(expr, ctx::mkBVXOR, null));
     }
     // #endregion
 
     // #region Arithmetic expressions
     @Override
     public void caseRemExpr(@Nonnull JRemExpr expr) {
-        setResult(transformArithExpr(expr, ctx::mkBVSRem));
+        setResult(transformArithExpr(expr, ctx::mkBVSRem, ctx::mkFPRem));
     }
 
     @Override
     public void caseAddExpr(@Nonnull JAddExpr expr) {
-        setResult(transformArithExpr(expr, (l, r) -> ctx.mkBVAdd((BitVecExpr) l, (BitVecExpr) r)));
+        setResult(
+                transformArithExpr(expr, ctx::mkBVAdd, (l, r) -> ctx.mkFPAdd(ctx.mkFPRoundNearestTiesToEven(), l, r)));
     }
 
     @Override
     public void caseSubExpr(@Nonnull JSubExpr expr) {
-        setResult(transformArithExpr(expr, (l, r) -> ctx.mkBVSub((BitVecExpr) l, (BitVecExpr) r)));
+        setResult(
+                transformArithExpr(expr, ctx::mkBVSub, (l, r) -> ctx.mkFPSub(ctx.mkFPRoundNearestTiesToEven(), l, r)));
     }
 
     @Override
     public void caseMulExpr(@Nonnull JMulExpr expr) {
-        setResult(transformArithExpr(expr, (l, r) -> ctx.mkBVMul((BitVecExpr) l, (BitVecExpr) r)));
+        setResult(
+                transformArithExpr(expr, ctx::mkBVMul, (l, r) -> ctx.mkFPMul(ctx.mkFPRoundNearestTiesToEven(), l, r)));
     }
 
     @Override
     public void caseDivExpr(@Nonnull JDivExpr expr) {
-        setResult(transformArithExpr(expr, (l, r) -> ctx.mkBVSDiv((BitVecExpr) l, (BitVecExpr) r)));
+        setResult(
+                transformArithExpr(expr, ctx::mkBVSDiv, (l, r) -> ctx.mkFPDiv(ctx.mkFPRoundNearestTiesToEven(), l, r)));
     }
 
     @Override
     public void caseShlExpr(@Nonnull JShlExpr expr) {
-        setResult(transformArithExpr(expr, ctx::mkBVSHL));
+        setResult(transformArithExpr(expr, ctx::mkBVSHL, null));
     }
 
     @Override
     public void caseShrExpr(@Nonnull JShrExpr expr) {
         // Signed (arithemtic) shift right
-        setResult(transformArithExpr(expr, ctx::mkBVASHR));
+        setResult(transformArithExpr(expr, ctx::mkBVASHR, null));
     }
 
     @Override
     public void caseUshrExpr(@Nonnull JUshrExpr expr) {
         // Unsigned (logical) shift right
-        setResult(transformArithExpr(expr, ctx::mkBVLSHR));
+        setResult(transformArithExpr(expr, ctx::mkBVLSHR, null));
     }
 
     @Override
     public void caseCmpExpr(@Nonnull JCmpExpr expr) {
         // Implement cmp operator as subtraction
-        setResult(transformArithExpr(expr, ctx::mkBVSub));
+        setResult(transformArithExpr(expr, ctx::mkBVSub, null));
+    }
+
+    // Cmpg is for floating point comparison and returns 1 if either operand is NaN
+    @Override
+    public void caseCmpgExpr(@Nonnull JCmpgExpr expr) {
+        setResult(transformFloatCmp(expr, 1));
+    }
+
+    // Cmpl is for floating point comparison and returns -1 if either operand is NaN
+    @Override
+    public void caseCmplExpr(@Nonnull JCmplExpr expr) {
+        setResult(transformFloatCmp(expr, -1));
     }
     // #endregion
 
@@ -254,12 +316,12 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
 
     @Override
     public void caseFloatConstant(@Nonnull FloatConstant constant) {
-        setResult(ctx.mkReal(Float.toString(constant.getValue())));
+        setResult(ctx.mkFP(constant.getValue(), (FPSort) determineSort(constant.getType())));
     }
 
     @Override
     public void caseDoubleConstant(@Nonnull DoubleConstant constant) {
-        setResult(ctx.mkReal(Double.toString(constant.getValue())));
+        setResult(ctx.mkFP(constant.getValue(), (FPSort) determineSort(constant.getType())));
     }
 
     @Override
