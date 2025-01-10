@@ -96,13 +96,8 @@ public class SymbolicState {
      * 
      * @return The path condition as a Z3 BoolExpr
      */
-    public BoolExpr getPathCondition() {
-        if (pathConstraints.isEmpty()) {
-            return ctx.mkTrue();
-        } else if (pathConstraints.size() == 1) {
-            return pathConstraints.get(0);
-        }
-        return ctx.mkAnd(pathConstraints.toArray(new BoolExpr[pathConstraints.size()]));
+    public List<BoolExpr> getPathConstraints() {
+        return pathConstraints;
     }
 
     public void negateRandomPathConstraint() {
@@ -127,6 +122,6 @@ public class SymbolicState {
 
     @Override
     public String toString() {
-        return "State: " + symbolicVariables + ", PC: " + getPathCondition();
+        return "State: " + symbolicVariables + ", PC: " + getPathConstraints();
     }
 }

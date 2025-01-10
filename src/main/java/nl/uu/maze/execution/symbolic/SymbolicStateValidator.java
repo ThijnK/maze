@@ -9,6 +9,7 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.microsoft.z3.BoolExpr;
 import com.microsoft.z3.Context;
 import com.microsoft.z3.Expr;
 import com.microsoft.z3.FuncDecl;
@@ -42,7 +43,7 @@ public class SymbolicStateValidator {
      */
     public Optional<Model> validate(SymbolicState state) {
         logger.debug("Final state: " + state);
-        solver.add(state.getPathCondition());
+        solver.add(state.getPathConstraints().toArray(new BoolExpr[0]));
         Status status = solver.check();
         logger.debug("Path condition " + status.toString());
         Optional<Model> model = Optional.empty();
