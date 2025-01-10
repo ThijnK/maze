@@ -10,7 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.microsoft.z3.Context;
-import com.microsoft.z3.Model;
 
 import nl.uu.maze.analysis.JavaAnalyzer;
 import nl.uu.maze.execution.concrete.ConcreteExecutor;
@@ -77,8 +76,7 @@ public class ExecutionController {
 
             StmtGraph<?> cfg = analyzer.getCFG(method);
             List<SymbolicState> finalStates = symbolic.execute(cfg);
-            List<Model> models = validator.validate(finalStates);
-            List<Map<String, Object>> knownParams = validator.evaluate(models);
+            List<Map<String, Object>> knownParams = validator.validateAndEvaluate(finalStates);
             generator.generateMethodTestCases(method, knownParams);
         }
 
@@ -112,12 +110,9 @@ public class ExecutionController {
 
             // Negate one constraint in the final state's path condition
             finalState.negateRandomPathConstraint();
-            Optional<Model> model = validator.validate(finalState);
+            Optional<Map<String, Object>> knownParams = validator.validateAndEvaluate(finalState);
             // Generate a test case for current state
-            if (model.isPresent()) {
-                Map<String, Object> knownParams = validator.evaluate(model.get());
-                generator.generateMethodTestCase(method, knownParams);
-            }
+            knownParams.ifPresent(params -> generator.generateMethodTestCase(method, params));
         }
 
         generator.writeToFile(outPath);

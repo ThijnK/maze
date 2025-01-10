@@ -18,6 +18,10 @@ import com.microsoft.z3.Status;
 
 import nl.uu.maze.transform.Z3ToJavaTransformer;
 
+/**
+ * Validates symbolic states by checking the satisfiability of the path
+ * condition and evaluating the resulting Z3 models.
+ */
 public class SymbolicStateValidator {
     private static final Logger logger = LoggerFactory.getLogger(SymbolicStateValidator.class);
 
@@ -97,5 +101,31 @@ public class SymbolicStateValidator {
             knownParams.add(evaluate(model));
         }
         return knownParams;
+    }
+
+    /**
+     * Validates and evaluates the given symbolic state.
+     * 
+     * @param state The symbolic state to validate and evaluate
+     * @return A map of known parameters if the path condition is satisfiable
+     */
+    public Optional<Map<String, Object>> validateAndEvaluate(SymbolicState state) {
+        Optional<Model> model = validate(state);
+        return model.map(this::evaluate);
+    }
+
+    /**
+     * Validates and evaluates the given list of symbolic states.
+     * 
+     * @param states The symbolic states to validate and evaluate
+     * @return A list of known parameters for the satisfiable path conditions
+     */
+    public List<Map<String, Object>> validateAndEvaluate(List<SymbolicState> states) {
+        List<Map<String, Object>> result = new ArrayList<>();
+        for (SymbolicState state : states) {
+            Optional<Map<String, Object>> params = validateAndEvaluate(state);
+            params.ifPresent(result::add);
+        }
+        return result;
     }
 }
