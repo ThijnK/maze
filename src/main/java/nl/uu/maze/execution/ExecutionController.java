@@ -2,6 +2,7 @@ package nl.uu.maze.execution;
 
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -20,7 +21,6 @@ import nl.uu.maze.generation.JUnitTestGenerator;
 import nl.uu.maze.instrument.BytecodeInstrumenter;
 import nl.uu.maze.search.SearchStrategy;
 import nl.uu.maze.search.SearchStrategyFactory;
-import nl.uu.maze.util.Pair;
 import sootup.core.graph.StmtGraph;
 import sootup.java.core.JavaSootMethod;
 import sootup.java.core.types.JavaClassType;
@@ -34,6 +34,7 @@ public class ExecutionController {
 
     private final String classPath;
     private final String className;
+    private final Path outPath;
     private final SearchStrategy searchStrategy;
     private final JavaAnalyzer analyzer;
     private final Context ctx;
@@ -46,9 +47,11 @@ public class ExecutionController {
     private final ConcreteExecutor concrete;
     private final JUnitTestGenerator generator;
 
-    public ExecutionController(String classPath, String className, String strategyName) throws Exception {
+    public ExecutionController(String classPath, String className, String strategyName, String outPath)
+            throws Exception {
         this.classPath = classPath;
         this.className = className;
+        this.outPath = Path.of(outPath);
         searchStrategy = SearchStrategyFactory.getStrategy(strategyName);
         logger.info("Using search strategy: " + searchStrategy.getClass().getSimpleName());
         this.analyzer = new JavaAnalyzer(classPath);
@@ -74,11 +77,12 @@ public class ExecutionController {
 
             StmtGraph<?> cfg = analyzer.getCFG(method);
             List<SymbolicState> finalStates = symbolic.execute(cfg);
-            List<Pair<Model, SymbolicState>> results = validator.validate(finalStates);
-            generator.generateMethodTestCases(results, method, ctx);
+            List<Model> models = validator.validate(finalStates);
+            List<Map<String, Object>> knownParams = validator.evaluate(models);
+            generator.generateMethodTestCases(method, knownParams);
         }
 
-        generator.writeToFile(Path.of("src/test/java"));
+        generator.writeToFile(outPath);
     }
 
     // ** Perform classic concolic execution. */
@@ -111,9 +115,12 @@ public class ExecutionController {
             Optional<Model> model = validator.validate(finalState);
             // Generate a test case for current state
             if (model.isPresent()) {
-                generator.generateMethodTestCase(model.get(), finalState, method, ctx);
+                Map<String, Object> knownParams = validator.evaluate(model.get());
+                generator.generateMethodTestCase(method, knownParams);
             }
         }
+
+        generator.writeToFile(outPath);
     }
 
     public void close() {
