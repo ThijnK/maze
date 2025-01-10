@@ -7,6 +7,7 @@ import javax.annotation.Nonnull;
 import com.microsoft.z3.*;
 
 import nl.uu.maze.execution.symbolic.SymbolicState;
+import nl.uu.maze.util.Pair;
 import sootup.core.jimple.basic.*;
 import sootup.core.jimple.common.constant.*;
 import sootup.core.jimple.common.expr.AbstractBinopExpr;
@@ -95,19 +96,9 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
         Expr<?> l = transform(op1);
         Expr<?> r = transform(op2);
 
-        // Ensure both operands have the same bit vector size
         if (l instanceof BitVecExpr && r instanceof BitVecExpr) {
-            BitVecExpr bvL = (BitVecExpr) l;
-            BitVecExpr bvR = (BitVecExpr) r;
-            int sizeL = bvL.getSortSize();
-            int sizeR = bvR.getSortSize();
-
-            if (sizeL > sizeR) {
-                r = ctx.mkSignExt(sizeL - sizeR, bvR);
-            } else if (sizeR > sizeL) {
-                l = ctx.mkSignExt(sizeR - sizeL, bvL);
-            }
-            return bvOperation.apply((BitVecExpr) l, (BitVecExpr) r);
+            Pair<BitVecExpr, BitVecExpr> coerced = coerceToSameSize((BitVecExpr) l, (BitVecExpr) r);
+            return bvOperation.apply(coerced.getFirst(), coerced.getSecond());
         } else if (l instanceof FPExpr && r instanceof FPExpr && fpOperation != null) {
             return fpOperation.apply((FPExpr) l, (FPExpr) r);
         }
@@ -137,10 +128,50 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
         FPExpr op2 = (FPExpr) transform(expr.getOp2());
         BoolExpr isNaN1 = ctx.mkFPIsNaN(op1);
         BoolExpr isNaN2 = ctx.mkFPIsNaN(op2);
+        // Pair<FPExpr, FPExpr> coerced = coerceToSameSize(op1, op2);
 
         // Result: 1 if either is NaN, otherwise use ctx.mkFPSub
         return ctx.mkITE(ctx.mkOr(isNaN1, isNaN2), ctx.mkFP(valueIfNaN, op1.getSort()),
                 ctx.mkFPSub(ctx.mkFPRoundNearestTiesToEven(), op1, op2));
+        // return ctx.mkITE(ctx.mkOr(isNaN1, isNaN2), ctx.mkFP(valueIfNaN,
+        // coerced.getFirst().getSort()),
+        // ctx.mkFPSub(ctx.mkFPRoundNearestTiesToEven(), coerced.getFirst(),
+        // coerced.getSecond()));
+    }
+
+    /**
+     * Coerce two bit vector expressions to the same size by sign extending the
+     * smaller one.
+     */
+    private Pair<BitVecExpr, BitVecExpr> coerceToSameSize(BitVecExpr l, BitVecExpr r) {
+        int sizeL = l.getSortSize();
+        int sizeR = r.getSortSize();
+
+        if (sizeL > sizeR) {
+            r = ctx.mkSignExt(sizeL - sizeR, r);
+        } else if (sizeR > sizeL) {
+            l = ctx.mkSignExt(sizeR - sizeL, l);
+        }
+        return new Pair<>(l, r);
+    }
+
+    /**
+     * Coerce two floating point expressions to the same size by converting them to
+     * the same sort.
+     * TODO: fix this
+     */
+    private Pair<FPExpr, FPExpr> coerceToSameSize(FPExpr l, FPExpr r) {
+        FPSort sortL = l.getSort();
+        FPSort sortR = r.getSort();
+        int sizeL = sortL.getEBits() + sortL.getSBits();
+        int sizeR = sortR.getEBits() + sortR.getSBits();
+
+        if (sizeL > sizeR) {
+            r = ctx.mkFPToFP(ctx.mkFPRoundNearestTiesToEven(), r, ctx.mkFPSort(sortL.getEBits(), sortL.getSBits()));
+        } else if (sizeR > sizeL) {
+            l = ctx.mkFPToFP(ctx.mkFPRoundNearestTiesToEven(), l, ctx.mkFPSort(sortR.getEBits(), sortR.getSBits()));
+        }
+        return new Pair<>(l, r);
     }
 
     /**
