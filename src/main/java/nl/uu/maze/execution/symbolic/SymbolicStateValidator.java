@@ -30,7 +30,7 @@ public class SymbolicStateValidator {
 
     public SymbolicStateValidator(Context ctx) {
         this.solver = ctx.mkSolver();
-        this.transformer = new Z3ToJavaTransformer(ctx);
+        this.transformer = new Z3ToJavaTransformer();
     }
 
     /**

@@ -4,34 +4,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.microsoft.z3.ArrayExpr;
-import com.microsoft.z3.BitVecExpr;
 import com.microsoft.z3.BitVecNum;
-import com.microsoft.z3.Context;
 import com.microsoft.z3.Expr;
-import com.microsoft.z3.IntExpr;
 import com.microsoft.z3.Model;
 
 import nl.uu.maze.execution.symbolic.SymbolicState;
 import sootup.core.types.Type;
-import sootup.core.types.PrimitiveType.BooleanType;
-import sootup.core.types.PrimitiveType.ByteType;
-import sootup.core.types.PrimitiveType.CharType;
-import sootup.core.types.PrimitiveType.FloatType;
-import sootup.core.types.PrimitiveType.IntType;
-import sootup.core.types.PrimitiveType.LongType;
-import sootup.core.types.PrimitiveType.ShortType;
+import sootup.core.types.PrimitiveType.*;
 
 /**
  * Transforms a Z3 expression ({@link Expr}) to a Java Object.
  */
 public class Z3ToJavaTransformer {
-
-    private final Context ctx;
-
-    public Z3ToJavaTransformer(Context ctx) {
-        this.ctx = ctx;
-    }
-
     // TODO: add comments to methods below
 
     public Object transform(String var, Expr<?> expr, Model model, SymbolicState state) {
@@ -44,10 +28,11 @@ public class Z3ToJavaTransformer {
         } else if (evaluated.isReal()) {
             return transformReal(evaluated, state.getSymbolicType(var));
         } else if (evaluated.isArray()) {
-            return transformArray((ArrayExpr<?, ?>) evaluated, model);
+            return transformArray((ArrayExpr<?, ?>) evaluated);
         } else if (evaluated.isBV()) {
-            return transformBitVector((BitVecExpr) evaluated, state.getSymbolicType(var),
-                    model);
+            // We assume here that we're only dealing with int like types and longs as those
+            // are the only types represented by bit vectors, so we can cast to BitVecNum
+            return transformBitVector((BitVecNum) evaluated, state.getSymbolicType(var));
         } else {
             return evaluated.toString();
         }
@@ -61,36 +46,29 @@ public class Z3ToJavaTransformer {
         }
     }
 
-    private Object transformBitVector(BitVecExpr bitVecExpr, Type type, Model model) {
-        if (Type.isIntLikeType(type)) {
-            IntExpr signedValue = ctx.mkBV2Int(bitVecExpr, true); // Interpret as signed integer
-            IntExpr evaluated = (IntExpr) model.evaluate(signedValue, true);
-            return parseIntLike(type, evaluated.toString());
-        } else if (type instanceof LongType && bitVecExpr instanceof BitVecNum) {
-            return ((BitVecNum) bitVecExpr).getLong();
-        }
-        // Other types are not represented by bit vectors
-        else
-            return null;
-    }
-
-    private Object parseIntLike(Type type, String value) {
-        if (type instanceof IntType) {
-            return Integer.parseInt(value);
-        } else if (type instanceof ByteType) {
-            return Byte.parseByte(value);
-        } else if (type instanceof ShortType) {
-            return Short.parseShort(value);
-        } else if (type instanceof CharType) {
-            return value.charAt(0);
-        } else if (type instanceof BooleanType) {
-            return value != "0";
+    private Object transformBitVector(BitVecNum bitVecNum, Type type) {
+        if (type instanceof LongType) {
+            return ((BitVecNum) bitVecNum).getLong();
         } else {
-            return Integer.parseInt(value);
+            return castIntLike(type, bitVecNum.getInt());
         }
     }
 
-    private List<Object> transformArray(ArrayExpr<?, ?> arrayExpr, Model model) {
+    private Object castIntLike(Type type, int value) {
+        if (type instanceof ByteType) {
+            return (byte) value;
+        } else if (type instanceof ShortType) {
+            return (short) value;
+        } else if (type instanceof CharType) {
+            return (char) value;
+        } else if (type instanceof BooleanType) {
+            return value != 0;
+        } else {
+            return value;
+        }
+    }
+
+    private List<Object> transformArray(ArrayExpr<?, ?> arrayExpr) {
         List<Object> arrayValues = new ArrayList<>();
         // TODO: transform Z3 array to Java array
         return arrayValues;
