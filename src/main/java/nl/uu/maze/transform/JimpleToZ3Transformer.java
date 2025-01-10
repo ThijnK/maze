@@ -286,7 +286,9 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
     public void caseParameterRef(@Nonnull JParameterRef ref) {
         Sort z3Sort = determineSort(ref.getType());
         // Create a symbolic value for the parameter
-        setResult(ctx.mkConst("p" + ref.getIndex(), z3Sort));
+        String var = "p" + ref.getIndex();
+        setResult(ctx.mkConst(var, z3Sort));
+        state.setSymbolicType(var, ref.getType());
     }
 
     @Override
@@ -332,7 +334,9 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
     @Override
     public void caseLengthExpr(@Nonnull JLengthExpr expr) {
         // Introduce a symbolic variable to represent the length of the array
-        setResult(ctx.mkConst(expr.getOp() + "len", ctx.mkBitVecSort(Type.getValueBitSize(IntType.getInstance()))));
+        String var = expr.getOp() + "len";
+        setResult(ctx.mkConst(var, ctx.mkBitVecSort(Type.getValueBitSize(IntType.getInstance()))));
+        state.setSymbolicType(var, IntType.getInstance());
     }
     // #endregion
 }

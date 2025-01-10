@@ -9,6 +9,7 @@ import com.microsoft.z3.*;
 
 import sootup.core.graph.StmtGraph;
 import sootup.core.jimple.common.stmt.Stmt;
+import sootup.core.types.Type;
 
 /**
  * Represents a symbolic state in the symbolic execution engine.
@@ -30,6 +31,9 @@ public class SymbolicState {
 
     private Map<String, Expr<?>> symbolicVariables;
     private List<BoolExpr> pathConstraints;
+
+    // Keep track of (SootUp) types of symbolic variables
+    private Map<String, Type> symbolicTypes;
 
     public SymbolicState(Context ctx, Stmt stmt) {
         this.currentStmt = stmt;
@@ -65,6 +69,14 @@ public class SymbolicState {
 
     public Expr<?> getVariable(String var) {
         return symbolicVariables.getOrDefault(var, null);
+    }
+
+    public void setSymbolicType(String var, Type type) {
+        symbolicTypes.put(var, type);
+    }
+
+    public Type getSymbolicType(String var) {
+        return symbolicTypes.getOrDefault(var, null);
     }
 
     /**
