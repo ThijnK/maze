@@ -5,7 +5,7 @@ package nl.uu.maze.example;
  */
 public class ExampleClass {
 
-    public static void print(int x) {
+    public static void print(long x) {
         if (x > 5) {
             System.out.println("Positive");
         } else {

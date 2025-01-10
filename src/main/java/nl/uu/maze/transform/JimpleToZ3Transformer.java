@@ -13,6 +13,7 @@ import sootup.core.jimple.common.expr.AbstractBinopExpr;
 import sootup.core.jimple.common.expr.JAddExpr;
 import sootup.core.jimple.common.expr.JAndExpr;
 import sootup.core.jimple.common.expr.JCastExpr;
+import sootup.core.jimple.common.expr.JCmpExpr;
 import sootup.core.jimple.common.expr.JDivExpr;
 import sootup.core.jimple.common.expr.JEqExpr;
 import sootup.core.jimple.common.expr.JGeExpr;
@@ -81,11 +82,23 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
             BiFunction<T, T, Expr<?>> operation) {
         Immediate op1 = expr.getOp1();
         Immediate op2 = expr.getOp2();
-
-        // TODO: handle conversion between types (e.g. binop on long and int)
-
         T l = (T) transform(op1);
         T r = (T) transform(op2);
+
+        // Ensure both operands have the same bit vector size
+        if (l instanceof BitVecExpr && r instanceof BitVecExpr) {
+            BitVecExpr bvL = (BitVecExpr) l;
+            BitVecExpr bvR = (BitVecExpr) r;
+            int sizeL = bvL.getSortSize();
+            int sizeR = bvR.getSortSize();
+
+            if (sizeL > sizeR) {
+                r = (T) ctx.mkSignExt(sizeL - sizeR, bvR);
+            } else if (sizeR > sizeL) {
+                l = (T) ctx.mkSignExt(sizeR - sizeL, bvL);
+            }
+        }
+
         return operation.apply(l, r);
     }
 
@@ -219,6 +232,12 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
     public void caseUshrExpr(@Nonnull JUshrExpr expr) {
         // Unsigned (logical) shift right
         setResult(transformArithExpr(expr, ctx::mkBVLSHR));
+    }
+
+    @Override
+    public void caseCmpExpr(@Nonnull JCmpExpr expr) {
+        // Implement cmp operator as subtraction
+        setResult(transformArithExpr(expr, ctx::mkBVSub));
     }
     // #endregion
 
