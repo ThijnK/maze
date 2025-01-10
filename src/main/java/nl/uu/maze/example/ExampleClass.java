@@ -6,7 +6,7 @@ package nl.uu.maze.example;
 public class ExampleClass {
 
     public static void print(int x) {
-        if (x > 0) {
+        if (x > 5) {
             System.out.println("Positive");
         } else {
             System.out.println("Negative");

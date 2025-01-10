@@ -40,15 +40,17 @@ public class SymbolicState {
         this.symbolicVariables = new HashMap<>();
         this.ctx = ctx;
         this.pathConstraints = new ArrayList<>();
+        this.symbolicTypes = new HashMap<>();
     }
 
     public SymbolicState(Context ctx, Stmt stmt, int depth, Map<String, Expr<?>> symbolicVariables,
-            List<BoolExpr> pathConstraints) {
+            List<BoolExpr> pathConstraints, Map<String, Type> symbolicTypes) {
         this.currentStmt = stmt;
         this.currentDepth = depth;
         this.symbolicVariables = new HashMap<>(symbolicVariables);
         this.ctx = ctx;
         this.pathConstraints = new ArrayList<>(pathConstraints);
+        this.symbolicTypes = new HashMap<>(symbolicTypes);
     }
 
     public int incrementDepth() {
@@ -114,7 +116,7 @@ public class SymbolicState {
     }
 
     public SymbolicState clone(Stmt stmt) {
-        return new SymbolicState(ctx, stmt, currentDepth, symbolicVariables, pathConstraints);
+        return new SymbolicState(ctx, stmt, currentDepth, symbolicVariables, pathConstraints, symbolicTypes);
     }
 
     public SymbolicState clone() {

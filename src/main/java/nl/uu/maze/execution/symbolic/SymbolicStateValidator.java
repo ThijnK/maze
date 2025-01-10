@@ -77,28 +77,14 @@ public class SymbolicStateValidator {
      * @param model The Z3 model to evaluate
      * @return A map of known parameters
      */
-    public Map<String, Object> evaluate(Model model) {
+    public Map<String, Object> evaluate(Model model, SymbolicState state) {
         Map<String, Object> knownParams = new HashMap<>();
         for (FuncDecl<?> decl : model.getConstDecls()) {
             String var = decl.getName().toString();
             Expr<?> expr = model.getConstInterp(decl);
 
-            Object value = transformer.transform(expr, model);
+            Object value = transformer.transform(var, expr, model, state);
             knownParams.put(var, value);
-        }
-        return knownParams;
-    }
-
-    /**
-     * Evaluates the list of models and returns a list of known parameters.
-     * 
-     * @param models The list of Z3 models to evaluate
-     * @return A list of known parameters
-     */
-    public List<Map<String, Object>> evaluate(List<Model> models) {
-        List<Map<String, Object>> knownParams = new ArrayList<>();
-        for (Model model : models) {
-            knownParams.add(evaluate(model));
         }
         return knownParams;
     }
@@ -109,9 +95,9 @@ public class SymbolicStateValidator {
      * @param state The symbolic state to validate and evaluate
      * @return A map of known parameters if the path condition is satisfiable
      */
-    public Optional<Map<String, Object>> validateAndEvaluate(SymbolicState state) {
+    public Optional<Map<String, Object>> evaluate(SymbolicState state) {
         Optional<Model> model = validate(state);
-        return model.map(this::evaluate);
+        return model.map(m -> evaluate(m, state));
     }
 
     /**
@@ -120,10 +106,10 @@ public class SymbolicStateValidator {
      * @param states The symbolic states to validate and evaluate
      * @return A list of known parameters for the satisfiable path conditions
      */
-    public List<Map<String, Object>> validateAndEvaluate(List<SymbolicState> states) {
+    public List<Map<String, Object>> evaluate(List<SymbolicState> states) {
         List<Map<String, Object>> result = new ArrayList<>();
         for (SymbolicState state : states) {
-            Optional<Map<String, Object>> params = validateAndEvaluate(state);
+            Optional<Map<String, Object>> params = evaluate(state);
             params.ifPresent(result::add);
         }
         return result;

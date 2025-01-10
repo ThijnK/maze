@@ -76,7 +76,7 @@ public class ExecutionController {
 
             StmtGraph<?> cfg = analyzer.getCFG(method);
             List<SymbolicState> finalStates = symbolic.execute(cfg);
-            List<Map<String, Object>> knownParams = validator.validateAndEvaluate(finalStates);
+            List<Map<String, Object>> knownParams = validator.evaluate(finalStates);
             generator.generateMethodTestCases(method, knownParams);
         }
 
@@ -110,7 +110,7 @@ public class ExecutionController {
 
             // Negate one constraint in the final state's path condition
             finalState.negateRandomPathConstraint();
-            Optional<Map<String, Object>> knownParams = validator.validateAndEvaluate(finalState);
+            Optional<Map<String, Object>> knownParams = validator.evaluate(finalState);
             // Generate a test case for current state
             knownParams.ifPresent(params -> generator.generateMethodTestCase(method, params));
         }

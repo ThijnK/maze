@@ -32,7 +32,7 @@ public class Application {
             String strategyName = args.length > 0 ? args[0] : "";
 
             ExecutionController controller = new ExecutionController(classPath, className, strategyName, outPath);
-            controller.runSymbolic();
+            controller.runConcolic();
             controller.close();
         } catch (Exception e) {
             e.printStackTrace();
