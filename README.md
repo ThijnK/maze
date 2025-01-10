@@ -3,7 +3,7 @@
 Maze is a concolic execution engine designed for automated test generation.
 It leverages symbolic execution and concrete execution to explore program paths and generate test cases.
 
-The focus of the project is on the exploration of different search strategies.
+The project is being developed as part of a master's thesis at Utrecht University and focuses on the exploration of different search strategies.
 
 ## Getting Started
 
