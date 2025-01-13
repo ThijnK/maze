@@ -428,7 +428,7 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
         // Create a symbolic value for the parameter
         String var = "p" + ref.getIndex();
         setResult(ctx.mkConst(var, z3Sort));
-        state.setSymbolicType(var, ref.getType());
+        state.setVariableType(var, ref.getType());
     }
 
     @Override
@@ -491,7 +491,7 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
         // Introduce a symbolic variable to represent the length of the array
         String var = expr.getOp() + "len";
         setResult(ctx.mkConst(var, ctx.mkBitVecSort(Type.getValueBitSize(IntType.getInstance()))));
-        state.setSymbolicType(var, IntType.getInstance());
+        state.setVariableType(var, IntType.getInstance());
     }
     // #endregion
 }

@@ -18,6 +18,7 @@ import com.microsoft.z3.Solver;
 import com.microsoft.z3.Status;
 
 import nl.uu.maze.transform.Z3ToJavaTransformer;
+import sootup.core.types.Type;
 
 /**
  * Validates symbolic states by checking the satisfiability of the path
@@ -83,8 +84,9 @@ public class SymbolicStateValidator {
         for (FuncDecl<?> decl : model.getConstDecls()) {
             String var = decl.getName().toString();
             Expr<?> expr = model.getConstInterp(decl);
+            Type type = state.getVariableType(var);
 
-            Object value = transformer.transform(var, expr, model, state);
+            Object value = transformer.transform(expr, model, type);
             knownParams.put(var, value);
         }
         return knownParams;

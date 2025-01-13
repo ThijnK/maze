@@ -33,24 +33,24 @@ public class SymbolicState {
     private List<BoolExpr> pathConstraints;
 
     // Keep track of (SootUp) types of symbolic variables
-    private Map<String, Type> symbolicTypes;
+    private Map<String, Type> variableTypes;
 
     public SymbolicState(Context ctx, Stmt stmt) {
         this.currentStmt = stmt;
         this.symbolicVariables = new HashMap<>();
         this.ctx = ctx;
         this.pathConstraints = new ArrayList<>();
-        this.symbolicTypes = new HashMap<>();
+        this.variableTypes = new HashMap<>();
     }
 
     public SymbolicState(Context ctx, Stmt stmt, int depth, Map<String, Expr<?>> symbolicVariables,
-            List<BoolExpr> pathConstraints, Map<String, Type> symbolicTypes) {
+            List<BoolExpr> pathConstraints, Map<String, Type> variableTypes) {
         this.currentStmt = stmt;
         this.currentDepth = depth;
         this.symbolicVariables = new HashMap<>(symbolicVariables);
         this.ctx = ctx;
         this.pathConstraints = new ArrayList<>(pathConstraints);
-        this.symbolicTypes = new HashMap<>(symbolicTypes);
+        this.variableTypes = new HashMap<>(variableTypes);
     }
 
     public int incrementDepth() {
@@ -73,12 +73,12 @@ public class SymbolicState {
         return symbolicVariables.getOrDefault(var, null);
     }
 
-    public void setSymbolicType(String var, Type type) {
-        symbolicTypes.put(var, type);
+    public void setVariableType(String var, Type type) {
+        variableTypes.put(var, type);
     }
 
-    public Type getSymbolicType(String var) {
-        return symbolicTypes.getOrDefault(var, null);
+    public Type getVariableType(String var) {
+        return variableTypes.getOrDefault(var, null);
     }
 
     /**
@@ -113,7 +113,7 @@ public class SymbolicState {
     }
 
     public SymbolicState clone(Stmt stmt) {
-        return new SymbolicState(ctx, stmt, currentDepth, symbolicVariables, pathConstraints, symbolicTypes);
+        return new SymbolicState(ctx, stmt, currentDepth, symbolicVariables, pathConstraints, variableTypes);
     }
 
     public SymbolicState clone() {
