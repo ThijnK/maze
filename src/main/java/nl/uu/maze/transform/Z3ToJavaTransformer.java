@@ -39,6 +39,7 @@ public class Z3ToJavaTransformer {
     }
 
     private Object transformBitVector(BitVecNum bitVecNum, Type type) {
+        // TODO: below does not work for negative integer/long values
         if (type instanceof LongType) {
             return bitVecNum.getLong();
         } else {
@@ -66,8 +67,8 @@ public class Z3ToJavaTransformer {
         long significand = fpNum.getSignificandUInt64();
 
         if (type instanceof FloatType) {
-            int floatBits = (int) ((sign << 31) | ((exponent + 127) << 23) | (significand >>> 40));
-            return Float.intBitsToFloat(floatBits);
+            long floatBits = (sign << 31) | (((int) (exponent + 127) & 0xFF) << 23) | ((int) (significand & 0x7FFFFF));
+            return Float.intBitsToFloat((int) floatBits);
         } else if (type instanceof DoubleType) {
             long doubleBits = ((long) sign << 63) | ((exponent + 1023) << 52) | (significand & 0xFFFFFFFFFFFFFL);
             return Double.longBitsToDouble(doubleBits);
