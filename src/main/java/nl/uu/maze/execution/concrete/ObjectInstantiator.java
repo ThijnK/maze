@@ -88,25 +88,25 @@ public class ObjectInstantiator {
         for (int i = 0; i < paramTypes.length; i++) {
             switch (paramTypes[i].getName()) {
                 case "int":
-                    arguments[i] = rand.nextInt();
+                    arguments[i] = rand.nextInt(Integer.MIN_VALUE, Integer.MAX_VALUE);
                     break;
                 case "double":
-                    arguments[i] = rand.nextDouble(Double.MAX_VALUE);
+                    arguments[i] = rand.nextDouble(Double.MIN_VALUE, Double.MAX_VALUE);
                     break;
                 case "float":
-                    arguments[i] = rand.nextFloat(Float.MAX_VALUE);
+                    arguments[i] = rand.nextFloat(Float.MIN_VALUE, Float.MAX_VALUE);
                     break;
                 case "long":
-                    arguments[i] = rand.nextLong();
+                    arguments[i] = rand.nextLong(Long.MIN_VALUE, Long.MAX_VALUE);
                     break;
                 case "short":
-                    arguments[i] = (short) rand.nextInt(Short.MAX_VALUE);
+                    arguments[i] = (short) rand.nextInt(Short.MIN_VALUE, Short.MAX_VALUE);
                     break;
                 case "byte":
-                    arguments[i] = (byte) rand.nextInt(Byte.MAX_VALUE);
+                    arguments[i] = (byte) rand.nextInt(Byte.MIN_VALUE, Byte.MAX_VALUE);
                     break;
                 case "char":
-                    arguments[i] = (char) rand.nextInt(Character.MAX_VALUE);
+                    arguments[i] = (char) rand.nextInt(Character.MIN_VALUE, Character.MAX_VALUE);
                     break;
                 case "boolean":
                     arguments[i] = rand.nextBoolean();
