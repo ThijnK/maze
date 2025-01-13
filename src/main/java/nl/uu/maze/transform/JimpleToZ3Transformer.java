@@ -105,11 +105,11 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
         // Handle coercions between floating point and bit vector if only one operand is
         // FP and the other is a bit vector
         else if (l instanceof FPExpr && r instanceof BitVecExpr && fpOperation != null) {
-            FPExpr rFP = ctx.mkFPToFP((BitVecExpr) r, (FPSort) l.getSort());
-            return fpOperation.apply((FPExpr) l, rFP);
+            Pair<FPExpr, FPExpr> coerced = coerceToSameSize((BitVecExpr) r, (FPExpr) l);
+            return fpOperation.apply(coerced.getSecond(), coerced.getFirst());
         } else if (l instanceof BitVecExpr && r instanceof FPExpr && fpOperation != null) {
-            FPExpr lFP = ctx.mkFPToFP((BitVecExpr) l, (FPSort) r.getSort());
-            return fpOperation.apply(lFP, (FPExpr) r);
+            Pair<FPExpr, FPExpr> coerced = coerceToSameSize((BitVecExpr) l, (FPExpr) r);
+            return fpOperation.apply(coerced.getFirst(), coerced.getSecond());
         } else {
             throw new UnsupportedOperationException(
                     "Unsupported operand types: " + l.getSort() + " and " + r.getSort());
@@ -128,15 +128,10 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
         FPExpr op2 = (FPExpr) transform(expr.getOp2());
         BoolExpr isNaN1 = ctx.mkFPIsNaN(op1);
         BoolExpr isNaN2 = ctx.mkFPIsNaN(op2);
-        // Pair<FPExpr, FPExpr> coerced = coerceToSameSize(op1, op2);
 
         // Result: 1 if either is NaN, otherwise use ctx.mkFPSub
         return ctx.mkITE(ctx.mkOr(isNaN1, isNaN2), ctx.mkFP(valueIfNaN, op1.getSort()),
                 ctx.mkFPSub(ctx.mkFPRoundNearestTiesToEven(), op1, op2));
-        // return ctx.mkITE(ctx.mkOr(isNaN1, isNaN2), ctx.mkFP(valueIfNaN,
-        // coerced.getFirst().getSort()),
-        // ctx.mkFPSub(ctx.mkFPRoundNearestTiesToEven(), coerced.getFirst(),
-        // coerced.getSecond()));
     }
 
     /**
@@ -156,22 +151,55 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
     }
 
     /**
-     * Coerce two floating point expressions to the same size by converting them to
-     * the same sort.
-     * TODO: fix this
+     * Coerce a bit vector and floating point expression to the same size and sort.
      */
-    private Pair<FPExpr, FPExpr> coerceToSameSize(FPExpr l, FPExpr r) {
-        FPSort sortL = l.getSort();
+    private Pair<FPExpr, FPExpr> coerceToSameSize(BitVecExpr l, FPExpr r) {
         FPSort sortR = r.getSort();
-        int sizeL = sortL.getEBits() + sortL.getSBits();
+        int sizeL = l.getSortSize();
         int sizeR = sortR.getEBits() + sortR.getSBits();
+        FPSort expectedSort = sortR;
 
         if (sizeL > sizeR) {
-            r = ctx.mkFPToFP(ctx.mkFPRoundNearestTiesToEven(), r, ctx.mkFPSort(sortL.getEBits(), sortL.getSBits()));
+            // Coerce the floating point number to the same size as the bit vector
+            expectedSort = ctx.mkFPSort(sizeL - sortR.getSBits(), sortR.getSBits());
+            r = ctx.mkFPToFP(ctx.mkFPRoundNearestTiesToEven(), r, expectedSort);
         } else if (sizeR > sizeL) {
-            l = ctx.mkFPToFP(ctx.mkFPRoundNearestTiesToEven(), l, ctx.mkFPSort(sortR.getEBits(), sortR.getSBits()));
+            // Sign extend the bit vector to match the size of the floating point number
+            l = ctx.mkSignExt(sizeR - sizeL, l);
         }
-        return new Pair<>(l, r);
+        FPExpr lFP = ctx.mkFPToFP(l, expectedSort);
+        return new Pair<>(lFP, r);
+    }
+
+    /**
+     * Coerce a bit vector to the given size by either sign extending or extracting
+     * bits.
+     */
+    private BitVecExpr coerceToSize(BitVecExpr epxr, int size) {
+        if (size > epxr.getSortSize()) {
+            return ctx.mkSignExt(size - epxr.getSortSize(), epxr);
+        } else if (size < epxr.getSortSize()) {
+            return ctx.mkExtract(size - 1, 0, epxr);
+        }
+        return epxr;
+    }
+
+    /** Coerce a floating point number to the given sort by rounding. */
+    private FPExpr coerceToSort(FPExpr expr, FPSort sort) {
+        int sizeExpr = expr.getSort().getEBits() + expr.getSort().getSBits();
+        int sizeSort = sort.getEBits() + sort.getSBits();
+        return sizeExpr != sizeSort ? ctx.mkFPToFP(ctx.mkFPRoundNearestTiesToEven(), expr, sort) : expr;
+    }
+
+    /** Coerce a bit vector to the given sort. */
+    private FPExpr coerceToSort(BitVecExpr expr, FPSort sort) {
+        int sizeSort = sort.getEBits() + sort.getSBits();
+        return ctx.mkFPToFP(coerceToSize(expr, sizeSort), sort);
+    }
+
+    /** Coerce a bit vector to the given sort. */
+    private BitVecExpr coerceToSort(BitVecExpr expr, BitVecSort sort) {
+        return coerceToSize(expr, sort.getSize());
     }
 
     /**
@@ -438,9 +466,24 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
     @Override
     public void caseCastExpr(@Nonnull JCastExpr expr) {
         Expr<?> innerExpr = transform(expr.getOp());
-        // TODO: handle casts
-        // expr.getType() is the type being cast to
-        setResult(innerExpr);
+        Type type = expr.getType();
+        Sort sort = determineSort(type);
+
+        // Cast from number to another number
+        if (innerExpr instanceof BitVecExpr || innerExpr instanceof FPExpr) {
+            if (innerExpr instanceof BitVecExpr && sort instanceof FPSort) {
+                setResult(coerceToSort((BitVecExpr) innerExpr, (FPSort) sort));
+            } else if (innerExpr instanceof FPExpr && sort instanceof FPSort) {
+                setResult(coerceToSort((FPExpr) innerExpr, (FPSort) sort));
+            } else if (innerExpr instanceof BitVecExpr && sort instanceof BitVecSort) {
+                setResult(coerceToSort((BitVecExpr) innerExpr, (BitVecSort) sort));
+            } else {
+                throw new UnsupportedOperationException("Unsupported cast from " + innerExpr.getSort() + " to " + sort);
+            }
+        } else {
+            // TODO: handle cast to other types
+            throw new UnsupportedOperationException("Unsupported cast from " + innerExpr.getSort() + " to " + sort);
+        }
     }
 
     @Override

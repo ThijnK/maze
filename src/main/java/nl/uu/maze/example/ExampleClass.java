@@ -5,8 +5,8 @@ package nl.uu.maze.example;
  */
 public class ExampleClass {
 
-    public static void print(double x) {
-        if (x > 5.0) {
+    public static void print(float x) {
+        if (x > 1.0) {
             System.out.println("Positive");
         } else {
             System.out.println("Negative");
