@@ -16,8 +16,14 @@ import sootup.core.types.PrimitiveType.*;
  * Transforms a Z3 expression ({@link Expr}) to a Java Object.
  */
 public class Z3ToJavaTransformer {
-    // TODO: add comments to methods below
 
+    /**
+     * Transform a Z3 expression to a Java object.
+     * 
+     * @param expr  The Z3 expression to transform
+     * @param model The Z3 model to evaluate the expression on
+     * @param type  The expected SootUp type of the expression
+     */
     public Object transform(Expr<?> expr, Model model, Type type) {
         Expr<?> evaluated = model.evaluate(expr, true);
 
@@ -28,9 +34,7 @@ public class Z3ToJavaTransformer {
         } else if (evaluated.isArray()) {
             return transformArray((ArrayExpr<?, ?>) evaluated);
         } else if (evaluated.isBV() && evaluated instanceof BitVecNum) {
-            // We assume here that we're only dealing with int like types and longs as those
-            // are the only types represented by bit vectors, so we can cast to BitVecNum
-            return transformBitVector((BitVecNum) evaluated, type);
+            return transformBV((BitVecNum) evaluated, type);
         } else if (evaluated instanceof FPNum) {
             return transformFP((FPNum) evaluated, type);
         } else {
@@ -38,7 +42,8 @@ public class Z3ToJavaTransformer {
         }
     }
 
-    private Object transformBitVector(BitVecNum bitVecNum, Type type) {
+    /** Transform a Z3 bit-vector to a Java int-like type */
+    private Object transformBV(BitVecNum bitVecNum, Type type) {
         // TODO: below does not work for negative integer/long values
         if (type instanceof LongType) {
             return bitVecNum.getLong();
@@ -61,6 +66,7 @@ public class Z3ToJavaTransformer {
         }
     }
 
+    /** Transform a Z3 floating-point number to a Java float or double */
     private Object transformFP(FPNum fpNum, Type type) {
         int sign = fpNum.getSign() ? 1 : 0;
         long exponent = fpNum.getExponentInt64(false);
@@ -77,10 +83,10 @@ public class Z3ToJavaTransformer {
         }
     }
 
+    /** Transform a Z3 array to a Java array */
     private List<Object> transformArray(ArrayExpr<?, ?> arrayExpr) {
         List<Object> arrayValues = new ArrayList<>();
         // TODO: transform Z3 array to Java array
         return arrayValues;
     }
-
 }
