@@ -44,15 +44,19 @@ public class Z3ToJavaTransformer {
 
     /** Transform a Z3 bit-vector to a Java int-like type */
     private Object transformBV(BitVecNum bitVecNum, Type type) {
-        // TODO: below does not work for negative integer/long values
         if (type instanceof LongType) {
-            return bitVecNum.getLong();
+            // To get a signed long value, we need to get BigInteger from Z3, because
+            // getLong() fails for negative values
+            return bitVecNum.getBigInteger().longValue();
         } else {
-            return castIntLike(type, bitVecNum.getInt());
+            // For the same reason as above, use getLong() and convert that to integer or
+            // other int-like type
+            return castIntLike(type, bitVecNum.getLong());
         }
     }
 
-    private Object castIntLike(Type type, int value) {
+    /** Cast a long value to a Java int-like type */
+    private Object castIntLike(Type type, long value) {
         if (type instanceof ByteType) {
             return (byte) value;
         } else if (type instanceof ShortType) {
@@ -62,7 +66,7 @@ public class Z3ToJavaTransformer {
         } else if (type instanceof BooleanType) {
             return value != 0;
         } else {
-            return value;
+            return (int) value;
         }
     }
 
