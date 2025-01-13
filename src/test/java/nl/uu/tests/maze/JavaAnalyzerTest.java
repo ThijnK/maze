@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.lang.reflect.Method;
 import java.util.Set;
 
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import nl.uu.maze.analysis.JavaAnalyzer;
@@ -17,10 +17,10 @@ public class JavaAnalyzerTest {
     private static final String classPath = "target/test-classes";
     private static final String className = "nl.uu.tests.maze.ExampleClass";
 
-    private JavaAnalyzer analyzer;
+    private static JavaAnalyzer analyzer;
 
-    @BeforeEach
-    public void setUp() {
+    @BeforeAll
+    public static void setUp() {
         analyzer = new JavaAnalyzer(classPath);
     }
 
