@@ -63,7 +63,7 @@ public class Z3ToJavaTransformerTest {
 
     @Test
     public void testTransform_BVExpr_PositiveInt() {
-        int value = 42;
+        int value = Integer.MAX_VALUE;
         Type type = IntType.getInstance();
         BitVecExpr expr = ctx.mkBV(value, Type.getValueBitSize(type));
         Object result = transformer.transform(expr, model, type);
@@ -72,7 +72,7 @@ public class Z3ToJavaTransformerTest {
 
     @Test
     public void testTransform_BVExpr_NegativeInt() {
-        int value = -42;
+        int value = Integer.MIN_VALUE;
         Type type = IntType.getInstance();
         BitVecExpr expr = ctx.mkBV(value, Type.getValueBitSize(type));
         Object result = transformer.transform(expr, model, type);
@@ -81,7 +81,7 @@ public class Z3ToJavaTransformerTest {
 
     @Test
     public void testTransform_BVExpr_PositiveLong() {
-        long value = 2147483648L;
+        long value = Long.MAX_VALUE;
         Type type = LongType.getInstance();
         BitVecExpr expr = ctx.mkBV(value, Type.getValueBitSize(type));
         Object result = transformer.transform(expr, model, type);
@@ -90,7 +90,7 @@ public class Z3ToJavaTransformerTest {
 
     @Test
     public void testTransform_BVExpr_NegativeLong() {
-        long value = -2147483648L;
+        long value = Long.MIN_VALUE;
         Type type = LongType.getInstance();
         BitVecExpr expr = ctx.mkBV(value, Type.getValueBitSize(type));
         Object result = transformer.transform(expr, model, type);
@@ -99,7 +99,7 @@ public class Z3ToJavaTransformerTest {
 
     @Test
     public void testTransform_BVExpr_Byte() {
-        byte value = 42;
+        byte value = Byte.MAX_VALUE;
         Type type = ByteType.getInstance();
         BitVecExpr expr = ctx.mkBV(value, Type.getValueBitSize(type));
         Object result = transformer.transform(expr, model, type);
@@ -108,7 +108,7 @@ public class Z3ToJavaTransformerTest {
 
     @Test
     public void testTransform_BVExpr_Short() {
-        short value = 42;
+        short value = Short.MAX_VALUE;
         Type type = ShortType.getInstance();
         BitVecExpr expr = ctx.mkBV(value, Type.getValueBitSize(type));
         Object result = transformer.transform(expr, model, type);
