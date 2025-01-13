@@ -91,10 +91,10 @@ public class ObjectInstantiator {
                     arguments[i] = rand.nextInt();
                     break;
                 case "double":
-                    arguments[i] = rand.nextDouble();
+                    arguments[i] = rand.nextDouble(Double.MAX_VALUE);
                     break;
                 case "float":
-                    arguments[i] = rand.nextFloat();
+                    arguments[i] = rand.nextFloat(Float.MAX_VALUE);
                     break;
                 case "long":
                     arguments[i] = rand.nextLong();
