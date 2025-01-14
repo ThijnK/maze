@@ -101,16 +101,17 @@ public class ExecutionController {
             // 4. Get Z3 model from that state
             // 5. Generate a test case for the current model and state
             // 6. Get Java values from the model to use as args of step 1
-            // - this requires transforming Z3 Expr to Java values
 
             StmtGraph<?> cfg = analyzer.getCFG(method);
             concrete.execute(instrumented, analyzer.getJavaMethod(method, instrumented));
             SymbolicState finalState = symbolic.replay(cfg, method.getName());
             logger.info("Replayed state: " + finalState);
+            Optional<Map<String, Object>> knownParams = validator.evaluate(finalState);
+            knownParams.ifPresent(params -> generator.generateMethodTestCase(method, params));
 
             // Negate one constraint in the final state's path condition
             finalState.negateRandomPathConstraint();
-            Optional<Map<String, Object>> knownParams = validator.evaluate(finalState);
+            knownParams = validator.evaluate(finalState);
             // Generate a test case for current state
             knownParams.ifPresent(params -> generator.generateMethodTestCase(method, params));
         }

@@ -426,7 +426,7 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
     public void caseParameterRef(@Nonnull JParameterRef ref) {
         Sort z3Sort = determineSort(ref.getType());
         // Create a symbolic value for the parameter
-        String var = "p" + ref.getIndex();
+        String var = "arg" + ref.getIndex();
         setResult(ctx.mkConst(var, z3Sort));
         state.setVariableType(var, ref.getType());
     }

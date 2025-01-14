@@ -4,6 +4,9 @@ import nl.uu.maze.execution.concrete.ObjectInstantiator;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.lang.reflect.Parameter;
+import java.util.Map;
+
 import org.junit.jupiter.api.BeforeAll;
 
 class ObjectInstantiatorTest {
@@ -37,9 +40,8 @@ class ObjectInstantiatorTest {
 
     @Test
     public void testGenerateArgs() {
-        Class<?>[] paramTypes = { int.class, double.class, float.class, long.class, short.class, byte.class, char.class,
-                boolean.class, TestClassWithArgs.class };
-        Object[] args = instantiator.generateArgs(paramTypes);
+        Parameter[] params = TestClassManyArgs.class.getConstructors()[0].getParameters();
+        Object[] args = instantiator.generateArgs(params);
         assertEquals(9, args.length);
         assertTrue(args[0] instanceof Integer);
         assertTrue(args[1] instanceof Double);
@@ -50,6 +52,24 @@ class ObjectInstantiatorTest {
         assertTrue(args[6] instanceof Character);
         assertTrue(args[7] instanceof Boolean);
         assertTrue(args[8] instanceof TestClassWithArgs);
+    }
+
+    @Test
+    public void testGenerateArgs_WithKnownParams() {
+        Parameter[] params = TestClassManyArgs.class.getConstructors()[0].getParameters();
+        Map<String, Object> knownParams = Map.of("arg0", 1, "arg1", 2.0, "arg2", 3.0f, "arg3", 4L, "arg4", (short) 5,
+                "arg5", (byte) 6, "arg6", '7', "arg7", true, "arg8", new TestClassWithArgs(1, 2.0, true));
+        Object[] args = instantiator.generateArgs(params, knownParams);
+        assertEquals(9, args.length);
+        assertEquals(1, args[0]);
+        assertEquals(2.0, args[1]);
+        assertEquals(3.0f, args[2]);
+        assertEquals(4L, args[3]);
+        assertEquals((short) 5, args[4]);
+        assertEquals((byte) 6, args[5]);
+        assertEquals('7', args[6]);
+        assertEquals(true, args[7]);
+        assertEquals(knownParams.get("arg8"), args[8]);
     }
 
     public static class TestClassNoArgs {
@@ -63,5 +83,11 @@ class ObjectInstantiatorTest {
     }
 
     public static class TestClassNoConstructors {
+    }
+
+    public static class TestClassManyArgs {
+        public TestClassManyArgs(int a, double b, float c, long d, short e, byte f, char g, boolean h,
+                TestClassWithArgs i) {
+        }
     }
 }

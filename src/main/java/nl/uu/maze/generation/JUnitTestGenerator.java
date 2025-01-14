@@ -64,7 +64,7 @@ public class JUnitTestGenerator {
         List<String> params = new ArrayList<>();
         List<Type> paramTypes = method.getParameterTypes();
         for (int j = 0; j < paramTypes.size(); j++) {
-            String var = "p" + j;
+            String var = "arg" + j;
             params.add(var);
 
             Object value = knownParams.get(var);
