@@ -91,10 +91,12 @@ public class ObjectInstantiator {
                     arguments[i] = rand.nextInt(Integer.MIN_VALUE, Integer.MAX_VALUE);
                     break;
                 case "double":
-                    arguments[i] = rand.nextDouble(Double.MIN_VALUE, Double.MAX_VALUE);
+                    long randomBits64 = rand.nextLong();
+                    arguments[i] = Double.longBitsToDouble(randomBits64);
                     break;
                 case "float":
-                    arguments[i] = rand.nextFloat(Float.MIN_VALUE, Float.MAX_VALUE);
+                    int randomBits32 = rand.nextInt();
+                    arguments[i] = Float.intBitsToFloat(randomBits32);
                     break;
                 case "long":
                     arguments[i] = rand.nextLong(Long.MIN_VALUE, Long.MAX_VALUE);
