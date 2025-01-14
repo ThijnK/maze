@@ -135,7 +135,7 @@ public class Z3ToJavaTransformerTest {
 
     @Test
     public void testTransform_FPExpr_PositiveFloat() {
-        float value = 42.0f;
+        float value = Float.MAX_VALUE;
         FPNum expr = ctx.mkFP(value, ctx.mkFPSort32());
         Object result = transformer.transform(expr, model, FloatType.getInstance());
         assertEquals(value, result);
@@ -143,7 +143,7 @@ public class Z3ToJavaTransformerTest {
 
     @Test
     public void testTransform_FPExpr_NegativeFloat() {
-        float value = -42.0f;
+        float value = -Float.MAX_VALUE;
         FPNum expr = ctx.mkFP(value, ctx.mkFPSort32());
         Object result = transformer.transform(expr, model, FloatType.getInstance());
         assertEquals(value, result);
@@ -151,7 +151,7 @@ public class Z3ToJavaTransformerTest {
 
     @Test
     public void testTransform_FPExpr_PositiveDouble() {
-        double value = 42.0;
+        double value = Double.MAX_VALUE;
         FPNum expr = ctx.mkFP(value, ctx.mkFPSort64());
         Object result = transformer.transform(expr, model, DoubleType.getInstance());
         assertEquals(value, result);
@@ -159,7 +159,7 @@ public class Z3ToJavaTransformerTest {
 
     @Test
     public void testTransform_FPExpr_NegativeDouble() {
-        double value = -42.0;
+        double value = -Double.MAX_VALUE;
         FPNum expr = ctx.mkFP(value, ctx.mkFPSort64());
         Object result = transformer.transform(expr, model, DoubleType.getInstance());
         assertEquals(value, result);
@@ -178,6 +178,38 @@ public class Z3ToJavaTransformerTest {
         float value = Float.NEGATIVE_INFINITY;
         FPNum expr = ctx.mkFP(value, ctx.mkFPSort32());
         Object result = transformer.transform(expr, model, FloatType.getInstance());
+        assertEquals(value, result);
+    }
+
+    @Test
+    public void testTransform_FPExpr_PositiveDoubleInfinity() {
+        double value = Double.POSITIVE_INFINITY;
+        FPNum expr = ctx.mkFP(value, ctx.mkFPSort64());
+        Object result = transformer.transform(expr, model, DoubleType.getInstance());
+        assertEquals(value, result);
+    }
+
+    @Test
+    public void testTransform_FPExpr_NegativeDoubleInfinity() {
+        double value = Double.NEGATIVE_INFINITY;
+        FPNum expr = ctx.mkFP(value, ctx.mkFPSort64());
+        Object result = transformer.transform(expr, model, DoubleType.getInstance());
+        assertEquals(value, result);
+    }
+
+    @Test
+    public void testTransform_FPExpr_FloatNaN() {
+        float value = Float.NaN;
+        FPNum expr = ctx.mkFP(value, ctx.mkFPSort32());
+        Object result = transformer.transform(expr, model, FloatType.getInstance());
+        assertEquals(value, result);
+    }
+
+    @Test
+    public void testTransform_FPExpr_DoubleNaN() {
+        double value = Double.NaN;
+        FPNum expr = ctx.mkFP(value, ctx.mkFPSort64());
+        Object result = transformer.transform(expr, model, DoubleType.getInstance());
         assertEquals(value, result);
     }
 }

@@ -72,6 +72,14 @@ public class Z3ToJavaTransformer {
 
     /** Transform a Z3 floating-point number to a Java float or double */
     private Object transformFP(FPNum fpNum, Type type) {
+        if (fpNum.isNaN()) {
+            if (type instanceof FloatType) {
+                return Float.NaN;
+            } else if (type instanceof DoubleType) {
+                return Double.NaN;
+            }
+        }
+
         int sign = fpNum.getSign() ? 1 : 0;
         long exponent = fpNum.getExponentInt64(false);
         long significand = fpNum.getSignificandUInt64();
