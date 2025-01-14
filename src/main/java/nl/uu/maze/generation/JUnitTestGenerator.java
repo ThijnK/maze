@@ -76,7 +76,9 @@ public class JUnitTestGenerator {
             }
             // If value is a primitive type, JavaPoet will handle it as a literal
             else if (value != null) {
-                methodBuilder.addStatement("$L $L = $L", paramTypes.get(j), var, value);
+                // Add a "F" or "L" postfix for float and long literals
+                String postfix = value instanceof Float ? "F" : value instanceof Long ? "L" : "";
+                methodBuilder.addStatement("$L $L = $L$L", paramTypes.get(j), var, value, postfix);
             }
             // If value is not known, use a default value
             else {
