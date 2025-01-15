@@ -8,6 +8,7 @@ import javax.lang.model.element.Modifier;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Test;
@@ -28,11 +29,15 @@ public class JUnitTestGenerator {
     private TypeSpec.Builder classBuilder;
     private Class<?> clazz;
 
+    /** Map of method names to the number of test cases generated for each method */
+    private Map<String, Integer> methodCount;
+
     public JUnitTestGenerator(Class<?> clazz) throws ClassNotFoundException {
         testClassName = clazz.getSimpleName() + "Test";
         classBuilder = TypeSpec.classBuilder(testClassName)
                 .addModifiers(Modifier.PUBLIC);
         this.clazz = clazz;
+        this.methodCount = new java.util.HashMap<>();
     }
 
     /**
@@ -40,24 +45,12 @@ public class JUnitTestGenerator {
      * parameter values as arguments to the method invocation.
      * 
      * @param method The {@link JavaSootMethod} to generate a test case for
-     * @param argMap {@link ArgMap} containing the arguments to pass to the method
-     *               invocation
+     * @param argMap {@link ArgMap} containing the arguments to pass to the
+     *               method invocation
      */
     public void generateMethodTestCase(JavaSootMethod method, ArgMap argMap) {
-        String testMethodName = "test" + capitalizeFirstLetter(method.getName());
-        generateMethodTestCase(method, argMap, testMethodName);
-    }
-
-    /**
-     * Generates a single JUnit test case for a method under test, passing the given
-     * parameter values as arguments to the method invocation.
-     * 
-     * @param method         The {@link JavaSootMethod} to generate a test case for
-     * @param argMap         {@link ArgMap} containing the arguments to pass to the
-     *                       method invocation
-     * @param testMethodName The name of the test method to use
-     */
-    private void generateMethodTestCase(JavaSootMethod method, ArgMap argMap, String testMethodName) {
+        methodCount.compute(method.getName(), (k, v) -> v == null ? 1 : v + 1);
+        String testMethodName = "test" + capitalizeFirstLetter(method.getName()) + methodCount.get(method.getName());
         MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder(testMethodName)
                 .addModifiers(Modifier.PUBLIC)
                 .addAnnotation(Test.class)
@@ -120,10 +113,8 @@ public class JUnitTestGenerator {
      */
     public void generateMethodTestCases(JavaSootMethod method, List<ArgMap> argMaps) {
         logger.info("Generating JUnit test cases...");
-        String testMethodName = "test" + capitalizeFirstLetter(method.getName());
-
         for (int i = 0; i < argMaps.size(); i++) {
-            generateMethodTestCase(method, argMaps.get(i), testMethodName + (i + 1));
+            generateMethodTestCase(method, argMaps.get(i));
         }
     }
 
