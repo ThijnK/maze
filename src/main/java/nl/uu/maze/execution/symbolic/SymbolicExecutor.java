@@ -37,9 +37,7 @@ public class SymbolicExecutor {
 
     public SymbolicState replay(StmtGraph<?> cfg, String methodName)
             throws FileNotFoundException, IOException, Exception {
-        TraceManager manager = new TraceManager();
-        manager.loadTraceFile();
-        Iterator<TraceEntry> iterator = manager.getTraceEntriesIterator(methodName);
+        Iterator<TraceEntry> iterator = TraceManager.getTraceEntriesIterator(methodName);
 
         SymbolicState current = new SymbolicState(ctx, cfg.getStartingStmt());
         while (!current.isFinalState(cfg)) {
@@ -133,6 +131,8 @@ public class SymbolicExecutor {
 
         // If replaying a trace, follow the branch indicated by the trace
         if (iterator != null) {
+            if (!iterator.hasNext())
+                throw new IllegalArgumentException("Trace is too short");
             TraceEntry entry = iterator.next();
             int branchIndex = entry.getValue();
             state.addPathConstraint(branchIndex == 0 ? ctx.mkNot(condExpr) : condExpr);

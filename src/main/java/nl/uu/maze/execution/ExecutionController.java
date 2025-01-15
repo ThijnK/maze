@@ -1,6 +1,8 @@
 package nl.uu.maze.execution;
 
+import java.lang.reflect.Method;
 import java.nio.file.Path;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -9,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.microsoft.z3.Context;
+import com.microsoft.z3.Model;
 
 import nl.uu.maze.analysis.JavaAnalyzer;
 import nl.uu.maze.execution.concrete.ConcreteExecutor;
@@ -17,6 +20,7 @@ import nl.uu.maze.execution.symbolic.SymbolicState;
 import nl.uu.maze.execution.symbolic.SymbolicStateValidator;
 import nl.uu.maze.generation.JUnitTestGenerator;
 import nl.uu.maze.instrument.BytecodeInstrumenter;
+import nl.uu.maze.instrument.TraceManager;
 import nl.uu.maze.search.SearchStrategy;
 import nl.uu.maze.search.SearchStrategyFactory;
 import sootup.core.graph.StmtGraph;
@@ -92,27 +96,38 @@ public class ExecutionController {
             }
 
             logger.info("Processing method: " + method.getName());
-
-            // Approach:
-            // 1. Execute the (instrumented) method concretely
-            // 2. Replay trace symbolically to get symbolic state
-            // 3. Negate one constraint in the path condition
-            // 4. Get Z3 model from that state
-            // 5. Generate a test case for the current model and state
-            // 6. Get Java values from the model to use as args of step 1
-
             StmtGraph<?> cfg = analyzer.getCFG(method);
-            concrete.execute(instrumented, analyzer.getJavaMethod(method, instrumented));
-            SymbolicState finalState = symbolic.replay(cfg, method.getName());
-            logger.info("Replayed state: " + finalState);
-            Optional<ArgMap> argMap = validator.evaluate(finalState);
-            argMap.ifPresent(params -> generator.generateMethodTestCase(method, params));
+            Method javaMethod = analyzer.getJavaMethod(method, instrumented);
+            Set<String> exploredPaths = new HashSet<>();
 
-            // Negate one constraint in the final state's path condition
-            finalState.negateRandomPathConstraint();
-            argMap = validator.evaluate(finalState);
-            // Generate a test case for current state
-            argMap.ifPresent(params -> generator.generateMethodTestCase(method, params));
+            // Intial concrete execution
+            TraceManager.clearTraceFile();
+            concrete.execute(instrumented, javaMethod);
+            TraceManager.loadTraceFile();
+            ArgMap initialArgs = concrete.getArgMap();
+            generator.generateMethodTestCase(method, initialArgs);
+
+            // Keep exploring new, unexplored paths until we cannot find a new one
+            while (true) {
+                // Replay the trace from concrete execution symbolically
+                SymbolicState finalState = symbolic.replay(cfg, method.getName());
+                exploredPaths.add(finalState.getPathConditionIdentifier());
+
+                // Find a new path condition by negating a random path constraint
+                Optional<Model> model = finalState.findNewPathCondition(validator, exploredPaths);
+                // If we cannot find a new path condition, we are done
+                if (model.isEmpty()) {
+                    break;
+                }
+
+                // If new path condition is found, evaluate it, generate a test case, and
+                // concretely execute the method with the corresponding arguments
+                ArgMap argMap = validator.evaluate(model.get(), finalState);
+                generator.generateMethodTestCase(method, argMap);
+                TraceManager.clearTraceFile();
+                concrete.execute(instrumented, javaMethod, argMap);
+                TraceManager.loadTraceFile();
+            }
         }
 
         generator.writeToFile(outPath);

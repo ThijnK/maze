@@ -4,9 +4,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.microsoft.z3.*;
 
+import nl.uu.maze.util.ArrayUtils;
 import sootup.core.graph.StmtGraph;
 import sootup.core.jimple.common.stmt.Stmt;
 import sootup.core.types.Type;
@@ -25,6 +31,8 @@ import sootup.core.types.Type;
  * </p>
  */
 public class SymbolicState {
+    private static final Logger logger = LoggerFactory.getLogger(SymbolicState.class);
+
     private Context ctx;
     private Stmt currentStmt;
     private int currentDepth;
@@ -100,12 +108,68 @@ public class SymbolicState {
         return pathConstraints;
     }
 
-    public void negateRandomPathConstraint() {
-        if (!pathConstraints.isEmpty()) {
-            int index = (int) (Math.random() * pathConstraints.size());
-            BoolExpr constraint = pathConstraints.get(index);
-            pathConstraints.set(index, ctx.mkNot(constraint));
+    /**
+     * Generates a unique identifier for the current path condition.
+     * 
+     * @return A unique identifier for the path condition
+     */
+    public String getPathConditionIdentifier() {
+        // TODO: this is not foolproof, because there can be two path conditions which
+        // end up with the same path
+        // E.g. if path condition (x <= 0),(x >= 0) and we negate the first one, we
+        // would get the same path as if we had path condition (x >= 0)
+
+        StringBuilder sb = new StringBuilder();
+        for (BoolExpr constraint : pathConstraints) {
+            sb.append(constraint.toString());
         }
+        return Integer.toHexString(sb.toString().hashCode());
+    }
+
+    /**
+     * Finds a <i>new</i> satisfiable path condition by negating a random path
+     * constraint.
+     * 
+     * @param validator     The symbolic state validator
+     * @param exploredPaths The set of previously explored paths (represented by
+     *                      their identifiers, obtained by
+     *                      {@link #getPathConditionIdentifier()})
+     * @return A Z3 model representing the new path condition, if found
+     */
+    public Optional<Model> findNewPathCondition(SymbolicStateValidator validator, Set<String> exploredPaths) {
+        if (pathConstraints.isEmpty()) {
+            return Optional.empty();
+        }
+
+        // Get the indices of path constraints in an array
+        Integer[] indices = new Integer[pathConstraints.size()];
+        for (int i = 0; i < indices.length; i++) {
+            indices[i] = i;
+        }
+
+        // Shuffle the array if indices to get a random order
+        ArrayUtils.shuffle(indices);
+
+        // Find the first path constraint for which negating it results in a new path
+        // condition
+        for (int index : indices) {
+            BoolExpr constraint = pathConstraints.get(index);
+            // Avoid double negation
+            BoolExpr negated = constraint.isNot() ? (BoolExpr) constraint.getArgs()[0] : ctx.mkNot(constraint);
+            logger.debug("Negating " + constraint + " -> " + negated);
+            pathConstraints.set(index, negated);
+            // Check if already explored
+            if (!exploredPaths.contains(getPathConditionIdentifier())) {
+                // Validate to make sure path condition satisfiable
+                Optional<Model> model = validator.validate(this);
+                if (model.isPresent()) {
+                    return model;
+                }
+            }
+            pathConstraints.set(index, constraint);
+        }
+
+        return Optional.empty();
     }
 
     public boolean isFinalState(StmtGraph<?> cfg) {

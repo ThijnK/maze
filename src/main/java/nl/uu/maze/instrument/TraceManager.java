@@ -3,6 +3,7 @@ package nl.uu.maze.instrument;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -106,7 +107,7 @@ public class TraceManager {
     }
 
     // Lists to store the trace entries per method
-    private final Map<String, LinkedList<TraceEntry>> traceEntries = new HashMap<>();
+    private static Map<String, LinkedList<TraceEntry>> traceEntries = new HashMap<>();
 
     /**
      * Load the trace entries from the log file.
@@ -114,7 +115,7 @@ public class TraceManager {
      * @throws FileNotFoundException If the file does not exist
      * @throws IOException           If an I/O error occurs
      */
-    public void loadTraceFile() throws FileNotFoundException, IOException {
+    public static void loadTraceFile() throws FileNotFoundException, IOException {
         BufferedReader br = new BufferedReader(new FileReader(FILE_PATH));
         String line;
         while ((line = br.readLine()) != null) {
@@ -124,6 +125,17 @@ public class TraceManager {
         br.close();
     }
 
+    public static void clearTraceFile() {
+        traceEntries.clear();
+        TraceLogger.close();
+        // Clear the trace file contents
+        try (FileWriter writer = new FileWriter(FILE_PATH)) {
+            writer.write("");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     /**
      * Get the trace entries for the specified method.
      * 
@@ -131,7 +143,7 @@ public class TraceManager {
      * @return The trace entries for the method or an empty list if no entries are
      *         found
      */
-    public List<TraceEntry> getTraceEntries(String methodName) {
+    public static List<TraceEntry> getTraceEntries(String methodName) {
         return traceEntries.getOrDefault(methodName, new LinkedList<>());
     }
 
@@ -141,7 +153,7 @@ public class TraceManager {
      * @param methodName The method name
      * @return The trace entries for the method or an empty iterator if no entries
      */
-    public Iterator<TraceEntry> getTraceEntriesIterator(String methodName) {
+    public static Iterator<TraceEntry> getTraceEntriesIterator(String methodName) {
         return getTraceEntries(methodName).iterator();
     }
 }

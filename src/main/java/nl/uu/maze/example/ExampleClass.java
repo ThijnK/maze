@@ -5,11 +5,13 @@ package nl.uu.maze.example;
  */
 public class ExampleClass {
 
-    public static void print(float x) {
-        if (x > 1.0) {
+    public static void print(int x) {
+        if (x > 0) {
             System.out.println("Positive");
-        } else {
+        } else if (x < 0) {
             System.out.println("Negative");
+        } else {
+            System.out.println("Zero");
         }
     }
 
