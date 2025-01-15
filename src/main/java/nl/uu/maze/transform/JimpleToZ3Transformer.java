@@ -97,7 +97,7 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
         Expr<?> r = transform(op2);
 
         if (l instanceof BitVecExpr && r instanceof BitVecExpr) {
-            Pair<BitVecExpr, BitVecExpr> coerced = coerceToSameSize((BitVecExpr) l, (BitVecExpr) r);
+            Pair<BitVecExpr, BitVecExpr> coerced = coerceToSameSort((BitVecExpr) l, (BitVecExpr) r);
             return bvOperation.apply(coerced.getFirst(), coerced.getSecond());
         } else if (l instanceof FPExpr && r instanceof FPExpr && fpOperation != null) {
             return fpOperation.apply((FPExpr) l, (FPExpr) r);
@@ -105,10 +105,10 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
         // Handle coercions between floating point and bit vector if only one operand is
         // FP and the other is a bit vector
         else if (l instanceof FPExpr && r instanceof BitVecExpr && fpOperation != null) {
-            Pair<FPExpr, FPExpr> coerced = coerceToSameSize((BitVecExpr) r, (FPExpr) l);
+            Pair<FPExpr, FPExpr> coerced = coerceToSameSort((BitVecExpr) r, (FPExpr) l);
             return fpOperation.apply(coerced.getSecond(), coerced.getFirst());
         } else if (l instanceof BitVecExpr && r instanceof FPExpr && fpOperation != null) {
-            Pair<FPExpr, FPExpr> coerced = coerceToSameSize((BitVecExpr) l, (FPExpr) r);
+            Pair<FPExpr, FPExpr> coerced = coerceToSameSort((BitVecExpr) l, (FPExpr) r);
             return fpOperation.apply(coerced.getFirst(), coerced.getSecond());
         } else {
             throw new UnsupportedOperationException(
@@ -138,7 +138,7 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
      * Coerce two bit vector expressions to the same size by sign extending the
      * smaller one.
      */
-    private Pair<BitVecExpr, BitVecExpr> coerceToSameSize(BitVecExpr l, BitVecExpr r) {
+    private Pair<BitVecExpr, BitVecExpr> coerceToSameSort(BitVecExpr l, BitVecExpr r) {
         int sizeL = l.getSortSize();
         int sizeR = r.getSortSize();
 
@@ -153,7 +153,7 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
     /**
      * Coerce a bit vector and floating point expression to the same size and sort.
      */
-    private Pair<FPExpr, FPExpr> coerceToSameSize(BitVecExpr l, FPExpr r) {
+    private Pair<FPExpr, FPExpr> coerceToSameSort(BitVecExpr l, FPExpr r) {
         FPSort sortR = r.getSort();
         int sizeL = l.getSortSize();
         int sizeR = sortR.getEBits() + sortR.getSBits();
