@@ -2,7 +2,6 @@ package nl.uu.maze.execution;
 
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -64,7 +63,7 @@ public class ExecutionController {
         this.generator = new JUnitTestGenerator(clazz);
     }
 
-    // ** Perform pure symbolic execution to generate test cases. */
+    /** Perform pure symbolic execution to generate test cases. */
     public void runSymbolic() throws Exception {
         for (JavaSootMethod method : methods) {
             // For now, skip the <init> method
@@ -76,14 +75,14 @@ public class ExecutionController {
 
             StmtGraph<?> cfg = analyzer.getCFG(method);
             List<SymbolicState> finalStates = symbolic.execute(cfg);
-            List<Map<String, Object>> knownParams = validator.evaluate(finalStates);
-            generator.generateMethodTestCases(method, knownParams);
+            List<ArgMap> argMap = validator.evaluate(finalStates);
+            generator.generateMethodTestCases(method, argMap);
         }
 
         generator.writeToFile(outPath);
     }
 
-    // ** Perform classic concolic execution. */
+    /** Perform classic concolic execution. */
     public void runConcolic() throws Exception {
         Class<?> instrumented = BytecodeInstrumenter.instrument(classPath, className);
         for (JavaSootMethod method : methods) {
@@ -106,14 +105,14 @@ public class ExecutionController {
             concrete.execute(instrumented, analyzer.getJavaMethod(method, instrumented));
             SymbolicState finalState = symbolic.replay(cfg, method.getName());
             logger.info("Replayed state: " + finalState);
-            Optional<Map<String, Object>> knownParams = validator.evaluate(finalState);
-            knownParams.ifPresent(params -> generator.generateMethodTestCase(method, params));
+            Optional<ArgMap> argMap = validator.evaluate(finalState);
+            argMap.ifPresent(params -> generator.generateMethodTestCase(method, params));
 
             // Negate one constraint in the final state's path condition
             finalState.negateRandomPathConstraint();
-            knownParams = validator.evaluate(finalState);
+            argMap = validator.evaluate(finalState);
             // Generate a test case for current state
-            knownParams.ifPresent(params -> generator.generateMethodTestCase(method, params));
+            argMap.ifPresent(params -> generator.generateMethodTestCase(method, params));
         }
 
         generator.writeToFile(outPath);

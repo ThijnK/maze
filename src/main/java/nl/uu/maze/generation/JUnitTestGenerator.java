@@ -8,13 +8,14 @@ import javax.lang.model.element.Modifier;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.palantir.javapoet.*;
+
+import nl.uu.maze.execution.ArgMap;
 
 /**
  * Generates JUnit test cases from a given Z3 model and symbolic state for a
@@ -38,12 +39,13 @@ public class JUnitTestGenerator {
      * Generates a single JUnit test case for a method under test, passing the given
      * parameter values as arguments to the method invocation.
      * 
-     * @param method      The {@link JavaSootMethod} to generate a test case for
-     * @param knownParams A map of known parameter values for the method
+     * @param method The {@link JavaSootMethod} to generate a test case for
+     * @param argMap {@link ArgMap} containing the arguments to pass to the method
+     *               invocation
      */
-    public void generateMethodTestCase(JavaSootMethod method, Map<String, Object> knownParams) {
+    public void generateMethodTestCase(JavaSootMethod method, ArgMap argMap) {
         String testMethodName = "test" + capitalizeFirstLetter(method.getName());
-        generateMethodTestCase(method, knownParams, testMethodName);
+        generateMethodTestCase(method, argMap, testMethodName);
     }
 
     /**
@@ -51,10 +53,11 @@ public class JUnitTestGenerator {
      * parameter values as arguments to the method invocation.
      * 
      * @param method         The {@link JavaSootMethod} to generate a test case for
-     * @param knownParams    A map of known parameter values for the method
+     * @param argMap         {@link ArgMap} containing the arguments to pass to the
+     *                       method invocation
      * @param testMethodName The name of the test method to use
      */
-    private void generateMethodTestCase(JavaSootMethod method, Map<String, Object> knownParams, String testMethodName) {
+    private void generateMethodTestCase(JavaSootMethod method, ArgMap argMap, String testMethodName) {
         MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder(testMethodName)
                 .addModifiers(Modifier.PUBLIC)
                 .addAnnotation(Test.class)
@@ -67,7 +70,7 @@ public class JUnitTestGenerator {
             String var = "arg" + j;
             params.add(var);
 
-            Object value = knownParams.get(var);
+            Object value = argMap.get(var);
             // TODO: may have to be Array instead
             if (value instanceof List) {
                 @SuppressWarnings("unchecked")
@@ -106,15 +109,16 @@ public class JUnitTestGenerator {
      * parameter values as arguments to the method invocations. One test case is
      * generated for each set of known parameter values.
      * 
-     * @param method      The {@link JavaSootMethod} to generate test cases for
-     * @param knownParams A list of maps of known parameter values for the method
+     * @param method  The {@link JavaSootMethod} to generate test cases for
+     * @param argMaps List of {@link ArgMap} containing the arguments to pass to the
+     *                method invocations
      */
-    public void generateMethodTestCases(JavaSootMethod method, List<Map<String, Object>> knownParams) {
+    public void generateMethodTestCases(JavaSootMethod method, List<ArgMap> argMaps) {
         logger.info("Generating JUnit test cases...");
         String testMethodName = "test" + capitalizeFirstLetter(method.getName());
 
-        for (int i = 0; i < knownParams.size(); i++) {
-            generateMethodTestCase(method, knownParams.get(i), testMethodName + (i + 1));
+        for (int i = 0; i < argMaps.size(); i++) {
+            generateMethodTestCase(method, argMaps.get(i), testMethodName + (i + 1));
         }
     }
 

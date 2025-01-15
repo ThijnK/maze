@@ -1,9 +1,7 @@
 package nl.uu.maze.execution.symbolic;
 
 import java.util.List;
-import java.util.Map;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Optional;
 
 import org.slf4j.Logger;
@@ -17,6 +15,7 @@ import com.microsoft.z3.Model;
 import com.microsoft.z3.Solver;
 import com.microsoft.z3.Status;
 
+import nl.uu.maze.execution.ArgMap;
 import nl.uu.maze.transform.Z3ToJavaTransformer;
 import sootup.core.types.Type;
 
@@ -79,17 +78,17 @@ public class SymbolicStateValidator {
      * @param model The Z3 model to evaluate
      * @return A map of known parameters
      */
-    public Map<String, Object> evaluate(Model model, SymbolicState state) {
-        Map<String, Object> knownParams = new HashMap<>();
+    public ArgMap evaluate(Model model, SymbolicState state) {
+        ArgMap argMap = new ArgMap();
         for (FuncDecl<?> decl : model.getConstDecls()) {
             String var = decl.getName().toString();
             Expr<?> expr = model.getConstInterp(decl);
             Type type = state.getVariableType(var);
 
             Object value = transformer.transform(expr, model, type);
-            knownParams.put(var, value);
+            argMap.set(var, value);
         }
-        return knownParams;
+        return argMap;
     }
 
     /**
@@ -98,7 +97,7 @@ public class SymbolicStateValidator {
      * @param state The symbolic state to validate and evaluate
      * @return A map of known parameters if the path condition is satisfiable
      */
-    public Optional<Map<String, Object>> evaluate(SymbolicState state) {
+    public Optional<ArgMap> evaluate(SymbolicState state) {
         Optional<Model> model = validate(state);
         return model.map(m -> evaluate(m, state));
     }
@@ -109,10 +108,10 @@ public class SymbolicStateValidator {
      * @param states The symbolic states to validate and evaluate
      * @return A list of known parameters for the satisfiable path conditions
      */
-    public List<Map<String, Object>> evaluate(List<SymbolicState> states) {
-        List<Map<String, Object>> result = new ArrayList<>();
+    public List<ArgMap> evaluate(List<SymbolicState> states) {
+        List<ArgMap> result = new ArrayList<>();
         for (SymbolicState state : states) {
-            Optional<Map<String, Object>> params = evaluate(state);
+            Optional<ArgMap> params = evaluate(state);
             params.ifPresent(result::add);
         }
         return result;

@@ -1,12 +1,13 @@
 package nl.uu.maze.execution.concrete;
 
 import java.lang.reflect.Constructor;
-import java.util.Map;
 import java.util.Random;
 import java.lang.reflect.Parameter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import nl.uu.maze.execution.ArgMap;
 
 /**
  * Instantiates objects using Java reflection and randomly generated
@@ -35,7 +36,7 @@ public class ObjectInstantiator {
     /**
      * Create an instance of the given class using the first constructor found,
      * invoking the constructor with the given arguments.
-     * If some parameter is missing in the knownParams map, it will be generated
+     * If some parameter is missing in the argMap map, it will be generated
      * randomly.
      * 
      * @param clazz The class to instantiate
@@ -43,8 +44,8 @@ public class ObjectInstantiator {
      * @implNote This will fail if the class has a single constructor which requires
      *           an instance of an inner class as an argument.
      */
-    public Object createInstance(Class<?> clazz, Map<String, Object> knownParams) {
-        return createInstance(clazz, 0, knownParams);
+    public Object createInstance(Class<?> clazz, ArgMap argMap) {
+        return createInstance(clazz, 0, argMap);
     }
 
     /**
@@ -56,7 +57,7 @@ public class ObjectInstantiator {
      * @implNote This will fail if the class has a single constructor which requires
      *           an instance of an inner class as an argument.
      */
-    private Object createInstance(Class<?> clazz, int depth, Map<String, Object> knownParams) {
+    private Object createInstance(Class<?> clazz, int depth, ArgMap argMap) {
         Constructor<?>[] ctors = clazz.getConstructors();
         if (ctors.length == 0) {
             logger.warn("No constructors found for class: " + clazz.getName());
@@ -67,7 +68,7 @@ public class ObjectInstantiator {
         for (Constructor<?> ctor : ctors) {
             try {
                 logger.debug("Param types: " + printArgs(ctor.getParameterTypes()));
-                Object[] args = generateArgs(ctor.getParameters(), depth, knownParams);
+                Object[] args = generateArgs(ctor.getParameters(), depth, argMap);
                 logger.debug("Creating instance of class: " + clazz.getName() + " with args: " + printArgs(args));
                 return ctor.newInstance(args);
             } catch (Exception e) {
@@ -80,17 +81,18 @@ public class ObjectInstantiator {
     }
 
     /**
-     * Generate random values for the given parameters, except for parameters that
-     * are already known (i.e. present in the given map).
+     * Generate random values for the given parameters, except for the ones present
+     * in the {@link ArgMap}, in which case the known value is used.
      * This will attempt to recursively create instances of objects if the parameter
      * type is not a primitive type, up to a certain depth.
      * 
-     * @param params      The parameters of the method
-     * @param knownParams A map of known parameter values to use
+     * @param params The parameters of the method
+     * @param argMap {@link ArgMap} containing the arguments to pass to the method
+     *               invocation
      * @return An array of random arguments
      */
-    public Object[] generateArgs(Parameter[] params, Map<String, Object> knownParams) {
-        return generateArgs(params, 0, knownParams);
+    public Object[] generateArgs(Parameter[] params, ArgMap argMap) {
+        return generateArgs(params, 0, argMap);
     }
 
     /**
@@ -106,23 +108,24 @@ public class ObjectInstantiator {
     }
 
     /**
-     * Generate random values for the given parameters, except for parameters that
-     * are already known (i.e. present in the given map).
+     * Generate random values for the given parameters, except for the ones present
+     * in the {@link ArgMap}, in which case the known value is used.
      * This will attempt to recursively create instances of objects if the parameter
      * type is not a primitive type, up to a certain depth.
      * 
-     * @param params      The parameters of the method
-     * @param depth       The current depth of the recursive instantiation
-     * @param knownParams A map of known parameter values to use
+     * @param params The parameters of the method
+     * @param depth  The current depth of the recursive instantiation
+     * @param argMap {@link ArgMap} containing the arguments to pass to the method
+     *               invocation
      * @return An array of random arguments
      */
-    private Object[] generateArgs(Parameter[] params, int depth, Map<String, Object> knownParams) {
+    private Object[] generateArgs(Parameter[] params, int depth, ArgMap argMap) {
         Object[] arguments = new Object[params.length];
         for (int i = 0; i < params.length; i++) {
             // If the parameter is known, use the known value
             String name = "arg" + i;
-            if (knownParams != null && knownParams.containsKey(name)) {
-                arguments[i] = knownParams.get(name);
+            if (argMap != null && argMap.containsKey(name)) {
+                arguments[i] = argMap.get(name);
                 continue;
             }
 
@@ -156,8 +159,8 @@ public class ObjectInstantiator {
                 default:
                     // If depth allows, recursively generate instances of objects
                     if (depth < MAX_INSTANTIATION_DEPTH && !params[i].getType().isPrimitive())
-                        // Note that the knownParams are intentionally only used for the first level of
-                        // recursion
+                        // Note that the argMap is intentionally only used for the first level of
+                        // recursion, so we pass null here
                         arguments[i] = createInstance(params[i].getType(), ++depth, null);
                     else
                         arguments[i] = null;

@@ -3,10 +3,11 @@ package nl.uu.maze.execution.concrete;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import nl.uu.maze.execution.ArgMap;
 
 public class ConcreteExecutor {
     private static final Logger logger = LoggerFactory.getLogger(ConcreteExecutor.class);
@@ -28,13 +29,16 @@ public class ConcreteExecutor {
      * Run concrete execution on the given method, passing the given known parameter
      * values at invocation.
      * 
-     * @param clazz       The Java class containing the method
-     * @param method      The method
-     * @param knownParams The arguments to pass to the method invocation
+     * @param clazz  The Java class containing the method
+     * @param method The method
+     * @param argMap {@link ArgMap} containing the arguments to pass to the method
+     *               invocation
      */
-    public void execute(Class<?> clazz, Method method, Map<String, Object> knownParams)
+    public void execute(Class<?> clazz, Method method, ArgMap argMap)
             throws IllegalAccessException, InvocationTargetException {
-        Object[] args = instantiator.generateArgs(method.getParameters(), knownParams);
+        // Calls generateArgs with the given argMap to fill in missing arguments
+        // The argMap will be updated with the generated arguments
+        Object[] args = instantiator.generateArgs(method.getParameters(), argMap);
         execute(clazz, method, args);
     }
 

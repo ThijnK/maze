@@ -1,5 +1,6 @@
 package nl.uu.tests.maze;
 
+import nl.uu.maze.execution.ArgMap;
 import nl.uu.maze.execution.concrete.ObjectInstantiator;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
@@ -55,11 +56,11 @@ class ObjectInstantiatorTest {
     }
 
     @Test
-    public void testGenerateArgs_WithKnownParams() {
+    public void testGenerateArgs_WithArgMap() {
         Parameter[] params = TestClassManyArgs.class.getConstructors()[0].getParameters();
-        Map<String, Object> knownParams = Map.of("arg0", 1, "arg1", 2.0, "arg2", 3.0f, "arg3", 4L, "arg4", (short) 5,
-                "arg5", (byte) 6, "arg6", '7', "arg7", true, "arg8", new TestClassWithArgs(1, 2.0, true));
-        Object[] args = instantiator.generateArgs(params, knownParams);
+        ArgMap argMap = new ArgMap(new Object[] { 1, 2.0, 3.0f, 4L, (short) 5, (byte) 6, '7', true,
+                new TestClassWithArgs(1, 2.0, true) });
+        Object[] args = instantiator.generateArgs(params, argMap);
         assertEquals(9, args.length);
         assertEquals(1, args[0]);
         assertEquals(2.0, args[1]);
@@ -69,7 +70,26 @@ class ObjectInstantiatorTest {
         assertEquals((byte) 6, args[5]);
         assertEquals('7', args[6]);
         assertEquals(true, args[7]);
-        assertEquals(knownParams.get("arg8"), args[8]);
+        assertEquals(argMap.get("arg8"), args[8]);
+    }
+
+    @Test
+    public void testGenerateArgs_WithIncompleteArgMap() {
+        // Tests that the arguments not present in the argMap are generated
+        Parameter[] params = TestClassManyArgs.class.getConstructors()[0].getParameters();
+        ArgMap argMap = new ArgMap(Map.of("arg0", 1, "arg3", 4L, "arg4", (short) 5,
+                "arg5", (byte) 6));
+        Object[] args = instantiator.generateArgs(params, argMap);
+        assertEquals(9, args.length);
+        assertEquals(1, args[0]);
+        assertTrue(args[1] instanceof Double);
+        assertTrue(args[2] instanceof Float);
+        assertEquals(4L, args[3]);
+        assertEquals((short) 5, args[4]);
+        assertEquals((byte) 6, args[5]);
+        assertTrue(args[6] instanceof Character);
+        assertTrue(args[7] instanceof Boolean);
+        assertTrue(args[8] instanceof TestClassWithArgs);
     }
 
     public static class TestClassNoArgs {
