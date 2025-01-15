@@ -79,8 +79,13 @@ public class JUnitTestGenerator {
             }
             // If value is a primitive type, JavaPoet will handle it as a literal
             else if (value != null) {
+                // TODO: add the Float. or Double. part for Infinity (but take into account
+                // negative values)
+
                 // Add a "F" or "L" postfix for float and long literals
-                String postfix = value instanceof Float ? "F" : value instanceof Long ? "L" : "";
+                String postfix = value instanceof Float && !Float.isInfinite((float) value)
+                        && !Float.isNaN((float) value) ? "F"
+                                : value instanceof Long ? "L" : "";
                 methodBuilder.addStatement("$L $L = $L$L", paramTypes.get(j), var, value, postfix);
             }
             // If value is not known, use a default value
