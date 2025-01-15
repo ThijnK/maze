@@ -80,7 +80,7 @@ public class ExecutionController {
             StmtGraph<?> cfg = analyzer.getCFG(method);
             List<SymbolicState> finalStates = symbolic.execute(cfg);
             List<ArgMap> argMap = validator.evaluate(finalStates);
-            generator.generateMethodTestCases(method, argMap);
+            generator.addMethodTestCases(method, argMap);
         }
 
         generator.writeToFile(outPath);
@@ -100,18 +100,26 @@ public class ExecutionController {
             Method javaMethod = analyzer.getJavaMethod(method, instrumented);
             Set<String> exploredPaths = new HashSet<>();
 
-            // Intial concrete execution
-            TraceManager.clearTraceFile();
-            concrete.execute(instrumented, javaMethod);
-            TraceManager.loadTraceFile();
-            ArgMap initialArgs = concrete.getArgMap();
-            generator.generateMethodTestCase(method, initialArgs);
+            ArgMap argMap = null;
 
             // Keep exploring new, unexplored paths until we cannot find a new one
             while (true) {
-                // Replay the trace from concrete execution symbolically
+                // Concrete execution followed by symbolic replay
+                TraceManager.clearTraceFile();
+                concrete.execute(instrumented, javaMethod, argMap);
+                TraceManager.loadTraceFile();
                 SymbolicState finalState = symbolic.replay(cfg, method.getName());
-                exploredPaths.add(finalState.getPathConditionIdentifier());
+
+                String pathConditionIdentifier = finalState.getPathConditionIdentifier();
+                logger.debug("Path condition identifier: " + pathConditionIdentifier);
+                // Only add a new test case if this path has not been explored before
+                // Note: this can happen only in certain edge cases which the
+                // findNewPathCondition method cannot cover
+                if (!exploredPaths.contains(pathConditionIdentifier)) {
+                    // Store the path condition identifier to avoid exploring the same path again
+                    exploredPaths.add(pathConditionIdentifier);
+                    generator.addMethodTestCase(method, argMap == null ? concrete.getArgMap() : argMap);
+                }
 
                 // Find a new path condition by negating a random path constraint
                 Optional<Model> model = finalState.findNewPathCondition(validator, exploredPaths);
@@ -120,13 +128,9 @@ public class ExecutionController {
                     break;
                 }
 
-                // If new path condition is found, evaluate it, generate a test case, and
-                // concretely execute the method with the corresponding arguments
-                ArgMap argMap = validator.evaluate(model.get(), finalState);
-                generator.generateMethodTestCase(method, argMap);
-                TraceManager.clearTraceFile();
-                concrete.execute(instrumented, javaMethod, argMap);
-                TraceManager.loadTraceFile();
+                // If a new path condition is found, evaluate it to get the next set of
+                // arguments which will be used in the next iteration for concrete execution
+                argMap = validator.evaluate(model.get(), finalState);
             }
         }
 

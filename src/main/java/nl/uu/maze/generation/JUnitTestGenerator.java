@@ -48,7 +48,7 @@ public class JUnitTestGenerator {
      * @param argMap {@link ArgMap} containing the arguments to pass to the
      *               method invocation
      */
-    public void generateMethodTestCase(JavaSootMethod method, ArgMap argMap) {
+    public void addMethodTestCase(JavaSootMethod method, ArgMap argMap) {
         methodCount.compute(method.getName(), (k, v) -> v == null ? 1 : v + 1);
         String testMethodName = "test" + capitalizeFirstLetter(method.getName()) + methodCount.get(method.getName());
         MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder(testMethodName)
@@ -111,10 +111,10 @@ public class JUnitTestGenerator {
      * @param argMaps List of {@link ArgMap} containing the arguments to pass to the
      *                method invocations
      */
-    public void generateMethodTestCases(JavaSootMethod method, List<ArgMap> argMaps) {
+    public void addMethodTestCases(JavaSootMethod method, List<ArgMap> argMaps) {
         logger.info("Generating JUnit test cases...");
         for (int i = 0; i < argMaps.size(); i++) {
-            generateMethodTestCase(method, argMaps.get(i));
+            addMethodTestCase(method, argMaps.get(i));
         }
     }
 

@@ -114,16 +114,32 @@ public class SymbolicState {
      * @return A unique identifier for the path condition
      */
     public String getPathConditionIdentifier() {
-        // TODO: this is not foolproof, because there can be two path conditions which
-        // end up with the same path
-        // E.g. if path condition (x <= 0),(x >= 0) and we negate the first one, we
-        // would get the same path as if we had path condition (x >= 0)
-
         StringBuilder sb = new StringBuilder();
         for (BoolExpr constraint : pathConstraints) {
             sb.append(constraint.toString());
         }
         return Integer.toHexString(sb.toString().hashCode());
+    }
+
+    /**
+     * Checks if the current path condition is a new path condition by comparing it
+     * and any of its prefixes to the set of explored paths.
+     * 
+     * @param exploredPaths The set of previously explored paths (represented by
+     *                      their identifiers, obtained by
+     *                      {@link #getPathConditionIdentifier()})
+     * @return True if the path condition is new, false otherwise
+     */
+    public boolean isNewPathCondition(Set<String> exploredPaths) {
+        StringBuilder sb = new StringBuilder();
+        for (BoolExpr constraint : pathConstraints) {
+            sb.append(constraint.toString());
+            String path = Integer.toHexString(sb.toString().hashCode());
+            if (exploredPaths.contains(path)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
@@ -159,7 +175,7 @@ public class SymbolicState {
             logger.debug("Negating " + constraint + " -> " + negated);
             pathConstraints.set(index, negated);
             // Check if already explored
-            if (!exploredPaths.contains(getPathConditionIdentifier())) {
+            if (isNewPathCondition(exploredPaths)) {
                 // Validate to make sure path condition satisfiable
                 Optional<Model> model = validator.validate(this);
                 if (model.isPresent()) {
