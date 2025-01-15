@@ -113,12 +113,12 @@ public class SymbolicState {
      * 
      * @return A unique identifier for the path condition
      */
-    public String getPathConditionIdentifier() {
+    public int getPathConditionIdentifier() {
         StringBuilder sb = new StringBuilder();
         for (BoolExpr constraint : pathConstraints) {
             sb.append(constraint.toString());
         }
-        return Integer.toHexString(sb.toString().hashCode());
+        return sb.toString().hashCode();
     }
 
     /**
@@ -130,12 +130,11 @@ public class SymbolicState {
      *                      {@link #getPathConditionIdentifier()})
      * @return True if the path condition is new, false otherwise
      */
-    public boolean isNewPathCondition(Set<String> exploredPaths) {
+    public boolean isNewPathCondition(Set<Integer> exploredPaths) {
         StringBuilder sb = new StringBuilder();
         for (BoolExpr constraint : pathConstraints) {
             sb.append(constraint.toString());
-            String path = Integer.toHexString(sb.toString().hashCode());
-            if (exploredPaths.contains(path)) {
+            if (exploredPaths.contains(sb.toString().hashCode())) {
                 return false;
             }
         }
@@ -152,7 +151,7 @@ public class SymbolicState {
      *                      {@link #getPathConditionIdentifier()})
      * @return A Z3 model representing the new path condition, if found
      */
-    public Optional<Model> findNewPathCondition(SymbolicStateValidator validator, Set<String> exploredPaths) {
+    public Optional<Model> findNewPathCondition(SymbolicStateValidator validator, Set<Integer> exploredPaths) {
         if (pathConstraints.isEmpty()) {
             return Optional.empty();
         }

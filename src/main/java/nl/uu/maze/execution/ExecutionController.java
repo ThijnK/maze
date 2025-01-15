@@ -98,7 +98,7 @@ public class ExecutionController {
             logger.info("Processing method: " + method.getName());
             StmtGraph<?> cfg = analyzer.getCFG(method);
             Method javaMethod = analyzer.getJavaMethod(method, instrumented);
-            Set<String> exploredPaths = new HashSet<>();
+            Set<Integer> exploredPaths = new HashSet<>();
 
             ArgMap argMap = null;
 
@@ -110,7 +110,7 @@ public class ExecutionController {
                 TraceManager.loadTraceFile();
                 SymbolicState finalState = symbolic.replay(cfg, method.getName());
 
-                String pathConditionIdentifier = finalState.getPathConditionIdentifier();
+                int pathConditionIdentifier = finalState.getPathConditionIdentifier();
                 logger.debug("Path condition identifier: " + pathConditionIdentifier);
                 // Only add a new test case if this path has not been explored before
                 // Note: this can happen only in certain edge cases which the
