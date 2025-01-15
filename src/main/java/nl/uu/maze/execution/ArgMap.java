@@ -29,6 +29,17 @@ public class ArgMap {
         return args;
     }
 
+    public void overwrite(Map<String, Object> args) {
+        this.args = args;
+    }
+
+    public void overwrite(Object[] args) {
+        this.args.clear();
+        for (int i = 0; i < args.length; i++) {
+            this.args.put("arg" + i, args[i]);
+        }
+    }
+
     public void set(String key, Object value) {
         args.put(key, value);
     }
@@ -71,5 +82,10 @@ public class ArgMap {
         }
 
         return result;
+    }
+
+    @Override
+    public String toString() {
+        return args.toString();
     }
 }
