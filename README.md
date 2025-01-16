@@ -41,6 +41,14 @@ mvn exec:java -Dexec.args="DFS"
 
 Replace `DFS` with the desired search strategy (e.g., `BFS`, `Random`, `RandomPath`).
 
+### Running the Tests
+
+To run the tests, use the following Maven command:
+
+```bash
+mvn test
+```
+
 ## Structure
 
 The project is structured roughly as displayed by the following tree, which shows which classes control which other classes and what their responsibilities are:
