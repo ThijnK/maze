@@ -41,15 +41,28 @@ mvn exec:java -Dexec.args="DFS"
 
 Replace `DFS` with the desired search strategy (e.g., `BFS`, `Random`, `RandomPath`).
 
-## Components
+## Structure
 
-Maze consists roughly of the following components:
+The project is structured roughly as displayed by the following tree, which shows which classes control which other classes and what their responsibilities are:
 
-- **Symbolic Execution Engine**: Responsible for symbolic execution of a program or replaying a symbolic trace file.
-- **Concrete Execution Engine**: Responsible for concrete execution of a program and generating the instances and arguments required for this.
-- **Bytecode Instrumentation**: Responsible for instrumenting the bytecode of a program to collect symbolic traces during concrete execution.
-- **Search Strategies**: Responsible for determining the order in which program paths are explored.
-- **Test Generation**: Responsible for generating test cases based on the final symbolic states of the symbolic execution engine.
+```java
+Application
+└── ExecutionController             // Controls the execution of a program, combining symbolic and concrete execution
+    ├── ConcreteExecutor            // Concrete execution engine, instantiates objects and executes methods
+    │   ├── ObjectInstantiator      // Instantiates primitive types and objects
+    │   ├── BytecodeInstrumenter    // Instruments bytecode to collect symbolic traces using TraceLogger
+    │   ├── TraceLogger             // Logs symbolic traces to a file during concrete execution
+    │   └── TraceManager            // Manages symbolic traces (reading, parsing, etc.)
+    ├── SymbolicExecutor            // Symbolic execution engine, explores a program using a given search strategy
+    │   ├── SearchStrategy          // Abstract class for symbolic search strategies
+    │   │   ├── DFSSearch           // Depth-first search strategy
+    │   │   ├── BFSSearch           // Breadth-first search strategy
+    │   │   ├── RandomPathSearch    // Random path search strategy
+    │   │   └── ...                 // Other search strategies
+    │   ├── SymbolicState           // Represents a symbolic state in the symbolic execution engine
+    │   └── SymbolicStateValidator  // Validates symbolic states using Z3 to produce inputs for concrete execution and/or test case generation
+    └── JUnitTestGenerator          // Generates JUnit test cases
+```
 
 ## Dependencies
 
