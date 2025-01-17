@@ -156,6 +156,7 @@ public class ObjectInstantiator {
                 case "boolean":
                     arguments[i] = rand.nextBoolean();
                     break;
+                // TODO: strings, arrays?
                 default:
                     // If depth allows, recursively generate instances of objects
                     if (depth < MAX_INSTANTIATION_DEPTH && !params[i].getType().isPrimitive())
