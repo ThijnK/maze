@@ -1,4 +1,4 @@
-package tests;
+package nl.uu.tests.maze;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
