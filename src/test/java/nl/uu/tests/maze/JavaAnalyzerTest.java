@@ -20,7 +20,7 @@ public class JavaAnalyzerTest {
     private static JavaAnalyzer analyzer;
 
     @BeforeAll
-    public static void setUp() {
+    public static void setUp() throws Exception {
         analyzer = new JavaAnalyzer(classPath);
     }
 

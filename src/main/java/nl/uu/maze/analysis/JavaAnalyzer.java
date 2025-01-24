@@ -2,6 +2,11 @@ package nl.uu.maze.analysis;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -32,14 +37,18 @@ public class JavaAnalyzer {
     private static final Logger logger = LoggerFactory.getLogger(JavaAnalyzer.class);
 
     private final AnalysisInputLocation inputLocation;
+    private final URLClassLoader classLoader;
     private final JavaView view;
 
-    public JavaAnalyzer(String classPath) {
+    public JavaAnalyzer(String classPath) throws MalformedURLException, URISyntaxException {
         inputLocation = new JavaClassPathAnalysisInputLocation(classPath);
+        // Set up a custom URL loader for the class path
+        URL classUrl = Paths.get(classPath).toUri().toURL();
+        this.classLoader = new URLClassLoader(new URL[] { classUrl });
         view = new JavaView(inputLocation);
     }
 
-    public JavaAnalyzer() {
+    public JavaAnalyzer() throws MalformedURLException, URISyntaxException {
         this("target/classes");
     }
 
@@ -81,7 +90,7 @@ public class JavaAnalyzer {
 
     /** Returns the Java class of a SootUp class type. */
     private Class<?> getJavaClass(ClassType type) throws ClassNotFoundException {
-        return Class.forName(type.getFullyQualifiedName());
+        return classLoader.loadClass(type.getFullyQualifiedName());
     }
 
     /** Returns the Java class of a SootUp primitive type. */
