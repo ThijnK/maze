@@ -32,75 +32,29 @@ public class JavaAnalyzerTest {
     }
 
     @Test
-    public void testGetJavaClass_ClassType() throws ClassNotFoundException {
-        ClassType classType = analyzer.getClassType(className);
-        Class<?> clazz = analyzer.getJavaClass(classType);
-        assertEquals(ExampleClass.class, clazz);
-    }
+    public void testGetJavaClass() throws ClassNotFoundException {
+        Object[][] testCases = {
+                { analyzer.getClassType(className), ExampleClass.class },
+                { IntType.getInt(), int.class },
+                { DoubleType.getDouble(), double.class },
+                { FloatType.getFloat(), float.class },
+                { LongType.getLong(), long.class },
+                { ShortType.getShort(), short.class },
+                { ByteType.getByte(), byte.class },
+                { CharType.getChar(), char.class },
+                { BooleanType.getBoolean(), boolean.class },
+                { Type.createArrayType(IntType.getInt(), 1), int[].class },
+                { VoidType.getInstance(), void.class },
+                { NullType.getInstance(), null },
+                { UnknownType.getInstance(), Object.class }
+        };
 
-    @Test
-    public void testGetJavaClass_PrimitiveType() throws ClassNotFoundException {
-        IntType intType = IntType.getInt();
-        Class<?> intClass = analyzer.getJavaClass(intType);
-
-        DoubleType doubleType = DoubleType.getDouble();
-        Class<?> doubleClass = analyzer.getJavaClass(doubleType);
-
-        FloatType floatType = FloatType.getFloat();
-        Class<?> floatClass = analyzer.getJavaClass(floatType);
-
-        LongType longType = LongType.getLong();
-        Class<?> longClass = analyzer.getJavaClass(longType);
-
-        ShortType shortType = ShortType.getShort();
-        Class<?> shortClass = analyzer.getJavaClass(shortType);
-
-        ByteType byteType = ByteType.getByte();
-        Class<?> byteClass = analyzer.getJavaClass(byteType);
-
-        CharType charType = CharType.getChar();
-        Class<?> charClass = analyzer.getJavaClass(charType);
-
-        BooleanType booleanType = BooleanType.getBoolean();
-        Class<?> booleanClass = analyzer.getJavaClass(booleanType);
-
-        assertEquals(int.class, intClass);
-        assertEquals(double.class, doubleClass);
-        assertEquals(float.class, floatClass);
-        assertEquals(long.class, longClass);
-        assertEquals(short.class, shortClass);
-        assertEquals(byte.class, byteClass);
-        assertEquals(char.class, charClass);
-        assertEquals(boolean.class, booleanClass);
-    }
-
-    @Test
-    public void testGetJavaClass_ArrayType() throws ClassNotFoundException {
-        Type elementType = IntType.getInt();
-        Type arrayType = Type.createArrayType(elementType, 1);
-        Class<?> clazz = analyzer.getJavaClass(arrayType);
-        assertEquals(int[].class, clazz);
-    }
-
-    @Test
-    public void testGetJavaClass_VoidType() throws ClassNotFoundException {
-        VoidType voidType = VoidType.getInstance();
-        Class<?> clazz = analyzer.getJavaClass(voidType);
-        assertEquals(void.class, clazz);
-    }
-
-    @Test
-    public void testGetJavaClass_NullType() throws ClassNotFoundException {
-        NullType nullType = NullType.getInstance();
-        Class<?> clazz = analyzer.getJavaClass(nullType);
-        assertNull(clazz);
-    }
-
-    @Test
-    public void testGetJavaClass_UnknownType() throws ClassNotFoundException {
-        UnknownType unknownType = UnknownType.getInstance();
-        Class<?> clazz = analyzer.getJavaClass(unknownType);
-        assertEquals(Object.class, clazz);
+        for (Object[] testCase : testCases) {
+            Type type = (Type) testCase[0];
+            Class<?> expectedClass = (Class<?>) testCase[1];
+            Class<?> actualClass = analyzer.getJavaClass(type);
+            assertEquals(expectedClass, actualClass);
+        }
     }
 
     @Test
