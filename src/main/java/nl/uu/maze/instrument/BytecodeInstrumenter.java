@@ -11,15 +11,13 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.Map;
 
 public class BytecodeInstrumenter {
-    private static final String LOGGER_CLASS = TraceLogger.class.getName();
-    private static final String LOGGER_CLASS_PATH = LOGGER_CLASS.replace('.', '/');
+    private static final String TRACE_MANAGER_PATH = TraceManager.class.getName().replace('.', '/');
+    private static final String BRANCH_TYPE_PATH = BranchType.class.getName().replace('.', '/');
 
     /**
-     * Instrument a class file to log symbolic traces.
+     * Instrument a class file to record symbolic traces.
      * 
      * @param classPath The path to the class file
      * @param className The name of the class
@@ -39,12 +37,10 @@ public class BytecodeInstrumenter {
         ClassVisitor classVisitor = new SymbolicTraceClassVisitor(classWriter);
         classReader.accept(classVisitor, ClassReader.EXPAND_FRAMES);
 
+        // TODO: only write opcodes to file for debugging purposes
         writeOpcodesToFile(classBytes);
 
-        // Register the TraceLogger class to this class loader, so the instrumented
-        // code will have access to the logging functionality
         BytecodeClassLoader classLoader = new BytecodeClassLoader();
-        classLoader.registerClass(TraceLogger.class);
         byte[] instrumentedBytes = classWriter.toByteArray();
         return classLoader.defineClass(className, instrumentedBytes);
     }
@@ -59,27 +55,9 @@ public class BytecodeInstrumenter {
     }
 
     /**
-     * Custom class loader that allows us to define classes from byte arrays, and to
-     * register classes that are already loaded in the JVM.
+     * Custom class loader that allows us to define classes from byte arrays.
      */
     static class BytecodeClassLoader extends ClassLoader {
-        private final Map<String, Class<?>> classes = new HashMap<>();
-
-        /**
-         * Register a class that is already loaded in the JVM to this class loader.
-         * 
-         * @param clazz The class to register
-         */
-        public void registerClass(Class<?> clazz) {
-            classes.put(clazz.getName(), clazz);
-        }
-
-        @Override
-        protected Class<?> findClass(String name) throws ClassNotFoundException {
-            Class<?> clazz = classes.get(name);
-            return clazz != null ? clazz : super.findClass(name);
-        }
-
         /**
          * Define a class from a byte array.
          * 
@@ -92,7 +70,7 @@ public class BytecodeInstrumenter {
         }
     }
 
-    /** Class visitor that instruments the class to log symbolic traces. */
+    /** Class visitor that instruments the class to record symbolic traces. */
     static class SymbolicTraceClassVisitor extends ClassVisitor {
         public SymbolicTraceClassVisitor(ClassVisitor classVisitor) {
             super(Opcodes.ASM9, classVisitor);
@@ -106,7 +84,7 @@ public class BytecodeInstrumenter {
         }
     }
 
-    /** Method visitor that instruments the method to log symbolic traces */
+    /** Method visitor that instruments the method to record symbolic traces */
     static class SymbolicTraceMethodVisitor extends AdviceAdapter {
         String methodName;
 
@@ -116,7 +94,7 @@ public class BytecodeInstrumenter {
             this.methodName = name;
         }
 
-        // Instrument if statements to log the branch taken
+        // Instrument if statements to record the branch taken
         @Override
         public void visitJumpInsn(int opcode, Label label) {
             if (isConditionalJump(opcode)) {
@@ -132,7 +110,7 @@ public class BytecodeInstrumenter {
                 Label falseLabel = new Label();
                 Label continueLabel = new Label();
 
-                // Insert a duplicate of the jump which logs the branch taken
+                // Insert a duplicate of the jump which records the branch taken
                 mv.visitJumpInsn(opcode, trueLabel);
                 mv.visitLabel(falseLabel);
                 instrumentTraceLog(BranchType.IF, 0); // 0 for false
@@ -171,13 +149,13 @@ public class BytecodeInstrumenter {
             return opcode >= Opcodes.IF_ICMPEQ && opcode <= Opcodes.IF_ACMPNE;
         }
 
-        // Handle sparse int switch statements (lookup switch)
+        // Instrument sparse int switch statements (lookup switch)
         @Override
         public void visitLookupSwitchInsn(Label dflt, int[] keys, Label[] labels) {
             // Duplicate the value to keep the original value for the actual jump
             mv.visitInsn(Opcodes.DUP);
 
-            // Create a copy of the switch statement with dummy labels that log the case
+            // Create a copy of the switch statement with dummy labels that records the case
             Label[] dummyLbls = createDummyLabels(labels.length);
             Label dummyDflt = new Label();
             mv.visitLookupSwitchInsn(dummyDflt, keys, dummyLbls);
@@ -197,13 +175,13 @@ public class BytecodeInstrumenter {
             super.visitLookupSwitchInsn(dflt, keys, labels);
         }
 
-        // Handle dense int switch statements (table switch)
+        // Instrument dense int switch statements (table switch)
         @Override
         public void visitTableSwitchInsn(int min, int max, Label dflt, Label... labels) {
             // Duplicate the value to keep the original value for the actual jump
             mv.visitInsn(Opcodes.DUP);
 
-            // Create a copy of the switch statement with dummy labels that log the case
+            // Create a copy of the switch statement with dummy labels that records the case
             Label[] dummyLbls = createDummyLabels(labels.length);
             Label dummyDflt = new Label();
             mv.visitTableSwitchInsn(min, max, dummyDflt, dummyLbls);
@@ -226,15 +204,26 @@ public class BytecodeInstrumenter {
         }
 
         /**
-         * Instrument code to log a symbolic trace message.
+         * Instrument code to record a trace entry
          * 
-         * @param message The message to log
-         * @see TraceLogger#log(String)
+         * @param type  The type of branch
+         * @param value The value of the branch
+         * @see TraceManager#recordTraceEntry(String, BranchType, int)
          */
         private void instrumentTraceLog(BranchType type, int value) {
-            String entry = TraceManager.TraceEntry.formatString(methodName, type, value);
-            mv.visitLdcInsn(entry);
-            mv.visitMethodInsn(Opcodes.INVOKESTATIC, LOGGER_CLASS_PATH, "log", "(Ljava/lang/String;)V", false);
+            // Push arguments on the stack
+            mv.visitLdcInsn(methodName);
+            mv.visitFieldInsn(Opcodes.GETSTATIC, BRANCH_TYPE_PATH, type.name(),
+                    String.format("L%s;", BRANCH_TYPE_PATH));
+            mv.visitIntInsn(Opcodes.SIPUSH, value);
+
+            // Call the recordTraceEntry method
+            mv.visitMethodInsn(
+                    Opcodes.INVOKESTATIC,
+                    TRACE_MANAGER_PATH,
+                    "recordTraceEntry",
+                    String.format("(Ljava/lang/String;L%s;I)V", BRANCH_TYPE_PATH),
+                    false);
         }
 
         /**

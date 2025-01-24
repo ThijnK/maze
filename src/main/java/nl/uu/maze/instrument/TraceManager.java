@@ -1,12 +1,6 @@
 package nl.uu.maze.instrument;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -15,9 +9,6 @@ import java.util.Map;
  * Manages symbolic trace files and its entries.
  */
 public class TraceManager {
-    /** The path to the trace log file */
-    public static final String FILE_PATH = "logs/trace.log";
-
     /**
      * Represents the type of a branch in a symbolic trace file.
      * This can be either an if-statement or a switch-statement.
@@ -110,30 +101,24 @@ public class TraceManager {
     private static Map<String, LinkedList<TraceEntry>> traceEntries = new HashMap<>();
 
     /**
-     * Load the trace entries from the log file.
+     * Record a trace entry for the specified method.
      * 
-     * @throws FileNotFoundException If the file does not exist
-     * @throws IOException           If an I/O error occurs
+     * @param methodName The name of the method
+     * @param branchType The type of branch
+     * @param value      The value of the branch
      */
-    public static void loadTraceFile() throws FileNotFoundException, IOException {
-        BufferedReader br = new BufferedReader(new FileReader(FILE_PATH));
-        String line;
-        while ((line = br.readLine()) != null) {
-            TraceEntry entry = TraceEntry.fromString(line);
-            traceEntries.computeIfAbsent(entry.getMethodName(), k -> new LinkedList<>()).add(entry);
-        }
-        br.close();
+    public static void recordTraceEntry(String methodName, BranchType branchType, int value) {
+        TraceEntry entry = new TraceEntry(methodName, branchType, value);
+        traceEntries.computeIfAbsent(methodName, k -> new LinkedList<>()).add(entry);
     }
 
-    public static void clearTraceFile() {
-        traceEntries.clear();
-        TraceLogger.close();
-        // Clear the trace file contents
-        try (FileWriter writer = new FileWriter(FILE_PATH)) {
-            writer.write("");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    /**
+     * Clear the trace entries for the specified method.
+     * 
+     * @param methodName The method name
+     */
+    public static void clearEntries(String methodName) {
+        traceEntries.remove(methodName);
     }
 
     /**
@@ -143,17 +128,7 @@ public class TraceManager {
      * @return The trace entries for the method or an empty list if no entries are
      *         found
      */
-    public static List<TraceEntry> getTraceEntries(String methodName) {
+    public static List<TraceEntry> getEntries(String methodName) {
         return traceEntries.getOrDefault(methodName, new LinkedList<>());
-    }
-
-    /**
-     * Get the trace entries for the specified method as an iterator.
-     * 
-     * @param methodName The method name
-     * @return The trace entries for the method or an empty iterator if no entries
-     */
-    public static Iterator<TraceEntry> getTraceEntriesIterator(String methodName) {
-        return getTraceEntries(methodName).iterator();
     }
 }

@@ -91,11 +91,12 @@ public class ExecutionController {
         Class<?> instrumented = BytecodeInstrumenter.instrument(classPath, className);
         for (JavaSootMethod method : methods) {
             // For now, skip the <init> method
-            if (method.getName().equals("<init>")) {
+            String methodName = method.getName();
+            if (methodName.equals("<init>")) {
                 continue;
             }
 
-            logger.info("Processing method: " + method.getName());
+            logger.info("Processing method: " + methodName);
             StmtGraph<?> cfg = analyzer.getCFG(method);
             Method javaMethod = analyzer.getJavaMethod(method, instrumented);
             Set<Integer> exploredPaths = new HashSet<>();
@@ -105,10 +106,9 @@ public class ExecutionController {
             // Keep exploring new, unexplored paths until we cannot find a new one
             while (true) {
                 // Concrete execution followed by symbolic replay
-                TraceManager.clearTraceFile();
+                TraceManager.clearEntries(methodName);
                 concrete.execute(instrumented, javaMethod, argMap);
-                TraceManager.loadTraceFile();
-                SymbolicState finalState = symbolic.replay(cfg, method.getName());
+                SymbolicState finalState = symbolic.replay(cfg, methodName);
 
                 int pathConditionIdentifier = finalState.getPathConditionIdentifier();
                 logger.debug("Path condition identifier: " + pathConditionIdentifier);

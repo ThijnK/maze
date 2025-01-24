@@ -37,7 +37,7 @@ public class SymbolicExecutor {
 
     public SymbolicState replay(StmtGraph<?> cfg, String methodName)
             throws FileNotFoundException, IOException, Exception {
-        Iterator<TraceEntry> iterator = TraceManager.getTraceEntriesIterator(methodName);
+        Iterator<TraceEntry> iterator = TraceManager.getEntries(methodName).iterator();
 
         SymbolicState current = new SymbolicState(ctx, cfg.getStartingStmt());
         while (!current.isFinalState(cfg)) {
