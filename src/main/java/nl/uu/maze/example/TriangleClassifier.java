@@ -1,7 +1,6 @@
 package nl.uu.maze.example;
 
 public class TriangleClassifier {
-
     public enum TriangleType {
         EQUILATERAL,
         ISOSCELES,
@@ -9,7 +8,7 @@ public class TriangleClassifier {
         INVALID
     }
 
-    public static TriangleType classifyTriangle(int a, int b, int c) {
+    public TriangleType classifyTriangle(int a, int b, int c) {
         if (a <= 0 || b <= 0 || c <= 0) {
             return TriangleType.INVALID;
         }
