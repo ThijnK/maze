@@ -1,6 +1,6 @@
 # Maze
 
-Maze is a concolic execution engine designed for automated test generation.
+Maze is a dynamic symbolic execution (DSE) engine designed for automated test generation.
 It leverages symbolic execution and concrete execution to explore program paths and generate test cases.
 
 The project is being developed as part of a master's thesis at Utrecht University and focuses on the exploration of different search strategies.
@@ -58,9 +58,8 @@ Application
 └── ExecutionController             // Controls the execution of a program, combining symbolic and concrete execution
     ├── ConcreteExecutor            // Concrete execution engine, instantiates objects and executes methods
     │   ├── ObjectInstantiator      // Instantiates primitive types and objects
-    │   ├── BytecodeInstrumenter    // Instruments bytecode to collect symbolic traces using TraceLogger
-    │   ├── TraceLogger             // Logs symbolic traces to a file during concrete execution
-    │   └── TraceManager            // Manages symbolic traces (reading, parsing, etc.)
+    │   ├── BytecodeInstrumenter    // Instruments bytecode to collect symbolic traces
+    │   └── TraceManager            // Manages symbolic traces
     ├── SymbolicExecutor            // Symbolic execution engine, explores a program using a given search strategy
     │   ├── SearchStrategy          // Abstract class for symbolic search strategies
     │   │   ├── DFSSearch           // Depth-first search strategy
