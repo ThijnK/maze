@@ -104,6 +104,7 @@ public abstract class ConcreteSearchStrategy implements SearchStrategy {
         private List<BoolExpr> pathConstraints;
         private int index;
         private Context ctx;
+        private boolean hasAppliedNegation = false;
 
         public PathConditionCandidate(List<BoolExpr> pathConstraints, int index, Context ctx) {
             this.pathConstraints = pathConstraints;
@@ -120,16 +121,17 @@ public abstract class ConcreteSearchStrategy implements SearchStrategy {
         }
 
         /**
-         * Apply the negation to the constraint at the index.
-         * 
-         * @return The path constraints with the negation applied
+         * Apply the negation to the constraint at the index if not already applied.
          */
-        public List<BoolExpr> applyNegation() {
+        public void applyNegation() {
+            if (hasAppliedNegation) {
+                return;
+            }
+
             BoolExpr constraint = pathConstraints.get(index);
             // Avoid double negation
             BoolExpr negated = constraint.isNot() ? (BoolExpr) constraint.getArgs()[0] : ctx.mkNot(constraint);
             pathConstraints.set(index, negated);
-            return pathConstraints;
         }
 
         /**
