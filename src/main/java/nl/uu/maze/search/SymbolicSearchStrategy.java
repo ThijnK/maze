@@ -4,6 +4,9 @@ import java.util.List;
 
 import nl.uu.maze.execution.symbolic.SymbolicState;
 
+/**
+ * Abstract class for search strategies that operate on symbolic-driven DSE.
+ */
 public abstract class SymbolicSearchStrategy implements SearchStrategy {
     /**
      * Initialize the search strategy with the initial symbolic state.
@@ -22,8 +25,6 @@ public abstract class SymbolicSearchStrategy implements SearchStrategy {
 
     /**
      * Add new symbolic states to the search strategy.
-     * In case a strategy needs to know the parent state, keep track of the current
-     * state inside the strategy, and update it in the next() method.
      * 
      * @param newStates The new symbolic states to add
      */

@@ -8,7 +8,7 @@ import nl.uu.maze.execution.symbolic.SymbolicState;
 import nl.uu.maze.search.SymbolicSearchStrategy;
 
 /**
- * A search strategy that explores states in a uniformly random manner.
+ * Symbolic-driven search strategy that selects the next state uniform randomly.
  */
 public class RandomSearch extends SymbolicSearchStrategy {
     private List<SymbolicState> states = new ArrayList<>();

@@ -6,6 +6,10 @@ import java.util.Random;
 
 import nl.uu.maze.search.ConcreteSearchStrategy;
 
+/**
+ * Symbolic-driven search strategy that selects the next constraint to negate
+ * uniform randomly.
+ */
 public class RandomSearch extends ConcreteSearchStrategy {
     private List<PathConditionCandidate> candidates = new ArrayList<>();
     private Random random = new Random();

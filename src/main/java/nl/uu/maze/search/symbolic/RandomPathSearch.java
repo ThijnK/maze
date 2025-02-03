@@ -9,7 +9,8 @@ import nl.uu.maze.search.SymbolicSearchStrategy;
 import nl.uu.maze.util.Tree;
 
 /**
- * A search strategy that keeps track of the execution tree and selects the next
+ * Symbolic-driven search strategy that keeps track of the execution tree and
+ * selects the next
  * state to explore by walking the tree from the root to one of the leaves,
  * randomly selecting the branch to follow at each node.
  * 

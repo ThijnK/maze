@@ -8,7 +8,7 @@ import nl.uu.maze.execution.symbolic.SymbolicState;
 import nl.uu.maze.search.SymbolicSearchStrategy;
 
 /**
- * A search strategy that explores states in a breadth-first manner.
+ * Symbolic-driven search strategy for Breadth-First Search (BFS).
  */
 public class BFS extends SymbolicSearchStrategy {
     private Queue<SymbolicState> states = new LinkedList<>();

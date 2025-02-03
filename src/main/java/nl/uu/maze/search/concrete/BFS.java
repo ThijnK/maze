@@ -5,6 +5,9 @@ import java.util.Queue;
 
 import nl.uu.maze.search.ConcreteSearchStrategy;
 
+/**
+ * Concrete-driven search strategy for Breadth-First Search (BFS).
+ */
 public class BFS extends ConcreteSearchStrategy {
     private Queue<PathConditionCandidate> candidates = new LinkedList<>();
 
