@@ -3,6 +3,11 @@ package nl.uu.maze.search;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import nl.uu.maze.search.symbolic.BFS;
+import nl.uu.maze.search.symbolic.DFS;
+import nl.uu.maze.search.symbolic.RandomPathSearch;
+import nl.uu.maze.search.symbolic.RandomSearch;
+
 /**
  * Factory class for creating search strategies.
  */
@@ -18,20 +23,18 @@ public class SearchStrategyFactory {
     public static SearchStrategy getStrategy(String name) {
         switch (name) {
             case "DFS":
-            case "DFSSearchStrategy":
-                return new DFSSearch();
+                return new DFS();
             case "BFS":
-            case "BFSSearchStrategy":
-                return new BFSSearch();
+                return new BFS();
             case "Random":
-            case "RandomSearchStrategy":
+            case "RandomSearch":
                 return new RandomSearch();
             case "RandomPath":
-            case "RandomPathSearchStrategy":
+            case "RandomPathSearch":
                 return new RandomPathSearch();
             default:
                 logger.warn("Unknown search strategy: " + name + ", defaulting to DFS");
-                return new DFSSearch();
+                return new DFS();
         }
     }
 }

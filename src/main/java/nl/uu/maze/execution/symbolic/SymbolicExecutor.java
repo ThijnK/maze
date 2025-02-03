@@ -10,7 +10,6 @@ import com.microsoft.z3.*;
 
 import nl.uu.maze.instrument.TraceManager;
 import nl.uu.maze.instrument.TraceManager.TraceEntry;
-import nl.uu.maze.search.SearchStrategy;
 import nl.uu.maze.transform.JimpleToZ3Transformer;
 import sootup.core.graph.*;
 import sootup.core.jimple.common.constant.IntConstant;
@@ -22,16 +21,11 @@ import sootup.core.jimple.javabytecode.stmt.JSwitchStmt;
  * Provides symbolic execution capabilities.
  */
 public class SymbolicExecutor {
-    /** Max path length for symbolic execution */
-    private final int MAX_DEPTH = 20;
-
     private Context ctx;
-    private SearchStrategy searchStrategy;
     private JimpleToZ3Transformer transformer;
 
-    public SymbolicExecutor(Context ctx, SearchStrategy searchStrategy) {
+    public SymbolicExecutor(Context ctx) {
         this.ctx = ctx;
-        this.searchStrategy = searchStrategy;
         this.transformer = new JimpleToZ3Transformer(ctx);
     }
 
@@ -50,50 +44,8 @@ public class SymbolicExecutor {
     }
 
     /**
-     * Run symbolic execution on the given control flow graph, using the given
-     * search strategy.
-     * 
-     * @param cfg            The control flow graph of the method to analyze
-     * @param ctx            The Z3 context
-     * @param searchStrategy The search strategy to use
-     * @return A list of final symbolic states
-     */
-    public List<SymbolicState> execute(StmtGraph<?> cfg) {
-        SymbolicState initialState = new SymbolicState(ctx, cfg.getStartingStmt());
-        // Note: pass around the symbolic states to allow parallelization
-        return execute(cfg, initialState);
-    }
-
-    /**
-     * Run symbolic execution on the given control flow graph, using the given
-     * search strategy and initial symbolic state.
-     * 
-     * @param cfg          The control flow graph of the method to analyze
-     * @param initialState The initial symbolic state
-     * @return A list of final symbolic states
-     */
-    public List<SymbolicState> execute(StmtGraph<?> cfg, SymbolicState initialState) {
-        initialState.setCurrentStmt(cfg.getStartingStmt());
-        List<SymbolicState> finalStates = new ArrayList<>();
-        searchStrategy.init(initialState);
-
-        SymbolicState current;
-        while ((current = searchStrategy.next()) != null) {
-            if (current.isFinalState(cfg) || current.incrementDepth() >= MAX_DEPTH) {
-                finalStates.add(current);
-                searchStrategy.remove(current);
-                continue;
-            }
-
-            List<SymbolicState> newStates = step(cfg, current, null);
-            searchStrategy.add(newStates);
-        }
-
-        return finalStates;
-    }
-
-    /**
-     * Execute a single step of symbolic execution on the given control flow graph.
+     * Execute a single step of symbolic execution on the given control flow graph
+     * and symbolic state.
      * 
      * @param cfg      The control flow graph
      * @param state    The current symbolic state
@@ -101,7 +53,7 @@ public class SymbolicExecutor {
      *                 replaying a trace
      * @return A list of new symbolic states after executing the current statement
      */
-    private List<SymbolicState> step(StmtGraph<?> cfg, SymbolicState state, Iterator<TraceEntry> iterator) {
+    public List<SymbolicState> step(StmtGraph<?> cfg, SymbolicState state, Iterator<TraceEntry> iterator) {
         Stmt stmt = state.getCurrentStmt();
 
         if (stmt instanceof JIfStmt)

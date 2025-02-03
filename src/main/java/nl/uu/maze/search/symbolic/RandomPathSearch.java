@@ -1,10 +1,11 @@
-package nl.uu.maze.search;
+package nl.uu.maze.search.symbolic;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 
 import nl.uu.maze.execution.symbolic.SymbolicState;
+import nl.uu.maze.search.SymbolicSearchStrategy;
 import nl.uu.maze.util.Tree;
 
 /**
@@ -18,7 +19,7 @@ import nl.uu.maze.util.Tree;
  * thus have a lower path length. This helps to keep the path conditions shorter
  * and more manageable.
  */
-public class RandomPathSearch extends SearchStrategy {
+public class RandomPathSearch extends SymbolicSearchStrategy {
     private Tree<SymbolicState> tree;
     private Tree.TreeNode<SymbolicState> current;
     private Random random;

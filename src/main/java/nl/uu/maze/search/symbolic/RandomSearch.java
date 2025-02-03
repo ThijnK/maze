@@ -1,15 +1,16 @@
-package nl.uu.maze.search;
+package nl.uu.maze.search.symbolic;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 import nl.uu.maze.execution.symbolic.SymbolicState;
+import nl.uu.maze.search.SymbolicSearchStrategy;
 
 /**
  * A search strategy that explores states in a uniformly random manner.
  */
-public class RandomSearch extends SearchStrategy {
+public class RandomSearch extends SymbolicSearchStrategy {
     private List<SymbolicState> states;
     private Random random;
 

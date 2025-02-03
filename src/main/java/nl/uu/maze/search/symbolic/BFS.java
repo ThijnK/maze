@@ -1,18 +1,19 @@
-package nl.uu.maze.search;
+package nl.uu.maze.search.symbolic;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
 import nl.uu.maze.execution.symbolic.SymbolicState;
+import nl.uu.maze.search.SymbolicSearchStrategy;
 
 /**
  * A search strategy that explores states in a breadth-first manner.
  */
-public class BFSSearch extends SearchStrategy {
+public class BFS extends SymbolicSearchStrategy {
     private Queue<SymbolicState> queue;
 
-    public BFSSearch() {
+    public BFS() {
         queue = new LinkedList<>();
     }
 
