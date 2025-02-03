@@ -3,11 +3,6 @@ package nl.uu.maze.search;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import nl.uu.maze.search.symbolic.BFS;
-import nl.uu.maze.search.symbolic.DFS;
-import nl.uu.maze.search.symbolic.RandomPathSearch;
-import nl.uu.maze.search.symbolic.RandomSearch;
-
 /**
  * Factory class for creating search strategies.
  */
@@ -17,24 +12,36 @@ public class SearchStrategyFactory {
     /**
      * Returns a search strategy based on the given name.
      * 
-     * @param name The name of the search strategy
+     * @param concreteDriven Whether to return a concrete- or symbolic-driven search
+     *                       strategy
+     * @param name           The name of the search strategy
      * @return A search strategy
      */
-    public static SearchStrategy getStrategy(String name) {
-        switch (name) {
-            case "DFS":
-                return new DFS();
-            case "BFS":
-                return new BFS();
-            case "Random":
-            case "RandomSearch":
-                return new RandomSearch();
-            case "RandomPath":
-            case "RandomPathSearch":
-                return new RandomPathSearch();
+    public static SearchStrategy getStrategy(boolean concreteDriven, String name) {
+        switch ((concreteDriven ? "CD-" : "SD-") + name) {
+            case "CD-DFS":
+                return new nl.uu.maze.search.concrete.DFS();
+            case "SD-DFS":
+                return new nl.uu.maze.search.symbolic.DFS();
+            case "CD-BFS":
+                return new nl.uu.maze.search.concrete.BFS();
+            case "SD-BFS":
+                return new nl.uu.maze.search.symbolic.BFS();
+            case "CD-RandomSearch":
+            case "CD-Random":
+            case "CD-RS":
+                return new nl.uu.maze.search.concrete.RandomSearch();
+            case "SD-RandomSearch":
+            case "SD-Random":
+            case "SD-RS":
+                return new nl.uu.maze.search.symbolic.RandomSearch();
+            case "SD-RandomPathSearch":
+            case "SD-RandomPath":
+            case "SD-RPS":
+                return new nl.uu.maze.search.symbolic.RandomPathSearch();
             default:
                 logger.warn("Unknown search strategy: " + name + ", defaulting to DFS");
-                return new DFS();
+                return concreteDriven ? new nl.uu.maze.search.concrete.DFS() : new nl.uu.maze.search.symbolic.DFS();
         }
     }
 }

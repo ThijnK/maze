@@ -53,10 +53,21 @@ public class ExecutionController {
     private final ConcreteExecutor concrete;
     private final JUnitTestGenerator generator;
 
-    public ExecutionController(String classPath, String className, String strategyName, String outPath)
+    /**
+     * Create a new execution controller.
+     * 
+     * @param classPath      The class path to the target class
+     * @param className      The name of the target class
+     * @param concreteDriven Whether to use concrete-driven DSE (otherwise symbolic)
+     * @param strategyName   The name of the search strategy to use
+     * @param outPath        The output path for the generated test cases
+     * @throws Exception
+     */
+    public ExecutionController(String classPath, String className, boolean concreteDriven, String strategyName,
+            String outPath)
             throws Exception {
         this.outPath = Path.of(outPath);
-        searchStrategy = SearchStrategyFactory.getStrategy(strategyName);
+        searchStrategy = SearchStrategyFactory.getStrategy(concreteDriven, strategyName);
         logger.info("Using search strategy: " + searchStrategy.getClass().getSimpleName());
         this.analyzer = new JavaAnalyzer(classPath);
         this.ctx = new Context();
