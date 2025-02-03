@@ -144,6 +144,7 @@ public class ExecutionController {
             TraceManager.clearEntries(method.getName());
             concrete.execute(instrumented, javaMethod, argMap);
             SymbolicState finalState = symbolic.replay(cfg, method.getName());
+            logger.debug("Replayed state: " + finalState);
 
             boolean isNew = searchStrategy.add(finalState);
             // Only add a new test case if this path has not been explored before

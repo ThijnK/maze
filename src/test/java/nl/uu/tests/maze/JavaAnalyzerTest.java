@@ -60,7 +60,6 @@ public class JavaAnalyzerTest {
     @Test
     public void testGetJavaMethod() throws ClassNotFoundException, NoSuchMethodException {
         JavaClassType classType = analyzer.getClassType(className);
-        System.out.println(classType);
         Set<JavaSootMethod> methods = analyzer.getMethods(classType);
         JavaSootMethod method = methods.stream().filter(m -> m.getName().equals("checkSign")).findFirst().get();
         Method javaMethod = analyzer.getJavaMethod(method);

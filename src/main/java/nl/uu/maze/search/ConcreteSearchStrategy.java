@@ -24,9 +24,7 @@ public abstract class ConcreteSearchStrategy implements SearchStrategy {
 
         // Add a candidate for every constraint in the path condition
         for (int i = 0; i < state.getPathConstraints().size(); i++) {
-            PathConditionCandidate candidate = new PathConditionCandidate(state.getPathConstraints(), i,
-                    state.getContext());
-            add(candidate);
+            add(new PathConditionCandidate(state.getPathConstraints(), i, state.getContext()));
         }
         return true;
     }
@@ -37,8 +35,9 @@ public abstract class ConcreteSearchStrategy implements SearchStrategy {
         // Find the first candidate that has not been explored yet and is satisfiable
         PathConditionCandidate candidate;
         while ((candidate = next()) != null) {
+            candidate.applyNegation();
             if (!candidate.isExplored()) {
-                Optional<Model> model = validator.validate(candidate.applyNegation());
+                Optional<Model> model = validator.validate(candidate.getPathConstraints());
                 if (model.isPresent()) {
                     return model;
                 }
@@ -71,6 +70,7 @@ public abstract class ConcreteSearchStrategy implements SearchStrategy {
         public PathConditionCandidate(List<BoolExpr> pathConstraints, int index, Context ctx) {
             this.pathConstraints = pathConstraints;
             this.index = index;
+            this.ctx = ctx;
         }
 
         public List<BoolExpr> getPathConstraints() {
