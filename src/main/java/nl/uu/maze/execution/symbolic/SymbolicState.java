@@ -4,15 +4,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.microsoft.z3.*;
 
-import nl.uu.maze.util.ArrayUtils;
 import sootup.core.graph.StmtGraph;
 import sootup.core.jimple.common.stmt.Stmt;
 import sootup.core.types.Type;
@@ -31,8 +25,6 @@ import sootup.core.types.Type;
  * </p>
  */
 public class SymbolicState {
-    private static final Logger logger = LoggerFactory.getLogger(SymbolicState.class);
-
     private Context ctx;
     private Stmt currentStmt;
     private int currentDepth;
@@ -108,85 +100,6 @@ public class SymbolicState {
         return pathConstraints;
     }
 
-    /**
-     * Generates a unique identifier for the current path condition.
-     * 
-     * @return A unique identifier for the path condition
-     */
-    public int getPathConditionIdentifier() {
-        StringBuilder sb = new StringBuilder();
-        for (BoolExpr constraint : pathConstraints) {
-            sb.append(constraint.toString());
-        }
-        return sb.toString().hashCode();
-    }
-
-    /**
-     * Checks if the current path condition is a new path condition by comparing it
-     * and any of its prefixes to the set of explored paths.
-     * 
-     * @param exploredPaths The set of previously explored paths (represented by
-     *                      their identifiers, obtained by
-     *                      {@link #getPathConditionIdentifier()})
-     * @return True if the path condition is new, false otherwise
-     */
-    public boolean isNewPathCondition(Set<Integer> exploredPaths) {
-        StringBuilder sb = new StringBuilder();
-        for (BoolExpr constraint : pathConstraints) {
-            sb.append(constraint.toString());
-            if (exploredPaths.contains(sb.toString().hashCode())) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    /**
-     * Finds a <i>new</i> satisfiable path condition by negating a random path
-     * constraint.
-     * 
-     * @param validator     The symbolic state validator
-     * @param exploredPaths The set of previously explored paths (represented by
-     *                      their identifiers, obtained by
-     *                      {@link #getPathConditionIdentifier()})
-     * @return A Z3 model representing the new path condition, if found
-     */
-    public Optional<Model> findNewPathCondition(SymbolicStateValidator validator, Set<Integer> exploredPaths) {
-        if (pathConstraints.isEmpty()) {
-            return Optional.empty();
-        }
-
-        // Get the indices of path constraints in an array
-        Integer[] indices = new Integer[pathConstraints.size()];
-        for (int i = 0; i < indices.length; i++) {
-            indices[i] = i;
-        }
-
-        // Shuffle the array if indices to get a random order
-        ArrayUtils.shuffle(indices);
-
-        // Find the first path constraint for which negating it results in a new path
-        // condition
-        for (int index : indices) {
-            BoolExpr constraint = pathConstraints.get(index);
-            // Avoid double negation
-            BoolExpr negated = constraint.isNot() ? (BoolExpr) constraint.getArgs()[0] : ctx.mkNot(constraint);
-            logger.debug("Negating " + constraint + " -> " + negated);
-            pathConstraints.set(index, negated);
-            // Check if already explored
-            if (isNewPathCondition(exploredPaths)) {
-                // Validate to make sure path condition satisfiable
-                Optional<Model> model = validator.validate(this);
-                if (model.isPresent()) {
-                    return model;
-                }
-            }
-            pathConstraints.set(index, constraint);
-        }
-
-        return Optional.empty();
-    }
-
     public boolean isFinalState(StmtGraph<?> cfg) {
         return cfg.getAllSuccessors(currentStmt).isEmpty();
     }
@@ -197,6 +110,10 @@ public class SymbolicState {
 
     public SymbolicState clone() {
         return clone(currentStmt);
+    }
+
+    public Context getContext() {
+        return ctx;
     }
 
     @Override

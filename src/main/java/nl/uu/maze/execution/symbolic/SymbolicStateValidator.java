@@ -35,15 +35,15 @@ public class SymbolicStateValidator {
     }
 
     /**
-     * Validates the given symbolic state. If the path condition is satisfiable, the
-     * corresponding model is returned.
+     * Validates the given list of path constraints. If the path condition is
+     * satisfiable, the corresponding model is returned.
      * 
-     * @param state The symbolic state to validate
+     * @param pathConstraints The path constraints to validate
      * @return An optional model if the path condition is satisfiable
      */
-    public Optional<Model> validate(SymbolicState state) {
-        logger.debug("Validating state: " + state);
-        solver.add(state.getPathConstraints().toArray(new BoolExpr[0]));
+    public Optional<Model> validate(List<BoolExpr> pathConstraints) {
+        logger.debug("Validating path condition: " + pathConstraints);
+        solver.add(pathConstraints.toArray(new BoolExpr[0]));
         Status status = solver.check();
         logger.debug("Path condition " + status.toString());
         Optional<Model> model = Optional.empty();
@@ -55,13 +55,24 @@ public class SymbolicStateValidator {
     }
 
     /**
+     * Validates the given symbolic state. If the path condition is satisfiable, the
+     * corresponding model is returned.
+     * 
+     * @param state The symbolic state to validate
+     * @return An optional model if the path condition is satisfiable
+     */
+    public Optional<Model> validate(SymbolicState state) {
+        return validate(state.getPathConstraints());
+    }
+
+    /**
      * Validates the given list of symbolic states. If the path condition is
      * satisfiable, the corresponding model is returned.
      * 
      * @param states The symbolic states to validate
      * @return A list of models for the satisfiable path conditions
      */
-    public List<Model> validate(List<SymbolicState> states) {
+    public List<Model> validateAll(List<SymbolicState> states) {
         List<Model> result = new ArrayList<>();
         for (SymbolicState state : states) {
             Optional<Model> model = validate(state);

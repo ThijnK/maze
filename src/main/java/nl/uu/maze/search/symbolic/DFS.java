@@ -10,29 +10,25 @@ import nl.uu.maze.search.SymbolicSearchStrategy;
  * A search strategy that explores states in a depth-first manner.
  */
 public class DFS extends SymbolicSearchStrategy {
-    private Stack<SymbolicState> stack;
-
-    public DFS() {
-        stack = new Stack<>();
-    }
+    private Stack<SymbolicState> states = new Stack<>();
 
     @Override
     public void init(SymbolicState initialState) {
-        stack.push(initialState);
+        states.push(initialState);
     }
 
     @Override
     public SymbolicState next() {
-        if (stack.isEmpty()) {
+        if (states.isEmpty()) {
             return null;
         }
-        return stack.pop();
+        return states.pop();
     }
 
     @Override
     public void add(List<SymbolicState> newStates) {
         for (SymbolicState state : newStates) {
-            stack.push(state);
+            states.push(state);
         }
     }
 }

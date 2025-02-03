@@ -11,29 +11,25 @@ import nl.uu.maze.search.SymbolicSearchStrategy;
  * A search strategy that explores states in a breadth-first manner.
  */
 public class BFS extends SymbolicSearchStrategy {
-    private Queue<SymbolicState> queue;
-
-    public BFS() {
-        queue = new LinkedList<>();
-    }
+    private Queue<SymbolicState> states = new LinkedList<>();
 
     @Override
     public void init(SymbolicState initialState) {
-        queue.add(initialState);
+        states.add(initialState);
     }
 
     @Override
     public SymbolicState next() {
-        if (queue.isEmpty()) {
+        if (states.isEmpty()) {
             return null;
         }
-        return queue.remove();
+        return states.remove();
     }
 
     @Override
     public void add(List<SymbolicState> newStates) {
         for (SymbolicState state : newStates) {
-            queue.add(state);
+            states.add(state);
         }
     }
 }

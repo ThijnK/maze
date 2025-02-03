@@ -4,7 +4,7 @@ import java.util.List;
 
 import nl.uu.maze.execution.symbolic.SymbolicState;
 
-public abstract class SymbolicSearchStrategy extends SearchStrategy {
+public abstract class SymbolicSearchStrategy implements SearchStrategy {
     /**
      * Initialize the search strategy with the initial symbolic state.
      * 

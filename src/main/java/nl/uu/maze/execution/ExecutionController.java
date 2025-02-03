@@ -3,7 +3,6 @@ package nl.uu.maze.execution;
 import java.lang.reflect.Method;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -82,7 +81,7 @@ public class ExecutionController {
      */
     public void run() throws Exception {
         for (JavaSootMethod method : methods) {
-            // For now, skip the <init> method
+            // TODO: for now, skip the <init> method
             if (method.getName().equals("<init>")) {
                 continue;
             }
@@ -101,7 +100,6 @@ public class ExecutionController {
 
     /** Run symbolic-driven DSE on the given method. */
     private void runSymbolicDriven(JavaSootMethod method, SymbolicSearchStrategy searchStrategy) throws Exception {
-
         StmtGraph<?> cfg = analyzer.getCFG(method);
         SymbolicState initialState = new SymbolicState(ctx, cfg.getStartingStmt());
         List<SymbolicState> finalStates = new ArrayList<>();
@@ -115,6 +113,8 @@ public class ExecutionController {
                 continue;
             }
 
+            // Symbolically execute the current statement of the selected symbolic state to
+            // be processed
             List<SymbolicState> newStates = symbolic.step(cfg, current, null);
             searchStrategy.add(newStates);
         }
@@ -126,30 +126,23 @@ public class ExecutionController {
     private void runConcreteDriven(JavaSootMethod method, ConcreteSearchStrategy searchStrategy) throws Exception {
         StmtGraph<?> cfg = analyzer.getCFG(method);
         Method javaMethod = analyzer.getJavaMethod(method, instrumented);
-        Set<Integer> exploredPaths = new HashSet<>();
-
         ArgMap argMap = null;
 
-        // Keep exploring new, unexplored paths until we cannot find a new one
         while (true) {
             // Concrete execution followed by symbolic replay
             TraceManager.clearEntries(method.getName());
             concrete.execute(instrumented, javaMethod, argMap);
             SymbolicState finalState = symbolic.replay(cfg, method.getName());
 
-            int pathConditionIdentifier = finalState.getPathConditionIdentifier();
-            logger.debug("Path condition identifier: " + pathConditionIdentifier);
+            boolean isNew = searchStrategy.add(finalState);
             // Only add a new test case if this path has not been explored before
-            // Note: this can happen only in certain edge cases which the
-            // findNewPathCondition method cannot cover
-            if (!exploredPaths.contains(pathConditionIdentifier)) {
-                // Store the path condition identifier to avoid exploring the same path again
-                exploredPaths.add(pathConditionIdentifier);
+            // Note: this particular check will catch only certain edge cases that are not
+            // caught by the search strategy
+            if (isNew) {
                 generator.addMethodTestCase(method, argMap == null ? concrete.getArgMap() : argMap);
             }
 
-            // Find a new path condition by negating a random path constraint
-            Optional<Model> model = finalState.findNewPathCondition(validator, exploredPaths);
+            Optional<Model> model = searchStrategy.next(validator);
             // If we cannot find a new path condition, we are done
             if (model.isEmpty()) {
                 break;
@@ -161,6 +154,7 @@ public class ExecutionController {
         }
     }
 
+    /** Close the Z3 context. */
     public void close() {
         ctx.close();
     }
