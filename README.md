@@ -61,13 +61,18 @@ Application
     │   ├── BytecodeInstrumenter    // Instruments bytecode to collect symbolic traces
     │   └── TraceManager            // Manages symbolic traces
     ├── SymbolicExecutor            // Symbolic execution engine, explores a program using a given search strategy
-    │   ├── SearchStrategy          // Abstract class for symbolic search strategies
-    │   │   ├── DFSSearch           // Depth-first search strategy
-    │   │   ├── BFSSearch           // Breadth-first search strategy
-    │   │   ├── RandomPathSearch    // Random path search strategy
-    │   │   └── ...                 // Other search strategies
     │   ├── SymbolicState           // Represents a symbolic state in the symbolic execution engine
     │   └── SymbolicStateValidator  // Validates symbolic states using Z3 to produce inputs for concrete execution and/or test case generation
+    ├── SearchStrategy              // Interface for search strategies
+    │   ├── SearchStrategyFactory   // Factory for creating search strategies
+    │   ├── ConcreteSearchStrategy  // Abstract class for concrete-driven search strategies
+    │   │   ├── DFS                 // Cocnrete-driven DFS
+    │   │   ├── BFS                 // Concrete-driven BFS
+    │   │   └── ...                 // Other concrete-driven search strategies
+    │   ├── SymbolicSearchStrategy  // Abstract class for symbolic-driven search strategies
+    │   │   ├── DFS                 // Symbolic-driven DFS
+    │   │   ├── BFS                 // Symbolic-driven BFS
+    │   │   └── ...                 // Other search strategies
     └── JUnitTestGenerator          // Generates JUnit test cases
 ```
 
