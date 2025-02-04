@@ -15,7 +15,7 @@ public class RandomSearch extends SymbolicSearchStrategy {
     private Random random = new Random();
 
     @Override
-    public void init(SymbolicState initialState) {
+    public void add(SymbolicState initialState) {
         states.add(initialState);
     }
 

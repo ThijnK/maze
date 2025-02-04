@@ -52,14 +52,12 @@ public class Tree<T> {
             this.children.add(child);
         }
 
-        public void addChildren(List<TreeNode<T>> children) {
-            this.children.addAll(children);
+        public void addChild(T value) {
+            this.children.add(new TreeNode<>(value, this));
         }
 
-        public void addChildrenFromValues(List<T> values) {
-            for (T value : values) {
-                this.children.add(new TreeNode<>(value, this));
-            }
+        public void addChildren(List<TreeNode<T>> children) {
+            this.children.addAll(children);
         }
 
         public boolean isLeaf() {

@@ -114,7 +114,7 @@ public class ExecutionController {
         StmtGraph<?> cfg = analyzer.getCFG(method);
         SymbolicState initialState = new SymbolicState(ctx, cfg.getStartingStmt());
         List<SymbolicState> finalStates = new ArrayList<>();
-        searchStrategy.init(initialState);
+        searchStrategy.add(initialState);
 
         SymbolicState current;
         while ((current = searchStrategy.next()) != null) {

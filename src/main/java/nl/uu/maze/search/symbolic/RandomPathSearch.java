@@ -7,6 +7,7 @@ import java.util.Random;
 import nl.uu.maze.execution.symbolic.SymbolicState;
 import nl.uu.maze.search.SymbolicSearchStrategy;
 import nl.uu.maze.util.Tree;
+import nl.uu.maze.util.Tree.TreeNode;
 
 /**
  * Symbolic-driven search strategy that keeps track of the execution tree and
@@ -22,16 +23,16 @@ import nl.uu.maze.util.Tree;
  */
 public class RandomPathSearch extends SymbolicSearchStrategy {
     private Tree<SymbolicState> tree;
-    private Tree.TreeNode<SymbolicState> current;
-    private Random random;
-
-    public RandomPathSearch() {
-        random = new Random();
-    }
+    private TreeNode<SymbolicState> current;
+    private Random random = new Random();
 
     @Override
-    public void init(SymbolicState initialState) {
-        tree = new Tree<>(initialState);
+    public void add(SymbolicState state) {
+        if (tree == null) {
+            tree = new Tree<>(state);
+        } else {
+            current.addChild(state);
+        }
     }
 
     @Override
@@ -40,15 +41,10 @@ public class RandomPathSearch extends SymbolicSearchStrategy {
         // follow at each node
         current = tree.getRoot();
         while (current != null && !current.isLeaf()) {
-            List<Tree.TreeNode<SymbolicState>> children = current.getChildren();
+            List<TreeNode<SymbolicState>> children = current.getChildren();
             current = children.get(random.nextInt(children.size()));
         }
         return current != null ? current.getValue() : null;
-    }
-
-    @Override
-    public void add(List<SymbolicState> newStates) {
-        current.addChildrenFromValues(newStates);
     }
 
     @Override
@@ -59,7 +55,7 @@ public class RandomPathSearch extends SymbolicSearchStrategy {
         if (current.getValue().equals(state)) {
             tree.removePath(current);
         } else {
-            Optional<Tree.TreeNode<SymbolicState>> node = tree.findNode(state);
+            Optional<TreeNode<SymbolicState>> node = tree.findNode(state);
             if (node.isPresent()) {
                 tree.removePath(node.get());
             }

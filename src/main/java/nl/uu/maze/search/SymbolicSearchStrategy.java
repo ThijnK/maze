@@ -9,26 +9,22 @@ import nl.uu.maze.execution.symbolic.SymbolicState;
  */
 public abstract class SymbolicSearchStrategy implements SearchStrategy {
     /**
-     * Initialize the search strategy with the initial symbolic state.
+     * Add a symbolic state to the search strategy.
      * 
-     * @param initialState The initial symbolic state
+     * @param states
      */
-    public abstract void init(SymbolicState initialState);
+    public abstract void add(SymbolicState state);
 
     /**
-     * Get the next symbolic state to explore.
+     * Add multiple symbolic states to the search strategy.
      * 
-     * @return The next symbolic state to explore, or null if there are no more
-     *         states to explore
+     * @param states The new symbolic states to add
      */
-    public abstract SymbolicState next();
-
-    /**
-     * Add new symbolic states to the search strategy.
-     * 
-     * @param newStates The new symbolic states to add
-     */
-    public abstract void add(List<SymbolicState> newStates);
+    public void add(List<SymbolicState> states) {
+        for (SymbolicState state : states) {
+            add(state);
+        }
+    }
 
     /**
      * Remove a symbolic state from the search strategy.
@@ -41,4 +37,12 @@ public abstract class SymbolicSearchStrategy implements SearchStrategy {
     public void remove(SymbolicState state) {
         // Default implementation does nothing
     }
+
+    /**
+     * Get the next symbolic state to explore.
+     * 
+     * @return The next symbolic state to explore, or null if there are no more
+     *         states to explore
+     */
+    public abstract SymbolicState next();
 }

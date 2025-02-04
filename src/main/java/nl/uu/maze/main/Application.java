@@ -26,12 +26,14 @@ public class Application {
     private static final String classPath = "target/classes";
     private static final String className = "nl.uu.maze.example.ExampleClass";
     private static final String outPath = "src/test/java";
+    private static final boolean concreteDriven = false;
 
     public static void main(String[] args) {
         try {
             String strategyName = args.length > 0 ? args[0] : "";
 
-            ExecutionController controller = new ExecutionController(classPath, className, true, strategyName, outPath);
+            ExecutionController controller = new ExecutionController(classPath, className, concreteDriven, strategyName,
+                    outPath);
             controller.run();
             controller.close();
         } catch (Exception e) {
