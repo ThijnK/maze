@@ -110,10 +110,9 @@ public class Tree<T> {
     }
 
     /**
-     * Removes the path from the given start node in both directions (up and down)
-     * by removing the start node and all its children.
+     * Removes the given start node and the path towards it from the tree.
      * 
-     * @param startNode The node to start removing the path from
+     * @param startNode The node to remove the path for
      */
     public void removePath(TreeNode<T> startNode) {
         if (startNode == null) {
@@ -123,16 +122,13 @@ public class Tree<T> {
         TreeNode<T> parent = startNode.getParent();
         if (parent != null) {
             parent.removeChild(startNode);
+            // Recursively remove the parent if it becomes a leaf
             if (parent.isLeaf()) {
-                removePath(parent); // Recursively remove the parent if it becomes a leaf
+                removePath(parent);
             }
         } else if (startNode == root) {
-            root = null; // If the startNode is the root, set the root to null
-        }
-
-        // Recursively remove all children of the startNode
-        for (TreeNode<T> child : new ArrayList<>(startNode.getChildren())) {
-            removePath(child);
+            // If the startNode is the root, set the root to null
+            root = null;
         }
     }
 }
