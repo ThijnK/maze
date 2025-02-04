@@ -1,5 +1,6 @@
 package nl.uu.maze.search;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -131,6 +132,8 @@ public abstract class ConcreteSearchStrategy implements SearchStrategy {
             BoolExpr constraint = pathConstraints.get(index);
             // Avoid double negation
             BoolExpr negated = constraint.isNot() ? (BoolExpr) constraint.getArgs()[0] : ctx.mkNot(constraint);
+            // Make a copy of the path constraints to avoid modifying the original list
+            pathConstraints = new ArrayList<>(pathConstraints);
             pathConstraints.set(index, negated);
         }
 
