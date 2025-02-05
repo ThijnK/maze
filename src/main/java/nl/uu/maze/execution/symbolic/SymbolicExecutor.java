@@ -16,6 +16,8 @@ import sootup.core.jimple.common.constant.IntConstant;
 import sootup.core.jimple.common.expr.AbstractConditionExpr;
 import sootup.core.jimple.common.stmt.*;
 import sootup.core.jimple.javabytecode.stmt.JSwitchStmt;
+import sootup.core.types.Type;
+import sootup.core.types.PrimitiveType.IntType;
 
 /**
  * Provides symbolic execution capabilities.
@@ -131,45 +133,44 @@ public class SymbolicExecutor {
             int branchIndex = entry.getValue();
             if (branchIndex >= values.size()) {
                 // Default case constraint is the negation of all other constraints
-                BoolExpr defaultCaseConstraint = null;
                 for (int i = 0; i < values.size(); i++) {
-                    BoolExpr constraint = ctx.mkEq(var, ctx.mkInt(values.get(i).getValue()));
-                    defaultCaseConstraint = defaultCaseConstraint != null
-                            ? ctx.mkAnd(defaultCaseConstraint, ctx.mkNot(constraint))
-                            : ctx.mkNot(constraint);
+                    state.addPathConstraint(ctx.mkNot(mkSwitchConstraint(var, values.get(i))));
                 }
-                state.addPathConstraint(defaultCaseConstraint);
             } else {
                 // Otherwise add constraint for the branch that was taken
-                state.addPathConstraint(ctx.mkEq(var, ctx.mkInt(values.get(branchIndex).getValue())));
+                state.addPathConstraint(mkSwitchConstraint(var, values.get(branchIndex)));
             }
             state.setCurrentStmt(succs.get(branchIndex));
             newStates.add(state);
         }
         // Otherwise, follow all branches
         else {
-            BoolExpr defaultCaseConstraint = null;
-            for (int i = 0; i < succs.size(); i++) {
-                SymbolicState newState = i == succs.size() - 1 ? state : state.clone();
+            // The last successor is the default case, whose constraint is the negation of
+            // all other constraints
+            SymbolicState defaultCaseState = state.clone();
+            // For all cases, except the default case
+            for (int i = 0; i < succs.size() - 1; i++) {
+                SymbolicState newState = i == succs.size() - 2 ? state : state.clone();
 
-                // A successor beyond the number of values in the switch statement is the
-                // default case
-                if (i < values.size()) {
-                    BoolExpr constraint = ctx.mkEq(var, ctx.mkInt(values.get(i).getValue()));
-                    newState.addPathConstraint(constraint);
-                    // Default case constraint is the negation of all other constraints
-                    defaultCaseConstraint = defaultCaseConstraint != null
-                            ? ctx.mkAnd(defaultCaseConstraint, ctx.mkNot(constraint))
-                            : ctx.mkNot(constraint);
-                } else {
-                    newState.addPathConstraint(defaultCaseConstraint);
-                }
+                BoolExpr constraint = mkSwitchConstraint(var, values.get(i));
+                newState.addPathConstraint(constraint);
+                defaultCaseState.addPathConstraint(ctx.mkNot(constraint));
                 newState.setCurrentStmt(succs.get(i));
                 newStates.add(newState);
             }
+            defaultCaseState.setCurrentStmt(succs.get(succs.size() - 1));
+            newStates.add(defaultCaseState);
         }
 
         return newStates;
+    }
+
+    /**
+     * Create a constraint for a switch case (i.e., the variable being switched over
+     * equals the case value)
+     */
+    private BoolExpr mkSwitchConstraint(Expr<?> var, IntConstant value) {
+        return ctx.mkEq(var, ctx.mkBV(value.getValue(), Type.getValueBitSize(IntType.getInstance())));
     }
 
     /**
