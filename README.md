@@ -53,7 +53,7 @@ mvn test
 
 The project is structured roughly as displayed by the following tree, which shows which classes control which other classes and what their responsibilities are:
 
-```java
+```cs
 Application
 └── ExecutionController             // Controls the execution of a program, combining symbolic and concrete execution
     ├── ConcreteExecutor            // Concrete execution engine, instantiates objects and executes methods
@@ -66,7 +66,7 @@ Application
     ├── SearchStrategy              // Interface for search strategies
     │   ├── SearchStrategyFactory   // Factory for creating search strategies
     │   ├── ConcreteSearchStrategy  // Abstract class for concrete-driven search strategies
-    │   │   ├── DFS                 // Cocnrete-driven DFS
+    │   │   ├── DFS                 // Concrete-driven DFS
     │   │   ├── BFS                 // Concrete-driven BFS
     │   │   └── ...                 // Other concrete-driven search strategies
     │   ├── SymbolicSearchStrategy  // Abstract class for symbolic-driven search strategies
