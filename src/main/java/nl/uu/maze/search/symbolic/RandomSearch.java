@@ -21,10 +21,7 @@ public class RandomSearch extends SymbolicSearchStrategy {
 
     @Override
     public SymbolicState next() {
-        if (states.isEmpty()) {
-            return null;
-        }
-        return states.remove(random.nextInt(states.size()));
+        return states.isEmpty() ? null : states.remove(random.nextInt(states.size()));
     }
 
     @Override

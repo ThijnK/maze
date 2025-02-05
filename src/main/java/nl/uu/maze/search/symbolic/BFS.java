@@ -19,9 +19,6 @@ public class BFS extends SymbolicSearchStrategy {
 
     @Override
     public SymbolicState next() {
-        if (states.isEmpty()) {
-            return null;
-        }
-        return states.remove();
+        return states.isEmpty() ? null : states.remove();
     }
 }

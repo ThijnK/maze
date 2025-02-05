@@ -17,9 +17,6 @@ public class DFS extends ConcreteSearchStrategy {
 
     @Override
     public PathConditionCandidate next() {
-        if (candidates.isEmpty()) {
-            return null;
-        }
-        return candidates.pop();
+        return candidates.isEmpty() ? null : candidates.pop();
     }
 }

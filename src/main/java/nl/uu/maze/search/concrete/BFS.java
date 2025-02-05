@@ -18,9 +18,6 @@ public class BFS extends ConcreteSearchStrategy {
 
     @Override
     public PathConditionCandidate next() {
-        if (candidates.isEmpty()) {
-            return null;
-        }
-        return candidates.remove();
+        return candidates.isEmpty() ? null : candidates.remove();
     }
 }
