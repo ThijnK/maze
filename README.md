@@ -69,10 +69,10 @@ Application
     │   │   ├── DFS                 // Concrete-driven DFS
     │   │   ├── BFS                 // Concrete-driven BFS
     │   │   └── ...                 // Other concrete-driven search strategies
-    │   ├── SymbolicSearchStrategy  // Abstract class for symbolic-driven search strategies
-    │   │   ├── DFS                 // Symbolic-driven DFS
-    │   │   ├── BFS                 // Symbolic-driven BFS
-    │   │   └── ...                 // Other search strategies
+    │   └── SymbolicSearchStrategy  // Abstract class for symbolic-driven search strategies
+    │       ├── DFS                 // Symbolic-driven DFS
+    │       ├── BFS                 // Symbolic-driven BFS
+    │       └── ...                 // Other search strategies
     └── JUnitTestGenerator          // Generates JUnit test cases
 ```
 

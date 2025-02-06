@@ -78,17 +78,32 @@ public class Z3ToJavaTransformer {
             } else if (type instanceof DoubleType) {
                 return Double.NaN;
             }
+        } else if (fpNum.isInf()) {
+            if (fpNum.isPositive()) {
+                if (type instanceof FloatType) {
+                    return Float.POSITIVE_INFINITY;
+                } else if (type instanceof DoubleType) {
+                    return Double.POSITIVE_INFINITY;
+                }
+            } else {
+                if (type instanceof FloatType) {
+                    return Float.NEGATIVE_INFINITY;
+                } else if (type instanceof DoubleType) {
+                    return Double.NEGATIVE_INFINITY;
+                }
+            }
         }
 
+        String fpStr = fpNum.toString();
         int sign = fpNum.getSign() ? 1 : 0;
-        long exponent = fpNum.getExponentInt64(false);
+        long exponent = fpNum.getExponentInt64(true);
         long significand = fpNum.getSignificandUInt64();
 
         if (type instanceof FloatType) {
-            long floatBits = (sign << 31) | (((int) (exponent + 127) & 0xFF) << 23) | ((int) (significand & 0x7FFFFF));
+            long floatBits = (sign << 31) | (((int) exponent & 0xFF) << 23) | ((int) (significand & 0x7FFFFF));
             return Float.intBitsToFloat((int) floatBits);
         } else if (type instanceof DoubleType) {
-            long doubleBits = ((long) sign << 63) | ((exponent + 1023) << 52) | (significand & 0xFFFFFFFFFFFFFL);
+            long doubleBits = ((long) sign << 63) | ((exponent & 0x7FF) << 52) | (significand & 0xFFFFFFFFFFFFFL);
             return Double.longBitsToDouble(doubleBits);
         } else {
             return null;
