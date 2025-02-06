@@ -94,7 +94,6 @@ public class Z3ToJavaTransformer {
             }
         }
 
-        String fpStr = fpNum.toString();
         int sign = fpNum.getSign() ? 1 : 0;
         long exponent = fpNum.getExponentInt64(true);
         long significand = fpNum.getSignificandUInt64();

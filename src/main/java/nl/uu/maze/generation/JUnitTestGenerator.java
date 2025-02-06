@@ -70,10 +70,27 @@ public class JUnitTestGenerator {
                 String arrayString = arrayToJavaString((List<Object>) value);
                 methodBuilder.addStatement("$T $L = $L", List.class, var, arrayString);
             }
-            // If value is a primitive type, JavaPoet will handle it as a literal
+            // If value is a primitive type, handle it as a literal
             else if (value != null) {
-                // TODO: add the Float. or Double. part for Infinity (but take into account
-                // negative values)
+                // Handle special cases for float and double
+                String overrideValue = "";
+                if (value instanceof Float) {
+                    if (Float.isNaN((float) value)) {
+                        overrideValue = "Float.NaN";
+                    } else if (Float.isInfinite((float) value)) {
+                        overrideValue = ((float) value > 0) ? "Float.POSITIVE_INFINITY" : "Float.NEGATIVE_INFINITY";
+                    }
+                } else if (value instanceof Double) {
+                    if (Double.isNaN((double) value)) {
+                        overrideValue = "Double.NaN";
+                    } else if (Double.isInfinite((double) value)) {
+                        overrideValue = ((double) value > 0) ? "Double.POSITIVE_INFINITY" : "Double.NEGATIVE_INFINITY";
+                    }
+                }
+                if (!overrideValue.isEmpty()) {
+                    methodBuilder.addStatement("$L $L = $L", paramTypes.get(j), var, overrideValue);
+                    continue;
+                }
 
                 // Add a "F" or "L" postfix for float and long literals
                 String postfix = value instanceof Float && !Float.isInfinite((float) value)
