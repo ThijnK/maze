@@ -4,6 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import com.microsoft.z3.BitVecExpr;
 import com.microsoft.z3.BoolExpr;
@@ -44,53 +46,27 @@ public class Z3ToJavaTransformerTest {
         assert !(Boolean) resultFalse;
     }
 
-    @Test
-    public void testTransform_IntExpr_Positive() {
-        int value = 42;
+    @ParameterizedTest
+    @ValueSource(ints = { 0, 1, -1, 69, -69, Integer.MAX_VALUE, Integer.MIN_VALUE })
+    public void testTransform_IntExpr(int value) {
         IntExpr expr = ctx.mkInt(value);
         Object result = transformer.transform(expr, model, IntType.getInstance());
         assertEquals(value, result);
 
     }
 
-    @Test
-    public void testTransform_IntExpr_Negative() {
-        int value = -42;
-        IntExpr expr = ctx.mkInt(value);
-        Object result = transformer.transform(expr, model, IntType.getInstance());
-        assertEquals(value, result);
-    }
-
-    @Test
-    public void testTransform_BVExpr_PositiveInt() {
-        int value = Integer.MAX_VALUE;
+    @ParameterizedTest
+    @ValueSource(ints = { 0, 1, -1, 69, -69, Integer.MAX_VALUE, Integer.MIN_VALUE })
+    public void testTransform_BVExpr_Int(int value) {
         Type type = IntType.getInstance();
         BitVecExpr expr = ctx.mkBV(value, Type.getValueBitSize(type));
         Object result = transformer.transform(expr, model, type);
         assertEquals(value, result);
     }
 
-    @Test
-    public void testTransform_BVExpr_NegativeInt() {
-        int value = Integer.MIN_VALUE;
-        Type type = IntType.getInstance();
-        BitVecExpr expr = ctx.mkBV(value, Type.getValueBitSize(type));
-        Object result = transformer.transform(expr, model, type);
-        assertEquals(value, result);
-    }
-
-    @Test
-    public void testTransform_BVExpr_PositiveLong() {
-        long value = Long.MAX_VALUE;
-        Type type = LongType.getInstance();
-        BitVecExpr expr = ctx.mkBV(value, Type.getValueBitSize(type));
-        Object result = transformer.transform(expr, model, type);
-        assertEquals(value, result);
-    }
-
-    @Test
-    public void testTransform_BVExpr_NegativeLong() {
-        long value = Long.MIN_VALUE;
+    @ParameterizedTest
+    @ValueSource(longs = { 0, 1, -1, 69, -69, Long.MAX_VALUE, Long.MIN_VALUE })
+    public void testTransform_BVExpr_Long(long value) {
         Type type = LongType.getInstance();
         BitVecExpr expr = ctx.mkBV(value, Type.getValueBitSize(type));
         Object result = transformer.transform(expr, model, type);
@@ -133,81 +109,19 @@ public class Z3ToJavaTransformerTest {
         assertEquals(value, result);
     }
 
-    @Test
-    public void testTransform_FPExpr_PositiveFloat() {
-        float value = Float.MAX_VALUE;
+    @ParameterizedTest
+    @ValueSource(floats = { 0.0f, 1.0f, -1.0f, 69.0f, -69.0f, Float.MAX_VALUE, Float.MIN_VALUE, Float.POSITIVE_INFINITY,
+            Float.NEGATIVE_INFINITY, Float.NaN })
+    public void testTransform_FPExpr_Float(float value) {
         FPNum expr = ctx.mkFP(value, ctx.mkFPSort32());
         Object result = transformer.transform(expr, model, FloatType.getInstance());
         assertEquals(value, result);
     }
 
-    @Test
-    public void testTransform_FPExpr_NegativeFloat() {
-        float value = -Float.MAX_VALUE;
-        FPNum expr = ctx.mkFP(value, ctx.mkFPSort32());
-        Object result = transformer.transform(expr, model, FloatType.getInstance());
-        assertEquals(value, result);
-    }
-
-    @Test
-    public void testTransform_FPExpr_PositiveDouble() {
-        double value = Double.MAX_VALUE;
-        FPNum expr = ctx.mkFP(value, ctx.mkFPSort64());
-        Object result = transformer.transform(expr, model, DoubleType.getInstance());
-        assertEquals(value, result);
-    }
-
-    @Test
-    public void testTransform_FPExpr_NegativeDouble() {
-        double value = -Double.MAX_VALUE;
-        FPNum expr = ctx.mkFP(value, ctx.mkFPSort64());
-        Object result = transformer.transform(expr, model, DoubleType.getInstance());
-        assertEquals(value, result);
-    }
-
-    @Test
-    public void testTransform_FPExpr_PositiveFloatInfinity() {
-        float value = Float.POSITIVE_INFINITY;
-        FPNum expr = ctx.mkFP(value, ctx.mkFPSort32());
-        Object result = transformer.transform(expr, model, FloatType.getInstance());
-        assertEquals(value, result);
-    }
-
-    @Test
-    public void testTransform_FPExpr_NegativeFloatInfinity() {
-        float value = Float.NEGATIVE_INFINITY;
-        FPNum expr = ctx.mkFP(value, ctx.mkFPSort32());
-        Object result = transformer.transform(expr, model, FloatType.getInstance());
-        assertEquals(value, result);
-    }
-
-    @Test
-    public void testTransform_FPExpr_PositiveDoubleInfinity() {
-        double value = Double.POSITIVE_INFINITY;
-        FPNum expr = ctx.mkFP(value, ctx.mkFPSort64());
-        Object result = transformer.transform(expr, model, DoubleType.getInstance());
-        assertEquals(value, result);
-    }
-
-    @Test
-    public void testTransform_FPExpr_NegativeDoubleInfinity() {
-        double value = Double.NEGATIVE_INFINITY;
-        FPNum expr = ctx.mkFP(value, ctx.mkFPSort64());
-        Object result = transformer.transform(expr, model, DoubleType.getInstance());
-        assertEquals(value, result);
-    }
-
-    @Test
-    public void testTransform_FPExpr_FloatNaN() {
-        float value = Float.NaN;
-        FPNum expr = ctx.mkFP(value, ctx.mkFPSort32());
-        Object result = transformer.transform(expr, model, FloatType.getInstance());
-        assertEquals(value, result);
-    }
-
-    @Test
-    public void testTransform_FPExpr_DoubleNaN() {
-        double value = Double.NaN;
+    @ParameterizedTest
+    @ValueSource(doubles = { 0.0, 1.0, -1.0, 69.0, -69.0, Double.MAX_VALUE, Double.MIN_VALUE, Double.POSITIVE_INFINITY,
+            Double.NEGATIVE_INFINITY, Double.NaN })
+    public void testTransform_FPExpr_Double(double value) {
         FPNum expr = ctx.mkFP(value, ctx.mkFPSort64());
         Object result = transformer.transform(expr, model, DoubleType.getInstance());
         assertEquals(value, result);
