@@ -275,8 +275,14 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
     @Override
     public void caseNegExpr(@Nonnull JNegExpr expr) {
         // Appears when you negate a non-literal value (e.g. -x)
-        BitVecExpr innerExpr = (BitVecExpr) transform(expr.getOp());
-        setResult(ctx.mkBVNeg(innerExpr));
+        Expr<?> innerExpr = transform(expr.getOp());
+        if (innerExpr instanceof BitVecExpr) {
+            setResult(ctx.mkBVNeg((BitVecExpr) innerExpr));
+        } else if (innerExpr instanceof FPExpr) {
+            setResult(ctx.mkFPNeg((FPExpr) innerExpr));
+        } else {
+            throw new UnsupportedOperationException("Unsupported operand type: " + innerExpr.getSort());
+        }
     }
 
     @Override
