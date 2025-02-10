@@ -91,6 +91,12 @@ public class ExecutionController {
      * @throws Exception
      */
     public void run() throws Exception {
+        // Symbolicaly execute a constructor to get the initial state
+        // TODO: find first constructor, and store its signature
+        // TODO: use signature to execute the right ctor in concrete exectuion (and with
+        // the same arguments!)
+        // TODO: use the symbolic state from ctor as initial state for symbolic (replay)
+
         for (JavaSootMethod method : methods) {
             // TODO: for now, skip the <init> method
             if (method.getName().equals("<init>")) {
@@ -107,6 +113,11 @@ public class ExecutionController {
         }
 
         generator.writeToFile(outPath);
+    }
+
+    private SymbolicState runConstructor(JavaSootMethod constructor) throws Exception {
+        // TODO: implement
+        return null;
     }
 
     /** Run symbolic-driven DSE on the given method. */
