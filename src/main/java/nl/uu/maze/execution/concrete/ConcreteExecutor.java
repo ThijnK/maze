@@ -61,7 +61,8 @@ public class ConcreteExecutor {
         if (Modifier.isStatic(method.getModifiers())) {
             instance = null;
         } else {
-            // TODO: keep one instance of the class around for all methods
+            // TODO: reuse instances based on the path encodings (or other)
+            // TODO: also use argMap for arguments of ctor
             instance = instantiator.createInstance(clazz);
             if (instance == null) {
                 logger.error("Failed to create instance of class: " + clazz.getName());

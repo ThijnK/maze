@@ -95,16 +95,21 @@ public class ExecutionController {
         this.instrumented = concreteDriven ? BytecodeInstrumenter.instrument(classPath, className) : null;
         this.generator = new JUnitTestGenerator(clazz);
 
-        this.ctorCfg = analyzer.getCFG(analyzer.getConstructor(classType));
+        // If class includes non-static methods, need to execute constructor first
+        if (!methods.stream().allMatch(JavaSootMethod::isStatic)) {
+            JavaSootMethod ctor = analyzer.getConstructor(classType);
+            logger.info("Using constructor: " + ctor.getSignature());
+            this.ctorCfg = analyzer.getCFG(ctor);
 
-        // Only instrument if concrete-driven DSE is used
-        if (!concreteDriven) {
-            this.ctorStates = new HashMap<Integer, SymbolicState>();
-            // TODO: maybe also have to store ctor identifier
-            SymbolicState initialState = new SymbolicState(ctx, ctorCfg.getStartingStmt());
-            initialState.isCtorState = true;
-            ctorStates.put(initialState.hashCode(), initialState);
+            if (!concreteDriven) {
+                this.ctorStates = new HashMap<Integer, SymbolicState>();
+                // TODO: maybe also have to store ctor identifier
+                SymbolicState initialState = new SymbolicState(ctx, ctorCfg.getStartingStmt());
+                initialState.isCtorState = true;
+                ctorStates.put(initialState.hashCode(), initialState);
+            }
         }
+
     }
 
     /**
@@ -136,9 +141,12 @@ public class ExecutionController {
         StmtGraph<?> cfg = analyzer.getCFG(method);
         List<SymbolicState> finalStates = new ArrayList<>();
 
-        // Initial states are all explored states of the ctor
-        // TODO: only start with ctor if not static method
-        searchStrategy.add(ctorStates.values());
+        // If static, start with target method, otherwise start with constructor
+        if (method.isStatic()) {
+            searchStrategy.add(new SymbolicState(ctx, cfg.getStartingStmt()));
+        } else {
+            searchStrategy.add(ctorStates.values());
+        }
 
         SymbolicState current;
         while ((current = searchStrategy.next()) != null) {
