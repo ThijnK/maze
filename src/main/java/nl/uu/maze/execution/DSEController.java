@@ -213,6 +213,7 @@ public class DSEController {
             // state
             if (ctorStates.containsKey(pathHash)) {
                 current = ctorStates.get(pathHash).clone();
+                current.setCurrentStmt(cfg.getStartingStmt());
                 iterator = TraceManager.getEntries(method.getName()).iterator();
             } else {
                 current = new SymbolicState(ctx, ctorCfg.getStartingStmt());
