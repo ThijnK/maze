@@ -123,4 +123,21 @@ public class SymbolicState {
     public String toString() {
         return "State: " + symbolicVariables + ", PC: " + getPathConstraints();
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this)
+            return true;
+        if (!(obj instanceof SymbolicState))
+            return false;
+
+        SymbolicState state = (SymbolicState) obj;
+        return state.currentStmt.equals(currentStmt) && state.symbolicVariables.equals(symbolicVariables)
+                && state.pathConstraints.equals(pathConstraints);
+    }
+
+    @Override
+    public int hashCode() {
+        return currentStmt.hashCode() + symbolicVariables.hashCode() + pathConstraints.hashCode();
+    }
 }
