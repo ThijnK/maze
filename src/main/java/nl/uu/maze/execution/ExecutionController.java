@@ -5,8 +5,10 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -58,8 +60,13 @@ public class ExecutionController {
     private final JUnitTestGenerator generator;
 
     private StmtGraph<?> ctorCfg;
-    private boolean ctorExecuted = false;
-    private List<SymbolicState> ctorStates = new ArrayList<>();
+    /**
+     * Map of constructor states, indexed by their hash code.
+     * This is used to keep track of (active) states in the constructor method,
+     * which are reused as initial states for every target method in symbolic-driven
+     * DSE.
+     */
+    private Map<Integer, SymbolicState> ctorStates;
 
     /**
      * Create a new execution controller.
@@ -88,9 +95,17 @@ public class ExecutionController {
         this.generator = new JUnitTestGenerator(clazz);
 
         // Only instrument if concrete-driven DSE is used
-        this.instrumented = searchStrategy instanceof ConcreteSearchStrategy
-                ? BytecodeInstrumenter.instrument(classPath, className)
-                : null;
+        if (concreteDriven) {
+            this.instrumented = BytecodeInstrumenter.instrument(classPath, className);
+        } else {
+            this.instrumented = null;
+            this.ctorStates = new HashMap<Integer, SymbolicState>();
+            this.ctorCfg = analyzer.getCFG(analyzer.getConstructor(classType));
+            // TODO: maybe also have to store ctor identifier
+            SymbolicState initialState = new SymbolicState(ctx, ctorCfg.getStartingStmt());
+            initialState.isCtorState = true;
+            ctorStates.put(initialState.hashCode(), initialState);
+        }
     }
 
     /**
@@ -117,22 +132,17 @@ public class ExecutionController {
         generator.writeToFile(outPath);
     }
 
-    private SymbolicState runConstructor(JavaSootMethod constructor) throws Exception {
-        // TODO: implement
-        return null;
-    }
-
     /** Run symbolic-driven DSE on the given method. */
     private void runSymbolicDriven(JavaSootMethod method, SymbolicSearchStrategy searchStrategy) throws Exception {
         StmtGraph<?> cfg = analyzer.getCFG(method);
-        SymbolicState initialState = new SymbolicState(ctx, cfg.getStartingStmt());
         List<SymbolicState> finalStates = new ArrayList<>();
-        searchStrategy.add(initialState);
 
-        // TODO: do ctor first (unless static class?)
+        // Initial states are all explored states of the ctor
+        searchStrategy.add(ctorStates.values());
+
         SymbolicState current;
         while ((current = searchStrategy.next()) != null) {
-            if (current.isFinalState(cfg) || current.incrementDepth() >= MAX_DEPTH) {
+            if (!current.isCtorState && current.isFinalState(cfg) || current.incrementDepth() >= MAX_DEPTH) {
                 finalStates.add(current);
                 searchStrategy.remove(current);
                 continue;
@@ -140,11 +150,24 @@ public class ExecutionController {
 
             // Symbolically execute the current statement of the selected symbolic state to
             // be processed
-            List<SymbolicState> newStates = symbolic.step(cfg, current);
+            List<SymbolicState> newStates = symbolic.step(current.isCtorState ? ctorCfg : cfg, current);
+            if (current.isCtorState) {
+                ctorStates.remove(current.hashCode());
+                // If any of the new states are final states, set their current statement to the
+                // starting statement of the target method
+                for (SymbolicState state : newStates) {
+                    if (state.isFinalState(ctorCfg)) {
+                        state.setCurrentStmt(cfg.getStartingStmt());
+                        state.isCtorState = false;
+                    }
+                    ctorStates.put(state.hashCode(), state);
+                }
+            }
+
             searchStrategy.add(newStates);
         }
         // TODO: have to take into account that arguments of ctor and methods may have
-        // the same names
+        // the same names (e.g., arg0 for both ctor and method)
         List<ArgMap> argMap = validator.evaluate(finalStates);
         generator.addMethodTestCases(method, argMap);
     }
@@ -156,8 +179,8 @@ public class ExecutionController {
         SymbolicState current = new SymbolicState(ctx, cfg.getStartingStmt());
 
         // TODO: do ctor first (unless static class?)
-        // TODO: unfortunately have to go through entire ctor instead of just grabbing a
-        // ready-made state
+        // TODO: can we avoid going through entire ctor by tracking ctor states based on
+        // their path encoding (like 11001, which can be extracted from trace)
         while (!current.isFinalState(cfg)) {
             List<SymbolicState> newStates = symbolic.step(cfg, current, iterator);
             // Note: newStates will always contain exactly one element, because we pass the

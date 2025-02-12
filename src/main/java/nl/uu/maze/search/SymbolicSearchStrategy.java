@@ -1,6 +1,6 @@
 package nl.uu.maze.search;
 
-import java.util.List;
+import java.util.Collection;
 
 import nl.uu.maze.execution.symbolic.SymbolicState;
 
@@ -20,7 +20,7 @@ public abstract class SymbolicSearchStrategy implements SearchStrategy {
      * 
      * @param states The new symbolic states to add
      */
-    public void add(List<SymbolicState> states) {
+    public void add(Collection<SymbolicState> states) {
         for (SymbolicState state : states) {
             add(state);
         }

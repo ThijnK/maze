@@ -32,8 +32,9 @@ public class SymbolicState {
     private Map<String, Expr<?>> symbolicVariables;
     private List<BoolExpr> pathConstraints;
 
-    // Keep track of (SootUp) types of symbolic variables
+    /** Keep track of (SootUp) types of symbolic variables */
     private Map<String, Type> variableTypes;
+    public boolean isCtorState;
 
     public SymbolicState(Context ctx, Stmt stmt) {
         this.currentStmt = stmt;
@@ -44,13 +45,14 @@ public class SymbolicState {
     }
 
     public SymbolicState(Context ctx, Stmt stmt, int depth, Map<String, Expr<?>> symbolicVariables,
-            List<BoolExpr> pathConstraints, Map<String, Type> variableTypes) {
+            List<BoolExpr> pathConstraints, Map<String, Type> variableTypes, boolean isCtorState) {
         this.currentStmt = stmt;
         this.currentDepth = depth;
         this.symbolicVariables = new HashMap<>(symbolicVariables);
         this.ctx = ctx;
         this.pathConstraints = new ArrayList<>(pathConstraints);
         this.variableTypes = new HashMap<>(variableTypes);
+        this.isCtorState = isCtorState;
     }
 
     public int incrementDepth() {
@@ -105,7 +107,8 @@ public class SymbolicState {
     }
 
     public SymbolicState clone(Stmt stmt) {
-        return new SymbolicState(ctx, stmt, currentDepth, symbolicVariables, pathConstraints, variableTypes);
+        return new SymbolicState(ctx, stmt, currentDepth, symbolicVariables, pathConstraints, variableTypes,
+                isCtorState);
     }
 
     public SymbolicState clone() {

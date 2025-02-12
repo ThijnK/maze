@@ -160,6 +160,14 @@ public class JavaAnalyzer {
         return getJavaMethod(method, clazz);
     }
 
+    public JavaSootMethod getConstructor(JavaClassType classType) throws Exception {
+        Optional<JavaSootClass> sootClass = view.getClass(classType);
+        if (sootClass.isEmpty()) {
+            throw new IllegalArgumentException("Class not found: " + classType.getFullyQualifiedName());
+        }
+        return sootClass.get().getMethodsByName("<init>").stream().findFirst().orElseThrow();
+    }
+
     /**
      * Returns the methods of a class as a set of {@link JavaSootMethod} objects.
      * 

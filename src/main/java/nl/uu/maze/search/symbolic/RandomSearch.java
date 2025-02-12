@@ -1,6 +1,7 @@
 package nl.uu.maze.search.symbolic;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Random;
 
@@ -25,7 +26,7 @@ public class RandomSearch extends SymbolicSearchStrategy {
     }
 
     @Override
-    public void add(List<SymbolicState> newStates) {
+    public void add(Collection<SymbolicState> newStates) {
         states.addAll(newStates);
     }
 }
