@@ -1,8 +1,11 @@
 package nl.uu.maze.execution;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -21,6 +24,7 @@ import nl.uu.maze.execution.symbolic.SymbolicStateValidator;
 import nl.uu.maze.generation.JUnitTestGenerator;
 import nl.uu.maze.instrument.BytecodeInstrumenter;
 import nl.uu.maze.instrument.TraceManager;
+import nl.uu.maze.instrument.TraceManager.TraceEntry;
 import nl.uu.maze.search.ConcreteSearchStrategy;
 import nl.uu.maze.search.SearchStrategy;
 import nl.uu.maze.search.SearchStrategyFactory;
@@ -52,6 +56,10 @@ public class ExecutionController {
     private final SymbolicStateValidator validator;
     private final ConcreteExecutor concrete;
     private final JUnitTestGenerator generator;
+
+    private StmtGraph<?> ctorCfg;
+    private boolean ctorExecuted = false;
+    private List<SymbolicState> ctorStates = new ArrayList<>();
 
     /**
      * Create a new execution controller.
@@ -91,14 +99,8 @@ public class ExecutionController {
      * @throws Exception
      */
     public void run() throws Exception {
-        // Symbolicaly execute a constructor to get the initial state
-        // TODO: find first constructor, and store its signature
-        // TODO: use signature to execute the right ctor in concrete exectuion (and with
-        // the same arguments!)
-        // TODO: use the symbolic state from ctor as initial state for symbolic (replay)
-
         for (JavaSootMethod method : methods) {
-            // TODO: for now, skip the <init> method
+            // Skip constructor methods
             if (method.getName().equals("<init>")) {
                 continue;
             }
@@ -127,6 +129,7 @@ public class ExecutionController {
         List<SymbolicState> finalStates = new ArrayList<>();
         searchStrategy.add(initialState);
 
+        // TODO: do ctor first (unless static class?)
         SymbolicState current;
         while ((current = searchStrategy.next()) != null) {
             if (current.isFinalState(cfg) || current.incrementDepth() >= MAX_DEPTH) {
@@ -137,11 +140,32 @@ public class ExecutionController {
 
             // Symbolically execute the current statement of the selected symbolic state to
             // be processed
-            List<SymbolicState> newStates = symbolic.step(cfg, current, null);
+            List<SymbolicState> newStates = symbolic.step(cfg, current);
             searchStrategy.add(newStates);
         }
+        // TODO: have to take into account that arguments of ctor and methods may have
+        // the same names
         List<ArgMap> argMap = validator.evaluate(finalStates);
         generator.addMethodTestCases(method, argMap);
+    }
+
+    /** Replay a trace symbolically. */
+    private SymbolicState replaySymbolic(StmtGraph<?> cfg, JavaSootMethod method)
+            throws FileNotFoundException, IOException, Exception {
+        Iterator<TraceEntry> iterator = TraceManager.getEntries(method.getName()).iterator();
+        SymbolicState current = new SymbolicState(ctx, cfg.getStartingStmt());
+
+        // TODO: do ctor first (unless static class?)
+        // TODO: unfortunately have to go through entire ctor instead of just grabbing a
+        // ready-made state
+        while (!current.isFinalState(cfg)) {
+            List<SymbolicState> newStates = symbolic.step(cfg, current, iterator);
+            // Note: newStates will always contain exactly one element, because we pass the
+            // iterator to the step function
+            current = newStates.get(0);
+        }
+        logger.debug("Replayed state: " + current);
+        return current;
     }
 
     /** Run concrete-driven DSE on the given method. */
@@ -153,9 +177,9 @@ public class ExecutionController {
         while (true) {
             // Concrete execution followed by symbolic replay
             TraceManager.clearEntries(method.getName());
+            // TODO: make sure this uses the right ctor
             concrete.execute(instrumented, javaMethod, argMap);
-            SymbolicState finalState = symbolic.replay(cfg, method.getName());
-            logger.debug("Replayed state: " + finalState);
+            SymbolicState finalState = replaySymbolic(cfg, method);
 
             boolean isNew = searchStrategy.add(finalState);
             // Only add a new test case if this path has not been explored before

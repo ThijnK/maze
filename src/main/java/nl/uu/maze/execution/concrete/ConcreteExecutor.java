@@ -41,7 +41,7 @@ public class ConcreteExecutor {
     public Object execute(Class<?> clazz, Method method, ArgMap argMap)
             throws IllegalAccessException, InvocationTargetException {
         // Calls generateArgs with the given argMap to fill in missing arguments
-        // The argMap will be updated with the generated arguments
+        // TODO: also use argMap for arguments of ctor
         Object[] args = instantiator.generateArgs(method.getParameters(), argMap);
         return execute(clazz, method, args);
     }

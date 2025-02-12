@@ -111,7 +111,7 @@ public class JUnitTestGenerator {
         }
         // For instance methods, create an instance of the class and call the method
         else {
-            // TODO: constructor may need arguments as well (deal with <init> method)
+            // TODO: use argMap also for arguments of ctor, possibly usig ObjectInstantiator
             methodBuilder.addStatement("$T cut = new $T()", clazz, clazz);
             methodBuilder.addStatement("cut.$L($L)", method.getName(), String.join(", ", params));
         }

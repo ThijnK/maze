@@ -1,14 +1,11 @@
 package nl.uu.maze.execution.symbolic;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 import com.microsoft.z3.*;
 
-import nl.uu.maze.instrument.TraceManager;
 import nl.uu.maze.instrument.TraceManager.TraceEntry;
 import nl.uu.maze.transform.JimpleToZ3Transformer;
 import sootup.core.graph.*;
@@ -31,23 +28,23 @@ public class SymbolicExecutor {
         this.transformer = new JimpleToZ3Transformer(ctx);
     }
 
-    public SymbolicState replay(StmtGraph<?> cfg, String methodName)
-            throws FileNotFoundException, IOException, Exception {
-        Iterator<TraceEntry> iterator = TraceManager.getEntries(methodName).iterator();
-
-        SymbolicState current = new SymbolicState(ctx, cfg.getStartingStmt());
-        while (!current.isFinalState(cfg)) {
-            List<SymbolicState> newStates = step(cfg, current, iterator);
-            // Note: newStates will always contain exactly one element, because we pass the
-            // iterator to the step function
-            current = newStates.get(0);
-        }
-        return current;
+    /**
+     * Execute a single step of symbolic execution on the given control flow graph
+     * and symbolic state.
+     * 
+     * @param cfg   The control flow graph
+     * @param state The current symbolic state
+     * @return A list of successor symbolic states after executing the current
+     *         statement
+     */
+    public List<SymbolicState> step(StmtGraph<?> cfg, SymbolicState state) {
+        return step(cfg, state, null);
     }
 
     /**
      * Execute a single step of symbolic execution on the given control flow graph
-     * and symbolic state.
+     * and symbolic state. If replaying a trace, follow the branch indicated by the
+     * trace.
      * 
      * @param cfg      The control flow graph
      * @param state    The current symbolic state
