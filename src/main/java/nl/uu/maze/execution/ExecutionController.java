@@ -92,15 +92,14 @@ public class ExecutionController {
         this.classType = analyzer.getClassType(className);
         this.methods = analyzer.getMethods(classType);
         this.clazz = analyzer.getJavaClass(classType);
+        this.instrumented = concreteDriven ? BytecodeInstrumenter.instrument(classPath, className) : null;
         this.generator = new JUnitTestGenerator(clazz);
 
+        this.ctorCfg = analyzer.getCFG(analyzer.getConstructor(classType));
+
         // Only instrument if concrete-driven DSE is used
-        if (concreteDriven) {
-            this.instrumented = BytecodeInstrumenter.instrument(classPath, className);
-        } else {
-            this.instrumented = null;
+        if (!concreteDriven) {
             this.ctorStates = new HashMap<Integer, SymbolicState>();
-            this.ctorCfg = analyzer.getCFG(analyzer.getConstructor(classType));
             // TODO: maybe also have to store ctor identifier
             SymbolicState initialState = new SymbolicState(ctx, ctorCfg.getStartingStmt());
             initialState.isCtorState = true;
@@ -138,6 +137,7 @@ public class ExecutionController {
         List<SymbolicState> finalStates = new ArrayList<>();
 
         // Initial states are all explored states of the ctor
+        // TODO: only start with ctor if not static method
         searchStrategy.add(ctorStates.values());
 
         SymbolicState current;
@@ -175,17 +175,32 @@ public class ExecutionController {
     /** Replay a trace symbolically. */
     private SymbolicState replaySymbolic(StmtGraph<?> cfg, JavaSootMethod method)
             throws FileNotFoundException, IOException, Exception {
-        Iterator<TraceEntry> iterator = TraceManager.getEntries(method.getName()).iterator();
-        SymbolicState current = new SymbolicState(ctx, cfg.getStartingStmt());
+        Iterator<TraceEntry> iterator;
+        SymbolicState current;
+        if (method.isStatic()) {
+            // Start immediately with target method
+            current = new SymbolicState(ctx, cfg.getStartingStmt());
+            iterator = TraceManager.getEntries(method.getName()).iterator();
+        } else {
+            // Start with constructor
+            current = new SymbolicState(ctx, ctorCfg.getStartingStmt());
+            current.isCtorState = true;
+            iterator = TraceManager.getEntries("<init>").iterator();
+        }
 
-        // TODO: do ctor first (unless static class?)
-        // TODO: can we avoid going through entire ctor by tracking ctor states based on
-        // their path encoding (like 11001, which can be extracted from trace)
-        while (!current.isFinalState(cfg)) {
-            List<SymbolicState> newStates = symbolic.step(cfg, current, iterator);
+        while (current.isCtorState || !current.isFinalState(cfg)) {
+            logger.debug("Current state: " + current);
+            List<SymbolicState> newStates = symbolic.step(current.isCtorState ? ctorCfg : cfg, current, iterator);
             // Note: newStates will always contain exactly one element, because we pass the
             // iterator to the step function
             current = newStates.get(0);
+            // At the end of the ctor, start with the target method
+            if (current.isCtorState && current.isFinalState(ctorCfg)) {
+                logger.debug("Switching to target method: " + method.getName());
+                current.setCurrentStmt(cfg.getStartingStmt());
+                current.isCtorState = false;
+                iterator = TraceManager.getEntries(method.getName()).iterator();
+            }
         }
         logger.debug("Replayed state: " + current);
         return current;

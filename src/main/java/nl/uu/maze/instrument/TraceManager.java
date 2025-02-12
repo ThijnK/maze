@@ -22,6 +22,42 @@ public class TraceManager {
         }
     }
 
+    // Lists to store the trace entries per method
+    private static Map<String, LinkedList<TraceEntry>> traceEntries = new HashMap<>();
+
+    /**
+     * Record a trace entry for the specified method.
+     * 
+     * @param methodName The name of the method
+     * @param branchType The type of branch
+     * @param value      The value of the branch
+     */
+    public static void recordTraceEntry(String methodName, BranchType branchType, int value) {
+        System.out.println(methodName + ", " + branchType + ", " + value);
+        TraceEntry entry = new TraceEntry(methodName, branchType, value);
+        traceEntries.computeIfAbsent(methodName, k -> new LinkedList<>()).add(entry);
+    }
+
+    /**
+     * Clear the trace entries for the specified method.
+     * 
+     * @param methodName The method name
+     */
+    public static void clearEntries(String methodName) {
+        traceEntries.remove(methodName);
+    }
+
+    /**
+     * Get the trace entries for the specified method.
+     * 
+     * @param methodName The method name
+     * @return The trace entries for the method or an empty list if no entries are
+     *         found
+     */
+    public static List<TraceEntry> getEntries(String methodName) {
+        return traceEntries.getOrDefault(methodName, new LinkedList<>());
+    }
+
     /**
      * Represents an entry of a symbolic trace file.
      * 
@@ -95,40 +131,5 @@ public class TraceManager {
             String[] parts = str.split(",");
             return new TraceEntry(parts[0], BranchType.valueOf(parts[1].toUpperCase()), Integer.parseInt(parts[2]));
         }
-    }
-
-    // Lists to store the trace entries per method
-    private static Map<String, LinkedList<TraceEntry>> traceEntries = new HashMap<>();
-
-    /**
-     * Record a trace entry for the specified method.
-     * 
-     * @param methodName The name of the method
-     * @param branchType The type of branch
-     * @param value      The value of the branch
-     */
-    public static void recordTraceEntry(String methodName, BranchType branchType, int value) {
-        TraceEntry entry = new TraceEntry(methodName, branchType, value);
-        traceEntries.computeIfAbsent(methodName, k -> new LinkedList<>()).add(entry);
-    }
-
-    /**
-     * Clear the trace entries for the specified method.
-     * 
-     * @param methodName The method name
-     */
-    public static void clearEntries(String methodName) {
-        traceEntries.remove(methodName);
-    }
-
-    /**
-     * Get the trace entries for the specified method.
-     * 
-     * @param methodName The method name
-     * @return The trace entries for the method or an empty list if no entries are
-     *         found
-     */
-    public static List<TraceEntry> getEntries(String methodName) {
-        return traceEntries.getOrDefault(methodName, new LinkedList<>());
     }
 }

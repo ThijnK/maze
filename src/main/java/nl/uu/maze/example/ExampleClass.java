@@ -4,8 +4,17 @@ package nl.uu.maze.example;
  * Example class to test the application on.
  */
 public class ExampleClass {
+    int a;
 
-    public static void print(int x) {
+    public ExampleClass(int x) {
+        if (x > 0) {
+            a = 1;
+        } else {
+            a = -1;
+        }
+    }
+
+    public void print(int x) {
         if (x > 0) {
             System.out.println("Positive");
         } else if (x < 0) {
