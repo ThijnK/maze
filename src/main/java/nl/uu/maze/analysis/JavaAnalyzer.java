@@ -1,12 +1,14 @@
 package nl.uu.maze.analysis;
 
 import java.lang.reflect.Array;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -124,6 +126,23 @@ public class JavaAnalyzer {
     }
 
     /**
+     * Returns an array of the Java classes of the parameters of a given SootUp
+     * method.
+     * 
+     * @param method The method for which to return the parameter classes
+     * @return An array of the Java classes of the parameters
+     */
+    private Class<?>[] getParameterClasses(JavaSootMethod method) throws ClassNotFoundException {
+        List<Type> parameterTypes = method.getParameterTypes();
+        Class<?>[] parameterClasses = new Class[parameterTypes.size()];
+        for (int i = 0; i < parameterTypes.size(); i++) {
+            Type type = parameterTypes.get(i);
+            parameterClasses[i] = getJavaClass(type);
+        }
+        return parameterClasses;
+    }
+
+    /**
      * Returns the Java method of a given SootUp method.
      * 
      * @param method The method for which to return the Java method
@@ -134,14 +153,21 @@ public class JavaAnalyzer {
      */
     public Method getJavaMethod(JavaSootMethod method, Class<?> clazz)
             throws ClassNotFoundException, NoSuchMethodException {
-        List<Type> parameterTypes = method.getParameterTypes();
-        Class<?>[] parameterClasses = new Class[parameterTypes.size()];
-        for (int i = 0; i < parameterTypes.size(); i++) {
-            Type type = parameterTypes.get(i);
-            parameterClasses[i] = getJavaClass(type);
-        }
+        return clazz.getMethod(method.getName(), getParameterClasses(method));
+    }
 
-        return clazz.getMethod(method.getName(), parameterClasses);
+    /**
+     * Returns the Java constructor of a given SootUp method.
+     * 
+     * @param method The method for which to return the Java constructor
+     * @param clazz  The Java class in which the constructor is defined
+     * @return The Java constructor
+     * @throws ClassNotFoundException
+     * @throws NoSuchMethodException
+     */
+    public Constructor<?> getJavaConstructor(JavaSootMethod method, Class<?> clazz)
+            throws ClassNotFoundException, NoSuchMethodException {
+        return clazz.getConstructor(getParameterClasses(method));
     }
 
     /**
@@ -160,12 +186,30 @@ public class JavaAnalyzer {
         return getJavaMethod(method, clazz);
     }
 
-    public JavaSootMethod getConstructor(JavaClassType classType) throws Exception {
-        Optional<JavaSootClass> sootClass = view.getClass(classType);
-        if (sootClass.isEmpty()) {
-            throw new IllegalArgumentException("Class not found: " + classType.getFullyQualifiedName());
+    /**
+     * Returns the {@link JavaSootMethod} corresponding to a given Java
+     * {@link Constructor}.
+     * 
+     * @param methods The set of methods to search in
+     * @param ctor    The constructor to find
+     * @return The {@link JavaSootMethod} corresponding to the constructor
+     */
+    public JavaSootMethod findConstructor(Set<JavaSootMethod> methods, Constructor<?> ctor) {
+        Class<?>[] targetParams = ctor.getParameterTypes();
+        for (JavaSootMethod method : methods) {
+            if (method.getName().equals("<init>")) {
+                try {
+                    Class<?>[] methodParams = getParameterClasses(method);
+                    // Check if parameters match
+                    if (Arrays.equals(methodParams, targetParams)) {
+                        return method;
+                    }
+                } catch (ClassNotFoundException e) {
+                    logger.error("Failed to get parameter classes for method: " + method.getName());
+                }
+            }
         }
-        return sootClass.get().getMethodsByName("<init>").stream().findFirst().orElseThrow();
+        return null;
     }
 
     /**

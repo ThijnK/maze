@@ -81,6 +81,39 @@ public class ObjectInstantiator {
     }
 
     /**
+     * Find a constructor for the given class for which arguments can be generated.
+     * This ensures that the constructor does not require complex arguments, such as
+     * instances of inner classes.
+     * 
+     * @param clazz The class to instantiate
+     * @return A constructor for the class
+     * @implNote This will fail if the class has a single constructor which requires
+     *           an instance of an inner class as an argument.
+     */
+    public Constructor<?> getConstructor(Class<?> clazz) {
+        Constructor<?>[] ctors = clazz.getConstructors();
+        if (ctors.length == 0) {
+            logger.warn("No constructors found for class " + clazz.getName());
+            return null;
+        }
+
+        // Try to create an instance using one of the constructors
+        for (Constructor<?> ctor : ctors) {
+            try {
+                logger.debug("Param types: " + printArgs(ctor.getParameterTypes()));
+                Object[] args = generateArgs(ctor.getParameters(), 0, null);
+                logger.debug("Creating instance of class: " + clazz.getName() + " with args: " + printArgs(args));
+                return ctor;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        logger.warn("Failed to find suitable constructor for class " + clazz.getName());
+        return null;
+    }
+
+    /**
      * Generate random values for the given parameters, except for the ones present
      * in the {@link ArgMap}, in which case the known value is used.
      * This will attempt to recursively create instances of objects if the parameter

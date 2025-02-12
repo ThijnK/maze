@@ -16,13 +16,17 @@ public class ArgMap {
 
     public ArgMap(Object[] args) {
         this.args = new java.util.HashMap<>();
-        for (int i = 0; i < args.length; i++) {
-            this.args.put("arg" + i, args[i]);
-        }
+        addAll(args);
     }
 
     public ArgMap() {
         this.args = new java.util.HashMap<>();
+    }
+
+    public void addAll(Object[] args) {
+        for (int i = 0; i < args.length; i++) {
+            this.args.put("arg" + i, args[i]);
+        }
     }
 
     public Map<String, Object> getArgs() {

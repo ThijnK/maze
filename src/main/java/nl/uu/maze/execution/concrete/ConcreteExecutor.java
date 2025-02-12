@@ -1,5 +1,6 @@
 package nl.uu.maze.execution.concrete;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -12,70 +13,47 @@ import nl.uu.maze.execution.ArgMap;
 public class ConcreteExecutor {
     private static final Logger logger = LoggerFactory.getLogger(ConcreteExecutor.class);
 
-    private ObjectInstantiator instantiator = new ObjectInstantiator();
+    private ObjectInstantiator instantiator;
     /** Map of arguments last used in a method invocation */
     private ArgMap argMap = new ArgMap();
 
-    /**
-     * Run concrete execution on the given method.
-     * 
-     * @param clazz  The Java class containing the method
-     * @param method The method
-     * @return The return value of the method
-     */
-    public Object execute(Class<?> clazz, Method method) throws IllegalAccessException, InvocationTargetException {
-        Object[] args = instantiator.generateArgs(method.getParameters());
-        return execute(clazz, method, args);
+    public ConcreteExecutor(ObjectInstantiator instantiator) {
+        this.instantiator = instantiator;
     }
 
     /**
-     * Run concrete execution on the given method, passing the given known parameter
-     * values at invocation.
+     * Run concrete execution on the given method, using the given constructor to
+     * create an instance of the class containing the method if necessary.
      * 
-     * @param clazz  The Java class containing the method
-     * @param method The method
-     * @param argMap {@link ArgMap} containing the arguments to pass to the method
-     *               invocation
+     * @param ctor   The constructor to use to create an instance of the class
+     *               containing the method
+     * @param method The method to invoke
+     * @param argMap {@link ArgMap} containing the arguments to pass to the
+     *               constructor and method invocation
      * @return The return value of the method
+     * @throws IllegalArgumentException
+     * @throws InstantiationException
      */
-    public Object execute(Class<?> clazz, Method method, ArgMap argMap)
-            throws IllegalAccessException, InvocationTargetException {
-        // Calls generateArgs with the given argMap to fill in missing arguments
-        // TODO: also use argMap for arguments of ctor
-        Object[] args = instantiator.generateArgs(method.getParameters(), argMap);
-        return execute(clazz, method, args);
-    }
-
-    /**
-     * Run concrete execution on the given method with the given arguments.
-     * 
-     * @param clazz  The Java class containing the method
-     * @param method The method
-     * @param args   The arguments to pass to the method invocation
-     * @return The return value of the method
-     */
-    public Object execute(Class<?> clazz, Method method, Object[] args)
-            throws IllegalAccessException, InvocationTargetException {
-        // Create an instance of the class if the method is not static
-        Object instance;
-        if (Modifier.isStatic(method.getModifiers())) {
-            instance = null;
-        } else {
-            // TODO: reuse instances based on the path encodings (or other)
-            // TODO: also use argMap for arguments of ctor
-            instance = instantiator.createInstance(clazz);
-            if (instance == null) {
-                logger.error("Failed to create instance of class: " + clazz.getName());
-                return null;
-            }
+    public Object execute(Constructor<?> ctor, Method method, ArgMap argMap)
+            throws IllegalAccessException, InvocationTargetException, InstantiationException, IllegalArgumentException {
+        // If not static, create an instance of the class
+        Object instance = null;
+        if (!Modifier.isStatic(method.getModifiers())) {
+            // Call generateArgs with argMap to use argumens from the map if present
+            Object[] args = instantiator.generateArgs(ctor.getParameters(), argMap);
+            logger.debug("Creating instance of class " + ctor.getDeclaringClass().getName() + " with args: "
+                    + instantiator.printArgs(args));
+            instance = ctor.newInstance(args);
+            this.argMap.addAll(args);
         }
+
+        // Generate args for the method invocation
+        Object[] args = instantiator.generateArgs(method.getParameters(), argMap);
+        this.argMap.addAll(args);
 
         logger.debug("Executing method " + method.getName() + " with args: " + instantiator.printArgs(args));
         Object result = method.invoke(instance, args);
         logger.debug("Retval: " + (result == null ? "null" : result.toString()));
-
-        // Update the argMap with the arguments used in the method invocation
-        argMap.overwrite(args);
 
         return result;
     }

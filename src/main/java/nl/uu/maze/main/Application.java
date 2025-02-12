@@ -1,6 +1,6 @@
 package nl.uu.maze.main;
 
-import nl.uu.maze.execution.ExecutionController;
+import nl.uu.maze.execution.DSEController;
 
 /**
  * The main class of the application.
@@ -32,7 +32,7 @@ public class Application {
         try {
             String strategyName = args.length > 0 ? args[0] : "";
 
-            ExecutionController controller = new ExecutionController(classPath, className, concreteDriven, strategyName,
+            DSEController controller = new DSEController(classPath, className, concreteDriven, strategyName,
                     outPath);
             controller.run();
             controller.close();

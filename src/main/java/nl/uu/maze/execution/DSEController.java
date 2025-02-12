@@ -2,6 +2,7 @@ package nl.uu.maze.execution;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -20,6 +21,7 @@ import com.microsoft.z3.Model;
 
 import nl.uu.maze.analysis.JavaAnalyzer;
 import nl.uu.maze.execution.concrete.ConcreteExecutor;
+import nl.uu.maze.execution.concrete.ObjectInstantiator;
 import nl.uu.maze.execution.symbolic.SymbolicExecutor;
 import nl.uu.maze.execution.symbolic.SymbolicState;
 import nl.uu.maze.execution.symbolic.SymbolicStateValidator;
@@ -36,18 +38,20 @@ import sootup.java.core.JavaSootMethod;
 import sootup.java.core.types.JavaClassType;
 
 /**
- * Controls the concolic execution using various search strategies
+ * Controls the dynamic symbolic execution using various search strategies
  * that may mix symbolic and concrete execution.
  */
-public class ExecutionController {
-    private static final Logger logger = LoggerFactory.getLogger(ExecutionController.class);
+public class DSEController {
+    private static final Logger logger = LoggerFactory.getLogger(DSEController.class);
 
     /** Max path length for symbolic execution */
     private final int MAX_DEPTH = 20;
 
+    private final boolean concreteDriven;
     private final Path outPath;
     private final SearchStrategy searchStrategy;
     private final JavaAnalyzer analyzer;
+    private final ObjectInstantiator instantiator = new ObjectInstantiator();
     private final Context ctx;
     private final JavaClassType classType;
     private final Set<JavaSootMethod> methods;
@@ -59,6 +63,7 @@ public class ExecutionController {
     private final ConcreteExecutor concrete;
     private final JUnitTestGenerator generator;
 
+    private Constructor<?> ctor;
     private StmtGraph<?> ctorCfg;
     /**
      * Map of constructor states, indexed by their hash code (in case of
@@ -79,9 +84,10 @@ public class ExecutionController {
      * @param outPath        The output path for the generated test cases
      * @throws Exception
      */
-    public ExecutionController(String classPath, String className, boolean concreteDriven, String strategyName,
+    public DSEController(String classPath, String className, boolean concreteDriven, String strategyName,
             String outPath)
             throws Exception {
+        this.concreteDriven = concreteDriven;
         this.outPath = Path.of(outPath);
         searchStrategy = SearchStrategyFactory.getStrategy(concreteDriven, strategyName);
         logger.info("Using search strategy: " + searchStrategy.getClass().getSimpleName());
@@ -89,28 +95,12 @@ public class ExecutionController {
         this.ctx = new Context();
         this.symbolic = new SymbolicExecutor(ctx);
         this.validator = new SymbolicStateValidator(ctx);
-        this.concrete = new ConcreteExecutor();
+        this.concrete = new ConcreteExecutor(instantiator);
         this.classType = analyzer.getClassType(className);
         this.methods = analyzer.getMethods(classType);
         this.clazz = analyzer.getJavaClass(classType);
         this.instrumented = concreteDriven ? BytecodeInstrumenter.instrument(classPath, className) : null;
         this.generator = new JUnitTestGenerator(clazz);
-
-        // If class includes non-static methods, need to execute constructor first
-        if (!methods.stream().allMatch(JavaSootMethod::isStatic)) {
-            JavaSootMethod ctor = analyzer.getConstructor(classType);
-            // TODO: maybe also have to store ctor signature
-            logger.info("Using constructor: " + ctor.getSignature());
-            this.ctorCfg = analyzer.getCFG(ctor);
-            this.ctorStates = new HashMap<Integer, SymbolicState>();
-
-            if (!concreteDriven) {
-                SymbolicState initialState = new SymbolicState(ctx, ctorCfg.getStartingStmt());
-                initialState.isCtorState = true;
-                ctorStates.put(initialState.hashCode(), initialState);
-            }
-        }
-
     }
 
     /**
@@ -119,6 +109,26 @@ public class ExecutionController {
      * @throws Exception
      */
     public void run() throws Exception {
+        // If class includes non-static methods, need to execute constructor first
+        if (!methods.stream().allMatch(JavaSootMethod::isStatic)) {
+            ctor = instantiator.getConstructor(instrumented);
+            if (ctor == null) {
+                throw new Exception("No constructor found for class: " + instrumented.getName());
+            }
+
+            // Get corresponding CFG
+            JavaSootMethod ctorSoot = analyzer.findConstructor(methods, ctor);
+            ctorCfg = analyzer.getCFG(ctorSoot);
+            ctorStates = new HashMap<Integer, SymbolicState>();
+            logger.info("Using constructor: " + ctorSoot.getSignature());
+
+            if (!concreteDriven) {
+                SymbolicState initialState = new SymbolicState(ctx, ctorCfg.getStartingStmt());
+                initialState.isCtorState = true;
+                ctorStates.put(initialState.hashCode(), initialState);
+            }
+        }
+
         for (JavaSootMethod method : methods) {
             // Skip constructor methods
             if (method.getName().equals("<init>")) {
@@ -126,11 +136,10 @@ public class ExecutionController {
             }
 
             logger.info("Processing method: " + method.getName());
-
-            if (searchStrategy instanceof SymbolicSearchStrategy) {
-                runSymbolicDriven(method, (SymbolicSearchStrategy) searchStrategy);
-            } else {
+            if (concreteDriven) {
                 runConcreteDriven(method, (ConcreteSearchStrategy) searchStrategy);
+            } else {
+                runSymbolicDriven(method, (SymbolicSearchStrategy) searchStrategy);
             }
         }
 
@@ -199,15 +208,16 @@ public class ExecutionController {
         } else {
             // Start with constructor
             List<TraceEntry> entries = TraceManager.getEntries("<init>");
-            iterator = entries.iterator();
             pathHash = entries.hashCode();
             // If the constructor has been explored along this path before, reuse the final
             // state
             if (ctorStates.containsKey(pathHash)) {
                 current = ctorStates.get(pathHash).clone();
+                iterator = TraceManager.getEntries(method.getName()).iterator();
             } else {
                 current = new SymbolicState(ctx, ctorCfg.getStartingStmt());
                 current.isCtorState = true;
+                iterator = entries.iterator();
             }
         }
 
@@ -219,11 +229,11 @@ public class ExecutionController {
             current = newStates.get(0);
             // At the end of the ctor, start with the target method
             if (current.isCtorState && current.isFinalState(ctorCfg)) {
-                logger.debug("Switching to target method: " + method.getName());
-                current.setCurrentStmt(cfg.getStartingStmt());
                 current.isCtorState = false;
                 // Save the final ctor state for reuse in other methods
                 ctorStates.put(pathHash, current.clone());
+                logger.debug("Switching to target method: " + method.getName());
+                current.setCurrentStmt(cfg.getStartingStmt());
                 iterator = TraceManager.getEntries(method.getName()).iterator();
             }
         }
@@ -241,8 +251,7 @@ public class ExecutionController {
         while (true) {
             // Concrete execution followed by symbolic replay
             TraceManager.clearEntries();
-            // TODO: make sure this uses the right ctor
-            concrete.execute(instrumented, javaMethod, argMap);
+            concrete.execute(ctor, javaMethod, argMap);
             SymbolicState finalState = replaySymbolic(cfg, method);
 
             boolean isNew = searchStrategy.add(finalState);
