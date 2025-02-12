@@ -61,10 +61,11 @@ public class ExecutionController {
 
     private StmtGraph<?> ctorCfg;
     /**
-     * Map of constructor states, indexed by their hash code.
+     * Map of constructor states, indexed by their hash code (in case of
+     * symbolic-driven) or the hash code of the path encoding (in case of
+     * concrete-driven).
      * This is used to keep track of (active) states in the constructor method,
-     * which are reused as initial states for every target method in symbolic-driven
-     * DSE.
+     * which are reused as initial states for symbolic execution.
      */
     private Map<Integer, SymbolicState> ctorStates;
 
@@ -98,12 +99,12 @@ public class ExecutionController {
         // If class includes non-static methods, need to execute constructor first
         if (!methods.stream().allMatch(JavaSootMethod::isStatic)) {
             JavaSootMethod ctor = analyzer.getConstructor(classType);
+            // TODO: maybe also have to store ctor signature
             logger.info("Using constructor: " + ctor.getSignature());
             this.ctorCfg = analyzer.getCFG(ctor);
+            this.ctorStates = new HashMap<Integer, SymbolicState>();
 
             if (!concreteDriven) {
-                this.ctorStates = new HashMap<Integer, SymbolicState>();
-                // TODO: maybe also have to store ctor identifier
                 SymbolicState initialState = new SymbolicState(ctx, ctorCfg.getStartingStmt());
                 initialState.isCtorState = true;
                 ctorStates.put(initialState.hashCode(), initialState);
@@ -158,17 +159,22 @@ public class ExecutionController {
 
             // Symbolically execute the current statement of the selected symbolic state to
             // be processed
+            int currHash = current.hashCode();
             List<SymbolicState> newStates = symbolic.step(current.isCtorState ? ctorCfg : cfg, current);
             if (current.isCtorState) {
-                ctorStates.remove(current.hashCode());
-                // If any of the new states are final states, set their current statement to the
-                // starting statement of the target method
+                ctorStates.remove(currHash);
+                // If any of the new states are final states, set their current
+                // statement to the starting statement of the target method
                 for (SymbolicState state : newStates) {
                     if (state.isFinalState(ctorCfg)) {
                         state.setCurrentStmt(cfg.getStartingStmt());
                         state.isCtorState = false;
+                        // Clone the state to avoid modifying the original in subsequent execution (want
+                        // to reuse this final ctor state for multiple methods)
+                        ctorStates.put(state.hashCode(), state.clone());
+                    } else {
+                        ctorStates.put(state.hashCode(), state);
                     }
-                    ctorStates.put(state.hashCode(), state);
                 }
             }
 
@@ -185,15 +191,24 @@ public class ExecutionController {
             throws FileNotFoundException, IOException, Exception {
         Iterator<TraceEntry> iterator;
         SymbolicState current;
+        int pathHash = 0;
         if (method.isStatic()) {
             // Start immediately with target method
             current = new SymbolicState(ctx, cfg.getStartingStmt());
             iterator = TraceManager.getEntries(method.getName()).iterator();
         } else {
             // Start with constructor
-            current = new SymbolicState(ctx, ctorCfg.getStartingStmt());
-            current.isCtorState = true;
-            iterator = TraceManager.getEntries("<init>").iterator();
+            List<TraceEntry> entries = TraceManager.getEntries("<init>");
+            iterator = entries.iterator();
+            pathHash = entries.hashCode();
+            // If the constructor has been explored along this path before, reuse the final
+            // state
+            if (ctorStates.containsKey(pathHash)) {
+                current = ctorStates.get(pathHash).clone();
+            } else {
+                current = new SymbolicState(ctx, ctorCfg.getStartingStmt());
+                current.isCtorState = true;
+            }
         }
 
         while (current.isCtorState || !current.isFinalState(cfg)) {
@@ -207,9 +222,12 @@ public class ExecutionController {
                 logger.debug("Switching to target method: " + method.getName());
                 current.setCurrentStmt(cfg.getStartingStmt());
                 current.isCtorState = false;
+                // Save the final ctor state for reuse in other methods
+                ctorStates.put(pathHash, current.clone());
                 iterator = TraceManager.getEntries(method.getName()).iterator();
             }
         }
+
         logger.debug("Replayed state: " + current);
         return current;
     }
@@ -222,7 +240,7 @@ public class ExecutionController {
 
         while (true) {
             // Concrete execution followed by symbolic replay
-            TraceManager.clearEntries(method.getName());
+            TraceManager.clearEntries();
             // TODO: make sure this uses the right ctor
             concrete.execute(instrumented, javaMethod, argMap);
             SymbolicState finalState = replaySymbolic(cfg, method);

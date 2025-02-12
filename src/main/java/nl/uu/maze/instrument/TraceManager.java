@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Manages symbolic trace files and its entries.
@@ -33,7 +34,6 @@ public class TraceManager {
      * @param value      The value of the branch
      */
     public static void recordTraceEntry(String methodName, BranchType branchType, int value) {
-        System.out.println(methodName + ", " + branchType + ", " + value);
         TraceEntry entry = new TraceEntry(methodName, branchType, value);
         traceEntries.computeIfAbsent(methodName, k -> new LinkedList<>()).add(entry);
     }
@@ -43,8 +43,8 @@ public class TraceManager {
      * 
      * @param methodName The method name
      */
-    public static void clearEntries(String methodName) {
-        traceEntries.remove(methodName);
+    public static void clearEntries() {
+        traceEntries.forEach((k, v) -> v.clear());
     }
 
     /**
@@ -130,6 +130,23 @@ public class TraceManager {
         public static TraceEntry fromString(String str) throws IllegalArgumentException {
             String[] parts = str.split(",");
             return new TraceEntry(parts[0], BranchType.valueOf(parts[1].toUpperCase()), Integer.parseInt(parts[2]));
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (obj == null || getClass() != obj.getClass()) {
+                return false;
+            }
+            TraceEntry other = (TraceEntry) obj;
+            return value == other.value && branchType == other.branchType && methodName.equals(other.methodName);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(methodName, branchType, value);
         }
     }
 }
