@@ -258,7 +258,7 @@ public class DSEController {
     private void runConcreteDriven(JavaSootMethod method, ConcreteSearchStrategy searchStrategy) throws Exception {
         StmtGraph<?> cfg = analyzer.getCFG(method);
         Method javaMethod = analyzer.getJavaMethod(method, instrumented);
-        ArgMap argMap = null;
+        ArgMap argMap = new ArgMap();
 
         while (true) {
             // Concrete execution followed by symbolic replay
@@ -271,7 +271,9 @@ public class DSEController {
             // Note: this particular check will catch only certain edge cases that are not
             // caught by the search strategy
             if (isNew) {
-                generator.addMethodTestCase(method, ctorSoot, argMap == null ? concrete.getArgMap() : argMap);
+                // For the first concrete execution, argMap is populated by the concrete
+                // executor
+                generator.addMethodTestCase(method, ctorSoot, argMap);
             }
 
             Optional<Model> model = searchStrategy.next(validator);

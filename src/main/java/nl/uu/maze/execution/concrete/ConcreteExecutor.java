@@ -13,9 +13,6 @@ import nl.uu.maze.execution.ArgMap;
 public class ConcreteExecutor {
     private static final Logger logger = LoggerFactory.getLogger(ConcreteExecutor.class);
 
-    /** Map of arguments last used in a method invocation */
-    private ArgMap argMap = new ArgMap();
-
     /**
      * Run concrete execution on the given method, using the given constructor to
      * create an instance of the class containing the method if necessary.
@@ -38,27 +35,17 @@ public class ConcreteExecutor {
             Object[] args = ObjectInstantiator.generateArgs(ctor.getParameters(), argMap, true);
             logger.debug("Creating instance of class " + ctor.getDeclaringClass().getName() + " with args: " + args);
             instance = ctor.newInstance(args);
-            this.argMap.addAll(args, true);
+            argMap.addAll(args, true);
         }
 
         // Generate args for the method invocation
         Object[] args = ObjectInstantiator.generateArgs(method.getParameters(), argMap, false);
-        this.argMap.addAll(args, false);
+        argMap.addAll(args, false);
 
         logger.debug("Executing method " + method.getName() + " with args: " + args);
         Object result = method.invoke(instance, args);
         logger.debug("Retval: " + (result == null ? "null" : result.toString()));
 
         return result;
-    }
-
-    // TODO: shouldn't need this, references passed by value work to update the map
-    /**
-     * Get the last used arguments in a method invocation.
-     * 
-     * @return The last used arguments
-     */
-    public ArgMap getArgMap() {
-        return argMap;
     }
 }
