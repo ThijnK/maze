@@ -9,8 +9,10 @@ import com.microsoft.z3.*;
 import nl.uu.maze.instrument.TraceManager.TraceEntry;
 import nl.uu.maze.transform.JimpleToZ3Transformer;
 import sootup.core.graph.*;
+import sootup.core.jimple.basic.LValue;
 import sootup.core.jimple.common.constant.IntConstant;
 import sootup.core.jimple.common.expr.AbstractConditionExpr;
+import sootup.core.jimple.common.ref.*;
 import sootup.core.jimple.common.stmt.*;
 import sootup.core.jimple.javabytecode.stmt.JSwitchStmt;
 import sootup.core.types.Type;
@@ -59,12 +61,14 @@ public class SymbolicExecutor {
             return handleIfStmt(cfg, (JIfStmt) stmt, state, iterator);
         else if (stmt instanceof JSwitchStmt)
             return handleSwitchStmt(cfg, (JSwitchStmt) stmt, state, iterator);
+        else if (stmt instanceof AbstractDefinitionStmt)
+            return handleDefStmt(cfg, (AbstractDefinitionStmt) stmt, state);
         else
             return handleOtherStmts(cfg, stmt, state);
     }
 
     /**
-     * Handle if statements during symbolic execution
+     * Handle if statements during symbolic execution.
      * 
      * @param cfg      The control flow graph
      * @param stmt     The if statement as a Jimple statement ({@link JIfStmt})
@@ -107,7 +111,7 @@ public class SymbolicExecutor {
     }
 
     /**
-     * Handle switch statements during symbolic execution
+     * Handle switch statements during symbolic execution.
      * 
      * @param cfg      The control flow graph
      * @param stmt     The switch statement as a Jimple statement
@@ -171,7 +175,36 @@ public class SymbolicExecutor {
     }
 
     /**
-     * Handle other types of statements during symbolic execution
+     * Handle definition statements (assignment, identity) during symbolic
+     * execution by updating the symbolic state.
+     * 
+     * @param cfg   The control flow graph
+     * @param stmt  The statement to handle
+     * @param state The current symbolic state
+     * @return A list of new symbolic states after executing the statement
+     */
+    private List<SymbolicState> handleDefStmt(StmtGraph<?> cfg, AbstractDefinitionStmt stmt, SymbolicState state) {
+        Expr<?> value = transformer.transform(stmt.getRightOp(), state);
+        LValue leftOp = stmt.getLeftOp();
+
+        if (stmt.getLeftOp() instanceof JArrayRef) {
+            // TODO: handle leftVar as array, probably with ctx.mkStore()
+        } else if (leftOp instanceof JStaticFieldRef) {
+            // TODO: handle static field assignment in <cinit>
+        } else if (leftOp instanceof JInstanceFieldRef) {
+            JInstanceFieldRef ref = (JInstanceFieldRef) leftOp;
+            Expr<?> objRef = state.getVariable(ref.getBase().toString());
+            state.setField(objRef, ref.getFieldSignature().getName(), value);
+        } else {
+            state.setVariable(leftOp.toString(), value);
+        }
+
+        // Definition statements follow the same control flow as other statements
+        return handleOtherStmts(cfg, stmt, state);
+    }
+
+    /**
+     * Handle other types of statements during symbolic execution.
      * 
      * @param cfg   The control flow graph
      * @param stmt  The statement to handle
@@ -179,15 +212,6 @@ public class SymbolicExecutor {
      * @return A list of new symbolic states after executing the statement
      */
     private List<SymbolicState> handleOtherStmts(StmtGraph<?> cfg, Stmt stmt, SymbolicState state) {
-        // Handle assignments (Assign, Identity)
-        if (stmt instanceof AbstractDefinitionStmt) {
-            AbstractDefinitionStmt defStmt = (AbstractDefinitionStmt) stmt;
-            Expr<?> rightExpr = transformer.transform(defStmt.getRightOp(), state);
-            String leftVar = defStmt.getLeftOp().toString();
-            // TODO: handle leftVar as array (ctx.mkStore())
-            state.setVariable(leftVar, rightExpr);
-        }
-
         List<SymbolicState> newStates = new ArrayList<SymbolicState>();
         List<Stmt> succs = cfg.getAllSuccessors(stmt);
         // Note: there will never be more than one successor for non-branching

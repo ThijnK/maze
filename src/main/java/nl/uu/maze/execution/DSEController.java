@@ -152,8 +152,10 @@ public class DSEController {
 
         // If static, start with target method, otherwise start with constructor
         if (method.isStatic()) {
+            logger.debug("Executing target method: " + method.getName());
             searchStrategy.add(new SymbolicState(ctx, cfg.getStartingStmt()));
         } else {
+            logger.debug("Executing constructor: " + ctorSoot.getName());
             // Clone the ctor states to avoid modifying the original in subsequent execution
             // and set their current statement to the starting statement of the target
             // method
@@ -170,6 +172,7 @@ public class DSEController {
 
         SymbolicState current;
         while ((current = searchStrategy.next()) != null) {
+            logger.debug("Current state: " + current);
             if (!current.isCtorState && current.isFinalState(cfg) || current.incrementDepth() >= MAX_DEPTH) {
                 finalStates.add(current);
                 searchStrategy.remove(current);

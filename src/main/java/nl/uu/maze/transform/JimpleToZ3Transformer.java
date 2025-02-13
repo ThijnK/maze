@@ -423,10 +423,13 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
     // #region References
     @Override
     public void caseThisRef(@Nonnull JThisRef ref) {
-        // TODO: implement as an object on the heeap
-        // get the fields of the class by ref.getClass().getFields()
-        // then intialize the fields with (symbolic) values?
-        super.caseThisRef(ref);
+        if (state.containsVariable("this")) {
+            setResult(state.getVariable("this"));
+        } else {
+            Expr<?> thisRef = state.allocateObject();
+            state.setVariable("this", thisRef);
+            setResult(thisRef);
+        }
     }
 
     @Override
@@ -453,8 +456,8 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
 
     @Override
     public void caseInstanceFieldRef(@Nonnull JInstanceFieldRef ref) {
-        // Note: ref.toString() will be e.g. "this.<org.a.s.e.SingleMethod: int x>"
-        setResult(state.getVariable(ref.toString()));
+        Expr<?> objRef = state.getVariable(ref.getBase().toString());
+        setResult(state.getField(objRef, ref.getFieldSignature().getName()));
     }
 
     @Override

@@ -27,33 +27,42 @@ import sootup.core.types.Type;
 public class SymbolicState {
     private Context ctx;
     private Stmt currentStmt;
-    private int currentDepth;
+    private int currentDepth = 0;
     public boolean isCtorState;
 
     private Map<String, Expr<?>> symbolicVariables;
     private List<BoolExpr> pathConstraints;
-
     /** Keep track of (SootUp) types of symbolic variables */
     private Map<String, Type> variableTypes;
 
+    private Map<Expr<?>, HeapObject> heap;
+    private int heapCounter = 0;
+    private Sort refSort;
+
     public SymbolicState(Context ctx, Stmt stmt) {
+        this.ctx = ctx;
         this.currentStmt = stmt;
         this.symbolicVariables = new HashMap<>();
-        this.ctx = ctx;
         this.pathConstraints = new ArrayList<>();
         this.variableTypes = new HashMap<>();
+        this.heap = new HashMap<>();
+        this.refSort = ctx.mkUninterpretedSort("RefSort");
     }
 
-    public SymbolicState(Context ctx, Stmt stmt, int depth, Map<String, Expr<?>> symbolicVariables,
-            List<BoolExpr> pathConstraints, Map<String, Type> variableTypes, boolean isCtorState) {
+    public SymbolicState(Context ctx, Stmt stmt, int depth, boolean isCtorState, Map<String, Expr<?>> symbolicVariables,
+            List<BoolExpr> pathConstraints, Map<String, Type> variableTypes, Map<Expr<?>, HeapObject> heap,
+            Sort refSort) {
         this.ctx = ctx;
         this.currentStmt = stmt;
         this.currentDepth = depth;
+        this.isCtorState = isCtorState;
         this.symbolicVariables = new HashMap<>(symbolicVariables);
         this.pathConstraints = new ArrayList<>(pathConstraints);
         // Share the same variable types map to avoid copying
         this.variableTypes = variableTypes;
-        this.isCtorState = isCtorState;
+        this.heap = new HashMap<>(heap); // TODO: may have to be deep copied
+        this.heapCounter = heap.size();
+        this.refSort = refSort;
     }
 
     public int incrementDepth() {
@@ -76,6 +85,10 @@ public class SymbolicState {
         return symbolicVariables.getOrDefault(var, null);
     }
 
+    public boolean containsVariable(String var) {
+        return symbolicVariables.containsKey(var);
+    }
+
     public void setVariableType(String var, Type type) {
         variableTypes.put(var, type);
     }
@@ -94,6 +107,41 @@ public class SymbolicState {
     }
 
     /**
+     * Allocates a new heap object and returns its unique reference.
+     */
+    public Expr<?> allocateObject() {
+        Expr<?> objRef = ctx.mkConst("obj" + heapCounter++, refSort);
+        HeapObject obj = new HeapObject();
+        heap.put(objRef, obj);
+        return objRef;
+    }
+
+    /**
+     * Sets the field 'fieldName' of the object identified by 'objRef' to the given
+     * symbolic value.
+     */
+    public void setField(Expr<?> objRef, String fieldName, Expr<?> value) {
+        HeapObject obj = heap.get(objRef);
+        if (obj != null) {
+            obj.setField(fieldName, value);
+        } else {
+            throw new RuntimeException("Heap object " + objRef + " not found");
+        }
+    }
+
+    /**
+     * Retrieves the symbolic value stored in field 'fieldName' of the object
+     * identified by 'objRef'.
+     */
+    public Expr<?> getField(Expr<?> objRef, String fieldName) {
+        HeapObject obj = heap.get(objRef);
+        if (obj != null) {
+            return obj.getField(fieldName);
+        }
+        return null;
+    }
+
+    /**
      * Returns the path condition of the current state as the conjunction of all
      * path constraints.
      * 
@@ -108,8 +156,8 @@ public class SymbolicState {
     }
 
     public SymbolicState clone(Stmt stmt) {
-        return new SymbolicState(ctx, stmt, currentDepth, symbolicVariables, pathConstraints, variableTypes,
-                isCtorState);
+        return new SymbolicState(ctx, stmt, currentDepth, isCtorState, symbolicVariables, pathConstraints,
+                variableTypes, heap, refSort);
     }
 
     public SymbolicState clone() {
@@ -122,7 +170,7 @@ public class SymbolicState {
 
     @Override
     public String toString() {
-        return "State: " + symbolicVariables + ", PC: " + getPathConstraints();
+        return "State: " + symbolicVariables + ", Heap: " + heap + ", PC: " + pathConstraints;
     }
 
     @Override
@@ -140,5 +188,46 @@ public class SymbolicState {
     @Override
     public int hashCode() {
         return currentStmt.hashCode() + symbolicVariables.hashCode() + pathConstraints.hashCode();
+    }
+
+    // public void setArrayElement(String arrayVar, Expr<?> index, Expr<?> value) {
+    // ArrayExpr array = (ArrayExpr) symbolicVariables.get(arrayVar);
+    // if (array == null) {
+    // throw new IllegalArgumentException("Array variable not found: " + arrayVar);
+    // }
+    // symbolicVariables.put(arrayVar, ctx.mkStore(array, index, value));
+    // }
+
+    // public Expr<?> getArrayElement(String arrayVar, Expr<?> index) {
+    // ArrayExpr array = (ArrayExpr) symbolicVariables.get(arrayVar);
+    // if (array == null) {
+    // throw new IllegalArgumentException("Array variable not found: " + arrayVar);
+    // }
+    // return ctx.mkSelect(array, index);
+    // }
+
+    /**
+     * Represents an object in the heap.
+     */
+    class HeapObject {
+        // A mapping from field names to symbolic expressions.
+        private Map<String, Expr<?>> fields;
+
+        public HeapObject() {
+            this.fields = new HashMap<>();
+        }
+
+        public void setField(String fieldName, Expr<?> value) {
+            fields.put(fieldName, value);
+        }
+
+        public Expr<?> getField(String fieldName) {
+            return fields.get(fieldName);
+        }
+
+        @Override
+        public String toString() {
+            return fields.toString();
+        }
     }
 }
