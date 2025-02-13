@@ -6,6 +6,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -21,7 +22,6 @@ import com.microsoft.z3.Model;
 
 import nl.uu.maze.analysis.JavaAnalyzer;
 import nl.uu.maze.execution.concrete.ConcreteExecutor;
-import nl.uu.maze.execution.concrete.ObjectInstantiator;
 import nl.uu.maze.execution.symbolic.SymbolicExecutor;
 import nl.uu.maze.execution.symbolic.SymbolicState;
 import nl.uu.maze.execution.symbolic.SymbolicStateValidator;
@@ -111,9 +111,9 @@ public class DSEController {
     public void run() throws Exception {
         // If class includes non-static methods, need to execute constructor first
         if (!methods.stream().allMatch(JavaSootMethod::isStatic)) {
-            ctor = analyzer.getJavaConstructor(instrumented);
+            ctor = analyzer.getJavaConstructor(instrumented != null ? instrumented : clazz);
             if (ctor == null) {
-                throw new Exception("No constructor found for class: " + instrumented.getName());
+                throw new Exception("No constructor found for class: " + clazz.getName());
             }
 
             // Get corresponding CFG
@@ -146,6 +146,8 @@ public class DSEController {
         generator.writeToFile(outPath);
     }
 
+    // TODO: fix constructor stuff for symbolic-driven
+
     /** Run symbolic-driven DSE on the given method. */
     private void runSymbolicDriven(JavaSootMethod method, SymbolicSearchStrategy searchStrategy) throws Exception {
         StmtGraph<?> cfg = analyzer.getCFG(method);
@@ -155,7 +157,16 @@ public class DSEController {
         if (method.isStatic()) {
             searchStrategy.add(new SymbolicState(ctx, cfg.getStartingStmt()));
         } else {
-            searchStrategy.add(ctorStates.values());
+            Collection<SymbolicState> ctorStates = this.ctorStates.values();
+            // Clone the ctor states to avoid modifying the original in subsequent execution
+            // and set their current statement to the starting statement of the target
+            // method
+            for (SymbolicState state : ctorStates) {
+                SymbolicState newState = state.clone();
+                newState.setCurrentStmt(cfg.getStartingStmt());
+                newState.isCtorState = false;
+                searchStrategy.add(newState);
+            }
         }
 
         SymbolicState current;
@@ -176,11 +187,12 @@ public class DSEController {
                 // statement to the starting statement of the target method
                 for (SymbolicState state : newStates) {
                     if (state.isFinalState(ctorCfg)) {
-                        state.setCurrentStmt(cfg.getStartingStmt());
                         state.isCtorState = false;
                         // Clone the state to avoid modifying the original in subsequent execution (want
                         // to reuse this final ctor state for multiple methods)
                         ctorStates.put(state.hashCode(), state.clone());
+                        logger.debug("Switching to target method: " + method.getName());
+                        state.setCurrentStmt(cfg.getStartingStmt());
                     } else {
                         ctorStates.put(state.hashCode(), state);
                     }
@@ -189,8 +201,7 @@ public class DSEController {
 
             searchStrategy.add(newStates);
         }
-        // TODO: have to take into account that arguments of ctor and methods may have
-        // the same names (e.g., arg0 for both ctor and method)
+
         List<ArgMap> argMap = validator.evaluate(finalStates);
         generator.addMethodTestCases(method, ctorSoot, argMap);
     }
@@ -209,11 +220,11 @@ public class DSEController {
             // Start with constructor
             List<TraceEntry> entries = TraceManager.getEntries("<init>");
             pathHash = entries.hashCode();
-            // If the constructor has been explored along this path before, reuse the final
-            // state
+            // If the ctor has been explored along this path before, reuse final state
             if (ctorStates.containsKey(pathHash)) {
                 current = ctorStates.get(pathHash).clone();
                 current.setCurrentStmt(cfg.getStartingStmt());
+                current.isCtorState = false;
                 iterator = TraceManager.getEntries(method.getName()).iterator();
             } else {
                 current = new SymbolicState(ctx, ctorCfg.getStartingStmt());
