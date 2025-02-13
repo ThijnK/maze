@@ -5,49 +5,19 @@ import java.util.function.BiFunction;
 import javax.annotation.Nonnull;
 
 import com.microsoft.z3.*;
+import com.microsoft.z3.Expr;
 
 import nl.uu.maze.execution.ArgMap;
 import nl.uu.maze.execution.symbolic.SymbolicState;
 import nl.uu.maze.util.Pair;
+
+import sootup.core.jimple.visitor.AbstractValueVisitor;
 import sootup.core.jimple.basic.*;
 import sootup.core.jimple.common.constant.*;
-import sootup.core.jimple.common.expr.AbstractBinopExpr;
-import sootup.core.jimple.common.expr.JAddExpr;
-import sootup.core.jimple.common.expr.JAndExpr;
-import sootup.core.jimple.common.expr.JCastExpr;
-import sootup.core.jimple.common.expr.JCmpExpr;
-import sootup.core.jimple.common.expr.JCmpgExpr;
-import sootup.core.jimple.common.expr.JCmplExpr;
-import sootup.core.jimple.common.expr.JDivExpr;
-import sootup.core.jimple.common.expr.JEqExpr;
-import sootup.core.jimple.common.expr.JGeExpr;
-import sootup.core.jimple.common.expr.JGtExpr;
-import sootup.core.jimple.common.expr.JLeExpr;
-import sootup.core.jimple.common.expr.JLengthExpr;
-import sootup.core.jimple.common.expr.JLtExpr;
-import sootup.core.jimple.common.expr.JMulExpr;
-import sootup.core.jimple.common.expr.JNeExpr;
-import sootup.core.jimple.common.expr.JNegExpr;
-import sootup.core.jimple.common.expr.JNewExpr;
-import sootup.core.jimple.common.expr.JOrExpr;
-import sootup.core.jimple.common.expr.JRemExpr;
-import sootup.core.jimple.common.expr.JShlExpr;
-import sootup.core.jimple.common.expr.JShrExpr;
-import sootup.core.jimple.common.expr.JSubExpr;
-import sootup.core.jimple.common.expr.JUshrExpr;
-import sootup.core.jimple.common.expr.JXorExpr;
-import sootup.core.jimple.common.ref.JArrayRef;
-import sootup.core.jimple.common.ref.JCaughtExceptionRef;
-import sootup.core.jimple.common.ref.JInstanceFieldRef;
-import sootup.core.jimple.common.ref.JParameterRef;
-import sootup.core.jimple.common.ref.JStaticFieldRef;
-import sootup.core.jimple.common.ref.JThisRef;
-import sootup.core.jimple.visitor.AbstractValueVisitor;
+import sootup.core.jimple.common.expr.*;
+import sootup.core.jimple.common.ref.*;
 import sootup.core.types.PrimitiveType.*;
-import sootup.core.types.ArrayType;
-import sootup.core.types.ClassType;
-import sootup.core.types.NullType;
-import sootup.core.types.Type;
+import sootup.core.types.*;
 
 /**
  * Transforms a Jimple value ({@link Value}) to a Z3 expression ({@link Expr}).
@@ -434,6 +404,12 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
     }
 
     @Override
+    public void caseNewExpr(@Nonnull JNewExpr expr) {
+        // Allocate a new object on the heap
+        setResult(state.allocateObject());
+    }
+
+    @Override
     public void caseParameterRef(@Nonnull JParameterRef ref) {
         Sort z3Sort = determineSort(ref.getType());
         // Create a symbolic value for the parameter
@@ -499,16 +475,11 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
 
     @Override
     public void caseLengthExpr(@Nonnull JLengthExpr expr) {
+        // TODO: handle array length
         // Introduce a symbolic variable to represent the length of the array
         String var = expr.getOp() + "len";
         setResult(ctx.mkConst(var, ctx.mkBitVecSort(Type.getValueBitSize(IntType.getInstance()))));
         state.setVariableType(var, IntType.getInstance());
-    }
-
-    @Override
-    public void caseNewExpr(@Nonnull JNewExpr expr) {
-        // Allocate a new object on the heap
-        setResult(state.allocateObject());
     }
     // #endregion
 }
