@@ -48,7 +48,7 @@ public class JUnitTestGenerator {
      * @param argMap {@link ArgMap} containing the arguments to pass to the
      *               method invocation
      */
-    public void addMethodTestCase(JavaSootMethod method, ArgMap argMap) {
+    public void addMethodTestCase(JavaSootMethod method, JavaSootMethod ctor, ArgMap argMap) {
         methodCount.compute(method.getName(), (k, v) -> v == null ? 1 : v + 1);
         String testMethodName = "test" + capitalizeFirstLetter(method.getName()) + methodCount.get(method.getName());
         MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder(testMethodName)
@@ -56,67 +56,85 @@ public class JUnitTestGenerator {
                 .addAnnotation(Test.class)
                 .returns(void.class);
 
-        // Next, build a list of parameters and define their values
-        List<String> params = new ArrayList<>();
-        List<Type> paramTypes = method.getParameterTypes();
-        for (int j = 0; j < paramTypes.size(); j++) {
-            String var = ArgMap.getSymbolicName(j, false);
-            params.add(var);
-
-            Object value = argMap.get(var);
-            // TODO: may have to be Array instead
-            if (value instanceof List) {
-                @SuppressWarnings("unchecked")
-                String arrayString = arrayToJavaString((List<Object>) value);
-                methodBuilder.addStatement("$T $L = $L", List.class, var, arrayString);
-            }
-            // If value is a primitive type, handle it as a literal
-            else if (value != null) {
-                // Handle special cases for float and double
-                String overrideValue = "";
-                if (value instanceof Float) {
-                    if (Float.isNaN((float) value)) {
-                        overrideValue = "Float.NaN";
-                    } else if (Float.isInfinite((float) value)) {
-                        overrideValue = ((float) value > 0) ? "Float.POSITIVE_INFINITY" : "Float.NEGATIVE_INFINITY";
-                    }
-                } else if (value instanceof Double) {
-                    if (Double.isNaN((double) value)) {
-                        overrideValue = "Double.NaN";
-                    } else if (Double.isInfinite((double) value)) {
-                        overrideValue = ((double) value > 0) ? "Double.POSITIVE_INFINITY" : "Double.NEGATIVE_INFINITY";
-                    }
-                }
-                if (!overrideValue.isEmpty()) {
-                    methodBuilder.addStatement("$L $L = $L", paramTypes.get(j), var, overrideValue);
-                    continue;
-                }
-
-                // Add a "F" or "L" postfix for float and long literals
-                String postfix = value instanceof Float && !Float.isInfinite((float) value)
-                        && !Float.isNaN((float) value) ? "F"
-                                : value instanceof Long ? "L" : "";
-                methodBuilder.addStatement("$L $L = $L$L", paramTypes.get(j), var, value, postfix);
-            }
-            // If value is not known, use a default value
-            else {
-                methodBuilder.addStatement("$L $L = $L", paramTypes.get(j), var,
-                        getDefaultValue(paramTypes.get(j)));
-            }
-        }
-
         // For static methods, just call the method
         if (method.isStatic()) {
+            // Add variable definitions for parameters
+            List<String> params = addParamDefinitions(methodBuilder, method.getParameterTypes(), argMap, false);
             methodBuilder.addStatement("$T.$L($L)", clazz, method.getName(), String.join(", ", params));
         }
         // For instance methods, create an instance of the class and call the method
         else {
-            // TODO: use argMap also for arguments of ctor, possibly usig ObjectInstantiator
-            methodBuilder.addStatement("$T cut = new $T()", clazz, clazz);
+            if (ctor == null) {
+                throw new IllegalArgumentException("Instance method " + method.getName() + " requires a constructor");
+            }
+
+            // Add variable definitions for the ctor parameters
+            List<String> ctorParams = addParamDefinitions(methodBuilder, ctor.getParameterTypes(), argMap, true);
+            methodBuilder.addStatement("$T cut = new $T($L)", clazz, clazz, String.join(", ", ctorParams));
+            List<String> params = addParamDefinitions(methodBuilder, method.getParameterTypes(), argMap, false);
             methodBuilder.addStatement("cut.$L($L)", method.getName(), String.join(", ", params));
         }
 
         classBuilder.addMethod(methodBuilder.build());
+    }
+
+    private List<String> addParamDefinitions(MethodSpec.Builder methodBuilder, List<Type> paramTypes, ArgMap argMap,
+            boolean isCtor) {
+        List<String> params = new ArrayList<>();
+        for (int i = 0; i < paramTypes.size(); i++) {
+            String var = ArgMap.getSymbolicName(i, isCtor);
+            params.add(var);
+            addDefinitionStmt(methodBuilder, paramTypes.get(i), var, argMap.get(var));
+        }
+        return params;
+    }
+
+    /*
+     * Adds a statement to the given method builder that defines a variable of the
+     * given type with the given value.
+     * 
+     * TODO: add support for objects and arrays
+     */
+    private void addDefinitionStmt(MethodSpec.Builder methodBuilder, Type type, String var, Object value) {
+        // TODO: may have to be Array or Collection instead
+        if (value instanceof List) {
+            @SuppressWarnings("unchecked")
+            String arrayString = arrayToJavaString((List<Object>) value);
+            methodBuilder.addStatement("$T $L = $L", List.class, var, arrayString);
+        }
+        // If value is a primitive type, handle it as a literal
+        else if (value != null) {
+            // Handle special cases for float and double
+            String overrideValue = "";
+            if (value instanceof Float) {
+                if (Float.isNaN((float) value)) {
+                    overrideValue = "Float.NaN";
+                } else if (Float.isInfinite((float) value)) {
+                    overrideValue = ((float) value > 0) ? "Float.POSITIVE_INFINITY" : "Float.NEGATIVE_INFINITY";
+                }
+            } else if (value instanceof Double) {
+                if (Double.isNaN((double) value)) {
+                    overrideValue = "Double.NaN";
+                } else if (Double.isInfinite((double) value)) {
+                    overrideValue = ((double) value > 0) ? "Double.POSITIVE_INFINITY" : "Double.NEGATIVE_INFINITY";
+                }
+            }
+            if (!overrideValue.isEmpty()) {
+                methodBuilder.addStatement("$L $L = $L", type, var, overrideValue);
+                return;
+            }
+
+            // Add a "F" or "L" postfix for float and long literals
+            String postfix = value instanceof Float && !Float.isInfinite((float) value)
+                    && !Float.isNaN((float) value) ? "F"
+                            : value instanceof Long ? "L" : "";
+            methodBuilder.addStatement("$L $L = $L$L", type, var, value, postfix);
+        }
+        // If value is not known, use a default value
+        else {
+            methodBuilder.addStatement("$L $L = $L", type, var,
+                    getDefaultValue(type));
+        }
     }
 
     /**
@@ -128,10 +146,10 @@ public class JUnitTestGenerator {
      * @param argMaps List of {@link ArgMap} containing the arguments to pass to the
      *                method invocations
      */
-    public void addMethodTestCases(JavaSootMethod method, List<ArgMap> argMaps) {
+    public void addMethodTestCases(JavaSootMethod method, JavaSootMethod ctor, List<ArgMap> argMaps) {
         logger.info("Generating JUnit test cases...");
         for (int i = 0; i < argMaps.size(); i++) {
-            addMethodTestCase(method, argMaps.get(i));
+            addMethodTestCase(method, ctor, argMaps.get(i));
         }
     }
 

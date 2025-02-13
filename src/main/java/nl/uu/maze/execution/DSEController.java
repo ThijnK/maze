@@ -64,6 +64,7 @@ public class DSEController {
     private final JUnitTestGenerator generator;
 
     private Constructor<?> ctor;
+    private JavaSootMethod ctorSoot;
     private StmtGraph<?> ctorCfg;
     /**
      * Map of constructor states, indexed by their hash code (in case of
@@ -117,7 +118,7 @@ public class DSEController {
             }
 
             // Get corresponding CFG
-            JavaSootMethod ctorSoot = analyzer.findConstructor(methods, ctor);
+            ctorSoot = analyzer.findConstructor(methods, ctor);
             ctorCfg = analyzer.getCFG(ctorSoot);
             ctorStates = new HashMap<Integer, SymbolicState>();
             logger.info("Using constructor: " + ctorSoot.getSignature());
@@ -192,7 +193,7 @@ public class DSEController {
         // TODO: have to take into account that arguments of ctor and methods may have
         // the same names (e.g., arg0 for both ctor and method)
         List<ArgMap> argMap = validator.evaluate(finalStates);
-        generator.addMethodTestCases(method, argMap);
+        generator.addMethodTestCases(method, ctorSoot, argMap);
     }
 
     /** Replay a trace symbolically. */
@@ -260,7 +261,7 @@ public class DSEController {
             // Note: this particular check will catch only certain edge cases that are not
             // caught by the search strategy
             if (isNew) {
-                generator.addMethodTestCase(method, argMap == null ? concrete.getArgMap() : argMap);
+                generator.addMethodTestCase(method, ctorSoot, argMap == null ? concrete.getArgMap() : argMap);
             }
 
             Optional<Model> model = searchStrategy.next(validator);
