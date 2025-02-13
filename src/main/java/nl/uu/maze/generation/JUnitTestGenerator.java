@@ -71,6 +71,7 @@ public class JUnitTestGenerator {
             // Add variable definitions for the ctor parameters
             List<String> ctorParams = addParamDefinitions(methodBuilder, ctor.getParameterTypes(), argMap, true);
             methodBuilder.addStatement("$T cut = new $T($L)", clazz, clazz, String.join(", ", ctorParams));
+            methodBuilder.addCode("\n"); // White space between ctor and method call
             List<String> params = addParamDefinitions(methodBuilder, method.getParameterTypes(), argMap, false);
             methodBuilder.addStatement("cut.$L($L)", method.getName(), String.join(", ", params));
         }

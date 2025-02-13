@@ -2,6 +2,8 @@ package nl.uu.maze.execution;
 
 import java.util.Map;
 
+import nl.uu.maze.execution.concrete.ObjectInstantiator;
+
 /**
  * Represents a map of arguments to be passed to a method.
  * Created either by the {@link ObjectInstantiator} randomly or from a Z3 model

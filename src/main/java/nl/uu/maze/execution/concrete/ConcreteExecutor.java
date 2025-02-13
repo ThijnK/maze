@@ -13,13 +13,8 @@ import nl.uu.maze.execution.ArgMap;
 public class ConcreteExecutor {
     private static final Logger logger = LoggerFactory.getLogger(ConcreteExecutor.class);
 
-    private ObjectInstantiator instantiator;
     /** Map of arguments last used in a method invocation */
     private ArgMap argMap = new ArgMap();
-
-    public ConcreteExecutor(ObjectInstantiator instantiator) {
-        this.instantiator = instantiator;
-    }
 
     /**
      * Run concrete execution on the given method, using the given constructor to
@@ -40,18 +35,17 @@ public class ConcreteExecutor {
         Object instance = null;
         if (!Modifier.isStatic(method.getModifiers())) {
             // Call generateArgs with argMap to use argumens from the map if present
-            Object[] args = instantiator.generateArgs(ctor.getParameters(), argMap, true);
-            logger.debug("Creating instance of class " + ctor.getDeclaringClass().getName() + " with args: "
-                    + instantiator.printArgs(args));
+            Object[] args = ObjectInstantiator.generateArgs(ctor.getParameters(), argMap, true);
+            logger.debug("Creating instance of class " + ctor.getDeclaringClass().getName() + " with args: " + args);
             instance = ctor.newInstance(args);
             this.argMap.addAll(args, true);
         }
 
         // Generate args for the method invocation
-        Object[] args = instantiator.generateArgs(method.getParameters(), argMap, false);
+        Object[] args = ObjectInstantiator.generateArgs(method.getParameters(), argMap, false);
         this.argMap.addAll(args, false);
 
-        logger.debug("Executing method " + method.getName() + " with args: " + instantiator.printArgs(args));
+        logger.debug("Executing method " + method.getName() + " with args: " + args);
         Object result = method.invoke(instance, args);
         logger.debug("Retval: " + (result == null ? "null" : result.toString()));
 

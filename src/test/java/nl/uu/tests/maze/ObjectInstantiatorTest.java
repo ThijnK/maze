@@ -8,33 +8,24 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.lang.reflect.Parameter;
 import java.util.Map;
 
-import org.junit.jupiter.api.BeforeAll;
-
 class ObjectInstantiatorTest {
-    private static ObjectInstantiator instantiator;
-
-    @BeforeAll
-    public static void setUp() {
-        instantiator = new ObjectInstantiator();
-    }
-
     @Test
     public void testCreateInstance_NoArgs() {
-        Object instance = instantiator.createInstance(TestClassNoArgs.class);
+        Object instance = ObjectInstantiator.createInstance(TestClassNoArgs.class);
         assertNotNull(instance);
         assertTrue(instance instanceof TestClassNoArgs);
     }
 
     @Test
     public void testCreateInstance_WithArgs() {
-        Object instance = instantiator.createInstance(TestClassWithArgs.class);
+        Object instance = ObjectInstantiator.createInstance(TestClassWithArgs.class);
         assertNotNull(instance);
         assertTrue(instance instanceof TestClassWithArgs);
     }
 
     @Test
     public void testCreateInstance_NoConstructors() {
-        Object instance = instantiator.createInstance(TestClassNoConstructors.class);
+        Object instance = ObjectInstantiator.createInstance(TestClassNoConstructors.class);
         assertNotNull(instance);
         assertTrue(instance instanceof TestClassNoConstructors);
     }
@@ -42,7 +33,7 @@ class ObjectInstantiatorTest {
     @Test
     public void testGenerateArgs() {
         Parameter[] params = TestClassManyArgs.class.getConstructors()[0].getParameters();
-        Object[] args = instantiator.generateArgs(params);
+        Object[] args = ObjectInstantiator.generateArgs(params);
         assertEquals(9, args.length);
         assertTrue(args[0] instanceof Integer);
         assertTrue(args[1] instanceof Double);
@@ -60,7 +51,7 @@ class ObjectInstantiatorTest {
         Parameter[] params = TestClassManyArgs.class.getConstructors()[0].getParameters();
         ArgMap argMap = new ArgMap(new Object[] { 1, 2.0, 3.0f, 4L, (short) 5, (byte) 6, '7', true,
                 new TestClassWithArgs(1, 2.0, true) }, false);
-        Object[] args = instantiator.generateArgs(params, argMap, false);
+        Object[] args = ObjectInstantiator.generateArgs(params, argMap, false);
         assertEquals(9, args.length);
         assertEquals(1, args[0]);
         assertEquals(2.0, args[1]);
@@ -79,7 +70,7 @@ class ObjectInstantiatorTest {
         Parameter[] params = TestClassManyArgs.class.getConstructors()[0].getParameters();
         ArgMap argMap = new ArgMap(Map.of("arg0", 1, "arg3", 4L, "arg4", (short) 5,
                 "arg5", (byte) 6));
-        Object[] args = instantiator.generateArgs(params, argMap, false);
+        Object[] args = ObjectInstantiator.generateArgs(params, argMap, false);
         assertEquals(9, args.length);
         assertEquals(1, args[0]);
         assertTrue(args[1] instanceof Double);

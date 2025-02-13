@@ -51,7 +51,6 @@ public class DSEController {
     private final Path outPath;
     private final SearchStrategy searchStrategy;
     private final JavaAnalyzer analyzer;
-    private final ObjectInstantiator instantiator = new ObjectInstantiator();
     private final Context ctx;
     private final JavaClassType classType;
     private final Set<JavaSootMethod> methods;
@@ -96,7 +95,7 @@ public class DSEController {
         this.ctx = new Context();
         this.symbolic = new SymbolicExecutor(ctx);
         this.validator = new SymbolicStateValidator(ctx);
-        this.concrete = new ConcreteExecutor(instantiator);
+        this.concrete = new ConcreteExecutor();
         this.classType = analyzer.getClassType(className);
         this.methods = analyzer.getMethods(classType);
         this.clazz = analyzer.getJavaClass(classType);
@@ -112,13 +111,13 @@ public class DSEController {
     public void run() throws Exception {
         // If class includes non-static methods, need to execute constructor first
         if (!methods.stream().allMatch(JavaSootMethod::isStatic)) {
-            ctor = instantiator.getConstructor(instrumented);
+            ctor = analyzer.getJavaConstructor(instrumented);
             if (ctor == null) {
                 throw new Exception("No constructor found for class: " + instrumented.getName());
             }
 
             // Get corresponding CFG
-            ctorSoot = analyzer.findConstructor(methods, ctor);
+            ctorSoot = analyzer.getSootConstructor(methods, ctor);
             ctorCfg = analyzer.getCFG(ctorSoot);
             ctorStates = new HashMap<Integer, SymbolicState>();
             logger.info("Using constructor: " + ctorSoot.getSignature());

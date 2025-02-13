@@ -16,6 +16,7 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import nl.uu.maze.execution.concrete.ObjectInstantiator;
 import sootup.core.graph.StmtGraph;
 import sootup.core.inputlocation.AnalysisInputLocation;
 import sootup.core.types.*;
@@ -194,7 +195,7 @@ public class JavaAnalyzer {
      * @param ctor    The constructor to find
      * @return The {@link JavaSootMethod} corresponding to the constructor
      */
-    public JavaSootMethod findConstructor(Set<JavaSootMethod> methods, Constructor<?> ctor) {
+    public JavaSootMethod getSootConstructor(Set<JavaSootMethod> methods, Constructor<?> ctor) {
         Class<?>[] targetParams = ctor.getParameterTypes();
         for (JavaSootMethod method : methods) {
             if (method.getName().equals("<init>")) {
@@ -209,6 +210,31 @@ public class JavaAnalyzer {
                 }
             }
         }
+        return null;
+    }
+
+    /**
+     * Find a constructor for the given class for which arguments can be generated.
+     * This ensures that the constructor does not require complex arguments, such as
+     * instances of inner classes.
+     * 
+     * @param clazz The class to instantiate
+     * @return A constructor for the class
+     * @implNote This will fail if the class has a single constructor which requires
+     *           an instance of an inner class as an argument.
+     */
+    public Constructor<?> getJavaConstructor(Class<?> clazz) {
+        // Find a constructor for which arguments can be generated
+        for (Constructor<?> ctor : clazz.getConstructors()) {
+            try {
+                ObjectInstantiator.generateArgs(ctor.getParameters(), null, true);
+                return ctor;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        logger.warn("Failed to find suitable constructor for class " + clazz.getName());
         return null;
     }
 

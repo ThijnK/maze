@@ -17,59 +17,40 @@ public class ObjectInstantiator {
     private static final Logger logger = LoggerFactory.getLogger(ObjectInstantiator.class);
 
     /** Max depth for recursively generating arguments */
-    private final int MAX_INSTANTIATION_DEPTH = 5;
+    private static final int MAX_INSTANTIATION_DEPTH = 5;
 
-    private Random rand = new Random();
+    private static Random rand = new Random();
 
     /**
-     * Create an instance of the given class using the first constructor found.
+     * Create an instance of the given class using randomly generated arguments.
      * 
      * @param clazz The class to instantiate
      * @return An instance of the class
      * @implNote This will fail if the class has a single constructor which requires
      *           an instance of an inner class as an argument.
      */
-    public Object createInstance(Class<?> clazz) {
+    public static Object createInstance(Class<?> clazz) {
         return createInstance(clazz, 0, null);
     }
 
     /**
-     * Create an instance of the given class using the first constructor found,
-     * invoking the constructor with the given arguments.
-     * If some parameter is missing in the argMap map, it will be generated
-     * randomly.
-     * 
-     * @param clazz The class to instantiate
-     * @return An instance of the class
-     * @implNote This will fail if the class has a single constructor which requires
-     *           an instance of an inner class as an argument.
-     */
-    public Object createInstance(Class<?> clazz, ArgMap argMap) {
-        return createInstance(clazz, 0, argMap);
-    }
-
-    /**
      * Create an instance of the given class using the first constructor found.
      * 
-     * @param clazz The class to instantiate
-     * @param depth The current depth of the recursive instantiation
+     * @param clazz  The class to instantiate
+     * @param depth  The current depth of the recursive instantiation
+     * @param argMap Optional {@link ArgMap} containing the arguments to pass to the
+     *               constructor
      * @return An instance of the class
      * @implNote This will fail if the class has a single constructor which requires
      *           an instance of an inner class as an argument.
      */
-    private Object createInstance(Class<?> clazz, int depth, ArgMap argMap) {
-        Constructor<?>[] ctors = clazz.getConstructors();
-        if (ctors.length == 0) {
-            logger.warn("No constructors found for class: " + clazz.getName());
-            return null;
-        }
-
+    private static Object createInstance(Class<?> clazz, int depth, ArgMap argMap) {
         // Try to create an instance using one of the constructors
-        for (Constructor<?> ctor : ctors) {
+        for (Constructor<?> ctor : clazz.getConstructors()) {
             try {
-                logger.debug("Param types: " + printArgs(ctor.getParameterTypes()));
+                logger.debug("Param types: " + ctor.getParameterTypes());
                 Object[] args = generateArgs(ctor.getParameters(), depth, argMap, true);
-                logger.debug("Creating instance of class: " + clazz.getName() + " with args: " + printArgs(args));
+                logger.debug("Creating instance of class: " + clazz.getName() + " with args: " + args);
                 return ctor.newInstance(args);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -77,41 +58,6 @@ public class ObjectInstantiator {
         }
 
         logger.warn("Failed to create instance of class: " + clazz.getName());
-        return null;
-    }
-
-    // TODO: move this to JavaAnzlyer, and remove the createInstance shenanigens
-    // above, then rename this class to something related to generating arguments
-    /**
-     * Find a constructor for the given class for which arguments can be generated.
-     * This ensures that the constructor does not require complex arguments, such as
-     * instances of inner classes.
-     * 
-     * @param clazz The class to instantiate
-     * @return A constructor for the class
-     * @implNote This will fail if the class has a single constructor which requires
-     *           an instance of an inner class as an argument.
-     */
-    public Constructor<?> getConstructor(Class<?> clazz) {
-        Constructor<?>[] ctors = clazz.getConstructors();
-        if (ctors.length == 0) {
-            logger.warn("No constructors found for class " + clazz.getName());
-            return null;
-        }
-
-        // Find a constructor for which arguments can be generated
-        for (Constructor<?> ctor : ctors) {
-            try {
-                logger.debug("Param types: " + printArgs(ctor.getParameterTypes()));
-                Object[] args = generateArgs(ctor.getParameters(), 0, null, true);
-                logger.debug("Generated args for " + clazz.getName() + ": " + printArgs(args));
-                return ctor;
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-
-        logger.warn("Failed to find suitable constructor for class " + clazz.getName());
         return null;
     }
 
@@ -127,7 +73,7 @@ public class ObjectInstantiator {
      * @param isCtor Whether the parameters are for a constructor
      * @return An array of random arguments
      */
-    public Object[] generateArgs(Parameter[] params, ArgMap argMap, boolean isCtor) {
+    public static Object[] generateArgs(Parameter[] params, ArgMap argMap, boolean isCtor) {
         return generateArgs(params, 0, argMap, isCtor);
     }
 
@@ -139,7 +85,7 @@ public class ObjectInstantiator {
      * @param params The parameters of the method
      * @return An array of random arguments
      */
-    public Object[] generateArgs(Parameter[] params) {
+    public static Object[] generateArgs(Parameter[] params) {
         return generateArgs(params, 0, null, false);
     }
 
@@ -155,7 +101,7 @@ public class ObjectInstantiator {
      *               invocation
      * @return An array of random arguments
      */
-    private Object[] generateArgs(Parameter[] params, int depth, ArgMap argMap, boolean isCtor) {
+    private static Object[] generateArgs(Parameter[] params, int depth, ArgMap argMap, boolean isCtor) {
         Object[] arguments = new Object[params.length];
         for (int i = 0; i < params.length; i++) {
             // If the parameter is known, use the known value
@@ -204,21 +150,5 @@ public class ObjectInstantiator {
             }
         }
         return arguments;
-    }
-
-    /**
-     * Print the arguments of a method invocation as a comma-separated list of
-     * strings.
-     * 
-     * @param args The arguments to print
-     * @return A string representation of the arguments
-     */
-    public String printArgs(Object[] args) {
-        StringBuilder sb = new StringBuilder();
-        for (Object arg : args) {
-            sb.append(arg == null ? "null" : arg.toString());
-            sb.append(", ");
-        }
-        return sb.toString();
     }
 }
