@@ -28,13 +28,13 @@ public class SymbolicState {
     private Context ctx;
     private Stmt currentStmt;
     private int currentDepth;
+    public boolean isCtorState;
 
     private Map<String, Expr<?>> symbolicVariables;
     private List<BoolExpr> pathConstraints;
 
     /** Keep track of (SootUp) types of symbolic variables */
     private Map<String, Type> variableTypes;
-    public boolean isCtorState;
 
     public SymbolicState(Context ctx, Stmt stmt) {
         this.currentStmt = stmt;
@@ -46,12 +46,13 @@ public class SymbolicState {
 
     public SymbolicState(Context ctx, Stmt stmt, int depth, Map<String, Expr<?>> symbolicVariables,
             List<BoolExpr> pathConstraints, Map<String, Type> variableTypes, boolean isCtorState) {
+        this.ctx = ctx;
         this.currentStmt = stmt;
         this.currentDepth = depth;
         this.symbolicVariables = new HashMap<>(symbolicVariables);
-        this.ctx = ctx;
         this.pathConstraints = new ArrayList<>(pathConstraints);
-        this.variableTypes = new HashMap<>(variableTypes);
+        // Share the same variable types map to avoid copying
+        this.variableTypes = variableTypes;
         this.isCtorState = isCtorState;
     }
 
