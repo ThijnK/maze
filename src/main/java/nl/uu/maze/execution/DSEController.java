@@ -6,7 +6,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -146,8 +145,6 @@ public class DSEController {
         generator.writeToFile(outPath);
     }
 
-    // TODO: fix constructor stuff for symbolic-driven
-
     /** Run symbolic-driven DSE on the given method. */
     private void runSymbolicDriven(JavaSootMethod method, SymbolicSearchStrategy searchStrategy) throws Exception {
         StmtGraph<?> cfg = analyzer.getCFG(method);
@@ -157,14 +154,16 @@ public class DSEController {
         if (method.isStatic()) {
             searchStrategy.add(new SymbolicState(ctx, cfg.getStartingStmt()));
         } else {
-            Collection<SymbolicState> ctorStates = this.ctorStates.values();
             // Clone the ctor states to avoid modifying the original in subsequent execution
             // and set their current statement to the starting statement of the target
             // method
-            for (SymbolicState state : ctorStates) {
+            for (SymbolicState state : ctorStates.values()) {
                 SymbolicState newState = state.clone();
-                newState.setCurrentStmt(cfg.getStartingStmt());
-                newState.isCtorState = false;
+                // Only if the state was the final constructor state, set the current statement
+                // to the starting statement of the target method
+                if (!state.isCtorState) {
+                    newState.setCurrentStmt(cfg.getStartingStmt());
+                }
                 searchStrategy.add(newState);
             }
         }
