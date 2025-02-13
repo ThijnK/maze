@@ -60,7 +60,7 @@ public class JUnitTestGenerator {
         List<String> params = new ArrayList<>();
         List<Type> paramTypes = method.getParameterTypes();
         for (int j = 0; j < paramTypes.size(); j++) {
-            String var = "arg" + j;
+            String var = ArgMap.getSymbolicName(j, false);
             params.add(var);
 
             Object value = argMap.get(var);

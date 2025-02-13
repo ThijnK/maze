@@ -40,16 +40,16 @@ public class ConcreteExecutor {
         Object instance = null;
         if (!Modifier.isStatic(method.getModifiers())) {
             // Call generateArgs with argMap to use argumens from the map if present
-            Object[] args = instantiator.generateArgs(ctor.getParameters(), argMap);
+            Object[] args = instantiator.generateArgs(ctor.getParameters(), argMap, true);
             logger.debug("Creating instance of class " + ctor.getDeclaringClass().getName() + " with args: "
                     + instantiator.printArgs(args));
             instance = ctor.newInstance(args);
-            this.argMap.addAll(args);
+            this.argMap.addAll(args, true);
         }
 
         // Generate args for the method invocation
-        Object[] args = instantiator.generateArgs(method.getParameters(), argMap);
-        this.argMap.addAll(args);
+        Object[] args = instantiator.generateArgs(method.getParameters(), argMap, false);
+        this.argMap.addAll(args, false);
 
         logger.debug("Executing method " + method.getName() + " with args: " + instantiator.printArgs(args));
         Object result = method.invoke(instance, args);
@@ -58,6 +58,7 @@ public class ConcreteExecutor {
         return result;
     }
 
+    // TODO: shouldn't need this, references passed by value work to update the map
     /**
      * Get the last used arguments in a method invocation.
      * 

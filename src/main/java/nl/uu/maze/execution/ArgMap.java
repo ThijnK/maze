@@ -14,34 +14,23 @@ public class ArgMap {
         this.args = args;
     }
 
-    public ArgMap(Object[] args) {
+    public ArgMap(Object[] args, boolean isCtor) {
         this.args = new java.util.HashMap<>();
-        addAll(args);
+        addAll(args, isCtor);
     }
 
     public ArgMap() {
         this.args = new java.util.HashMap<>();
     }
 
-    public void addAll(Object[] args) {
+    public void addAll(Object[] args, boolean isCtor) {
         for (int i = 0; i < args.length; i++) {
-            this.args.put("arg" + i, args[i]);
+            this.args.put(getSymbolicName(i, isCtor), args[i]);
         }
     }
 
     public Map<String, Object> getArgs() {
         return args;
-    }
-
-    public void overwrite(Map<String, Object> args) {
-        this.args = args;
-    }
-
-    public void overwrite(Object[] args) {
-        this.args.clear();
-        for (int i = 0; i < args.length; i++) {
-            this.args.put("arg" + i, args[i]);
-        }
     }
 
     public void set(String key, Object value) {
@@ -57,35 +46,11 @@ public class ArgMap {
     }
 
     /**
-     * Extract only the arguments that follow the format "argX" where X is the index
-     * from the argument map, and return them in order as an array.
-     * 
-     * @return An array of arguments
+     * Get an appropriate symbolic name for a parameter based on its index and
+     * whether it's part of a constructor or method.
      */
-    public Object[] toArray() {
-        // Find the highest index to determine the size of the array
-        int maxIndex = -1;
-        for (String key : args.keySet()) {
-            if (key.startsWith("arg")) {
-                int index = Integer.parseInt(key.substring(3));
-                if (index > maxIndex) {
-                    maxIndex = index;
-                }
-            }
-        }
-
-        // Create an array of the appropriate size
-        Object[] result = new Object[maxIndex + 1];
-
-        // Populate the array with values from the map
-        for (String key : args.keySet()) {
-            if (key.startsWith("arg")) {
-                int index = Integer.parseInt(key.substring(3));
-                result[index] = args.get(key);
-            }
-        }
-
-        return result;
+    public static String getSymbolicName(int index, boolean isCtor) {
+        return isCtor ? "ctorArg" + index : "arg" + index;
     }
 
     @Override

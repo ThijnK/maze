@@ -68,7 +68,7 @@ public class ObjectInstantiator {
         for (Constructor<?> ctor : ctors) {
             try {
                 logger.debug("Param types: " + printArgs(ctor.getParameterTypes()));
-                Object[] args = generateArgs(ctor.getParameters(), depth, argMap);
+                Object[] args = generateArgs(ctor.getParameters(), depth, argMap, true);
                 logger.debug("Creating instance of class: " + clazz.getName() + " with args: " + printArgs(args));
                 return ctor.newInstance(args);
             } catch (Exception e) {
@@ -80,6 +80,8 @@ public class ObjectInstantiator {
         return null;
     }
 
+    // TODO: move this to JavaAnzlyer, and remove the createInstance shenanigens
+    // above, then rename this class to something related to generating arguments
     /**
      * Find a constructor for the given class for which arguments can be generated.
      * This ensures that the constructor does not require complex arguments, such as
@@ -97,12 +99,12 @@ public class ObjectInstantiator {
             return null;
         }
 
-        // Try to create an instance using one of the constructors
+        // Find a constructor for which arguments can be generated
         for (Constructor<?> ctor : ctors) {
             try {
                 logger.debug("Param types: " + printArgs(ctor.getParameterTypes()));
-                Object[] args = generateArgs(ctor.getParameters(), 0, null);
-                logger.debug("Creating instance of class: " + clazz.getName() + " with args: " + printArgs(args));
+                Object[] args = generateArgs(ctor.getParameters(), 0, null, true);
+                logger.debug("Generated args for " + clazz.getName() + ": " + printArgs(args));
                 return ctor;
             } catch (Exception e) {
                 e.printStackTrace();
@@ -122,10 +124,11 @@ public class ObjectInstantiator {
      * @param params The parameters of the method
      * @param argMap {@link ArgMap} containing the arguments to pass to the method
      *               invocation
+     * @param isCtor Whether the parameters are for a constructor
      * @return An array of random arguments
      */
-    public Object[] generateArgs(Parameter[] params, ArgMap argMap) {
-        return generateArgs(params, 0, argMap);
+    public Object[] generateArgs(Parameter[] params, ArgMap argMap, boolean isCtor) {
+        return generateArgs(params, 0, argMap, isCtor);
     }
 
     /**
@@ -137,7 +140,7 @@ public class ObjectInstantiator {
      * @return An array of random arguments
      */
     public Object[] generateArgs(Parameter[] params) {
-        return generateArgs(params, 0, null);
+        return generateArgs(params, 0, null, false);
     }
 
     /**
@@ -152,11 +155,11 @@ public class ObjectInstantiator {
      *               invocation
      * @return An array of random arguments
      */
-    private Object[] generateArgs(Parameter[] params, int depth, ArgMap argMap) {
+    private Object[] generateArgs(Parameter[] params, int depth, ArgMap argMap, boolean isCtor) {
         Object[] arguments = new Object[params.length];
         for (int i = 0; i < params.length; i++) {
             // If the parameter is known, use the known value
-            String name = "arg" + i;
+            String name = ArgMap.getSymbolicName(i, isCtor);
             if (argMap != null && argMap.containsKey(name)) {
                 arguments[i] = argMap.get(name);
                 continue;

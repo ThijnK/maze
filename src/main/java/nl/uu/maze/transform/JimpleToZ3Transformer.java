@@ -6,6 +6,7 @@ import javax.annotation.Nonnull;
 
 import com.microsoft.z3.*;
 
+import nl.uu.maze.execution.ArgMap;
 import nl.uu.maze.execution.symbolic.SymbolicState;
 import nl.uu.maze.util.Pair;
 import sootup.core.jimple.basic.*;
@@ -432,7 +433,7 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
     public void caseParameterRef(@Nonnull JParameterRef ref) {
         Sort z3Sort = determineSort(ref.getType());
         // Create a symbolic value for the parameter
-        String var = "arg" + ref.getIndex();
+        String var = ArgMap.getSymbolicName(ref.getIndex(), state.isCtorState);
         setResult(ctx.mkConst(var, z3Sort));
         state.setVariableType(var, ref.getType());
     }

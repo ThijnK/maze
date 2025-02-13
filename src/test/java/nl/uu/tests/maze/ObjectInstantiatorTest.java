@@ -59,8 +59,8 @@ class ObjectInstantiatorTest {
     public void testGenerateArgs_WithArgMap() {
         Parameter[] params = TestClassManyArgs.class.getConstructors()[0].getParameters();
         ArgMap argMap = new ArgMap(new Object[] { 1, 2.0, 3.0f, 4L, (short) 5, (byte) 6, '7', true,
-                new TestClassWithArgs(1, 2.0, true) });
-        Object[] args = instantiator.generateArgs(params, argMap);
+                new TestClassWithArgs(1, 2.0, true) }, false);
+        Object[] args = instantiator.generateArgs(params, argMap, false);
         assertEquals(9, args.length);
         assertEquals(1, args[0]);
         assertEquals(2.0, args[1]);
@@ -79,7 +79,7 @@ class ObjectInstantiatorTest {
         Parameter[] params = TestClassManyArgs.class.getConstructors()[0].getParameters();
         ArgMap argMap = new ArgMap(Map.of("arg0", 1, "arg3", 4L, "arg4", (short) 5,
                 "arg5", (byte) 6));
-        Object[] args = instantiator.generateArgs(params, argMap);
+        Object[] args = instantiator.generateArgs(params, argMap, false);
         assertEquals(9, args.length);
         assertEquals(1, args[0]);
         assertTrue(args[1] instanceof Double);
