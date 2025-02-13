@@ -26,7 +26,7 @@ public class Application {
     private static final String classPath = "target/classes";
     private static final String className = "nl.uu.maze.example.ExampleClass";
     private static final String outPath = "src/test/java";
-    private static final boolean concreteDriven = true;
+    private static final boolean concreteDriven = false;
 
     public static void main(String[] args) {
         try {

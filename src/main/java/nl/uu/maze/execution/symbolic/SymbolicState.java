@@ -51,7 +51,7 @@ public class SymbolicState {
 
     public SymbolicState(Context ctx, Stmt stmt, int depth, boolean isCtorState, Map<String, Expr<?>> symbolicVariables,
             List<BoolExpr> pathConstraints, Map<String, Type> variableTypes, Map<Expr<?>, HeapObject> heap,
-            Sort refSort) {
+            int heapCounter, Sort refSort) {
         this.ctx = ctx;
         this.currentStmt = stmt;
         this.currentDepth = depth;
@@ -61,7 +61,7 @@ public class SymbolicState {
         // Share the same variable types map to avoid copying
         this.variableTypes = variableTypes;
         this.heap = new HashMap<>(heap); // TODO: may have to be deep copied
-        this.heapCounter = heap.size();
+        this.heapCounter = heapCounter;
         this.refSort = refSort;
     }
 
@@ -157,7 +157,7 @@ public class SymbolicState {
 
     public SymbolicState clone(Stmt stmt) {
         return new SymbolicState(ctx, stmt, currentDepth, isCtorState, symbolicVariables, pathConstraints,
-                variableTypes, heap, refSort);
+                variableTypes, heap, heapCounter, refSort);
     }
 
     public SymbolicState clone() {

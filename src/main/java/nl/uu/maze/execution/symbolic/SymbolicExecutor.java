@@ -193,7 +193,7 @@ public class SymbolicExecutor {
             // TODO: handle static field assignment in <cinit>
         } else if (leftOp instanceof JInstanceFieldRef) {
             JInstanceFieldRef ref = (JInstanceFieldRef) leftOp;
-            Expr<?> objRef = state.getVariable(ref.getBase().toString());
+            Expr<?> objRef = state.getVariable(ref.getBase().getName());
             state.setField(objRef, ref.getFieldSignature().getName(), value);
         } else {
             state.setVariable(leftOp.toString(), value);

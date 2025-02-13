@@ -28,6 +28,7 @@ import sootup.core.jimple.common.expr.JLtExpr;
 import sootup.core.jimple.common.expr.JMulExpr;
 import sootup.core.jimple.common.expr.JNeExpr;
 import sootup.core.jimple.common.expr.JNegExpr;
+import sootup.core.jimple.common.expr.JNewExpr;
 import sootup.core.jimple.common.expr.JOrExpr;
 import sootup.core.jimple.common.expr.JRemExpr;
 import sootup.core.jimple.common.expr.JShlExpr;
@@ -456,7 +457,7 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
 
     @Override
     public void caseInstanceFieldRef(@Nonnull JInstanceFieldRef ref) {
-        Expr<?> objRef = state.getVariable(ref.getBase().toString());
+        Expr<?> objRef = state.getVariable(ref.getBase().getName());
         setResult(state.getField(objRef, ref.getFieldSignature().getName()));
     }
 
@@ -502,6 +503,12 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
         String var = expr.getOp() + "len";
         setResult(ctx.mkConst(var, ctx.mkBitVecSort(Type.getValueBitSize(IntType.getInstance()))));
         state.setVariableType(var, IntType.getInstance());
+    }
+
+    @Override
+    public void caseNewExpr(@Nonnull JNewExpr expr) {
+        // Allocate a new object on the heap
+        setResult(state.allocateObject());
     }
     // #endregion
 }
