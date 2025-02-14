@@ -52,6 +52,8 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
         return transform(immediate, state);
     }
 
+    // #region Helper methods
+
     /**
      * Transform a binary arithmetic expression.
      * 
@@ -205,13 +207,14 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
         } else if (sootType instanceof NullType) {
             return ctx.mkIntSort();
         }
-        // TODO: missing types
+        // TODO: missing types?
         else {
             throw new UnsupportedOperationException("Unsupported type: " + sootType);
         }
     }
+    // #endregion
 
-    // #region Boolean expressions
+    // #region Logic
     @Override
     public void caseEqExpr(@Nonnull JEqExpr expr) {
         setResult(transformArithExpr(expr, ctx::mkEq, ctx::mkFPEq));
@@ -272,7 +275,7 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
     }
     // #endregion
 
-    // #region Arithmetic expressions
+    // #region Arithmetic
     @Override
     public void caseRemExpr(@Nonnull JRemExpr expr) {
         setResult(transformArithExpr(expr, ctx::mkBVSRem, ctx::mkFPRem));
@@ -365,15 +368,15 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
     }
 
     @Override
-    public void caseEnumConstant(@Nonnull EnumConstant constant) {
-        // TODO Auto-generated method stub
-        super.caseEnumConstant(constant);
-    }
-
-    @Override
     public void caseBooleanConstant(@Nonnull BooleanConstant constant) {
         // Ignore, booleans are converted to integers by SootUp
         super.caseBooleanConstant(constant);
+    }
+
+    @Override
+    public void caseEnumConstant(@Nonnull EnumConstant constant) {
+        // TODO Auto-generated method stub
+        super.caseEnumConstant(constant);
     }
 
     @Override
@@ -386,10 +389,11 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
     public void caseClassConstant(@Nonnull ClassConstant constant) {
         // TODO Auto-generated method stub
         super.caseClassConstant(constant);
+        // String value = constant.getValue();
     }
     // #endregion
 
-    // #region References
+    // #region Objects
     @Override
     public void caseThisRef(@Nonnull JThisRef ref) {
         if (state.containsVariable("this")) {
@@ -408,31 +412,6 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
     }
 
     @Override
-    public void caseParameterRef(@Nonnull JParameterRef ref) {
-        Type sootType = ref.getType();
-        if (sootType instanceof ArrayType) {
-            // TODO: Create a symbolic array for the parameter
-        } else if (sootType instanceof ClassType) {
-            // TODO: deal with objects as arguments
-
-            // Allocate new object on the heap
-            Expr<?> objRef = state.allocateObject();
-            setResult(objRef);
-        } else {
-            // Create a symbolic value for the parameter
-            String var = ArgMap.getSymbolicName(state.getMethodType(), ref.getIndex());
-            setResult(ctx.mkConst(var, determineSort(sootType)));
-            state.setVariableType(var, sootType);
-        }
-    }
-
-    @Override
-    public void caseArrayRef(@Nonnull JArrayRef ref) {
-        ArrayExpr<BitVecSort, ?> array = (ArrayExpr<BitVecSort, ?>) state.getVariable(ref.getBase().toString());
-        setResult(ctx.mkSelect(array, (BitVecExpr) transform(ref.getIndex())));
-    }
-
-    @Override
     public void caseStaticFieldRef(@Nonnull JStaticFieldRef ref) {
         // Note: ref.toString() will be e.g. "<org.a.s.e.SingleMethod: int x>"
         // (but not abbreviated)
@@ -444,20 +423,40 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
         Expr<?> objRef = state.getVariable(ref.getBase().getName());
         setResult(state.getField(objRef, ref.getFieldSignature().getName()));
     }
+    // #endregion
+
+    // #region Arrays
+    @Override
+    public void caseLengthExpr(@Nonnull JLengthExpr expr) {
+        // TODO: handle array length
+        // Introduce a symbolic variable to represent the length of the array
+        String var = expr.getOp() + "len";
+        setResult(ctx.mkConst(var, ctx.mkBitVecSort(Type.getValueBitSize(IntType.getInstance()))));
+        state.setVariableType(var, IntType.getInstance());
+    }
 
     @Override
-    public void caseCaughtExceptionRef(@Nonnull JCaughtExceptionRef ref) {
+    public void caseNewArrayExpr(@Nonnull JNewArrayExpr expr) {
         // TODO Auto-generated method stub
-        super.caseCaughtExceptionRef(ref);
+        super.caseNewArrayExpr(expr);
+    }
+
+    @Override
+    public void caseNewMultiArrayExpr(@Nonnull JNewMultiArrayExpr expr) {
+        // TODO Auto-generated method stub
+        super.caseNewMultiArrayExpr(expr);
+    }
+
+    @Override
+    public void caseArrayRef(@Nonnull JArrayRef ref) {
+        // TODO: handle array access
+        // Probably a good idea to abstract some of this away to SymbolicState methods
+        ArrayExpr<BitVecSort, ?> array = (ArrayExpr<BitVecSort, ?>) state.getVariable(ref.getBase().toString());
+        setResult(ctx.mkSelect(array, (BitVecExpr) transform(ref.getIndex())));
     }
     // #endregion
 
-    // #region Other
-    @Override
-    public void caseLocal(@Nonnull Local local) {
-        setResult(state.getVariable(local.getName()));
-    }
-
+    // #region Casting
     @Override
     public void caseCastExpr(@Nonnull JCastExpr expr) {
         Expr<?> innerExpr = transform(expr.getOp());
@@ -481,20 +480,45 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
     }
 
     @Override
-    public void caseLengthExpr(@Nonnull JLengthExpr expr) {
-        // TODO: handle array length
-        // Introduce a symbolic variable to represent the length of the array
-        String var = expr.getOp() + "len";
-        setResult(ctx.mkConst(var, ctx.mkBitVecSort(Type.getValueBitSize(IntType.getInstance()))));
-        state.setVariableType(var, IntType.getInstance());
-    }
-
-    @Override
     public void caseInstanceOfExpr(@Nonnull JInstanceOfExpr expr) {
         Type checkType = expr.getCheckType();
         Type actualType = expr.getOp().getType();
         boolean isInstance = checkType.equals(actualType) || checkType.equals(NullType.getInstance());
         setResult(ctx.mkBV(isInstance ? 1 : 0, Type.getValueBitSize(IntType.getInstance())));
+    }
+    // #endregion
+
+    // #region Params and locals
+    @Override
+    public void caseParameterRef(@Nonnull JParameterRef ref) {
+        Type sootType = ref.getType();
+        if (sootType instanceof ArrayType) {
+            // TODO: Create a symbolic array for the parameter
+        } else if (sootType instanceof ClassType) {
+            // TODO: deal with objects as arguments
+
+            // Allocate new object on the heap
+            Expr<?> objRef = state.allocateObject();
+            setResult(objRef);
+        } else {
+            // Create a symbolic value for the parameter
+            String var = ArgMap.getSymbolicName(state.getMethodType(), ref.getIndex());
+            setResult(ctx.mkConst(var, determineSort(sootType)));
+            state.setVariableType(var, sootType);
+        }
+    }
+
+    @Override
+    public void caseLocal(@Nonnull Local local) {
+        setResult(state.getVariable(local.getName()));
+    }
+    // #endregion
+
+    // #region Control flow
+    @Override
+    public void caseCaughtExceptionRef(@Nonnull JCaughtExceptionRef ref) {
+        // TODO Auto-generated method stub
+        super.caseCaughtExceptionRef(ref);
     }
     // #endregion
 }
