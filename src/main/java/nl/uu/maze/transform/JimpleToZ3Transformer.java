@@ -200,10 +200,8 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
             Sort indexSort = ctx.mkBitVecSort(Type.getValueBitSize(IntType.getInstance()));
             return ctx.mkArraySort(indexSort, elementSort);
         } else if (sootType instanceof ClassType) {
-            // TODO: how to represent arbitrary classes including Strings?
-            // probably no need, only represent their fields as symbolic values (except
-            // maybe strings that do have to be handled here)
-            return ctx.mkIntSort();
+            // Note: sootType.toString() will return the fully qualified name of the class
+            return ctx.mkUninterpretedSort(sootType.toString());
         } else if (sootType instanceof NullType) {
             return ctx.mkIntSort();
         }
@@ -463,11 +461,10 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
     @Override
     public void caseCastExpr(@Nonnull JCastExpr expr) {
         Expr<?> innerExpr = transform(expr.getOp());
-        Type type = expr.getType();
-        Sort sort = determineSort(type);
 
         // Cast from number to another number
         if (innerExpr instanceof BitVecExpr || innerExpr instanceof FPExpr) {
+            Sort sort = determineSort(expr.getType());
             if (innerExpr instanceof BitVecExpr && sort instanceof FPSort) {
                 setResult(coerceToSort((BitVecExpr) innerExpr, (FPSort) sort));
             } else if (innerExpr instanceof FPExpr && sort instanceof FPSort) {
@@ -478,8 +475,8 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
                 throw new UnsupportedOperationException("Unsupported cast from " + innerExpr.getSort() + " to " + sort);
             }
         } else {
-            // TODO: handle cast to other types
-            throw new UnsupportedOperationException("Unsupported cast from " + innerExpr.getSort() + " to " + sort);
+            // Ignore casts for other types
+            setResult(innerExpr);
         }
     }
 
