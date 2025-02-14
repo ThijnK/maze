@@ -10,7 +10,7 @@ import com.microsoft.z3.Expr;
 import nl.uu.maze.execution.ArgMap;
 import nl.uu.maze.execution.symbolic.SymbolicState;
 import nl.uu.maze.util.Pair;
-
+import nl.uu.maze.util.Z3Sorts;
 import sootup.core.jimple.visitor.AbstractValueVisitor;
 import sootup.core.jimple.basic.*;
 import sootup.core.jimple.common.constant.*;
@@ -23,8 +23,8 @@ import sootup.core.types.*;
  * Transforms a Jimple value ({@link Value}) to a Z3 expression ({@link Expr}).
  */
 public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
-    Context ctx;
-    SymbolicState state;
+    private Context ctx;
+    private SymbolicState state;
 
     public JimpleToZ3Transformer(Context ctx) {
         this.ctx = ctx;
@@ -70,6 +70,24 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
         Expr<?> l = transform(op1);
         Expr<?> r = transform(op2);
 
+        // Handle object references and null comparisons
+        Sort refSort = Z3Sorts.getInstance().getRefSort();
+        Sort nullSort = Z3Sorts.getInstance().getNullSort();
+        if (l.getSort().equals(refSort) || l.getSort().equals(nullSort) ||
+                r.getSort().equals(refSort) || r.getSort().equals(nullSort)) {
+            if (l.getSort().equals(null) && r.getSort().equals(nullSort)) {
+                // TODO: obviously not ideal, because you may explore infeasible paths
+                // Simulate true as a BoolExpr
+                return ctx.mkEq(ctx.mkInt(0), ctx.mkInt(0));
+            } else if (l.getSort().equals(refSort) && r.getSort().equals(refSort)) {
+                return ctx.mkEq(l, r);
+            } else {
+                // Simulate false as a BoolExpr
+                return ctx.mkEq(ctx.mkInt(0), ctx.mkInt(1));
+            }
+        }
+
+        // Handle arithmetic operations
         if (l instanceof BitVecExpr && r instanceof BitVecExpr) {
             Pair<BitVecExpr, BitVecExpr> coerced = coerceToSameSort((BitVecExpr) l, (BitVecExpr) r);
             return bvOperation.apply(coerced.getFirst(), coerced.getSecond());
@@ -381,8 +399,7 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
 
     @Override
     public void caseNullConstant(@Nonnull NullConstant constant) {
-        // TODO null is represented as 0 (false)
-        setResult(ctx.mkBV(0, 1));
+        setResult(ctx.mkConst("null", Z3Sorts.getInstance().getNullSort()));
     }
 
     @Override
