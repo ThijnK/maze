@@ -11,10 +11,14 @@ public class Z3Sorts {
 
     private Sort refSort;
     private Sort nullSort;
+    private Sort voidSort;
+    private Sort classSort;
 
     private Z3Sorts(Context ctx) {
         refSort = ctx.mkUninterpretedSort("Ref");
         nullSort = ctx.mkUninterpretedSort("Null");
+        voidSort = ctx.mkUninterpretedSort("Void");
+        classSort = ctx.mkUninterpretedSort("Class");
     }
 
     public static synchronized void initialize(Context ctx) {
@@ -36,5 +40,13 @@ public class Z3Sorts {
 
     public Sort getNullSort() {
         return nullSort;
+    }
+
+    public Sort getVoidSort() {
+        return voidSort;
+    }
+
+    public Sort getClassSort() {
+        return classSort;
     }
 }

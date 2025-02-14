@@ -204,7 +204,6 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
      * @see Type
      */
     private Sort determineSort(Type sootType) {
-
         if (Type.isIntLikeType(sootType)) {
             // Int like types are all represented as integers by SootUp, so they get the bit
             // vector size for integers
@@ -223,10 +222,10 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
             // Note: sootType.toString() will return the fully qualified name of the class
             return ctx.mkUninterpretedSort(sootType.toString());
         } else if (sootType instanceof NullType) {
-            return ctx.mkIntSort();
-        }
-        // TODO: missing types?
-        else {
+            return Z3Sorts.getInstance().getNullSort();
+        } else if (sootType instanceof VoidType) {
+            return Z3Sorts.getInstance().getVoidSort();
+        } else {
             throw new UnsupportedOperationException("Unsupported type: " + sootType);
         }
     }
@@ -404,9 +403,8 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
 
     @Override
     public void caseClassConstant(@Nonnull ClassConstant constant) {
-        // TODO Auto-generated method stub
-        super.caseClassConstant(constant);
-        // String value = constant.getValue();
+        // Ignore class constants (e.g. MyClass.class), outside of scope
+        setResult(ctx.mkConst(constant.getValue(), Z3Sorts.getInstance().getClassSort()));
     }
     // #endregion
 
