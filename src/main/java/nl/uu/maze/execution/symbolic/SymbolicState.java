@@ -61,7 +61,11 @@ public class SymbolicState {
         this.pathConstraints = new ArrayList<>(pathConstraints);
         // Share the same variable types map to avoid copying
         this.variableTypes = variableTypes;
-        this.heap = new HashMap<>(heap); // TODO: may have to be deep copied
+        // Deep copy the heap
+        this.heap = new HashMap<>();
+        for (Map.Entry<Expr<?>, HeapObject> entry : heap.entrySet()) {
+            this.heap.put(entry.getKey(), entry.getValue().clone());
+        }
         this.heapCounter = heapCounter;
         this.refSort = refSort;
     }
@@ -226,7 +230,7 @@ public class SymbolicState {
     /**
      * Represents an object in the heap.
      */
-    class HeapObject {
+    public static class HeapObject {
         // A mapping from field names to symbolic expressions.
         private Map<String, Expr<?>> fields;
 
@@ -240,6 +244,12 @@ public class SymbolicState {
 
         public Expr<?> getField(String fieldName) {
             return fields.get(fieldName);
+        }
+
+        public HeapObject clone() {
+            HeapObject obj = new HeapObject();
+            obj.fields.putAll(fields);
+            return obj;
         }
 
         @Override
