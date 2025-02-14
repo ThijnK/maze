@@ -8,6 +8,7 @@ import java.util.Map;
 import com.microsoft.z3.*;
 
 import nl.uu.maze.execution.MethodType;
+import nl.uu.maze.util.Z3Sorts;
 import sootup.core.graph.StmtGraph;
 import sootup.core.jimple.common.stmt.Stmt;
 import sootup.core.types.Type;
@@ -38,7 +39,6 @@ public class SymbolicState {
 
     private Map<Expr<?>, HeapObject> heap;
     private int heapCounter = 0;
-    private Sort refSort;
 
     public SymbolicState(Context ctx, Stmt stmt) {
         this.ctx = ctx;
@@ -47,12 +47,11 @@ public class SymbolicState {
         this.pathConstraints = new ArrayList<>();
         this.variableTypes = new HashMap<>();
         this.heap = new HashMap<>();
-        this.refSort = ctx.mkUninterpretedSort("RefSort");
     }
 
     public SymbolicState(Context ctx, Stmt stmt, int depth, MethodType methodType,
             Map<String, Expr<?>> symbolicVariables, List<BoolExpr> pathConstraints, Map<String, Type> variableTypes,
-            Map<Expr<?>, HeapObject> heap, int heapCounter, Sort refSort) {
+            Map<Expr<?>, HeapObject> heap, int heapCounter) {
         this.ctx = ctx;
         this.currentStmt = stmt;
         this.currentDepth = depth;
@@ -67,7 +66,6 @@ public class SymbolicState {
             this.heap.put(entry.getKey(), entry.getValue().clone());
         }
         this.heapCounter = heapCounter;
-        this.refSort = refSort;
     }
 
     public void setMethodType(MethodType methodType) {
@@ -131,7 +129,7 @@ public class SymbolicState {
      * Allocates a new heap object and returns its unique reference.
      */
     public Expr<?> allocateObject() {
-        Expr<?> objRef = ctx.mkConst("obj" + heapCounter++, refSort);
+        Expr<?> objRef = ctx.mkConst("obj" + heapCounter++, Z3Sorts.getInstance().getRefSort());
         HeapObject obj = new HeapObject();
         heap.put(objRef, obj);
         return objRef;
@@ -178,7 +176,7 @@ public class SymbolicState {
 
     public SymbolicState clone(Stmt stmt) {
         return new SymbolicState(ctx, stmt, currentDepth, methodType, symbolicVariables, pathConstraints,
-                variableTypes, heap, heapCounter, refSort);
+                variableTypes, heap, heapCounter);
     }
 
     public SymbolicState clone() {

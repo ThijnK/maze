@@ -33,6 +33,7 @@ import nl.uu.maze.search.ConcreteSearchStrategy;
 import nl.uu.maze.search.SearchStrategy;
 import nl.uu.maze.search.SearchStrategyFactory;
 import nl.uu.maze.search.SymbolicSearchStrategy;
+import nl.uu.maze.util.Z3Sorts;
 import sootup.core.graph.StmtGraph;
 import sootup.java.core.JavaSootClass;
 import sootup.java.core.JavaSootMethod;
@@ -96,6 +97,7 @@ public class DSEController {
         logger.info("Using search strategy: " + searchStrategy.getClass().getSimpleName());
         this.analyzer = new JavaAnalyzer(classPath);
         this.ctx = new Context();
+        Z3Sorts.initialize(ctx);
         this.symbolic = new SymbolicExecutor(ctx);
         this.validator = new SymbolicStateValidator(ctx);
         this.concrete = new ConcreteExecutor();

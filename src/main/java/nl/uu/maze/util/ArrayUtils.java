@@ -2,6 +2,9 @@ package nl.uu.maze.util;
 
 import java.util.Random;
 
+/**
+ * Utility class for array operations.
+ */
 public class ArrayUtils {
     private static final Random rand = new Random();
 
