@@ -15,7 +15,7 @@ import sootup.java.core.types.JavaClassType;
 
 public class JavaAnalyzerTest {
     private static final String classPath = "target/test-classes";
-    private static final String className = "nl.uu.tests.maze.ExampleClass";
+    private static final String className = "nl.uu.tests.maze.TestClass";
 
     private static JavaAnalyzer analyzer;
 
@@ -34,7 +34,7 @@ public class JavaAnalyzerTest {
     @Test
     public void testGetJavaClass() throws ClassNotFoundException {
         Object[][] testCases = {
-                { analyzer.getClassType(className), ExampleClass.class },
+                { analyzer.getClassType(className), TestClass.class },
                 { IntType.getInt(), int.class },
                 { DoubleType.getDouble(), double.class },
                 { FloatType.getFloat(), float.class },
@@ -64,7 +64,7 @@ public class JavaAnalyzerTest {
         JavaSootMethod method = methods.stream().filter(m -> m.getName().equals("checkSign")).findFirst().get();
         Method javaMethod = analyzer.getJavaMethod(method);
         assertNotNull(javaMethod);
-        assertEquals(ExampleClass.class.getMethod("checkSign", int.class), javaMethod);
+        assertEquals(TestClass.class.getMethod("checkSign", int.class), javaMethod);
     }
 
     @Test

@@ -4,7 +4,7 @@ package nl.uu.tests.maze;
  * Example class containing methods with different control flow structures for
  * use in JUnit tests.
  */
-public class ExampleClass {
+public class TestClass {
     /**
      * Example method containing a branching statement.
      * 
