@@ -6,11 +6,15 @@ import org.objectweb.asm.util.TraceClassVisitor;
 
 import nl.uu.maze.instrument.TraceManager.BranchType;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class BytecodeInstrumenter {
     private static final String TRACE_MANAGER_PATH = TraceManager.class.getName().replace('.', '/');
@@ -24,28 +28,50 @@ public class BytecodeInstrumenter {
      * @return The instrumented class
      */
     public static Class<?> instrument(String classPath, String className) throws IOException {
-        String classString = className.replace(".", "/");
-        String classFile = classPath + '/' + classString + ".class";
-
-        byte[] classBytes = Files.readAllBytes(Paths.get(classFile));
-
-        // Read the existing class file
-        ClassReader classReader = new ClassReader(classBytes);
-        ClassWriter classWriter = new ClassWriter(ClassWriter.COMPUTE_FRAMES | ClassWriter.COMPUTE_MAXS);
-
-        // Instrument the class
-        ClassVisitor classVisitor = new SymbolicTraceClassVisitor(classWriter);
-        classReader.accept(classVisitor, ClassReader.EXPAND_FRAMES);
-
-        // TODO: only write opcodes to file for debugging purposes
-        writeOpcodesToFile(classBytes);
-
+        String simpleName = className.substring(className.lastIndexOf('.') + 1);
+        String qualifiedName = className.replace(".", "/");
+        String classPrefix = qualifiedName.substring(0, qualifiedName.lastIndexOf('/'));
         BytecodeClassLoader classLoader = new BytecodeClassLoader();
-        byte[] instrumentedBytes = classWriter.toByteArray();
-        return classLoader.defineClass(className, instrumentedBytes);
+        Map<String, byte[]> instrumentedClasses = new HashMap<>();
+
+        // Collect main and nested class files
+        File classPathDir = new File(classPath, classPrefix);
+        List<File> classFiles = new ArrayList<>();
+        for (File file : classPathDir.listFiles()) {
+            if (file.getName().startsWith(simpleName) && file.getName().endsWith(".class")) {
+                classFiles.add(file);
+            }
+        }
+
+        // Instrument all collected class files
+        for (File file : classFiles) {
+            String name = file.getName().substring(0, file.getName().length() - 6);
+            byte[] classBytes = Files.readAllBytes(file.toPath());
+
+            ClassReader classReader = new ClassReader(classBytes);
+            ClassWriter classWriter = new ClassWriter(ClassWriter.COMPUTE_FRAMES | ClassWriter.COMPUTE_MAXS);
+            ClassVisitor classVisitor = new SymbolicTraceClassVisitor(classWriter);
+            classReader.accept(classVisitor, ClassReader.EXPAND_FRAMES);
+
+            byte[] instrumentedBytes = classWriter.toByteArray();
+            instrumentedClasses.put(name, instrumentedBytes);
+        }
+
+        // Load all instrumented classes
+        Class<?> mainClass = null;
+        for (Map.Entry<String, byte[]> entry : instrumentedClasses.entrySet()) {
+            String name = (classPrefix + '.' + entry.getKey()).replace('/', '.');
+            Class<?> cls = classLoader.defineClass(name, entry.getValue());
+            if (entry.getKey().equals(simpleName)) {
+                mainClass = cls;
+            }
+        }
+
+        return mainClass;
     }
 
     /** Write bytecode of a class to a file in human-readable format (opcodes). */
+    @SuppressWarnings("unused")
     private static void writeOpcodesToFile(byte[] classBytes) throws IOException {
         ClassReader classReader = new ClassReader(classBytes);
         try (PrintWriter writer = new PrintWriter(new FileWriter("logs/opcodes.txt"))) {
@@ -58,6 +84,23 @@ public class BytecodeInstrumenter {
      * Custom class loader that allows us to define classes from byte arrays.
      */
     static class BytecodeClassLoader extends ClassLoader {
+        private final Map<String, Class<?>> classes = new HashMap<>();
+
+        /**
+         * Register a class that is already loaded in the JVM to this class loader
+         * 
+         * @param clazz The class to register
+         */
+        public void registerClass(Class<?> clazz) {
+            classes.put(clazz.getName(), clazz);
+        }
+
+        @Override
+        protected Class<?> findClass(String name) throws ClassNotFoundException {
+            Class<?> clazz = classes.get(name);
+            return clazz != null ? clazz : super.findClass(name);
+        }
+
         /**
          * Define a class from a byte array.
          * 
