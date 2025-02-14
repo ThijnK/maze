@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import nl.uu.maze.analysis.JavaAnalyzer;
 import sootup.core.types.*;
 import sootup.core.types.PrimitiveType.*;
+import sootup.java.core.JavaSootClass;
 import sootup.java.core.JavaSootMethod;
 import sootup.java.core.types.JavaClassType;
 
@@ -60,7 +61,7 @@ public class JavaAnalyzerTest {
     @Test
     public void testGetJavaMethod() throws ClassNotFoundException, NoSuchMethodException {
         JavaClassType classType = analyzer.getClassType(className);
-        Set<JavaSootMethod> methods = analyzer.getMethods(classType);
+        Set<JavaSootMethod> methods = analyzer.getSootClass(classType).getMethods();
         JavaSootMethod method = methods.stream().filter(m -> m.getName().equals("checkSign")).findFirst().get();
         Method javaMethod = analyzer.getJavaMethod(method);
         assertNotNull(javaMethod);
@@ -68,17 +69,10 @@ public class JavaAnalyzerTest {
     }
 
     @Test
-    public void testGetMethods() {
-        JavaClassType classType = analyzer.getClassType(className);
-        Set<JavaSootMethod> methods = analyzer.getMethods(classType);
-        assertNotNull(methods);
-        assertFalse(methods.isEmpty());
-    }
-
-    @Test
     public void testGetCFG() {
         JavaClassType classType = analyzer.getClassType(className);
-        Set<JavaSootMethod> methods = analyzer.getMethods(classType);
+        JavaSootClass sootClass = analyzer.getSootClass(classType);
+        Set<JavaSootMethod> methods = sootClass.getMethods();
         JavaSootMethod method = methods.stream().filter(m -> m.getName().equals("checkSign")).findFirst().get();
         assertNotNull(analyzer.getCFG(method));
     }
