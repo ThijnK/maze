@@ -491,5 +491,13 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
         setResult(ctx.mkConst(var, ctx.mkBitVecSort(Type.getValueBitSize(IntType.getInstance()))));
         state.setVariableType(var, IntType.getInstance());
     }
+
+    @Override
+    public void caseInstanceOfExpr(@Nonnull JInstanceOfExpr expr) {
+        Type checkType = expr.getCheckType();
+        Type actualType = expr.getOp().getType();
+        boolean isInstance = checkType.equals(actualType) || checkType.equals(NullType.getInstance());
+        setResult(ctx.mkBV(isInstance ? 1 : 0, Type.getValueBitSize(IntType.getInstance())));
+    }
     // #endregion
 }
