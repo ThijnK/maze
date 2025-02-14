@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +34,7 @@ import nl.uu.maze.search.SearchStrategy;
 import nl.uu.maze.search.SearchStrategyFactory;
 import nl.uu.maze.search.SymbolicSearchStrategy;
 import sootup.core.graph.StmtGraph;
+import sootup.java.core.JavaSootClass;
 import sootup.java.core.JavaSootMethod;
 import sootup.java.core.types.JavaClassType;
 
@@ -52,7 +54,7 @@ public class DSEController {
     private final JavaAnalyzer analyzer;
     private final Context ctx;
     private final JavaClassType classType;
-    private final Set<JavaSootMethod> methods;
+    private final JavaSootClass sootClass;
     private final Class<?> clazz;
     private final Class<?> instrumented;
 
@@ -98,7 +100,7 @@ public class DSEController {
         this.validator = new SymbolicStateValidator(ctx);
         this.concrete = new ConcreteExecutor();
         this.classType = analyzer.getClassType(className);
-        this.methods = analyzer.getMethods(classType);
+        this.sootClass = analyzer.getSootClass(classType);
         this.clazz = analyzer.getJavaClass(classType);
         this.instrumented = concreteDriven ? BytecodeInstrumenter.instrument(classPath, className) : null;
         this.generator = new JUnitTestGenerator(clazz);
@@ -110,6 +112,10 @@ public class DSEController {
      * @throws Exception
      */
     public void run() throws Exception {
+        Set<JavaSootMethod> methods = sootClass.getMethods();
+        // Regex pattern to match non-standard method names (e.g., <init>, <clinit>)
+        Pattern pattern = Pattern.compile("<[^>]+>");
+
         // If class includes non-static methods, need to execute constructor first
         if (!methods.stream().allMatch(JavaSootMethod::isStatic)) {
             ctor = analyzer.getJavaConstructor(instrumented != null ? instrumented : clazz);
@@ -131,8 +137,8 @@ public class DSEController {
         }
 
         for (JavaSootMethod method : methods) {
-            // Skip constructor methods
-            if (method.getName().equals("<init>")) {
+            // Skip non-standard methods
+            if (pattern.matcher(method.getName()).matches()) {
                 continue;
             }
 

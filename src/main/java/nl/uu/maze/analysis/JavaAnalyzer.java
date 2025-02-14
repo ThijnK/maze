@@ -10,7 +10,7 @@ import java.net.URLClassLoader;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
+import java.util.NoSuchElementException;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -240,18 +240,13 @@ public class JavaAnalyzer {
     }
 
     /**
-     * Returns the methods of a class as a set of {@link JavaSootMethod} objects.
+     * Returns the {@link JavaSootMethod} corresponding to a given
+     * {@link JavaClassType}
      * 
-     * @param classType The class for which to return the methods
-     * @return A set of {@link JavaSootMethod} objects representing the methods of
-     *         the class
+     * @param classType The class type to search in
      */
-    public Set<JavaSootMethod> getMethods(JavaClassType classType) {
-        Optional<JavaSootClass> sootClass = view.getClass(classType);
-        if (sootClass.isEmpty()) {
-            throw new IllegalArgumentException("Class not found: " + classType.getFullyQualifiedName());
-        }
-        return sootClass.get().getMethods();
+    public JavaSootClass getSootClass(JavaClassType classType) throws NoSuchElementException {
+        return view.getClass(classType).orElseThrow();
     }
 
     /**
