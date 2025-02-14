@@ -411,11 +411,21 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
 
     @Override
     public void caseParameterRef(@Nonnull JParameterRef ref) {
-        Sort z3Sort = determineSort(ref.getType());
-        // Create a symbolic value for the parameter
-        String var = ArgMap.getSymbolicName(state.getMethodType(), ref.getIndex());
-        setResult(ctx.mkConst(var, z3Sort));
-        state.setVariableType(var, ref.getType());
+        Type sootType = ref.getType();
+        if (sootType instanceof ArrayType) {
+            // TODO: Create a symbolic array for the parameter
+        } else if (sootType instanceof ClassType) {
+            // TODO: deal with objects as arguments
+
+            // Allocate new object on the heap
+            Expr<?> objRef = state.allocateObject();
+            setResult(objRef);
+        } else {
+            // Create a symbolic value for the parameter
+            String var = ArgMap.getSymbolicName(state.getMethodType(), ref.getIndex());
+            setResult(ctx.mkConst(var, determineSort(sootType)));
+            state.setVariableType(var, sootType);
+        }
     }
 
     @Override
