@@ -16,18 +16,18 @@ public class ArgMap {
         this.args = args;
     }
 
-    public ArgMap(Object[] args, boolean isCtor) {
+    public ArgMap(Object[] args, MethodType type) {
         this.args = new java.util.HashMap<>();
-        addAll(args, isCtor);
+        addAll(args, type);
     }
 
     public ArgMap() {
         this.args = new java.util.HashMap<>();
     }
 
-    public void addAll(Object[] args, boolean isCtor) {
+    public void addAll(Object[] args, MethodType type) {
         for (int i = 0; i < args.length; i++) {
-            this.args.put(getSymbolicName(i, isCtor), args[i]);
+            this.args.put(getSymbolicName(type, i), args[i]);
         }
     }
 
@@ -48,11 +48,12 @@ public class ArgMap {
     }
 
     /**
-     * Get an appropriate symbolic name for a parameter based on its index and
-     * whether it's part of a constructor or method.
+     * Get an appropriate symbolic name for a parameter based on its index and a
+     * prefix to avoid name conflicts between different methods (e.g., constructor
+     * and target method).
      */
-    public static String getSymbolicName(int index, boolean isCtor) {
-        return isCtor ? "ctorArg" + index : "arg" + index;
+    public static String getSymbolicName(MethodType type, int index) {
+        return type.getPrefix() + "Arg" + index;
     }
 
     @Override

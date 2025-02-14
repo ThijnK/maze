@@ -16,6 +16,7 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import nl.uu.maze.execution.MethodType;
 import nl.uu.maze.execution.concrete.ObjectInstantiator;
 import sootup.core.graph.StmtGraph;
 import sootup.core.inputlocation.AnalysisInputLocation;
@@ -227,7 +228,7 @@ public class JavaAnalyzer {
         // Find a constructor for which arguments can be generated
         for (Constructor<?> ctor : clazz.getConstructors()) {
             try {
-                ObjectInstantiator.generateArgs(ctor.getParameters(), null, true);
+                ObjectInstantiator.generateArgs(ctor.getParameters(), null, MethodType.CTOR);
                 return ctor;
             } catch (Exception e) {
                 e.printStackTrace();

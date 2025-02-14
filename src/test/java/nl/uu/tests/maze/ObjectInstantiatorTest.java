@@ -1,6 +1,7 @@
 package nl.uu.tests.maze;
 
 import nl.uu.maze.execution.ArgMap;
+import nl.uu.maze.execution.MethodType;
 import nl.uu.maze.execution.concrete.ObjectInstantiator;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
@@ -50,8 +51,8 @@ class ObjectInstantiatorTest {
     public void testGenerateArgs_WithArgMap() {
         Parameter[] params = TestClassManyArgs.class.getConstructors()[0].getParameters();
         ArgMap argMap = new ArgMap(new Object[] { 1, 2.0, 3.0f, 4L, (short) 5, (byte) 6, '7', true,
-                new TestClassWithArgs(1, 2.0, true) }, false);
-        Object[] args = ObjectInstantiator.generateArgs(params, argMap, false);
+                new TestClassWithArgs(1, 2.0, true) }, MethodType.METHOD);
+        Object[] args = ObjectInstantiator.generateArgs(params, argMap, MethodType.METHOD);
         assertEquals(9, args.length);
         assertEquals(1, args[0]);
         assertEquals(2.0, args[1]);
@@ -70,7 +71,7 @@ class ObjectInstantiatorTest {
         Parameter[] params = TestClassManyArgs.class.getConstructors()[0].getParameters();
         ArgMap argMap = new ArgMap(Map.of("arg0", 1, "arg3", 4L, "arg4", (short) 5,
                 "arg5", (byte) 6));
-        Object[] args = ObjectInstantiator.generateArgs(params, argMap, false);
+        Object[] args = ObjectInstantiator.generateArgs(params, argMap, MethodType.METHOD);
         assertEquals(9, args.length);
         assertEquals(1, args[0]);
         assertTrue(args[1] instanceof Double);

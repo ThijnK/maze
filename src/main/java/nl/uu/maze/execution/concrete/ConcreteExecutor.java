@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import nl.uu.maze.execution.ArgMap;
+import nl.uu.maze.execution.MethodType;
 
 public class ConcreteExecutor {
     private static final Logger logger = LoggerFactory.getLogger(ConcreteExecutor.class);
@@ -32,15 +33,15 @@ public class ConcreteExecutor {
         Object instance = null;
         if (!Modifier.isStatic(method.getModifiers())) {
             // Call generateArgs with argMap to use argumens from the map if present
-            Object[] args = ObjectInstantiator.generateArgs(ctor.getParameters(), argMap, true);
+            Object[] args = ObjectInstantiator.generateArgs(ctor.getParameters(), argMap, MethodType.CTOR);
             logger.debug("Creating instance of class " + ctor.getDeclaringClass().getName() + " with args: " + args);
             instance = ctor.newInstance(args);
-            argMap.addAll(args, true);
+            argMap.addAll(args, MethodType.CTOR);
         }
 
         // Generate args for the method invocation
-        Object[] args = ObjectInstantiator.generateArgs(method.getParameters(), argMap, false);
-        argMap.addAll(args, false);
+        Object[] args = ObjectInstantiator.generateArgs(method.getParameters(), argMap, MethodType.METHOD);
+        argMap.addAll(args, MethodType.METHOD);
 
         logger.debug("Executing method " + method.getName() + " with args: " + args);
         Object result = method.invoke(instance, args);

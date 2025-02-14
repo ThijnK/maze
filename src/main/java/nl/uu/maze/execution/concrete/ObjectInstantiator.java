@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import nl.uu.maze.execution.ArgMap;
+import nl.uu.maze.execution.MethodType;
 
 /**
  * Instantiates objects using Java reflection and randomly generated
@@ -49,7 +50,7 @@ public class ObjectInstantiator {
         for (Constructor<?> ctor : clazz.getConstructors()) {
             try {
                 logger.debug("Param types: " + ctor.getParameterTypes());
-                Object[] args = generateArgs(ctor.getParameters(), depth, argMap, true);
+                Object[] args = generateArgs(ctor.getParameters(), depth, argMap, MethodType.CTOR);
                 logger.debug("Creating instance of class: " + clazz.getName() + " with args: " + args);
                 return ctor.newInstance(args);
             } catch (Exception e) {
@@ -73,8 +74,8 @@ public class ObjectInstantiator {
      * @param isCtor Whether the parameters are for a constructor
      * @return An array of random arguments
      */
-    public static Object[] generateArgs(Parameter[] params, ArgMap argMap, boolean isCtor) {
-        return generateArgs(params, 0, argMap, isCtor);
+    public static Object[] generateArgs(Parameter[] params, ArgMap argMap, MethodType methodType) {
+        return generateArgs(params, 0, argMap, methodType);
     }
 
     /**
@@ -86,7 +87,7 @@ public class ObjectInstantiator {
      * @return An array of random arguments
      */
     public static Object[] generateArgs(Parameter[] params) {
-        return generateArgs(params, 0, null, false);
+        return generateArgs(params, 0, null, MethodType.METHOD);
     }
 
     /**
@@ -101,11 +102,11 @@ public class ObjectInstantiator {
      *               invocation
      * @return An array of random arguments
      */
-    private static Object[] generateArgs(Parameter[] params, int depth, ArgMap argMap, boolean isCtor) {
+    private static Object[] generateArgs(Parameter[] params, int depth, ArgMap argMap, MethodType methodType) {
         Object[] arguments = new Object[params.length];
         for (int i = 0; i < params.length; i++) {
             // If the parameter is known, use the known value
-            String name = ArgMap.getSymbolicName(i, isCtor);
+            String name = ArgMap.getSymbolicName(methodType, i);
             if (argMap != null && argMap.containsKey(name)) {
                 arguments[i] = argMap.get(name);
                 continue;

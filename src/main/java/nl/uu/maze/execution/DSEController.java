@@ -65,13 +65,15 @@ public class DSEController {
     private JavaSootMethod ctorSoot;
     private StmtGraph<?> ctorCfg;
     /**
-     * Map of constructor states, indexed by their hash code (in case of
+     * Map of init states, indexed by their hash code (in case of
      * symbolic-driven) or the hash code of the path encoding (in case of
      * concrete-driven).
-     * This is used to keep track of (active) states in the constructor method,
-     * which are reused as initial states for symbolic execution.
+     * This is used to keep track of (active) states in init methods (e.g.,
+     * constructors, and other methods executed before the target method). This way,
+     * these states can be reused as initial states in symbolic execution to avoid
+     * re-executing the init methods for each target method.
      */
-    private Map<Integer, SymbolicState> ctorStates;
+    private Map<Integer, SymbolicState> initStates;
 
     /**
      * Create a new execution controller.
@@ -118,13 +120,13 @@ public class DSEController {
             // Get corresponding CFG
             ctorSoot = analyzer.getSootConstructor(methods, ctor);
             ctorCfg = analyzer.getCFG(ctorSoot);
-            ctorStates = new HashMap<Integer, SymbolicState>();
+            initStates = new HashMap<Integer, SymbolicState>();
             logger.info("Using constructor: " + ctorSoot.getSignature());
 
             if (!concreteDriven) {
                 SymbolicState initialState = new SymbolicState(ctx, ctorCfg.getStartingStmt());
-                initialState.isCtorState = true;
-                ctorStates.put(initialState.hashCode(), initialState);
+                initialState.setMethodType(MethodType.CTOR);
+                initStates.put(initialState.hashCode(), initialState);
             }
         }
 
@@ -159,11 +161,11 @@ public class DSEController {
             // Clone the ctor states to avoid modifying the original in subsequent execution
             // and set their current statement to the starting statement of the target
             // method
-            for (SymbolicState state : ctorStates.values()) {
+            for (SymbolicState state : initStates.values()) {
                 SymbolicState newState = state.clone();
                 // Only if the state was the final constructor state, set the current statement
                 // to the starting statement of the target method
-                if (!state.isCtorState) {
+                if (!state.isCtor()) {
                     newState.setCurrentStmt(cfg.getStartingStmt());
                 }
                 searchStrategy.add(newState);
@@ -173,7 +175,7 @@ public class DSEController {
         SymbolicState current;
         while ((current = searchStrategy.next()) != null) {
             logger.debug("Current state: " + current);
-            if (!current.isCtorState && current.isFinalState(cfg) || current.incrementDepth() >= MAX_DEPTH) {
+            if (!current.isCtor() && current.isFinalState(cfg) || current.incrementDepth() >= MAX_DEPTH) {
                 finalStates.add(current);
                 searchStrategy.remove(current);
                 continue;
@@ -182,21 +184,21 @@ public class DSEController {
             // Symbolically execute the current statement of the selected symbolic state to
             // be processed
             int currHash = current.hashCode();
-            List<SymbolicState> newStates = symbolic.step(current.isCtorState ? ctorCfg : cfg, current);
-            if (current.isCtorState) {
-                ctorStates.remove(currHash);
+            List<SymbolicState> newStates = symbolic.step(current.isCtor() ? ctorCfg : cfg, current);
+            if (current.isCtor()) {
+                initStates.remove(currHash);
                 // If any of the new states are final states, set their current
                 // statement to the starting statement of the target method
                 for (SymbolicState state : newStates) {
                     if (state.isFinalState(ctorCfg)) {
-                        state.isCtorState = false;
+                        state.setMethodType(MethodType.METHOD);
                         // Clone the state to avoid modifying the original in subsequent execution (want
                         // to reuse this final ctor state for multiple methods)
-                        ctorStates.put(state.hashCode(), state.clone());
+                        initStates.put(state.hashCode(), state.clone());
                         logger.debug("Switching to target method: " + method.getName());
                         state.setCurrentStmt(cfg.getStartingStmt());
                     } else {
-                        ctorStates.put(state.hashCode(), state);
+                        initStates.put(state.hashCode(), state);
                     }
                 }
             }
@@ -223,29 +225,29 @@ public class DSEController {
             List<TraceEntry> entries = TraceManager.getEntries("<init>");
             pathHash = entries.hashCode();
             // If the ctor has been explored along this path before, reuse final state
-            if (ctorStates.containsKey(pathHash)) {
-                current = ctorStates.get(pathHash).clone();
+            if (initStates.containsKey(pathHash)) {
+                current = initStates.get(pathHash).clone();
                 current.setCurrentStmt(cfg.getStartingStmt());
-                current.isCtorState = false;
+                current.setMethodType(MethodType.METHOD);
                 iterator = TraceManager.getEntries(method.getName()).iterator();
             } else {
                 current = new SymbolicState(ctx, ctorCfg.getStartingStmt());
-                current.isCtorState = true;
+                current.setMethodType(MethodType.CTOR);
                 iterator = entries.iterator();
             }
         }
 
-        while (current.isCtorState || !current.isFinalState(cfg)) {
+        while (current.isCtor() || !current.isFinalState(cfg)) {
             logger.debug("Current state: " + current);
-            List<SymbolicState> newStates = symbolic.step(current.isCtorState ? ctorCfg : cfg, current, iterator);
+            List<SymbolicState> newStates = symbolic.step(current.isCtor() ? ctorCfg : cfg, current, iterator);
             // Note: newStates will always contain exactly one element, because we pass the
             // iterator to the step function
             current = newStates.get(0);
             // At the end of the ctor, start with the target method
-            if (current.isCtorState && current.isFinalState(ctorCfg)) {
-                current.isCtorState = false;
+            if (current.isCtor() && current.isFinalState(ctorCfg)) {
+                current.setMethodType(MethodType.METHOD);
                 // Save the final ctor state for reuse in other methods
-                ctorStates.put(pathHash, current.clone());
+                initStates.put(pathHash, current.clone());
                 logger.debug("Switching to target method: " + method.getName());
                 current.setCurrentStmt(cfg.getStartingStmt());
                 iterator = TraceManager.getEntries(method.getName()).iterator();

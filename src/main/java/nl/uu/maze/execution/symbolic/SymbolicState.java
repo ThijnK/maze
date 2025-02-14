@@ -7,6 +7,7 @@ import java.util.Map;
 
 import com.microsoft.z3.*;
 
+import nl.uu.maze.execution.MethodType;
 import sootup.core.graph.StmtGraph;
 import sootup.core.jimple.common.stmt.Stmt;
 import sootup.core.types.Type;
@@ -28,7 +29,7 @@ public class SymbolicState {
     private Context ctx;
     private Stmt currentStmt;
     private int currentDepth = 0;
-    public boolean isCtorState;
+    private MethodType methodType = MethodType.METHOD;
 
     private Map<String, Expr<?>> symbolicVariables;
     private List<BoolExpr> pathConstraints;
@@ -49,13 +50,13 @@ public class SymbolicState {
         this.refSort = ctx.mkUninterpretedSort("RefSort");
     }
 
-    public SymbolicState(Context ctx, Stmt stmt, int depth, boolean isCtorState, Map<String, Expr<?>> symbolicVariables,
-            List<BoolExpr> pathConstraints, Map<String, Type> variableTypes, Map<Expr<?>, HeapObject> heap,
-            int heapCounter, Sort refSort) {
+    public SymbolicState(Context ctx, Stmt stmt, int depth, MethodType methodType,
+            Map<String, Expr<?>> symbolicVariables, List<BoolExpr> pathConstraints, Map<String, Type> variableTypes,
+            Map<Expr<?>, HeapObject> heap, int heapCounter, Sort refSort) {
         this.ctx = ctx;
         this.currentStmt = stmt;
         this.currentDepth = depth;
-        this.isCtorState = isCtorState;
+        this.methodType = methodType;
         this.symbolicVariables = new HashMap<>(symbolicVariables);
         this.pathConstraints = new ArrayList<>(pathConstraints);
         // Share the same variable types map to avoid copying
@@ -63,6 +64,22 @@ public class SymbolicState {
         this.heap = new HashMap<>(heap); // TODO: may have to be deep copied
         this.heapCounter = heapCounter;
         this.refSort = refSort;
+    }
+
+    public void setMethodType(MethodType methodType) {
+        this.methodType = methodType;
+    }
+
+    public MethodType getMethodType() {
+        return methodType;
+    }
+
+    public boolean isCtor() {
+        return methodType.isCtor();
+    }
+
+    public boolean isInit() {
+        return methodType.isInit();
     }
 
     public int incrementDepth() {
@@ -156,7 +173,7 @@ public class SymbolicState {
     }
 
     public SymbolicState clone(Stmt stmt) {
-        return new SymbolicState(ctx, stmt, currentDepth, isCtorState, symbolicVariables, pathConstraints,
+        return new SymbolicState(ctx, stmt, currentDepth, methodType, symbolicVariables, pathConstraints,
                 variableTypes, heap, heapCounter, refSort);
     }
 

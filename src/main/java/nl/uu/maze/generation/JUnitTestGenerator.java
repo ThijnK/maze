@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import com.palantir.javapoet.*;
 
 import nl.uu.maze.execution.ArgMap;
+import nl.uu.maze.execution.MethodType;
 
 /**
  * Generates JUnit test cases from a given Z3 model and symbolic state for a
@@ -59,7 +60,8 @@ public class JUnitTestGenerator {
         // For static methods, just call the method
         if (method.isStatic()) {
             // Add variable definitions for parameters
-            List<String> params = addParamDefinitions(methodBuilder, method.getParameterTypes(), argMap, false);
+            List<String> params = addParamDefinitions(methodBuilder, method.getParameterTypes(), argMap,
+                    MethodType.METHOD);
             methodBuilder.addStatement("$T.$L($L)", clazz, method.getName(), String.join(", ", params));
         }
         // For instance methods, create an instance of the class and call the method
@@ -69,10 +71,12 @@ public class JUnitTestGenerator {
             }
 
             // Add variable definitions for the ctor parameters
-            List<String> ctorParams = addParamDefinitions(methodBuilder, ctor.getParameterTypes(), argMap, true);
+            List<String> ctorParams = addParamDefinitions(methodBuilder, ctor.getParameterTypes(), argMap,
+                    MethodType.CTOR);
             methodBuilder.addStatement("$T cut = new $T($L)", clazz, clazz, String.join(", ", ctorParams));
             methodBuilder.addCode("\n"); // White space between ctor and method call
-            List<String> params = addParamDefinitions(methodBuilder, method.getParameterTypes(), argMap, false);
+            List<String> params = addParamDefinitions(methodBuilder, method.getParameterTypes(), argMap,
+                    MethodType.METHOD);
             methodBuilder.addStatement("cut.$L($L)", method.getName(), String.join(", ", params));
         }
 
@@ -80,10 +84,10 @@ public class JUnitTestGenerator {
     }
 
     private List<String> addParamDefinitions(MethodSpec.Builder methodBuilder, List<Type> paramTypes, ArgMap argMap,
-            boolean isCtor) {
+            MethodType methodType) {
         List<String> params = new ArrayList<>();
         for (int i = 0; i < paramTypes.size(); i++) {
-            String var = ArgMap.getSymbolicName(i, isCtor);
+            String var = ArgMap.getSymbolicName(methodType, i);
             params.add(var);
             addDefinitionStmt(methodBuilder, paramTypes.get(i), var, argMap.get(var));
         }
