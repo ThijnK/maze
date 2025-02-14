@@ -183,6 +183,7 @@ public class DSEController {
         SymbolicState current;
         while ((current = searchStrategy.next()) != null) {
             logger.debug("Current state: " + current);
+            logger.debug("Next stmt: " + current.getCurrentStmt());
             if (!current.isCtor() && current.isFinalState(cfg) || current.incrementDepth() >= MAX_DEPTH) {
                 finalStates.add(current);
                 searchStrategy.remove(current);

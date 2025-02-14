@@ -239,7 +239,7 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
 
     @Override
     public void caseNeExpr(@Nonnull JNeExpr expr) {
-        setResult(transformArithExpr(expr, (l, r) -> ctx.mkNot(ctx.mkEq(l, r)), (l, r) -> ctx.mkNot(ctx.mkFPEq(l, r))));
+        setResult(ctx.mkNot((BoolExpr) transformArithExpr(expr, ctx::mkEq, ctx::mkFPEq)));
     }
 
     @Override
@@ -392,8 +392,8 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
 
     @Override
     public void caseEnumConstant(@Nonnull EnumConstant constant) {
-        // TODO Auto-generated method stub
-        super.caseEnumConstant(constant);
+        // Ignore, should not occur in Jimple
+        throw new UnsupportedOperationException("Enum constants are not supported");
     }
 
     @Override
