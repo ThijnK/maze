@@ -99,12 +99,13 @@ public class JUnitTestGenerator {
      * Adds a statement to the given method builder that defines a variable of the
      * given type with the given value.
      * 
-     * TODO: add support for objects and arrays
+     * TODO: add support for objects
      */
     private void addDefinitionStmt(MethodSpec.Builder methodBuilder, Type type, String var, ArgMap argMap) {
         Object value = argMap.get(var);
 
         if (type instanceof ArrayType && value instanceof Object[]) {
+            // TODO: multi-dimensional arrays
             methodBuilder.addStatement("$L $L = $L", type, var, ArrayUtils.toString((Object[]) value, true));
         }
         // If value is a primitive type, handle it as a literal

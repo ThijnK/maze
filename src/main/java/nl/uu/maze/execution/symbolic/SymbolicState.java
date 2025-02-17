@@ -192,7 +192,7 @@ public class SymbolicState {
      * reference.
      * 
      * @param <E>      The Z3 sort of the elements in the array
-     * @param var      The name of the array variable
+     * @param var      The name to use for the array object on the heap
      * @param size     The size of the array, usually a Z3 BitVecNum
      * @param elemSort The Z3 sort of the elements in the array
      * @return The reference to the newly allocated array object
@@ -211,17 +211,60 @@ public class SymbolicState {
     }
 
     /**
+     * Allocates a multi-dimensional array with the given sizes and element sort.
+     * 
+     * @see #allocateMultiArray(String, List, int, Sort)
+     */
+    public <E extends Sort> Expr<?> allocateMultiArray(List<Expr<?>> sizes, E elemSort) {
+        return allocateMultiArray("arr" + heapCounter++, sizes, 0, 0, elemSort);
+    }
+
+    /**
+     * Allocates a multi-dimensional array with the given sizes and element sort.
+     * 
+     * @param <E>      The Z3 sort of the elements in the array
+     * @param var      The name to use for the array object on the heap
+     * @param sizes    The sizes of each dimension of the array
+     * @param dim      The current dimension being allocated
+     * @param index    The index of the array being allocated in the array it is an
+     *                 element of
+     * @param elemSort The Z3 sort of the elements in the array
+     * @return The reference to the newly allocated array object
+     */
+    public <E extends Sort> Expr<?> allocateMultiArray(String var, List<Expr<?>> sizes, int dim, int index,
+            E elemSort) {
+        Sort currElemSort = (dim == sizes.size() - 1) ? elemSort : Z3Sorts.getInstance().getRefSort();
+        String varName = var + "_dim" + dim;
+        if (dim > 0) {
+            varName += index;
+        }
+        Expr<?> arrRef = allocateArray(varName, sizes.get(dim), currElemSort);
+
+        // If more dimensions to allocate, recursively allocate sub-arrays
+        if (dim < sizes.size() - 1) {
+            int concreteSize = ((BitVecNum) sizes.get(dim)).getInt();
+            for (int i = 0; i < concreteSize; i++) {
+                BitVecExpr indexExpr = ctx.mkBV(i, Type.getValueBitSize(IntType.getInstance()));
+                Expr<?> subArrRef = allocateMultiArray(var, sizes, dim + 1, i, elemSort);
+                setArrayElement(arrRef, indexExpr, subArrRef);
+            }
+        }
+
+        return arrRef;
+    }
+
+    /**
      * Retrieves the symbolic value stored at the given index in the array object
      * identified by 'arrRef'.
      * 
      * @return The symbolic value stored at the index, or null if the array does not
      */
+    @SuppressWarnings("unchecked")
     public <E extends Sort> Expr<E> getArrayElement(Expr<?> arrRef, BitVecExpr index) {
         HeapObject arrObj = heap.get(arrRef);
         if (arrObj != null) {
-            @SuppressWarnings("unchecked")
-            ArrayExpr<BitVecSort, E> arr = (ArrayExpr<BitVecSort, E>) arrObj.getField("elements");
-            return ctx.mkSelect(arr, index);
+            Expr<?> arr = arrObj.getField("elements");
+            return ctx.mkSelect((ArrayExpr<BitVecSort, E>) arr, index);
         }
         return null;
     }

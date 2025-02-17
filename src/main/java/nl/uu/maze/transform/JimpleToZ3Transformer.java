@@ -1,5 +1,7 @@
 package nl.uu.maze.transform;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.BiFunction;
 
 import javax.annotation.Nonnull;
@@ -450,8 +452,12 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
 
     @Override
     public void caseNewMultiArrayExpr(@Nonnull JNewMultiArrayExpr expr) {
-        // TODO Auto-generated method stub
-        super.caseNewMultiArrayExpr(expr);
+        Sort elemSort = determineSort(expr.getBaseType());
+        List<Expr<?>> sizes = new ArrayList<>();
+        for (int i = 0; i < expr.getSizes().size(); i++) {
+            sizes.add(transform(expr.getSizes().get(i)));
+        }
+        setResult(state.allocateMultiArray(sizes, elemSort));
     }
 
     @Override
@@ -505,8 +511,9 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
     public void caseParameterRef(@Nonnull JParameterRef ref) {
         // Create a symbolic value for the parameter
         String var = ArgMap.getSymbolicName(state.getMethodType(), ref.getIndex());
-
         Type sootType = ref.getType();
+        state.setVariableType(var, sootType);
+
         if (sootType instanceof ArrayType) {
             // Allocate new array on the heap
             // TODO: arrType.getDimension() for multi-dimensional arrays
@@ -520,8 +527,8 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
             Expr<?> objRef = state.allocateObject();
             setResult(objRef);
         } else {
+            // Create a new variable for the parameter
             setResult(ctx.mkConst(var, determineSort(sootType)));
-            state.setVariableType(var, sootType);
         }
     }
 
