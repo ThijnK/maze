@@ -105,7 +105,7 @@ public class JUnitTestGenerator {
         Object value = argMap.get(var);
 
         if (type instanceof ArrayType && value instanceof Object[]) {
-            methodBuilder.addStatement("$L $L = $L", type, var, ArrayUtils.toString((Object[]) value), true);
+            methodBuilder.addStatement("$L $L = $L", type, var, ArrayUtils.toString((Object[]) value, true));
         }
         // If value is a primitive type, handle it as a literal
         else if (value != null) {
