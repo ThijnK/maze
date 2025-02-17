@@ -8,10 +8,10 @@ import com.microsoft.z3.*;
 
 import nl.uu.maze.instrument.TraceManager.TraceEntry;
 import nl.uu.maze.transform.JimpleToZ3Transformer;
+import nl.uu.maze.util.Z3Utils;
 import sootup.core.graph.*;
 import sootup.core.jimple.basic.LValue;
 import sootup.core.jimple.common.constant.IntConstant;
-import sootup.core.jimple.common.expr.AbstractConditionExpr;
 import sootup.core.jimple.common.ref.*;
 import sootup.core.jimple.common.stmt.*;
 import sootup.core.jimple.javabytecode.stmt.JSwitchStmt;
@@ -80,8 +80,7 @@ public class SymbolicExecutor {
     private List<SymbolicState> handleIfStmt(StmtGraph<?> cfg, JIfStmt stmt, SymbolicState state,
             Iterator<TraceEntry> iterator) {
         List<Stmt> succs = cfg.getAllSuccessors(stmt);
-        AbstractConditionExpr cond = stmt.getCondition();
-        BoolExpr condExpr = (BoolExpr) transformer.transform(cond, state);
+        BoolExpr cond = (BoolExpr) transformer.transform(stmt.getCondition(), state);
         List<SymbolicState> newStates = new ArrayList<SymbolicState>();
 
         // If replaying a trace, follow the branch indicated by the trace
@@ -90,7 +89,7 @@ public class SymbolicExecutor {
                 throw new IllegalArgumentException("Trace is too short");
             TraceEntry entry = iterator.next();
             int branchIndex = entry.getValue();
-            state.addPathConstraint(branchIndex == 0 ? ctx.mkNot(condExpr) : condExpr);
+            state.addPathConstraint(branchIndex == 0 ? Z3Utils.negate(ctx, cond) : cond);
             state.setCurrentStmt(succs.get(branchIndex));
             newStates.add(state);
         }
@@ -98,11 +97,11 @@ public class SymbolicExecutor {
         else {
             // False branch
             SymbolicState newState = state.clone(succs.get(0));
-            newState.addPathConstraint(ctx.mkNot(condExpr));
+            newState.addPathConstraint(Z3Utils.negate(ctx, cond));
             newStates.add(newState);
 
             // True branch
-            state.addPathConstraint(condExpr);
+            state.addPathConstraint(cond);
             state.setCurrentStmt(succs.get(1));
             newStates.add(state);
         }
