@@ -127,6 +127,8 @@ public class SymbolicState {
 
     /**
      * Allocates a new heap object and returns its unique reference.
+     * 
+     * @return The reference to the newly allocated object
      */
     public Expr<?> allocateObject() {
         Expr<?> objRef = ctx.mkConst("obj" + heapCounter++, Z3Sorts.getInstance().getRefSort());
@@ -138,6 +140,8 @@ public class SymbolicState {
     /**
      * Sets the field 'fieldName' of the object identified by 'objRef' to the given
      * symbolic value.
+     * 
+     * @return The reference to the object
      */
     public void setField(Expr<?> objRef, String fieldName, Expr<?> value) {
         HeapObject obj = heap.get(objRef);
@@ -151,11 +155,77 @@ public class SymbolicState {
     /**
      * Retrieves the symbolic value stored in field 'fieldName' of the object
      * identified by 'objRef'.
+     * 
+     * @return The symbolic value stored in the field, or null if the object does
+     *         not exist or the field is not set
      */
     public Expr<?> getField(Expr<?> objRef, String fieldName) {
         HeapObject obj = heap.get(objRef);
         if (obj != null) {
             return obj.getField(fieldName);
+        }
+        return null;
+    }
+
+    /**
+     * Allocates a new array of the given size and element sort, and returns its
+     * reference.
+     * 
+     * @param size     The size of the array, usually a Z3 BitVecNum
+     * @param elemSort The Z3 sort of the elements in the array
+     * @return The reference to the newly allocated array object
+     */
+    public <E extends Sort> Expr<?> allocateArray(Expr<?> size, E elemSort) {
+        Expr<?> arrRef = ctx.mkConst("arr" + heapCounter, Z3Sorts.getInstance().getRefSort());
+        // Actual Z3 array as a field of the heap object
+        ArrayExpr<IntSort, E> arr = ctx.mkArrayConst("elems" + heapCounter++, ctx.mkIntSort(), elemSort);
+
+        HeapObject arrObj = new HeapObject();
+        arrObj.setField("elements", arr);
+        arrObj.setField("length", size);
+        heap.put(arrRef, arrObj);
+        return arrRef;
+    }
+
+    /**
+     * Retrieves the symbolic value stored at the given index in the array object
+     * identified by 'arrRef'.
+     * 
+     * @return The symbolic value stored at the index, or null if the array does not
+     */
+    public <E extends Sort> Expr<E> getArrayElement(Expr<?> arrRef, IntExpr index) {
+        HeapObject arrObj = heap.get(arrRef);
+        if (arrObj != null) {
+            @SuppressWarnings("unchecked")
+            ArrayExpr<IntSort, E> arr = (ArrayExpr<IntSort, E>) arrObj.getField("elements");
+            return ctx.mkSelect(arr, index);
+        }
+        return null;
+    }
+
+    /**
+     * Sets the symbolic value at the given index in the array object identified by
+     * 'arrRef'.
+     */
+    public <E extends Sort> void setArrayElement(Expr<?> arrRef, IntExpr index, Expr<E> value) {
+        HeapObject arrObj = heap.get(arrRef);
+        if (arrObj != null) {
+            @SuppressWarnings("unchecked")
+            ArrayExpr<IntSort, E> arr = (ArrayExpr<IntSort, E>) arrObj.getField("elements");
+            arrObj.setField("elements", ctx.mkStore(arr, index, value));
+        }
+    }
+
+    /**
+     * Retrieves the symbolic value representing the length of the array object
+     * identified by 'arrRef'.
+     * 
+     * @return The Z3 expr representing the length of the array
+     */
+    public Expr<?> getArrayLength(Expr<?> arrRef) {
+        HeapObject arrObj = heap.get(arrRef);
+        if (arrObj != null) {
+            return arrObj.getField("length");
         }
         return null;
     }
@@ -208,22 +278,6 @@ public class SymbolicState {
     public int hashCode() {
         return currentStmt.hashCode() + symbolicVariables.hashCode() + pathConstraints.hashCode();
     }
-
-    // public void setArrayElement(String arrayVar, Expr<?> index, Expr<?> value) {
-    // ArrayExpr array = (ArrayExpr) symbolicVariables.get(arrayVar);
-    // if (array == null) {
-    // throw new IllegalArgumentException("Array variable not found: " + arrayVar);
-    // }
-    // symbolicVariables.put(arrayVar, ctx.mkStore(array, index, value));
-    // }
-
-    // public Expr<?> getArrayElement(String arrayVar, Expr<?> index) {
-    // ArrayExpr array = (ArrayExpr) symbolicVariables.get(arrayVar);
-    // if (array == null) {
-    // throw new IllegalArgumentException("Array variable not found: " + arrayVar);
-    // }
-    // return ctx.mkSelect(array, index);
-    // }
 
     /**
      * Represents an object in the heap.

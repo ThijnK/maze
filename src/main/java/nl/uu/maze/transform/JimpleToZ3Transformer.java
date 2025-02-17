@@ -442,18 +442,10 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
 
     // #region Arrays
     @Override
-    public void caseLengthExpr(@Nonnull JLengthExpr expr) {
-        // TODO: handle array length
-        // Introduce a symbolic variable to represent the length of the array
-        String var = expr.getOp() + "len";
-        setResult(ctx.mkConst(var, ctx.mkBitVecSort(Type.getValueBitSize(IntType.getInstance()))));
-        state.setVariableType(var, IntType.getInstance());
-    }
-
-    @Override
     public void caseNewArrayExpr(@Nonnull JNewArrayExpr expr) {
-        // TODO Auto-generated method stub
-        super.caseNewArrayExpr(expr);
+        Sort elemSort = determineSort(expr.getBaseType());
+        Expr<?> size = transform(expr.getSize());
+        setResult(state.allocateArray(size, elemSort));
     }
 
     @Override
@@ -463,11 +455,16 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
     }
 
     @Override
+    public void caseLengthExpr(@Nonnull JLengthExpr expr) {
+        Expr<?> arrRef = state.getVariable(expr.getOp().toString());
+        setResult(state.getArrayLength(arrRef));
+    }
+
+    @Override
     public void caseArrayRef(@Nonnull JArrayRef ref) {
-        // TODO: handle array access
-        // Probably a good idea to abstract some of this away to SymbolicState methods
-        ArrayExpr<BitVecSort, ?> array = (ArrayExpr<BitVecSort, ?>) state.getVariable(ref.getBase().toString());
-        setResult(ctx.mkSelect(array, (BitVecExpr) transform(ref.getIndex())));
+        Expr<?> arrRef = state.getVariable(ref.getBase().getName());
+        IntExpr index = ctx.mkInt(((IntConstant) ref.getIndex()).getValue());
+        setResult(state.getArrayElement(arrRef, index));
     }
     // #endregion
 

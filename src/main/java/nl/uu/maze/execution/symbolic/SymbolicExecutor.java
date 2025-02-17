@@ -188,7 +188,10 @@ public class SymbolicExecutor {
         LValue leftOp = stmt.getLeftOp();
 
         if (stmt.getLeftOp() instanceof JArrayRef) {
-            // TODO: handle leftVar as array, probably with ctx.mkStore()
+            JArrayRef ref = (JArrayRef) leftOp;
+            Expr<?> arrRef = state.getVariable(ref.getBase().getName());
+            IntExpr index = ctx.mkInt(((IntConstant) ref.getIndex()).getValue());
+            state.setArrayElement(arrRef, index, value);
         } else if (leftOp instanceof JStaticFieldRef) {
             // TODO: handle static field assignment in <cinit>
         } else if (leftOp instanceof JInstanceFieldRef) {
