@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import nl.uu.maze.execution.ArgMap;
 import nl.uu.maze.execution.MethodType;
+import nl.uu.maze.util.ArrayUtils;
 
 /**
  * Instantiates objects using Java reflection and randomly generated
@@ -51,7 +52,8 @@ public class ObjectInstantiator {
             try {
                 logger.debug("Param types: " + ctor.getParameterTypes());
                 Object[] args = generateArgs(ctor.getParameters(), depth, argMap, MethodType.CTOR);
-                logger.debug("Creating instance of class: " + clazz.getName() + " with args: " + args);
+                logger.debug(
+                        "Creating instance of class: " + clazz.getName() + " with args: " + ArrayUtils.toString(args));
                 return ctor.newInstance(args);
             } catch (Exception e) {
                 e.printStackTrace();

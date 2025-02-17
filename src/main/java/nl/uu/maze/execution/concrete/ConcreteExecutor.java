@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import nl.uu.maze.execution.ArgMap;
 import nl.uu.maze.execution.MethodType;
+import nl.uu.maze.util.ArrayUtils;
 
 public class ConcreteExecutor {
     private static final Logger logger = LoggerFactory.getLogger(ConcreteExecutor.class);
@@ -34,7 +35,8 @@ public class ConcreteExecutor {
         if (!Modifier.isStatic(method.getModifiers())) {
             // Call generateArgs with argMap to use argumens from the map if present
             Object[] args = ObjectInstantiator.generateArgs(ctor.getParameters(), argMap, MethodType.CTOR);
-            logger.debug("Creating instance of class " + ctor.getDeclaringClass().getName() + " with args: " + args);
+            logger.debug("Creating instance of class " + ctor.getDeclaringClass().getName() + " with args: "
+                    + ArrayUtils.toString(args));
             instance = ctor.newInstance(args);
             argMap.addAll(args, MethodType.CTOR);
         }
@@ -43,7 +45,7 @@ public class ConcreteExecutor {
         Object[] args = ObjectInstantiator.generateArgs(method.getParameters(), argMap, MethodType.METHOD);
         argMap.addAll(args, MethodType.METHOD);
 
-        logger.debug("Executing method " + method.getName() + " with args: " + args);
+        logger.debug("Executing method " + method.getName() + " with args: " + ArrayUtils.toString(args));
         Object result = method.invoke(instance, args);
         logger.debug("Retval: " + (result == null ? "null" : result.toString()));
 
