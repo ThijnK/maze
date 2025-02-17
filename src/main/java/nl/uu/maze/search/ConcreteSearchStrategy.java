@@ -12,6 +12,7 @@ import com.microsoft.z3.Model;
 
 import nl.uu.maze.execution.symbolic.SymbolicState;
 import nl.uu.maze.execution.symbolic.SymbolicStateValidator;
+import nl.uu.maze.util.Z3Utils;
 
 /**
  * Abstract class for search strategies that operate on concrete-driven DSE.
@@ -130,11 +131,9 @@ public abstract class ConcreteSearchStrategy implements SearchStrategy {
             }
 
             BoolExpr constraint = pathConstraints.get(index);
-            // Avoid double negation
-            BoolExpr negated = constraint.isNot() ? (BoolExpr) constraint.getArgs()[0] : ctx.mkNot(constraint);
             // Make a copy of the path constraints to avoid modifying the original list
             pathConstraints = new ArrayList<>(pathConstraints);
-            pathConstraints.set(index, negated);
+            pathConstraints.set(index, Z3Utils.negate(ctx, constraint));
         }
 
         /**
