@@ -17,7 +17,6 @@ import com.microsoft.z3.Status;
 
 import nl.uu.maze.execution.ArgMap;
 import nl.uu.maze.transform.Z3ToJavaTransformer;
-import sootup.core.types.Type;
 
 /**
  * Validates symbolic states by checking the satisfiability of the path
@@ -31,7 +30,7 @@ public class SymbolicStateValidator {
 
     public SymbolicStateValidator(Context ctx) {
         this.solver = ctx.mkSolver();
-        this.transformer = new Z3ToJavaTransformer();
+        this.transformer = new Z3ToJavaTransformer(ctx);
     }
 
     /**
@@ -90,12 +89,15 @@ public class SymbolicStateValidator {
      */
     public ArgMap evaluate(Model model, SymbolicState state) {
         ArgMap argMap = new ArgMap();
+
         for (FuncDecl<?> decl : model.getConstDecls()) {
             String var = decl.getName().toString();
+            // For arrays, remove the _elems or _len suffix
+            if (var.endsWith("_elems")) {
+                var = var.substring(0, var.lastIndexOf('_'));
+            }
             Expr<?> expr = model.getConstInterp(decl);
-            Type type = state.getVariableType(var);
-
-            Object value = transformer.transform(expr, model, type);
+            Object value = transformer.transform(var, expr, model, state);
             argMap.set(var, value);
         }
         return argMap;

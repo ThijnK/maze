@@ -132,7 +132,7 @@ public class SymbolicState {
      * @return The reference to the newly allocated object
      */
     public Expr<?> allocateObject() {
-        Expr<?> objRef = ctx.mkConst("obj" + heapCounter++, Z3Sorts.getInstance().getRefSort());
+        Expr<?> objRef = mkHeapRef("obj" + heapCounter++);
         HeapObject obj = new HeapObject();
         heap.put(objRef, obj);
         return objRef;
@@ -169,19 +169,39 @@ public class SymbolicState {
     }
 
     /**
+     * Allocates a new array of the given element sort with a symbolic length.
+     * 
+     * @see #allocateArray(String, Expr, Sort)
+     */
+    public <E extends Sort> Expr<?> allocateArray(String var, E elemSort) {
+        Expr<?> len = ctx.mkConst(var + "_len", ctx.mkBitVecSort(Type.getValueBitSize(IntType.getInstance())));
+        return allocateArray(var, len, elemSort);
+    }
+
+    /**
+     * Allocates a new array of the given element sort with a symbolic length.
+     * 
+     * @see #allocateArray(String, Expr, Sort)
+     */
+    public <E extends Sort> Expr<?> allocateArray(Expr<?> size, E elemSort) {
+        return allocateArray("arr" + heapCounter++, size, elemSort);
+    }
+
+    /**
      * Allocates a new array of the given size and element sort, and returns its
      * reference.
      * 
      * @param <E>      The Z3 sort of the elements in the array
+     * @param var      The name of the array variable
      * @param size     The size of the array, usually a Z3 BitVecNum
      * @param elemSort The Z3 sort of the elements in the array
      * @return The reference to the newly allocated array object
      */
-    public <E extends Sort> Expr<?> allocateArray(Expr<?> size, E elemSort) {
+    public <E extends Sort> Expr<?> allocateArray(String var, Expr<?> size, E elemSort) {
         BitVecSort indexSort = ctx.mkBitVecSort(Type.getValueBitSize(IntType.getInstance()));
-        Expr<?> arrRef = ctx.mkConst("arr" + heapCounter, Z3Sorts.getInstance().getRefSort());
+        Expr<?> arrRef = mkHeapRef(var);
         // Actual Z3 array as a field of the heap object
-        ArrayExpr<BitVecSort, E> arr = ctx.mkArrayConst("elems" + heapCounter++, indexSort, elemSort);
+        ArrayExpr<BitVecSort, E> arr = ctx.mkArrayConst(var + "_elems", indexSort, elemSort);
 
         HeapObject arrObj = new HeapObject();
         arrObj.setField("elements", arr);
@@ -231,6 +251,16 @@ public class SymbolicState {
             return arrObj.getField("length");
         }
         return null;
+    }
+
+    /**
+     * Creates a new Z3 constant representing a reference to a heap object.
+     * 
+     * @param var The name of the reference variable
+     * @return The Z3 expr representing the heap reference
+     */
+    public Expr<?> mkHeapRef(String var) {
+        return ctx.mkConst(var, Z3Sorts.getInstance().getRefSort());
     }
 
     /**

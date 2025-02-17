@@ -1,44 +1,48 @@
 package nl.uu.maze.transform;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.microsoft.z3.ArrayExpr;
+import com.microsoft.z3.BitVecExpr;
 import com.microsoft.z3.BitVecNum;
+import com.microsoft.z3.BitVecSort;
+import com.microsoft.z3.Context;
 import com.microsoft.z3.Expr;
 import com.microsoft.z3.FPNum;
 import com.microsoft.z3.Model;
 
+import nl.uu.maze.execution.symbolic.SymbolicState;
 import sootup.core.types.Type;
 import sootup.core.types.PrimitiveType.*;
 
 /**
- * Transforms a Z3 expression ({@link Expr}) to a Java Object.
+ * Transform Z3 expressions to Java objects.
  */
 public class Z3ToJavaTransformer {
+    private Context ctx;
+
+    public Z3ToJavaTransformer(Context ctx) {
+        this.ctx = ctx;
+    }
 
     /**
      * Transform a Z3 expression to a Java object.
-     * 
-     * @param expr  The Z3 expression to transform
-     * @param model The Z3 model to evaluate the expression on
-     * @param type  The expected SootUp type of the expression
      */
-    public Object transform(Expr<?> expr, Model model, Type type) {
-        Expr<?> evaluated = model.evaluate(expr, true);
-
-        if (evaluated.isBool()) {
-            return evaluated.isTrue();
-        } else if (evaluated.isInt()) {
-            return Integer.parseInt(evaluated.toString());
-        } else if (evaluated.isArray()) {
-            return transformArray((ArrayExpr<?, ?>) evaluated);
-        } else if (evaluated.isBV() && evaluated instanceof BitVecNum) {
-            return transformBV((BitVecNum) evaluated, type);
-        } else if (evaluated instanceof FPNum) {
-            return transformFP((FPNum) evaluated, type);
+    public Object transform(String var, Expr<?> expr, Model model, SymbolicState state) {
+        if (expr.isBool()) {
+            return expr.isTrue();
+        } else if (expr.isInt()) {
+            return Integer.parseInt(expr.toString());
+        } else if (expr.isArray()) {
+            @SuppressWarnings("unchecked")
+            ArrayExpr<BitVecSort, ?> arrayExpr = (ArrayExpr<BitVecSort, ?>) expr;
+            Expr<?> lenExpr = state.getArrayLength(state.mkHeapRef(var));
+            int length = (int) transform(var, model.eval(lenExpr, true), model, state);
+            return transformArray(arrayExpr, length, model, state);
+        } else if (expr.isBV() && expr instanceof BitVecNum) {
+            return transformBV((BitVecNum) expr, state.getVariableType(var));
+        } else if (expr instanceof FPNum) {
+            return transformFP((FPNum) expr, state.getVariableType(var));
         } else {
-            return evaluated.toString();
+            return expr.toString();
         }
     }
 
@@ -110,9 +114,14 @@ public class Z3ToJavaTransformer {
     }
 
     /** Transform a Z3 array to a Java array */
-    private List<Object> transformArray(ArrayExpr<?, ?> arrayExpr) {
-        List<Object> arrayValues = new ArrayList<>();
-        // TODO: transform Z3 array to Java array
-        return arrayValues;
+    private Object transformArray(ArrayExpr<BitVecSort, ?> arrExpr, int length, Model model, SymbolicState state) {
+        Object[] arr = new Object[length];
+        for (int i = 0; i < length; i++) {
+            BitVecExpr index = ctx.mkBV(i, 32);
+            // Select element at the index
+            Expr<?> element = model.eval(ctx.mkSelect(arrExpr, index), true);
+            arr[i] = transform("arr[" + i + "]", element, model, state);
+        }
+        return arr;
     }
 }

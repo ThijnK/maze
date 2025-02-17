@@ -503,9 +503,16 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
     // #region Params and locals
     @Override
     public void caseParameterRef(@Nonnull JParameterRef ref) {
+        // Create a symbolic value for the parameter
+        String var = ArgMap.getSymbolicName(state.getMethodType(), ref.getIndex());
+
         Type sootType = ref.getType();
         if (sootType instanceof ArrayType) {
-            // TODO: Create a symbolic array for the parameter
+            // Allocate new array on the heap
+            // TODO: arrType.getDimension() for multi-dimensional arrays
+            ArrayType arrType = (ArrayType) sootType;
+            Expr<?> arrRef = state.allocateArray(var, determineSort(arrType.getElementType()));
+            setResult(arrRef);
         } else if (sootType instanceof ClassType) {
             // TODO: deal with objects as arguments
 
@@ -513,8 +520,6 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
             Expr<?> objRef = state.allocateObject();
             setResult(objRef);
         } else {
-            // Create a symbolic value for the parameter
-            String var = ArgMap.getSymbolicName(state.getMethodType(), ref.getIndex());
             setResult(ctx.mkConst(var, determineSort(sootType)));
             state.setVariableType(var, sootType);
         }

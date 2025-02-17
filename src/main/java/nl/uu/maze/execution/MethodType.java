@@ -18,9 +18,9 @@ public enum MethodType {
     public String getPrefix() {
         switch (this) {
             case CTOR:
-                return "ctor";
+                return "c";
             case CINIT:
-                return "cinit";
+                return "cl";
             case METHOD:
                 return "m";
             default:

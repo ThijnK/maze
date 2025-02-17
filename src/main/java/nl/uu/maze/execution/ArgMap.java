@@ -53,7 +53,7 @@ public class ArgMap {
      * and target method).
      */
     public static String getSymbolicName(MethodType type, int index) {
-        return type.getPrefix() + "Arg" + index;
+        return type.getPrefix() + "arg" + index;
     }
 
     @Override

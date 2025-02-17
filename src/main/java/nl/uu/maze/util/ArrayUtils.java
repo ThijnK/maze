@@ -19,4 +19,21 @@ public class ArrayUtils {
         }
         return array;
     }
+
+    public static String toString(Object[] arr) {
+        return toString(arr, false);
+    }
+
+    public static String toString(Object[] arr, boolean useCurlyBraces) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(useCurlyBraces ? "{ " : '[');
+        for (int i = 0; i < arr.length; i++) {
+            sb.append(arr[i]);
+            if (i < arr.length - 1) {
+                sb.append(", ");
+            }
+        }
+        sb.append(useCurlyBraces ? " }" : ']');
+        return sb.toString();
+    }
 }

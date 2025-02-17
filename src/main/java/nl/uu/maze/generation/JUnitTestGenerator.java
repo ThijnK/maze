@@ -1,5 +1,6 @@
 package nl.uu.maze.generation;
 
+import sootup.core.types.ArrayType;
 import sootup.core.types.Type;
 import sootup.java.core.JavaSootMethod;
 
@@ -9,7 +10,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -18,6 +18,7 @@ import com.palantir.javapoet.*;
 
 import nl.uu.maze.execution.ArgMap;
 import nl.uu.maze.execution.MethodType;
+import nl.uu.maze.util.ArrayUtils;
 
 /**
  * Generates JUnit test cases from a given Z3 model and symbolic state for a
@@ -89,7 +90,7 @@ public class JUnitTestGenerator {
         for (int i = 0; i < paramTypes.size(); i++) {
             String var = ArgMap.getSymbolicName(methodType, i);
             params.add(var);
-            addDefinitionStmt(methodBuilder, paramTypes.get(i), var, argMap.get(var));
+            addDefinitionStmt(methodBuilder, paramTypes.get(i), var, argMap);
         }
         return params;
     }
@@ -100,12 +101,11 @@ public class JUnitTestGenerator {
      * 
      * TODO: add support for objects and arrays
      */
-    private void addDefinitionStmt(MethodSpec.Builder methodBuilder, Type type, String var, Object value) {
-        // TODO: may have to be Array or Collection instead
-        if (value instanceof List) {
-            @SuppressWarnings("unchecked")
-            String arrayString = arrayToJavaString((List<Object>) value);
-            methodBuilder.addStatement("$T $L = $L", List.class, var, arrayString);
+    private void addDefinitionStmt(MethodSpec.Builder methodBuilder, Type type, String var, ArgMap argMap) {
+        Object value = argMap.get(var);
+
+        if (type instanceof ArrayType && value instanceof Object[]) {
+            methodBuilder.addStatement("$L $L = $L", type, var, ArrayUtils.toString((Object[]) value), true);
         }
         // If value is a primitive type, handle it as a literal
         else if (value != null) {
@@ -207,12 +207,6 @@ public class JUnitTestGenerator {
             default:
                 return "null";
         }
-    }
-
-    private String arrayToJavaString(List<Object> arrayValues) {
-        return arrayValues.stream()
-                .map(Object::toString)
-                .collect(Collectors.joining(", ", "new Object[]{", "}"));
     }
 
     private String capitalizeFirstLetter(String str) {
