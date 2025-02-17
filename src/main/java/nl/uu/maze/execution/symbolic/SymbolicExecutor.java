@@ -190,7 +190,7 @@ public class SymbolicExecutor {
         if (stmt.getLeftOp() instanceof JArrayRef) {
             JArrayRef ref = (JArrayRef) leftOp;
             Expr<?> arrRef = state.getVariable(ref.getBase().getName());
-            IntExpr index = ctx.mkInt(((IntConstant) ref.getIndex()).getValue());
+            BitVecExpr index = (BitVecExpr) transformer.transform(ref.getIndex(), state);
             state.setArrayElement(arrRef, index, value);
         } else if (leftOp instanceof JStaticFieldRef) {
             // TODO: handle static field assignment in <cinit>

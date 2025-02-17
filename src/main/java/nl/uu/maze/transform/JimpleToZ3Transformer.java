@@ -463,7 +463,7 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
     @Override
     public void caseArrayRef(@Nonnull JArrayRef ref) {
         Expr<?> arrRef = state.getVariable(ref.getBase().getName());
-        IntExpr index = ctx.mkInt(((IntConstant) ref.getIndex()).getValue());
+        BitVecExpr index = (BitVecExpr) transform(ref.getIndex());
         setResult(state.getArrayElement(arrRef, index));
     }
     // #endregion

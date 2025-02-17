@@ -12,6 +12,7 @@ import nl.uu.maze.util.Z3Sorts;
 import sootup.core.graph.StmtGraph;
 import sootup.core.jimple.common.stmt.Stmt;
 import sootup.core.types.Type;
+import sootup.core.types.PrimitiveType.IntType;
 
 /**
  * Represents a symbolic state in the symbolic execution engine.
@@ -171,14 +172,16 @@ public class SymbolicState {
      * Allocates a new array of the given size and element sort, and returns its
      * reference.
      * 
+     * @param <E>      The Z3 sort of the elements in the array
      * @param size     The size of the array, usually a Z3 BitVecNum
      * @param elemSort The Z3 sort of the elements in the array
      * @return The reference to the newly allocated array object
      */
     public <E extends Sort> Expr<?> allocateArray(Expr<?> size, E elemSort) {
+        BitVecSort indexSort = ctx.mkBitVecSort(Type.getValueBitSize(IntType.getInstance()));
         Expr<?> arrRef = ctx.mkConst("arr" + heapCounter, Z3Sorts.getInstance().getRefSort());
         // Actual Z3 array as a field of the heap object
-        ArrayExpr<IntSort, E> arr = ctx.mkArrayConst("elems" + heapCounter++, ctx.mkIntSort(), elemSort);
+        ArrayExpr<BitVecSort, E> arr = ctx.mkArrayConst("elems" + heapCounter++, indexSort, elemSort);
 
         HeapObject arrObj = new HeapObject();
         arrObj.setField("elements", arr);
@@ -193,11 +196,11 @@ public class SymbolicState {
      * 
      * @return The symbolic value stored at the index, or null if the array does not
      */
-    public <E extends Sort> Expr<E> getArrayElement(Expr<?> arrRef, IntExpr index) {
+    public <E extends Sort> Expr<E> getArrayElement(Expr<?> arrRef, BitVecExpr index) {
         HeapObject arrObj = heap.get(arrRef);
         if (arrObj != null) {
             @SuppressWarnings("unchecked")
-            ArrayExpr<IntSort, E> arr = (ArrayExpr<IntSort, E>) arrObj.getField("elements");
+            ArrayExpr<BitVecSort, E> arr = (ArrayExpr<BitVecSort, E>) arrObj.getField("elements");
             return ctx.mkSelect(arr, index);
         }
         return null;
@@ -207,11 +210,11 @@ public class SymbolicState {
      * Sets the symbolic value at the given index in the array object identified by
      * 'arrRef'.
      */
-    public <E extends Sort> void setArrayElement(Expr<?> arrRef, IntExpr index, Expr<E> value) {
+    public <E extends Sort> void setArrayElement(Expr<?> arrRef, BitVecExpr index, Expr<E> value) {
         HeapObject arrObj = heap.get(arrRef);
         if (arrObj != null) {
             @SuppressWarnings("unchecked")
-            ArrayExpr<IntSort, E> arr = (ArrayExpr<IntSort, E>) arrObj.getField("elements");
+            ArrayExpr<BitVecSort, E> arr = (ArrayExpr<BitVecSort, E>) arrObj.getField("elements");
             arrObj.setField("elements", ctx.mkStore(arr, index, value));
         }
     }
