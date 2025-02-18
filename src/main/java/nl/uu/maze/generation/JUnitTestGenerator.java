@@ -188,6 +188,10 @@ public class JUnitTestGenerator {
      * @return The default value for the given type as a string
      */
     private String getDefaultValue(Type type) {
+        if (type instanceof ArrayType) {
+            return "{}";
+        }
+
         switch (type.toString()) {
             case "int":
                 return "0";
