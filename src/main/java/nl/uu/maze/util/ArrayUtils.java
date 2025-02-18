@@ -25,6 +25,13 @@ public class ArrayUtils {
     }
 
     public static String toString(Object[] arr, boolean useCurlyBraces) {
+        if (arr == null) {
+            return "null";
+        }
+        if (arr.length == 0) {
+            return useCurlyBraces ? "{}" : "[]";
+        }
+
         StringBuilder sb = new StringBuilder();
         sb.append(useCurlyBraces ? "{ " : '[');
         for (int i = 0; i < arr.length; i++) {
