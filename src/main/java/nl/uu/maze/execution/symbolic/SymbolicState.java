@@ -39,6 +39,17 @@ public class SymbolicState {
      * Tracks the SootUp types of symbolic variables representing method parameters.
      */
     private Map<String, Type> paramTypes;
+    /**
+     * Tracks indices of multi-dimensional array accesses.
+     * In JVM bytecode, accessing a multi-dimensional array is done by accessing the
+     * array at each dimension separately, i.e., <code>arr[0][1]</code> becomes
+     * <code>$stack0 = arr[0]; $stack1 = $stack0[1];</code>
+     * This map stores the indices of each dimension accessed so far for a given
+     * array variable. In the example, the map would store
+     * <code>$stack0 -> [0]</code>.
+     * Only used for multi-dimensional arrays.
+     */
+    private Map<String, BitVecExpr[]> arrayIndices = new HashMap<>();
 
     private Map<Expr<?>, HeapObject> heap;
     private int heapCounter = 0;
@@ -50,11 +61,12 @@ public class SymbolicState {
         this.pathConstraints = new ArrayList<>();
         this.paramTypes = new HashMap<>();
         this.heap = new HashMap<>();
+        this.arrayIndices = new HashMap<>();
     }
 
     public SymbolicState(Context ctx, Stmt stmt, int depth, MethodType methodType,
             Map<String, Expr<?>> symbolicVariables, List<BoolExpr> pathConstraints, Map<String, Type> paramTypes,
-            Map<Expr<?>, HeapObject> heap, int heapCounter) {
+            Map<Expr<?>, HeapObject> heap, int heapCounter, Map<String, BitVecExpr[]> arrayIndices) {
         this.ctx = ctx;
         this.currentStmt = stmt;
         this.currentDepth = depth;
@@ -69,6 +81,8 @@ public class SymbolicState {
             this.heap.put(entry.getKey(), entry.getValue().clone());
         }
         this.heapCounter = heapCounter;
+        this.arrayIndices = new HashMap<>(arrayIndices);
+
     }
 
     public void setMethodType(MethodType methodType) {
@@ -202,12 +216,8 @@ public class SymbolicState {
     public <E extends Sort> Expr<?> allocateArray(String var, Expr<?> size, E elemSort) {
         BitVecSort indexSort = ctx.mkBitVecSort(Type.getValueBitSize(IntType.getInstance()));
         Expr<?> arrRef = mkHeapRef(var);
-        // Actual Z3 array as a field of the heap object
         ArrayExpr<BitVecSort, E> arr = ctx.mkArrayConst(var + "_elems", indexSort, elemSort);
-
-        HeapObject arrObj = new HeapObject();
-        arrObj.setField("elements", arr);
-        arrObj.setField("length", size);
+        ArrayObject arrObj = new ArrayObject(arr, size);
         heap.put(arrRef, arrObj);
         return arrRef;
     }
@@ -217,42 +227,46 @@ public class SymbolicState {
      * 
      * @see #allocateMultiArray(String, List, int, Sort)
      */
-    public <E extends Sort> Expr<?> allocateMultiArray(List<Expr<?>> sizes, E elemSort) {
-        return allocateMultiArray("arr" + heapCounter++, sizes, 0, 0, elemSort);
+    public <E extends Sort> Expr<?> allocateMultiArray(List<BitVecExpr> sizes, E elemSort) {
+        return allocateMultiArray("arr" + heapCounter++, sizes, elemSort);
     }
 
     /**
      * Allocates a multi-dimensional array with the given sizes and element sort.
      * 
-     * @param <E>      The Z3 sort of the elements in the array
-     * @param var      The name to use for the array object on the heap
-     * @param sizes    The sizes of each dimension of the array
-     * @param dim      The current dimension being allocated
-     * @param index    The index of the array being allocated in the array it is an
-     *                 element of
-     * @param elemSort The Z3 sort of the elements in the array
+     * @param <E> The Z3 sort of the elements in the array
      * @return The reference to the newly allocated array object
      */
-    public <E extends Sort> Expr<?> allocateMultiArray(String var, List<Expr<?>> sizes, int dim, int index,
-            E elemSort) {
-        Sort currElemSort = (dim == sizes.size() - 1) ? elemSort : Z3Sorts.getInstance().getRefSort();
-        String varName = var + "_dim" + dim;
-        if (dim > 0) {
-            varName += index;
+    public <E extends Sort> Expr<?> allocateMultiArray(String var, List<BitVecExpr> sizes, E elemSort) {
+        BitVecSort indexSort = ctx.mkBitVecSort(Type.getValueBitSize(IntType.getInstance()));
+        Expr<?> arrRef = mkHeapRef(var);
+        ArrayExpr<BitVecSort, E> arr = ctx.mkArrayConst(var + "_elems", indexSort, elemSort);
+        ArrayExpr<BitVecSort, BitVecSort> lengths = ctx.mkArrayConst(var + "_lens", indexSort, indexSort);
+        for (int i = 0; i < sizes.size(); i++) {
+            lengths = ctx.mkStore(lengths, ctx.mkBV(i, Type.getValueBitSize(IntType.getInstance())), sizes.get(i));
         }
-        Expr<?> arrRef = allocateArray(varName, sizes.get(dim), currElemSort);
 
-        // If more dimensions to allocate, recursively allocate sub-arrays
-        if (dim < sizes.size() - 1) {
-            int concreteSize = ((BitVecNum) sizes.get(dim)).getInt();
-            for (int i = 0; i < concreteSize; i++) {
-                BitVecExpr indexExpr = ctx.mkBV(i, Type.getValueBitSize(IntType.getInstance()));
-                Expr<?> subArrRef = allocateMultiArray(var, sizes, dim + 1, i, elemSort);
-                setArrayElement(arrRef, indexExpr, subArrRef);
+        MultiArrayObject arrObj = new MultiArrayObject(sizes.size(), arr, lengths);
+        heap.put(arrRef, arrObj);
+        return arrRef;
+    }
+
+    /**
+     * Retrieves the array indices collected so far for the given array variable and
+     * adds the new index.
+     */
+    private BitVecExpr[] getArrayIndices(String var, int dim, BitVecExpr newIndex) {
+        BitVecExpr[] indices = arrayIndices.get(var);
+        if (indices == null || indices.length < dim) {
+            indices = new BitVecExpr[indices == null ? 1 : indices.length + 1];
+            if (indices.length == 1) {
+                indices[0] = newIndex;
+            } else {
+                System.arraycopy(arrayIndices.get(var), 0, indices, 0, indices.length - 1);
+                indices[indices.length - 1] = newIndex;
             }
         }
-
-        return arrRef;
+        return indices;
     }
 
     /**
@@ -261,12 +275,29 @@ public class SymbolicState {
      * 
      * @return The symbolic value stored at the index, or null if the array does not
      */
-    @SuppressWarnings("unchecked")
-    public <E extends Sort> Expr<E> getArrayElement(Expr<?> arrRef, BitVecExpr index) {
+    public Expr<?> getArrayElement(String lhs, String var, BitVecExpr index) {
+        Expr<?> arrRef = symbolicVariables.get(var);
         HeapObject arrObj = heap.get(arrRef);
-        if (arrObj != null) {
-            Expr<?> arr = arrObj.getField("elements");
-            return ctx.mkSelect((ArrayExpr<BitVecSort, E>) arr, index);
+        if (arrObj != null && arrObj instanceof ArrayObject) {
+            // Special handling for multi-dimensional arrays
+            if (arrObj instanceof MultiArrayObject) {
+                MultiArrayObject multiArrObj = (MultiArrayObject) arrObj;
+                int dim = multiArrObj.getDim();
+                BitVecExpr[] indices = getArrayIndices(var, dim, index);
+
+                // When enough indices collected, return the element
+                if (dim == indices.length) {
+                    return multiArrObj.getElem(indices);
+                } else {
+                    // Otherwise, store new indices for the lhs of the assignment this is part of
+                    if (lhs != null) {
+                        arrayIndices.put(lhs, indices);
+                    }
+                    return arrRef;
+                }
+            }
+
+            return ((ArrayObject) arrObj).getElem(index);
         }
         return null;
     }
@@ -275,12 +306,25 @@ public class SymbolicState {
      * Sets the symbolic value at the given index in the array object identified by
      * 'arrRef'.
      */
-    public <E extends Sort> void setArrayElement(Expr<?> arrRef, BitVecExpr index, Expr<E> value) {
+    public <E extends Sort> void setArrayElement(String var, BitVecExpr index, Expr<E> value) {
+        Expr<?> arrRef = symbolicVariables.get(var);
         HeapObject arrObj = heap.get(arrRef);
-        if (arrObj != null) {
-            @SuppressWarnings("unchecked")
-            ArrayExpr<BitVecSort, E> arr = (ArrayExpr<BitVecSort, E>) arrObj.getField("elements");
-            arrObj.setField("elements", ctx.mkStore(arr, index, value));
+        if (arrObj != null && arrObj instanceof ArrayObject) {
+            if (arrObj instanceof MultiArrayObject) {
+                MultiArrayObject multiArrObj = (MultiArrayObject) arrObj;
+                int dim = multiArrObj.getDim();
+                BitVecExpr[] indices = getArrayIndices(var, dim, index);
+
+                // If not enough indices collected, throw an exception
+                // TODO: the value expr here could be another array with lower dimension
+                if (dim != indices.length) {
+                    throw new RuntimeException("Not enough indices collected for multi-dimensional array access");
+                }
+
+                multiArrObj.setElem(value, indices);
+            } else {
+                ((ArrayObject) arrObj).setElem(index, value);
+            }
         }
     }
 
@@ -290,10 +334,27 @@ public class SymbolicState {
      * 
      * @return The Z3 expr representing the length of the array
      */
-    public Expr<?> getArrayLength(Expr<?> arrRef) {
+    public Expr<?> getArrayLength(String var) {
+        Expr<?> arrRef = symbolicVariables.get(var);
+        return getArrayLength(var, arrRef);
+    }
+
+    /**
+     * Retrieves the symbolic value representing the length of the array object
+     * identified by 'arrRef'.
+     * 
+     * @return The Z3 expr representing the length of the array
+     */
+    public Expr<?> getArrayLength(String var, Expr<?> arrRef) {
         HeapObject arrObj = heap.get(arrRef);
-        if (arrObj != null) {
-            return arrObj.getField("length");
+        if (arrObj != null && arrObj instanceof ArrayObject) {
+            if (arrObj instanceof MultiArrayObject) {
+                BitVecExpr[] indices = arrayIndices.get(var);
+                int dim = indices == null ? 0 : indices.length;
+                return ((MultiArrayObject) arrObj).getLength(dim);
+            }
+
+            return ((ArrayObject) arrObj).getLength();
         }
         return null;
     }
@@ -306,8 +367,8 @@ public class SymbolicState {
      */
     public Expr<?> getArray(Expr<?> arrRef) {
         HeapObject arrObj = heap.get(arrRef);
-        if (arrObj != null) {
-            return arrObj.getField("elements");
+        if (arrObj != null && arrObj instanceof ArrayObject) {
+            return ((ArrayObject) arrObj).getElems();
         }
         return null;
     }
@@ -338,7 +399,7 @@ public class SymbolicState {
 
     public SymbolicState clone(Stmt stmt) {
         return new SymbolicState(ctx, stmt, currentDepth, methodType, symbolicVariables, pathConstraints,
-                paramTypes, heap, heapCounter);
+                paramTypes, heap, heapCounter, arrayIndices);
     }
 
     public SymbolicState clone() {
@@ -374,7 +435,7 @@ public class SymbolicState {
     /**
      * Represents an object in the heap.
      */
-    public static class HeapObject {
+    public class HeapObject {
         // A mapping from field names to symbolic expressions.
         private Map<String, Expr<?>> fields;
 
@@ -399,6 +460,85 @@ public class SymbolicState {
         @Override
         public String toString() {
             return fields.toString();
+        }
+    }
+
+    public class ArrayObject extends HeapObject {
+        public ArrayObject(Expr<?> elems, Expr<?> length) {
+            super();
+            setField("elems", elems);
+            setField("len", length);
+        }
+
+        @SuppressWarnings("unchecked")
+        public <E extends Sort> ArrayExpr<BitVecSort, E> getElems() {
+            return (ArrayExpr<BitVecSort, E>) getField("elems");
+        }
+
+        public <E extends Sort> Expr<E> getElem(BitVecExpr index) {
+            return ctx.mkSelect(getElems(), index);
+        }
+
+        public <E extends Sort> void setElem(BitVecExpr index, Expr<E> value) {
+            setField("elems", ctx.mkStore(getElems(), index, value));
+        }
+
+        public Expr<?> getLength() {
+            return getField("len");
+        }
+    }
+
+    public class MultiArrayObject extends ArrayObject {
+        private int dim;
+
+        public MultiArrayObject(int dim, Expr<?> elems, ArrayExpr<BitVecSort, BitVecSort> lengths) {
+            super(elems, lengths);
+            this.dim = dim;
+        }
+
+        public int getDim() {
+            return dim;
+        }
+
+        /**
+         * Returns the length of the array at the given dimension.
+         */
+        @SuppressWarnings("unchecked")
+        public Expr<BitVecSort> getLength(int index) {
+            BitVecExpr indexExpr = ctx.mkBV(index, Type.getValueBitSize(IntType.getInstance()));
+            return ctx.mkSelect((ArrayExpr<BitVecSort, BitVecSort>) getLength(), indexExpr);
+        }
+
+        private BitVecExpr calcIndex(BitVecExpr... indices) {
+            if (indices.length != dim) {
+                throw new IllegalArgumentException("Expected " + dim + " indices, got " + indices.length);
+            }
+
+            BitVecExpr flatIndex = indices[dim - 1];
+            for (int i = dim - 2; i >= 0; i--) {
+                Expr<BitVecSort> prod = getLength(i);
+                for (int j = i + 2; j < dim; j++) {
+                    prod = ctx.mkBVMul(prod, getLength(j));
+                }
+                flatIndex = ctx.mkBVAdd(ctx.mkBVMul(indices[i], prod), flatIndex);
+            }
+            return flatIndex;
+        }
+
+        /**
+         * Returns the element at the given indices by calculating the offset in the
+         * flattened multi-dimensional array.
+         */
+        public <E extends Sort> Expr<E> getElem(BitVecExpr... indices) {
+            return super.getElem(calcIndex(indices));
+        }
+
+        /**
+         * Sets the element at the given indices by calculating the offset in the
+         * flattened multi-dimensional array.
+         */
+        public <E extends Sort> void setElem(Expr<E> value, BitVecExpr... indices) {
+            super.setElem(calcIndex(indices), value);
         }
     }
 }

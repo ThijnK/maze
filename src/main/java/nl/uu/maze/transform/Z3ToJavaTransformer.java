@@ -34,7 +34,7 @@ public class Z3ToJavaTransformer {
         } else if (expr.isArray()) {
             @SuppressWarnings("unchecked")
             ArrayExpr<BitVecSort, ?> arrayExpr = (ArrayExpr<BitVecSort, ?>) expr;
-            Expr<?> lenExpr = state.getArrayLength(state.mkHeapRef(var));
+            Expr<?> lenExpr = state.getArrayLength(var, state.mkHeapRef(var));
             int length = (int) transform(var, model.eval(lenExpr, true), model, state);
             if (length < 0) {
                 return null;

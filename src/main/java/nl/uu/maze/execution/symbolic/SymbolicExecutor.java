@@ -183,14 +183,14 @@ public class SymbolicExecutor {
      * @return A list of new symbolic states after executing the statement
      */
     private List<SymbolicState> handleDefStmt(StmtGraph<?> cfg, AbstractDefinitionStmt stmt, SymbolicState state) {
-        Expr<?> value = transformer.transform(stmt.getRightOp(), state);
         LValue leftOp = stmt.getLeftOp();
+        Expr<?> value = transformer.transform(stmt.getRightOp(), state, leftOp.toString());
 
-        if (stmt.getLeftOp() instanceof JArrayRef) {
+        if (leftOp instanceof JArrayRef) {
             JArrayRef ref = (JArrayRef) leftOp;
-            Expr<?> arrRef = state.getVariable(ref.getBase().getName());
+            String var = ref.getBase().getName();
             BitVecExpr index = (BitVecExpr) transformer.transform(ref.getIndex(), state);
-            state.setArrayElement(arrRef, index, value);
+            state.setArrayElement(var, index, value);
         } else if (leftOp instanceof JStaticFieldRef) {
             // TODO: handle static field assignment in <cinit>
         } else if (leftOp instanceof JInstanceFieldRef) {

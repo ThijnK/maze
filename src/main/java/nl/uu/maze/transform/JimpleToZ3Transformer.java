@@ -27,6 +27,7 @@ import sootup.core.types.*;
 public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
     private Context ctx;
     private SymbolicState state;
+    private String lhs;
 
     public JimpleToZ3Transformer(Context ctx) {
         this.ctx = ctx;
@@ -37,21 +38,32 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
      * 
      * @param value The Jimple value to transform
      * @param state The symbolic state
+     * @param lhs   The left-hand side of the assignment (if any)
      * @return The Z3 expression representing the Jimple value
      * @implNote This method is not thread-safe! Create a new instance for each
      *           thread.
      */
-    public Expr<?> transform(Value value, SymbolicState state) {
+    public Expr<?> transform(Value value, SymbolicState state, String lhs) {
         this.state = state;
+        this.lhs = lhs;
         value.accept(this);
         Expr<?> res = getResult();
         setResult(null);
         return res;
     }
 
+    /**
+     * Transform the given Jimple value to a Z3 expression.
+     * 
+     * @see #transform(Value, SymbolicState, String)
+     */
+    public Expr<?> transform(Value value, SymbolicState state) {
+        return transform(value, state, null);
+    }
+
     /** Local alias for the public transform method */
     private Expr<?> transform(Immediate immediate) {
-        return transform(immediate, state);
+        return transform(immediate, state, lhs);
     }
 
     // #region Helper methods
@@ -452,25 +464,30 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
 
     @Override
     public void caseNewMultiArrayExpr(@Nonnull JNewMultiArrayExpr expr) {
-        Sort elemSort = determineSort(expr.getBaseType());
-        List<Expr<?>> sizes = new ArrayList<>();
+        // Get the final element sort
+        Type elementType = expr.getBaseType();
+        while (elementType instanceof ArrayType) {
+            elementType = ((ArrayType) elementType).getElementType();
+        }
+        Sort elemSort = determineSort(elementType);
+        List<BitVecExpr> sizes = new ArrayList<>();
         for (int i = 0; i < expr.getSizes().size(); i++) {
-            sizes.add(transform(expr.getSizes().get(i)));
+            sizes.add((BitVecExpr) transform(expr.getSizes().get(i)));
         }
         setResult(state.allocateMultiArray(sizes, elemSort));
     }
 
     @Override
     public void caseLengthExpr(@Nonnull JLengthExpr expr) {
-        Expr<?> arrRef = state.getVariable(expr.getOp().toString());
-        setResult(state.getArrayLength(arrRef));
+        String var = expr.getOp().toString();
+        setResult(state.getArrayLength(var));
     }
 
     @Override
     public void caseArrayRef(@Nonnull JArrayRef ref) {
-        Expr<?> arrRef = state.getVariable(ref.getBase().getName());
+        String var = ref.getBase().getName();
         BitVecExpr index = (BitVecExpr) transform(ref.getIndex());
-        setResult(state.getArrayElement(arrRef, index));
+        setResult(state.getArrayElement(lhs, var, index));
     }
     // #endregion
 
