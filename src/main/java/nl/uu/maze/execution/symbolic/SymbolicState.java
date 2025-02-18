@@ -299,6 +299,20 @@ public class SymbolicState {
     }
 
     /**
+     * Retrieves the symbolic value representing the array elements of the array
+     * object identified by 'arrRef'.
+     * 
+     * @return The Z3 expr representing the array elements
+     */
+    public Expr<?> getArray(Expr<?> arrRef) {
+        HeapObject arrObj = heap.get(arrRef);
+        if (arrObj != null) {
+            return arrObj.getField("elements");
+        }
+        return null;
+    }
+
+    /**
      * Creates a new Z3 constant representing a reference to a heap object.
      * 
      * @param var The name of the reference variable

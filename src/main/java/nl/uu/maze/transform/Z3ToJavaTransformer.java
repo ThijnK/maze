@@ -36,13 +36,16 @@ public class Z3ToJavaTransformer {
             ArrayExpr<BitVecSort, ?> arrayExpr = (ArrayExpr<BitVecSort, ?>) expr;
             Expr<?> lenExpr = state.getArrayLength(state.mkHeapRef(var));
             int length = (int) transform(var, model.eval(lenExpr, true), model, state);
+            if (length < 0) {
+                return null;
+            }
             return transformArray(arrayExpr, length, model, state);
         } else if (expr.isBV() && expr instanceof BitVecNum) {
             return transformBV((BitVecNum) expr, state.getParamType(var));
         } else if (expr instanceof FPNum) {
             return transformFP((FPNum) expr, state.getParamType(var));
         } else {
-            return expr.toString();
+            return null;
         }
     }
 
@@ -120,6 +123,7 @@ public class Z3ToJavaTransformer {
             BitVecExpr index = ctx.mkBV(i, 32);
             // Select element at the index
             Expr<?> element = model.eval(ctx.mkSelect(arrExpr, index), true);
+            // TODO: handle multi-dimensional arrays
             arr[i] = transform("arr[" + i + "]", element, model, state);
         }
         return arr;

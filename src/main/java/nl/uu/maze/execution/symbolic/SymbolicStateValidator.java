@@ -92,11 +92,26 @@ public class SymbolicStateValidator {
 
         for (FuncDecl<?> decl : model.getConstDecls()) {
             String var = decl.getName().toString();
-            // For arrays, remove the _elems or _len suffix
-            if (var.endsWith("_elems")) {
-                var = var.substring(0, var.lastIndexOf('_'));
+            if (!var.contains("arg")) {
+                continue;
             }
             Expr<?> expr = model.getConstInterp(decl);
+
+            // For arrays
+            boolean isElems = var.endsWith("_elems"), isLen = var.endsWith("_len");
+            if (isElems || isLen) {
+                var = var.substring(0, var.lastIndexOf('_'));
+                // If the model contains a _len decl for an array, but no _elems decl for the
+                // same array, we still need to evaluate the array
+                // So, if this array var is not yet in the ArgMap (_elems not present or not yet
+                // encountered), add it
+                if (isLen) {
+                    if (argMap.containsKey(var)) {
+                        continue;
+                    }
+                    expr = state.getArray(state.mkHeapRef(var));
+                }
+            }
             Object value = transformer.transform(var, expr, model, state);
             argMap.set(var, value);
         }
