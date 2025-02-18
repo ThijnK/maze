@@ -38,9 +38,9 @@ public class Z3ToJavaTransformer {
             int length = (int) transform(var, model.eval(lenExpr, true), model, state);
             return transformArray(arrayExpr, length, model, state);
         } else if (expr.isBV() && expr instanceof BitVecNum) {
-            return transformBV((BitVecNum) expr, state.getVariableType(var));
+            return transformBV((BitVecNum) expr, state.getParamType(var));
         } else if (expr instanceof FPNum) {
-            return transformFP((FPNum) expr, state.getVariableType(var));
+            return transformFP((FPNum) expr, state.getParamType(var));
         } else {
             return expr.toString();
         }

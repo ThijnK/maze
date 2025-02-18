@@ -512,7 +512,7 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
         // Create a symbolic value for the parameter
         String var = ArgMap.getSymbolicName(state.getMethodType(), ref.getIndex());
         Type sootType = ref.getType();
-        state.setVariableType(var, sootType);
+        state.setParamType(var, sootType);
 
         if (sootType instanceof ArrayType) {
             // Allocate new array on the heap

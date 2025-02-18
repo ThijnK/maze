@@ -35,8 +35,10 @@ public class SymbolicState {
 
     private Map<String, Expr<?>> symbolicVariables;
     private List<BoolExpr> pathConstraints;
-    /** Keep track of (SootUp) types of symbolic variables */
-    private Map<String, Type> variableTypes;
+    /**
+     * Tracks the SootUp types of symbolic variables representing method parameters.
+     */
+    private Map<String, Type> paramTypes;
 
     private Map<Expr<?>, HeapObject> heap;
     private int heapCounter = 0;
@@ -46,12 +48,12 @@ public class SymbolicState {
         this.currentStmt = stmt;
         this.symbolicVariables = new HashMap<>();
         this.pathConstraints = new ArrayList<>();
-        this.variableTypes = new HashMap<>();
+        this.paramTypes = new HashMap<>();
         this.heap = new HashMap<>();
     }
 
     public SymbolicState(Context ctx, Stmt stmt, int depth, MethodType methodType,
-            Map<String, Expr<?>> symbolicVariables, List<BoolExpr> pathConstraints, Map<String, Type> variableTypes,
+            Map<String, Expr<?>> symbolicVariables, List<BoolExpr> pathConstraints, Map<String, Type> paramTypes,
             Map<Expr<?>, HeapObject> heap, int heapCounter) {
         this.ctx = ctx;
         this.currentStmt = stmt;
@@ -60,7 +62,7 @@ public class SymbolicState {
         this.symbolicVariables = new HashMap<>(symbolicVariables);
         this.pathConstraints = new ArrayList<>(pathConstraints);
         // Share the same variable types map to avoid copying
-        this.variableTypes = variableTypes;
+        this.paramTypes = paramTypes;
         // Deep copy the heap
         this.heap = new HashMap<>();
         for (Map.Entry<Expr<?>, HeapObject> entry : heap.entrySet()) {
@@ -109,12 +111,12 @@ public class SymbolicState {
         return symbolicVariables.containsKey(var);
     }
 
-    public void setVariableType(String var, Type type) {
-        variableTypes.put(var, type);
+    public void setParamType(String var, Type type) {
+        paramTypes.put(var, type);
     }
 
-    public Type getVariableType(String var) {
-        return variableTypes.getOrDefault(var, null);
+    public Type getParamType(String var) {
+        return paramTypes.getOrDefault(var, null);
     }
 
     /**
@@ -322,7 +324,7 @@ public class SymbolicState {
 
     public SymbolicState clone(Stmt stmt) {
         return new SymbolicState(ctx, stmt, currentDepth, methodType, symbolicVariables, pathConstraints,
-                variableTypes, heap, heapCounter);
+                paramTypes, heap, heapCounter);
     }
 
     public SymbolicState clone() {
