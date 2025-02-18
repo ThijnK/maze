@@ -28,6 +28,8 @@ import sootup.core.types.PrimitiveType.IntType;
  * </p>
  */
 public class SymbolicState {
+    private static final Z3Sorts sorts = Z3Sorts.getInstance();
+
     private Context ctx;
     private Stmt currentStmt;
     private int currentDepth = 0;
@@ -190,7 +192,7 @@ public class SymbolicState {
      * @see #allocateArray(String, Expr, Sort)
      */
     public <E extends Sort> Expr<?> allocateArray(String var, E elemSort) {
-        Expr<?> len = ctx.mkConst(var + "_len", ctx.mkBitVecSort(Type.getValueBitSize(IntType.getInstance())));
+        Expr<?> len = ctx.mkConst(var + "_len", sorts.getIntSort());
         return allocateArray(var, len, elemSort);
     }
 
@@ -214,7 +216,7 @@ public class SymbolicState {
      * @return The reference to the newly allocated array object
      */
     public <E extends Sort> Expr<?> allocateArray(String var, Expr<?> size, E elemSort) {
-        BitVecSort indexSort = ctx.mkBitVecSort(Type.getValueBitSize(IntType.getInstance()));
+        BitVecSort indexSort = sorts.getIntSort();
         Expr<?> arrRef = mkHeapRef(var);
         ArrayExpr<BitVecSort, E> arr = ctx.mkArrayConst(var + "_elems", indexSort, elemSort);
         ArrayObject arrObj = new ArrayObject(arr, size);
@@ -231,7 +233,7 @@ public class SymbolicState {
         List<BitVecExpr> sizes = new ArrayList<>(dim);
         for (int i = 0; i < dim; i++) {
             sizes.add((BitVecExpr) ctx.mkConst(var + "_len" + i,
-                    ctx.mkBitVecSort(Type.getValueBitSize(IntType.getInstance()))));
+                    sorts.getIntSort()));
         }
         return allocateMultiArray(var, sizes, elemSort);
     }
@@ -255,7 +257,7 @@ public class SymbolicState {
      * @return The reference to the newly allocated array object
      */
     public <E extends Sort> Expr<?> allocateMultiArray(String var, List<BitVecExpr> sizes, E elemSort) {
-        BitVecSort indexSort = ctx.mkBitVecSort(Type.getValueBitSize(IntType.getInstance()));
+        BitVecSort indexSort = sorts.getIntSort();
         Expr<?> arrRef = mkHeapRef(var);
         ArrayExpr<BitVecSort, E> arr = ctx.mkArrayConst(var + "_elems", indexSort, elemSort);
         ArrayExpr<BitVecSort, BitVecSort> lengths = ctx.mkArrayConst(var + "_lens", indexSort, indexSort);
@@ -397,7 +399,7 @@ public class SymbolicState {
      * @return The Z3 expr representing the heap reference
      */
     public Expr<?> mkHeapRef(String var) {
-        return ctx.mkConst(var, Z3Sorts.getInstance().getRefSort());
+        return ctx.mkConst(var, sorts.getRefSort());
     }
 
     /**

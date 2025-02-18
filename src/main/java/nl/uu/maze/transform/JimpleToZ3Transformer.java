@@ -25,6 +25,8 @@ import sootup.core.types.*;
  * Transforms a Jimple value ({@link Value}) to a Z3 expression ({@link Expr}).
  */
 public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
+    private static final Z3Sorts sorts = Z3Sorts.getInstance();
+
     private Context ctx;
     private SymbolicState state;
     private String lhs;
@@ -207,42 +209,6 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
     private BitVecExpr coerceToSort(BitVecExpr expr, BitVecSort sort) {
         return coerceToSize(expr, sort.getSize());
     }
-
-    /**
-     * Determine the Z3 sort for the given Soot type.
-     * 
-     * @param sootType The Soot type
-     * @return The Z3 sort
-     * @throws UnsupportedOperationException If the type is not supported
-     * @see Sort
-     * @see Type
-     */
-    private Sort determineSort(Type sootType) {
-        if (Type.isIntLikeType(sootType)) {
-            // Int like types are all represented as integers by SootUp, so they get the bit
-            // vector size for integers
-            return ctx.mkBitVecSort(Type.getValueBitSize(IntType.getInstance()));
-        } else if (sootType instanceof LongType) {
-            return ctx.mkBitVecSort(Type.getValueBitSize(sootType));
-        } else if (sootType instanceof DoubleType) {
-            return ctx.mkFPSort64();
-        } else if (sootType instanceof FloatType) {
-            return ctx.mkFPSort32();
-        } else if (sootType instanceof ArrayType) {
-            Sort elementSort = determineSort(((ArrayType) sootType).getElementType());
-            Sort indexSort = ctx.mkBitVecSort(Type.getValueBitSize(IntType.getInstance()));
-            return ctx.mkArraySort(indexSort, elementSort);
-        } else if (sootType instanceof ClassType) {
-            // Note: sootType.toString() will return the fully qualified name of the class
-            return ctx.mkUninterpretedSort(sootType.toString());
-        } else if (sootType instanceof NullType) {
-            return Z3Sorts.getInstance().getNullSort();
-        } else if (sootType instanceof VoidType) {
-            return Z3Sorts.getInstance().getVoidSort();
-        } else {
-            throw new UnsupportedOperationException("Unsupported type: " + sootType);
-        }
-    }
     // #endregion
 
     // #region Logic
@@ -385,12 +351,12 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
 
     @Override
     public void caseFloatConstant(@Nonnull FloatConstant constant) {
-        setResult(ctx.mkFP(constant.getValue(), (FPSort) determineSort(constant.getType())));
+        setResult(ctx.mkFP(constant.getValue(), (FPSort) sorts.determineSort(constant.getType())));
     }
 
     @Override
     public void caseDoubleConstant(@Nonnull DoubleConstant constant) {
-        setResult(ctx.mkFP(constant.getValue(), (FPSort) determineSort(constant.getType())));
+        setResult(ctx.mkFP(constant.getValue(), (FPSort) sorts.determineSort(constant.getType())));
     }
 
     @Override
@@ -457,14 +423,14 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
     // #region Arrays
     @Override
     public void caseNewArrayExpr(@Nonnull JNewArrayExpr expr) {
-        Sort elemSort = determineSort(expr.getBaseType());
+        Sort elemSort = sorts.determineSort(expr.getBaseType());
         Expr<?> size = transform(expr.getSize());
         setResult(state.allocateArray(size, elemSort));
     }
 
     @Override
     public void caseNewMultiArrayExpr(@Nonnull JNewMultiArrayExpr expr) {
-        Sort elemSort = determineSort(expr.getBaseType().getBaseType());
+        Sort elemSort = sorts.determineSort(expr.getBaseType().getBaseType());
         List<BitVecExpr> sizes = new ArrayList<>(((ArrayType) expr.getType()).getDimension());
         for (int i = 0; i < expr.getSizes().size(); i++) {
             sizes.add((BitVecExpr) transform(expr.getSizes().get(i)));
@@ -493,7 +459,7 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
 
         // Cast from number to another number
         if (innerExpr instanceof BitVecExpr || innerExpr instanceof FPExpr) {
-            Sort sort = determineSort(expr.getType());
+            Sort sort = sorts.determineSort(expr.getType());
             if (innerExpr instanceof BitVecExpr && sort instanceof FPSort) {
                 setResult(coerceToSort((BitVecExpr) innerExpr, (FPSort) sort));
             } else if (innerExpr instanceof FPExpr && sort instanceof FPSort) {
@@ -530,9 +496,10 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
             // Allocate new array on the heap
             ArrayType arrType = (ArrayType) sootType;
             if (arrType.getDimension() > 1) {
-                setResult(state.allocateMultiArray(var, arrType.getDimension(), determineSort(arrType.getBaseType())));
+                setResult(state.allocateMultiArray(var, arrType.getDimension(),
+                        sorts.determineSort(arrType.getBaseType())));
             } else {
-                setResult(state.allocateArray(var, determineSort(arrType.getBaseType())));
+                setResult(state.allocateArray(var, sorts.determineSort(arrType.getBaseType())));
             }
         } else if (sootType instanceof ClassType) {
             // TODO: deal with objects as arguments
@@ -542,7 +509,7 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
             setResult(objRef);
         } else {
             // Create a new variable for the parameter
-            setResult(ctx.mkConst(var, determineSort(sootType)));
+            setResult(ctx.mkConst(var, sorts.determineSort(sootType)));
         }
     }
 
