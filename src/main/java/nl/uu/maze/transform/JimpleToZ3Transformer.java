@@ -464,13 +464,8 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
 
     @Override
     public void caseNewMultiArrayExpr(@Nonnull JNewMultiArrayExpr expr) {
-        // Get the final element sort
-        Type elementType = expr.getBaseType();
-        while (elementType instanceof ArrayType) {
-            elementType = ((ArrayType) elementType).getElementType();
-        }
-        Sort elemSort = determineSort(elementType);
-        List<BitVecExpr> sizes = new ArrayList<>();
+        Sort elemSort = determineSort(expr.getBaseType().getBaseType());
+        List<BitVecExpr> sizes = new ArrayList<>(((ArrayType) expr.getType()).getDimension());
         for (int i = 0; i < expr.getSizes().size(); i++) {
             sizes.add((BitVecExpr) transform(expr.getSizes().get(i)));
         }
@@ -533,10 +528,12 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
 
         if (sootType instanceof ArrayType) {
             // Allocate new array on the heap
-            // TODO: arrType.getDimension() for multi-dimensional arrays
             ArrayType arrType = (ArrayType) sootType;
-            Expr<?> arrRef = state.allocateArray(var, determineSort(arrType.getElementType()));
-            setResult(arrRef);
+            if (arrType.getDimension() > 1) {
+                setResult(state.allocateMultiArray(var, arrType.getDimension(), determineSort(arrType.getBaseType())));
+            } else {
+                setResult(state.allocateArray(var, determineSort(arrType.getBaseType())));
+            }
         } else if (sootType instanceof ClassType) {
             // TODO: deal with objects as arguments
 

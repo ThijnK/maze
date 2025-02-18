@@ -225,7 +225,21 @@ public class SymbolicState {
     /**
      * Allocates a multi-dimensional array with the given sizes and element sort.
      * 
-     * @see #allocateMultiArray(String, List, int, Sort)
+     * @see #allocateMultiArray(String, List, Sort)
+     */
+    public <E extends Sort> Expr<?> allocateMultiArray(String var, int dim, E elemSort) {
+        List<BitVecExpr> sizes = new ArrayList<>(dim);
+        for (int i = 0; i < dim; i++) {
+            sizes.add((BitVecExpr) ctx.mkConst(var + "_len" + i,
+                    ctx.mkBitVecSort(Type.getValueBitSize(IntType.getInstance()))));
+        }
+        return allocateMultiArray(var, sizes, elemSort);
+    }
+
+    /**
+     * Allocates a multi-dimensional array with the given sizes and element sort.
+     * 
+     * @see #allocateMultiArray(String, List, Sort)
      */
     public <E extends Sort> Expr<?> allocateMultiArray(List<BitVecExpr> sizes, E elemSort) {
         return allocateMultiArray("arr" + heapCounter++, sizes, elemSort);
@@ -234,7 +248,10 @@ public class SymbolicState {
     /**
      * Allocates a multi-dimensional array with the given sizes and element sort.
      * 
-     * @param <E> The Z3 sort of the elements in the array
+     * @param <E>      The Z3 sort of the elements in the array
+     * @param var      The name to use for the array object on the heap
+     * @param sizes    The sizes of the array dimensions
+     * @param elemSort The Z3 sort of the elements in the array
      * @return The reference to the newly allocated array object
      */
     public <E extends Sort> Expr<?> allocateMultiArray(String var, List<BitVecExpr> sizes, E elemSort) {
