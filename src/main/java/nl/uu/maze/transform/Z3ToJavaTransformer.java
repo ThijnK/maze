@@ -44,6 +44,8 @@ public class Z3ToJavaTransformer {
             return transformBV((BitVecNum) expr, state.getParamType(var));
         } else if (expr instanceof FPNum) {
             return transformFP((FPNum) expr, state.getParamType(var));
+        } else if (expr.isString()) {
+            return expr.getString();
         } else {
             return null;
         }

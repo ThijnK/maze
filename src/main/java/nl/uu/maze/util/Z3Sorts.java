@@ -27,6 +27,7 @@ public class Z3Sorts {
     private Sort nullSort;
     private Sort voidSort;
     private Sort classSort;
+    private Sort stringSort;
 
     private BitVecSort intSort;
     private BitVecSort longSort;
@@ -39,6 +40,7 @@ public class Z3Sorts {
         nullSort = ctx.mkUninterpretedSort("Null");
         voidSort = ctx.mkUninterpretedSort("Void");
         classSort = ctx.mkUninterpretedSort("Class");
+        stringSort = ctx.mkStringSort();
 
         intSort = ctx.mkBitVecSort(Type.getValueBitSize(IntType.getInstance()));
         longSort = ctx.mkBitVecSort(Type.getValueBitSize(LongType.getInstance()));
@@ -73,6 +75,10 @@ public class Z3Sorts {
 
     public Sort getClassSort() {
         return classSort;
+    }
+
+    public Sort getStringSort() {
+        return stringSort;
     }
 
     public BitVecSort getIntSort() {
@@ -115,6 +121,9 @@ public class Z3Sorts {
             Sort elementSort = determineSort(((ArrayType) sootType).getElementType());
             return ctx.mkArraySort(getIntSort(), elementSort);
         } else if (sootType instanceof ClassType) {
+            if (sootType.toString().equals("java.lang.String")) {
+                return getStringSort();
+            }
             // Note: sootType.toString() will return the fully qualified name of the class
             return ctx.mkUninterpretedSort(sootType.toString());
         } else if (sootType instanceof NullType) {

@@ -129,6 +129,10 @@ public class JUnitTestGenerator {
                 methodBuilder.addStatement("$L $L = $L", type, var, overrideValue);
                 return;
             }
+            if (value instanceof String) {
+                methodBuilder.addStatement("String $L = \"$L\"", var, value);
+                return;
+            }
 
             // Add a "F" or "L" postfix for float and long literals
             String postfix = value instanceof Float && !Float.isInfinite((float) value)
@@ -209,6 +213,8 @@ public class JUnitTestGenerator {
                 return "0.0f";
             case "double":
                 return "0.0";
+            case "java.lang.String":
+                return "\"\"";
             default:
                 return "null";
         }

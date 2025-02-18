@@ -87,8 +87,8 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
         Expr<?> r = transform(op2);
 
         // Handle object references and null comparisons
-        Sort refSort = Z3Sorts.getInstance().getRefSort();
-        Sort nullSort = Z3Sorts.getInstance().getNullSort();
+        Sort refSort = sorts.getRefSort();
+        Sort nullSort = sorts.getNullSort();
         if (l.getSort().equals(refSort) || l.getSort().equals(nullSort) ||
                 r.getSort().equals(refSort) || r.getSort().equals(nullSort)) {
             if (l.getSort().equals(null) && r.getSort().equals(nullSort)) {
@@ -101,6 +101,11 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
                 // Simulate false as a BoolExpr
                 return ctx.mkEq(ctx.mkInt(0), ctx.mkInt(1));
             }
+        }
+
+        // Handle string comparisons
+        if (l.getSort().equals(sorts.getStringSort()) && r.getSort().equals(sorts.getStringSort())) {
+            return ctx.mkEq(l, r);
         }
 
         // Handle arithmetic operations
@@ -378,13 +383,13 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
 
     @Override
     public void caseNullConstant(@Nonnull NullConstant constant) {
-        setResult(ctx.mkConst("null", Z3Sorts.getInstance().getNullSort()));
+        setResult(ctx.mkConst("null", sorts.getNullSort()));
     }
 
     @Override
     public void caseClassConstant(@Nonnull ClassConstant constant) {
         // Ignore class constants (e.g. MyClass.class), outside of scope
-        setResult(ctx.mkConst(constant.getValue(), Z3Sorts.getInstance().getClassSort()));
+        setResult(ctx.mkConst(constant.getValue(), sorts.getClassSort()));
     }
     // #endregion
 
@@ -501,7 +506,7 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
             } else {
                 setResult(state.allocateArray(var, sorts.determineSort(arrType.getBaseType())));
             }
-        } else if (sootType instanceof ClassType) {
+        } else if (sootType instanceof ClassType && !sootType.toString().equals("java.lang.String")) {
             // TODO: deal with objects as arguments
 
             // Allocate new object on the heap
