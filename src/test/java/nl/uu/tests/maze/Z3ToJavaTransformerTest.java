@@ -15,7 +15,9 @@ import com.microsoft.z3.IntExpr;
 import com.microsoft.z3.Model;
 import com.microsoft.z3.Solver;
 
+import nl.uu.maze.execution.symbolic.SymbolicState;
 import nl.uu.maze.transform.Z3ToJavaTransformer;
+import nl.uu.maze.util.Z3Sorts;
 import sootup.core.types.Type;
 import sootup.core.types.PrimitiveType.*;
 
@@ -23,24 +25,35 @@ public class Z3ToJavaTransformerTest {
     private static Z3ToJavaTransformer transformer;
     private static Context ctx;
     private static Model model;
+    private static SymbolicState state;
 
     @BeforeAll
     public static void setUp() {
-        transformer = new Z3ToJavaTransformer();
         ctx = new Context();
+        Z3Sorts.initialize(ctx);
+        transformer = new Z3ToJavaTransformer(ctx);
         Solver solver = ctx.mkSolver();
         // BoolExpr[] constraints = new BoolExpr[] { ctx.mkTrue() };
         // solver.add(constraints);
         solver.check();
         model = solver.getModel();
+        state = new SymbolicState(ctx, null);
+        state.setParamType("int", IntType.getInstance());
+        state.setParamType("long", LongType.getInstance());
+        state.setParamType("float", FloatType.getInstance());
+        state.setParamType("double", DoubleType.getInstance());
+        state.setParamType("byte", ByteType.getInstance());
+        state.setParamType("short", ShortType.getInstance());
+        state.setParamType("char", CharType.getInstance());
+        state.setParamType("boolean", BooleanType.getInstance());
     }
 
     @Test
     public void testTransform_BoolExpr() {
         BoolExpr exprTrue = ctx.mkTrue();
         BoolExpr exprFalse = ctx.mkFalse();
-        Object resultTrue = transformer.transform(exprTrue, model, BooleanType.getInstance());
-        Object resultFalse = transformer.transform(exprFalse, model, BooleanType.getInstance());
+        Object resultTrue = transformer.transform("", exprTrue, model, state);
+        Object resultFalse = transformer.transform("", exprFalse, model, state);
 
         assert (Boolean) resultTrue;
         assert !(Boolean) resultFalse;
@@ -50,7 +63,7 @@ public class Z3ToJavaTransformerTest {
     @ValueSource(ints = { 0, 1, -1, 69, -69, Integer.MAX_VALUE, Integer.MIN_VALUE })
     public void testTransform_IntExpr(int value) {
         IntExpr expr = ctx.mkInt(value);
-        Object result = transformer.transform(expr, model, IntType.getInstance());
+        Object result = transformer.transform("int", expr, model, state);
         assertEquals(value, result);
 
     }
@@ -60,7 +73,7 @@ public class Z3ToJavaTransformerTest {
     public void testTransform_BVExpr_Int(int value) {
         Type type = IntType.getInstance();
         BitVecExpr expr = ctx.mkBV(value, Type.getValueBitSize(type));
-        Object result = transformer.transform(expr, model, type);
+        Object result = transformer.transform("int", expr, model, state);
         assertEquals(value, result);
     }
 
@@ -69,7 +82,7 @@ public class Z3ToJavaTransformerTest {
     public void testTransform_BVExpr_Long(long value) {
         Type type = LongType.getInstance();
         BitVecExpr expr = ctx.mkBV(value, Type.getValueBitSize(type));
-        Object result = transformer.transform(expr, model, type);
+        Object result = transformer.transform("long", expr, model, state);
         assertEquals(value, result);
     }
 
@@ -78,7 +91,7 @@ public class Z3ToJavaTransformerTest {
         byte value = Byte.MAX_VALUE;
         Type type = ByteType.getInstance();
         BitVecExpr expr = ctx.mkBV(value, Type.getValueBitSize(type));
-        Object result = transformer.transform(expr, model, type);
+        Object result = transformer.transform("byte", expr, model, state);
         assertEquals(value, result);
     }
 
@@ -87,7 +100,7 @@ public class Z3ToJavaTransformerTest {
         short value = Short.MAX_VALUE;
         Type type = ShortType.getInstance();
         BitVecExpr expr = ctx.mkBV(value, Type.getValueBitSize(type));
-        Object result = transformer.transform(expr, model, type);
+        Object result = transformer.transform("short", expr, model, state);
         assertEquals(value, result);
     }
 
@@ -96,7 +109,7 @@ public class Z3ToJavaTransformerTest {
         char value = 'a';
         Type type = CharType.getInstance();
         BitVecExpr expr = ctx.mkBV(value, Type.getValueBitSize(type));
-        Object result = transformer.transform(expr, model, type);
+        Object result = transformer.transform("char", expr, model, state);
         assertEquals(value, result);
     }
 
@@ -105,7 +118,7 @@ public class Z3ToJavaTransformerTest {
         boolean value = true;
         Type type = BooleanType.getInstance();
         BitVecExpr expr = ctx.mkBV(value ? 1 : 0, Type.getValueBitSize(type));
-        Object result = transformer.transform(expr, model, type);
+        Object result = transformer.transform("boolean", expr, model, state);
         assertEquals(value, result);
     }
 
@@ -114,7 +127,7 @@ public class Z3ToJavaTransformerTest {
             Float.NEGATIVE_INFINITY, Float.NaN })
     public void testTransform_FPExpr_Float(float value) {
         FPNum expr = ctx.mkFP(value, ctx.mkFPSort32());
-        Object result = transformer.transform(expr, model, FloatType.getInstance());
+        Object result = transformer.transform("float", expr, model, state);
         assertEquals(value, result);
     }
 
@@ -123,7 +136,7 @@ public class Z3ToJavaTransformerTest {
             Double.NEGATIVE_INFINITY, Double.NaN })
     public void testTransform_FPExpr_Double(double value) {
         FPNum expr = ctx.mkFP(value, ctx.mkFPSort64());
-        Object result = transformer.transform(expr, model, DoubleType.getInstance());
+        Object result = transformer.transform("double", expr, model, state);
         assertEquals(value, result);
     }
 }
