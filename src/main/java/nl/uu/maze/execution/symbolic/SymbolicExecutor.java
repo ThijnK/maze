@@ -216,8 +216,8 @@ public class SymbolicExecutor {
     private List<SymbolicState> handleOtherStmts(StmtGraph<?> cfg, Stmt stmt, SymbolicState state) {
         List<SymbolicState> newStates = new ArrayList<SymbolicState>();
         List<Stmt> succs = cfg.getAllSuccessors(stmt);
-        // Note: there will never be more than one successor for non-branching
-        // statements, so this for loop is here "just in case"
+        // Note: generally non-branching statements will not have more than 1 successor,
+        // but it can happen for exception-throwing statements
         for (int i = 0; i < succs.size(); i++) {
             SymbolicState newState = i == succs.size() - 1 ? state : state.clone();
             newState.setCurrentStmt(succs.get(i));

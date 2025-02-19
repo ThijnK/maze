@@ -18,7 +18,6 @@ import sootup.core.jimple.basic.*;
 import sootup.core.jimple.common.constant.*;
 import sootup.core.jimple.common.expr.*;
 import sootup.core.jimple.common.ref.*;
-import sootup.core.types.PrimitiveType.*;
 import sootup.core.types.*;
 
 /**
@@ -91,9 +90,9 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
         Sort nullSort = sorts.getNullSort();
         if (l.getSort().equals(refSort) || l.getSort().equals(nullSort) ||
                 r.getSort().equals(refSort) || r.getSort().equals(nullSort)) {
-            if (l.getSort().equals(null) && r.getSort().equals(nullSort)) {
-                // TODO: obviously not ideal, because you may explore infeasible paths
+            if (l.getSort().equals(nullSort) && r.getSort().equals(nullSort)) {
                 // Simulate true as a BoolExpr
+                // TODO: obviously not ideal, because you may explore infeasible paths
                 return ctx.mkEq(ctx.mkInt(0), ctx.mkInt(0));
             } else if (l.getSort().equals(refSort) && r.getSort().equals(refSort)) {
                 return ctx.mkEq(l, r);
@@ -423,6 +422,15 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
         Expr<?> objRef = state.getVariable(ref.getBase().getName());
         setResult(state.getField(objRef, ref.getFieldSignature().getName()));
     }
+
+    /**
+     * Caught exceptions are essentially objects, so we treat them as such.
+     */
+    @Override
+    public void caseCaughtExceptionRef(@Nonnull JCaughtExceptionRef ref) {
+        // TODO: may have to instantiate the Throwable object here with symbolic values
+        setResult(state.allocateObject());
+    }
     // #endregion
 
     // #region Arrays
@@ -521,14 +529,6 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
     @Override
     public void caseLocal(@Nonnull Local local) {
         setResult(state.getVariable(local.getName()));
-    }
-    // #endregion
-
-    // #region Control flow
-    @Override
-    public void caseCaughtExceptionRef(@Nonnull JCaughtExceptionRef ref) {
-        // TODO Auto-generated method stub
-        super.caseCaughtExceptionRef(ref);
     }
     // #endregion
 }
