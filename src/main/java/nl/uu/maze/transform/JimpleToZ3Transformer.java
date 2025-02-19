@@ -490,10 +490,11 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
 
     @Override
     public void caseInstanceOfExpr(@Nonnull JInstanceOfExpr expr) {
-        Type checkType = expr.getCheckType();
-        Type actualType = expr.getOp().getType();
-        boolean isInstance = checkType.equals(actualType) || checkType.equals(NullType.getInstance());
-        setResult(ctx.mkBV(isInstance ? 1 : 0, Type.getValueBitSize(IntType.getInstance())));
+        // Create a symbolic value that we can later use to derive whether the operand
+        // is an instance of the given type
+        Expr<?> op = transform(expr.getOp());
+        Expr<?> instof = ctx.mkConst(op + "_instof_" + expr.getCheckType(), sorts.getIntSort());
+        setResult(instof);
     }
     // #endregion
 
