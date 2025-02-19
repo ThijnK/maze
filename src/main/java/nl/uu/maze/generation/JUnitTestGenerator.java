@@ -90,7 +90,10 @@ public class JUnitTestGenerator {
             String var = ArgMap.getSymbolicName(methodType, i);
             params.add(var);
             Object value = argMap.get(var);
-            String valueStr = value == null ? getDefaultValue(paramTypes.get(i)) : valueToString(value);
+            // If the ArgMap contains no value, use a default value
+            // Note that it's possible that it contains a null value, in which case it's
+            // intentional
+            String valueStr = !argMap.containsKey(var) ? getDefaultValue(paramTypes.get(i)) : valueToString(value);
             methodBuilder.addStatement("$L $L = $L", paramTypes.get(i), var, valueStr);
         }
         return params;
@@ -137,6 +140,9 @@ public class JUnitTestGenerator {
      * source file.
      */
     private String valueToString(Object value) {
+        if (value == null) {
+            return "null";
+        }
         if (value instanceof String) {
             return "\"" + value + "\"";
         }

@@ -85,25 +85,10 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
         Expr<?> l = transform(op1);
         Expr<?> r = transform(op2);
 
-        // Handle object references and null comparisons
+        // Handle reference and null comparisons, and string comparisons
         Sort refSort = sorts.getRefSort();
-        Sort nullSort = sorts.getNullSort();
-        if (l.getSort().equals(refSort) || l.getSort().equals(nullSort) ||
-                r.getSort().equals(refSort) || r.getSort().equals(nullSort)) {
-            if (l.getSort().equals(nullSort) && r.getSort().equals(nullSort)) {
-                // Simulate true as a BoolExpr
-                // TODO: obviously not ideal, because you may explore infeasible paths
-                return ctx.mkEq(ctx.mkInt(0), ctx.mkInt(0));
-            } else if (l.getSort().equals(refSort) && r.getSort().equals(refSort)) {
-                return ctx.mkEq(l, r);
-            } else {
-                // Simulate false as a BoolExpr
-                return ctx.mkEq(ctx.mkInt(0), ctx.mkInt(1));
-            }
-        }
-
-        // Handle string comparisons
-        if (l.getSort().equals(sorts.getStringSort()) && r.getSort().equals(sorts.getStringSort())) {
+        if (l.getSort().equals(refSort) || r.getSort().equals(refSort) || l.getSort().equals(sorts.getStringSort())
+                || r.getSort().equals(sorts.getStringSort())) {
             return ctx.mkEq(l, r);
         }
 
@@ -382,7 +367,7 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
 
     @Override
     public void caseNullConstant(@Nonnull NullConstant constant) {
-        setResult(ctx.mkConst("null", sorts.getNullSort()));
+        setResult(sorts.getNullConst());
     }
 
     @Override

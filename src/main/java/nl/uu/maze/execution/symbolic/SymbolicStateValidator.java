@@ -18,6 +18,7 @@ import com.microsoft.z3.Status;
 import nl.uu.maze.execution.ArgMap;
 import nl.uu.maze.execution.symbolic.SymbolicState.ArrayObject;
 import nl.uu.maze.transform.Z3ToJavaTransformer;
+import nl.uu.maze.util.Z3Sorts;
 import sootup.core.types.ArrayType;
 import sootup.core.types.Type;
 
@@ -93,15 +94,31 @@ public class SymbolicStateValidator {
     public ArgMap evaluate(Model model, SymbolicState state) {
         ArgMap argMap = new ArgMap();
 
+        // nullValue is the interpreted value of the null constant
+        // If any argument is interpreted to be equal to nullValue, it is considered
+        // null
+        // This would be the case if there was a null comparison in the path condition
+        Expr<?> nullExpr = model.eval(Z3Sorts.getInstance().getNullConst(), true);
+
+        // TODO: handle cases where references are interpreted to be equal
+        // need to set those arguments to the same object somehow
+
         for (FuncDecl<?> decl : model.getConstDecls()) {
             String var = decl.getName().toString();
             if (!var.contains("arg")) {
                 continue;
             }
+            Expr<?> expr = model.getConstInterp(decl);
 
             // Remove potential suffixes (e.g., _elems, _len)
             var = var.contains("_") ? var.substring(0, var.indexOf('_')) : var;
             Type type = state.getParamType(var);
+
+            // If the variable is interpreted as null, set it to null
+            if (expr.equals(nullExpr)) {
+                argMap.set(var, null);
+                continue;
+            }
 
             // For arrays
             if (type instanceof ArrayType) {

@@ -2,6 +2,7 @@ package nl.uu.maze.util;
 
 import com.microsoft.z3.BitVecSort;
 import com.microsoft.z3.Context;
+import com.microsoft.z3.Expr;
 import com.microsoft.z3.FPSort;
 import com.microsoft.z3.Sort;
 
@@ -24,7 +25,8 @@ public class Z3Sorts {
     private Context ctx;
 
     private Sort refSort;
-    private Sort nullSort;
+    /** Null constant, used for null comparisons etc. */
+    private Expr<?> nullConst;
     private Sort voidSort;
     private Sort classSort;
     private Sort stringSort;
@@ -37,7 +39,7 @@ public class Z3Sorts {
     private Z3Sorts(Context ctx) {
         this.ctx = ctx;
         refSort = ctx.mkUninterpretedSort("Ref");
-        nullSort = ctx.mkUninterpretedSort("Null");
+        nullConst = ctx.mkConst("null", refSort);
         voidSort = ctx.mkUninterpretedSort("Void");
         classSort = ctx.mkUninterpretedSort("Class");
         stringSort = ctx.mkStringSort();
@@ -65,8 +67,8 @@ public class Z3Sorts {
         return refSort;
     }
 
-    public Sort getNullSort() {
-        return nullSort;
+    public Expr<?> getNullConst() {
+        return nullConst;
     }
 
     public Sort getVoidSort() {
@@ -127,7 +129,7 @@ public class Z3Sorts {
             // Note: sootType.toString() will return the fully qualified name of the class
             return ctx.mkUninterpretedSort(sootType.toString());
         } else if (sootType instanceof NullType) {
-            return getNullSort();
+            return getRefSort();
         } else if (sootType instanceof VoidType) {
             return getVoidSort();
         } else {
