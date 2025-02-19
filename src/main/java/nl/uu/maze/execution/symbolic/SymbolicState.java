@@ -28,6 +28,12 @@ import sootup.core.types.PrimitiveType.IntType;
  * </p>
  */
 public class SymbolicState {
+    /**
+     * The maximum length of an array to avoid memory issues trying to reconstruct
+     * really large arrays.
+     */
+    private static final int MAX_ARRAY_LENGTH = 100;
+
     private static final Z3Sorts sorts = Z3Sorts.getInstance();
 
     private Context ctx;
@@ -192,7 +198,11 @@ public class SymbolicState {
      * @see #allocateArray(String, Expr, Sort)
      */
     public <E extends Sort> Expr<?> allocateArray(String var, E elemSort) {
-        Expr<?> len = ctx.mkConst(var + "_len", sorts.getIntSort());
+        Expr<BitVecSort> len = ctx.mkConst(var + "_len", sorts.getIntSort());
+        // Make sure array size is non-negative and does not exceed the max length
+        addPathConstraint(ctx.mkBVSGE(len, ctx.mkBV(0, Type.getValueBitSize(IntType.getInstance()))));
+        addPathConstraint(ctx.mkBVSLT(len, ctx.mkBV(MAX_ARRAY_LENGTH, Type.getValueBitSize(IntType.getInstance()))));
+
         return allocateArray(var, len, elemSort);
     }
 
@@ -232,9 +242,14 @@ public class SymbolicState {
     public <E extends Sort> Expr<?> allocateMultiArray(String var, int dim, E elemSort) {
         List<BitVecExpr> sizes = new ArrayList<>(dim);
         for (int i = 0; i < dim; i++) {
-            sizes.add((BitVecExpr) ctx.mkConst(var + "_len" + i,
-                    sorts.getIntSort()));
+            Expr<BitVecSort> size = ctx.mkConst(var + "_len" + i, sorts.getIntSort());
+            sizes.add((BitVecExpr) size);
+            // Make sure array size is non-negative and does not exceed the max length
+            addPathConstraint(ctx.mkBVSGE(size, ctx.mkBV(0, Type.getValueBitSize(IntType.getInstance()))));
+            addPathConstraint(
+                    ctx.mkBVSLT(size, ctx.mkBV(MAX_ARRAY_LENGTH, Type.getValueBitSize(IntType.getInstance()))));
         }
+
         return allocateMultiArray(var, sizes, elemSort);
     }
 

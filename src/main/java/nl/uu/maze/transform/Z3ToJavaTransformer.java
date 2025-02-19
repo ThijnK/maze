@@ -125,6 +125,8 @@ public class Z3ToJavaTransformer {
         for (int i = 0; i < dim; i++) {
             Expr<BitVecSort> lenExpr = arrObj.getLength(i);
             lengths[i] = (int) transformExpr(model.eval(lenExpr, true), IntType.getInstance());
+            // If for whatever reason, the length is negative, return null (should never
+            // happen)
             if (lengths[i] < 0) {
                 return null;
             }
