@@ -404,6 +404,33 @@ public class SymbolicState {
     }
 
     /**
+     * Determines whether the given variable references an array.
+     */
+    public boolean isArray(String var) {
+        return heap.containsKey(symbolicVariables.get(var))
+                && heap.get(symbolicVariables.get(var)) instanceof ArrayObject;
+    }
+
+    /**
+     * Determines whether the given variable references a multi-dimensional array.
+     */
+    public boolean isMultiArray(String var) {
+        return heap.containsKey(symbolicVariables.get(var))
+                && heap.get(symbolicVariables.get(var)) instanceof MultiArrayObject;
+    }
+
+    /**
+     * Copies the array indices for the given variable to the new variable.
+     * Useful when the array reference is reassigned to another variable.
+     */
+    public void copyArrayIndices(String from, String to) {
+        BitVecExpr[] indices = arrayIndices.get(from);
+        if (indices != null) {
+            arrayIndices.put(to, indices);
+        }
+    }
+
+    /**
      * Creates a new Z3 constant representing a reference to a heap object.
      * 
      * @param var The name of the reference variable

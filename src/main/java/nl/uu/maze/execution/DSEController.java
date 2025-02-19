@@ -47,7 +47,7 @@ public class DSEController {
     private static final Logger logger = LoggerFactory.getLogger(DSEController.class);
 
     /** Max path length for symbolic execution */
-    private final int MAX_DEPTH = 20;
+    private final int MAX_DEPTH = 50;
 
     private final boolean concreteDriven;
     private final Path outPath;

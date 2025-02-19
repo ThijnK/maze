@@ -529,7 +529,15 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
 
     @Override
     public void caseLocal(@Nonnull Local local) {
-        setResult(state.getVariable(local.getName()));
+        String var = local.getName();
+        // If this local is a reference to an array, need to also set the collected
+        // array indices for the lhs (if any) to a copy of the local's array indices
+        // (this is only applicable to multi-dimensional arrays)
+        if (lhs != null && state.isMultiArray(var)) {
+            state.copyArrayIndices(var, lhs);
+        }
+
+        setResult(state.getVariable(var));
     }
     // #endregion
 }
