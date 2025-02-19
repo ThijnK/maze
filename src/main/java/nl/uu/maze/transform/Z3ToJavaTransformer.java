@@ -1,6 +1,5 @@
 package nl.uu.maze.transform;
 
-import com.microsoft.z3.ArrayExpr;
 import com.microsoft.z3.BitVecExpr;
 import com.microsoft.z3.BitVecNum;
 import com.microsoft.z3.BitVecSort;
@@ -9,7 +8,6 @@ import com.microsoft.z3.Expr;
 import com.microsoft.z3.FPNum;
 import com.microsoft.z3.Model;
 
-import nl.uu.maze.execution.symbolic.SymbolicState;
 import nl.uu.maze.execution.symbolic.SymbolicState.ArrayObject;
 import nl.uu.maze.execution.symbolic.SymbolicState.MultiArrayObject;
 import sootup.core.types.Type;
@@ -25,21 +23,18 @@ public class Z3ToJavaTransformer {
         this.ctx = ctx;
     }
 
-    /**
-     * Transform a Z3 expression to a Java object.
-     */
-    @SuppressWarnings("unchecked")
-    public Object transform(String var, Expr<?> expr, Model model, SymbolicState state) {
+    /** Transform a Z3 expression to a Java object. */
+    public Object transformExpr(Expr<?> expr, Type type) {
         if (expr.isBool()) {
             return expr.isTrue();
         } else if (expr.isInt()) {
             return Integer.parseInt(expr.toString());
         } else if (expr.isArray()) {
-            return transformArray(var, (ArrayExpr<BitVecSort, ?>) expr, model, state);
+            throw new UnsupportedOperationException("Use transformArray() for array expressions");
         } else if (expr.isBV() && expr instanceof BitVecNum) {
-            return transformBV((BitVecNum) expr, state.getParamType(var));
+            return transformBV((BitVecNum) expr, type);
         } else if (expr instanceof FPNum) {
-            return transformFP((FPNum) expr, state.getParamType(var));
+            return transformFP((FPNum) expr, type);
         } else if (expr.isString()) {
             return expr.getString();
         } else {
@@ -114,32 +109,29 @@ public class Z3ToJavaTransformer {
         }
     }
 
-    /** Transform a Z3 array to a Java array */
-    private Object transformArray(String var, ArrayExpr<BitVecSort, ?> arrExpr, Model model, SymbolicState state) {
-        Expr<?> arrRef = state.mkHeapRef(var);
-        ArrayObject arrObj = state.getArrayObject(arrRef);
-
+    /** Transform a Z3 array to a Java array with the given element type. */
+    public Object transformArray(ArrayObject arrObj, Model model, Type elemType) {
         if (arrObj instanceof MultiArrayObject) {
-            return transformMultiArray((MultiArrayObject) arrObj, model, state);
+            return transformMultiArray((MultiArrayObject) arrObj, model, elemType);
         } else {
-            return transformSingleArray(arrObj, model, state);
+            return transformSingleArray(arrObj, model, elemType);
         }
     }
 
-    /** Transform a Z3 multi-dimensional array to a Java multi-dimensional array */
-    private Object transformMultiArray(MultiArrayObject arrObj, Model model, SymbolicState state) {
+    /** Transform a Z3 multi-dimensional array to a Java multi-dimensional array. */
+    private Object transformMultiArray(MultiArrayObject arrObj, Model model, Type elemType) {
         int dim = arrObj.getDim();
         int[] lengths = new int[dim];
         for (int i = 0; i < dim; i++) {
             Expr<BitVecSort> lenExpr = arrObj.getLength(i);
-            lengths[i] = (int) transform("", model.eval(lenExpr, true), model, state);
+            lengths[i] = (int) transformExpr(model.eval(lenExpr, true), IntType.getInstance());
             if (lengths[i] < 0) {
                 return null;
             }
         }
 
         // Recursively build the multi-dimensional array
-        return buildMultiArray(arrObj, model, state, lengths, 0, new int[dim]);
+        return buildMultiArray(arrObj, model, elemType, lengths, 0, new int[dim]);
     }
 
     /**
@@ -155,8 +147,8 @@ public class Z3ToJavaTransformer {
      * @param indices    The multi-index built so far.
      * @return A Java Object representing the multi-dimensional array.
      */
-    private Object buildMultiArray(MultiArrayObject arrObj, Model model,
-            SymbolicState state, int[] lengths, int currentDim, int[] indices) {
+    private Object buildMultiArray(MultiArrayObject arrObj, Model model, Type elemType, int[] lengths, int currentDim,
+            int[] indices) {
         if (currentDim == lengths.length) {
             // All dimensions filled, evaluate element at flattened index
             BitVecExpr[] idxExprs = new BitVecExpr[lengths.length];
@@ -164,22 +156,22 @@ public class Z3ToJavaTransformer {
                 idxExprs[i] = ctx.mkBV(indices[i], Type.getValueBitSize(IntType.getInstance()));
             }
             Expr<?> element = model.eval(arrObj.getElem(idxExprs), true);
-            return transform("", element, model, state);
+            return transformExpr(element, elemType);
         } else {
             // Fill the current dimension
             Object[] arr = new Object[lengths[currentDim]];
             for (int i = 0; i < lengths[currentDim]; i++) {
                 indices[currentDim] = i;
-                arr[i] = buildMultiArray(arrObj, model, state, lengths, currentDim + 1, indices);
+                arr[i] = buildMultiArray(arrObj, model, elemType, lengths, currentDim + 1, indices);
             }
             return arr;
         }
     }
 
     /** Transform a Z3 single-dimensional array to a Java array */
-    private Object transformSingleArray(ArrayObject arrObj, Model model, SymbolicState state) {
+    private Object transformSingleArray(ArrayObject arrObj, Model model, Type elemType) {
         Expr<?> lenExpr = arrObj.getLength();
-        int length = (int) transform("", model.eval(lenExpr, true), model, state);
+        int length = (int) transformExpr(model.eval(lenExpr, true), elemType);
         if (length < 0) {
             return null;
         }
@@ -189,7 +181,7 @@ public class Z3ToJavaTransformer {
             BitVecExpr index = ctx.mkBV(i, Type.getValueBitSize(IntType.getInstance()));
             // Select element at the index
             Expr<?> element = model.eval(arrObj.getElem(index), true);
-            arr[i] = transform("", element, model, state);
+            arr[i] = transformExpr(element, elemType);
         }
         return arr;
     }

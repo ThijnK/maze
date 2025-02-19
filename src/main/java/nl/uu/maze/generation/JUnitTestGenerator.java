@@ -140,6 +140,9 @@ public class JUnitTestGenerator {
         if (value instanceof String) {
             return "\"" + value + "\"";
         }
+        if (value instanceof Character) {
+            return "\'" + Character.toString((char) value) + "\'";
+        }
         if (value instanceof Object[]) {
             return arrayToString((Object[]) value);
         }

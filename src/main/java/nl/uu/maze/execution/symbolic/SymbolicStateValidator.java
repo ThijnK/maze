@@ -16,7 +16,10 @@ import com.microsoft.z3.Solver;
 import com.microsoft.z3.Status;
 
 import nl.uu.maze.execution.ArgMap;
+import nl.uu.maze.execution.symbolic.SymbolicState.ArrayObject;
 import nl.uu.maze.transform.Z3ToJavaTransformer;
+import sootup.core.types.ArrayType;
+import sootup.core.types.Type;
 
 /**
  * Validates symbolic states by checking the satisfiability of the path
@@ -95,26 +98,28 @@ public class SymbolicStateValidator {
             if (!var.contains("arg")) {
                 continue;
             }
-            Expr<?> expr = model.getConstInterp(decl);
+
+            // Remove potential suffixes (e.g., _elems, _len)
+            var = var.contains("_") ? var.substring(0, var.indexOf('_')) : var;
+            Type type = state.getParamType(var);
 
             // For arrays
-            boolean isElems = var.endsWith("_elems"), isLen = var.contains("_len");
-            if (isElems || isLen) {
-                var = var.substring(0, var.lastIndexOf('_'));
-
-                // If the model contains a _len decl for an array, but no _elems decl for the
-                // same array, we still need to evaluate the array
-                // So, if this array var is not yet in the ArgMap (_elems not present or not yet
-                // encountered), add it
-                if (isLen) {
-                    if (argMap.containsKey(var)) {
-                        continue;
-                    }
-                    expr = state.getArray(state.mkHeapRef(var));
+            if (type instanceof ArrayType) {
+                // There can be multiple declarations for the same array (elems and len)
+                if (argMap.containsKey(var)) {
+                    continue;
                 }
+
+                Expr<?> arrRef = state.mkHeapRef(var);
+                ArrayObject arrObj = state.getArrayObject(arrRef);
+                Type elemType = ((ArrayType) type).getBaseType();
+                Object arr = transformer.transformArray(arrObj, model, elemType);
+                argMap.set(var, arr);
+            } else {
+                // Primitive types
+                Object value = transformer.transformExpr(model.getConstInterp(decl), type);
+                argMap.set(var, value);
             }
-            Object value = transformer.transform(var, expr, model, state);
-            argMap.set(var, value);
         }
         return argMap;
     }

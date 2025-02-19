@@ -52,8 +52,8 @@ public class Z3ToJavaTransformerTest {
     public void testTransform_BoolExpr() {
         BoolExpr exprTrue = ctx.mkTrue();
         BoolExpr exprFalse = ctx.mkFalse();
-        Object resultTrue = transformer.transform("", exprTrue, model, state);
-        Object resultFalse = transformer.transform("", exprFalse, model, state);
+        Object resultTrue = transformer.transformExpr("", exprTrue, model, state);
+        Object resultFalse = transformer.transformExpr("", exprFalse, model, state);
 
         assert (Boolean) resultTrue;
         assert !(Boolean) resultFalse;
@@ -63,7 +63,7 @@ public class Z3ToJavaTransformerTest {
     @ValueSource(ints = { 0, 1, -1, 69, -69, Integer.MAX_VALUE, Integer.MIN_VALUE })
     public void testTransform_IntExpr(int value) {
         IntExpr expr = ctx.mkInt(value);
-        Object result = transformer.transform("int", expr, model, state);
+        Object result = transformer.transformExpr("int", expr, model, state);
         assertEquals(value, result);
 
     }
@@ -73,7 +73,7 @@ public class Z3ToJavaTransformerTest {
     public void testTransform_BVExpr_Int(int value) {
         Type type = IntType.getInstance();
         BitVecExpr expr = ctx.mkBV(value, Type.getValueBitSize(type));
-        Object result = transformer.transform("int", expr, model, state);
+        Object result = transformer.transformExpr("int", expr, model, state);
         assertEquals(value, result);
     }
 
@@ -82,7 +82,7 @@ public class Z3ToJavaTransformerTest {
     public void testTransform_BVExpr_Long(long value) {
         Type type = LongType.getInstance();
         BitVecExpr expr = ctx.mkBV(value, Type.getValueBitSize(type));
-        Object result = transformer.transform("long", expr, model, state);
+        Object result = transformer.transformExpr("long", expr, model, state);
         assertEquals(value, result);
     }
 
@@ -91,7 +91,7 @@ public class Z3ToJavaTransformerTest {
         byte value = Byte.MAX_VALUE;
         Type type = ByteType.getInstance();
         BitVecExpr expr = ctx.mkBV(value, Type.getValueBitSize(type));
-        Object result = transformer.transform("byte", expr, model, state);
+        Object result = transformer.transformExpr("byte", expr, model, state);
         assertEquals(value, result);
     }
 
@@ -100,7 +100,7 @@ public class Z3ToJavaTransformerTest {
         short value = Short.MAX_VALUE;
         Type type = ShortType.getInstance();
         BitVecExpr expr = ctx.mkBV(value, Type.getValueBitSize(type));
-        Object result = transformer.transform("short", expr, model, state);
+        Object result = transformer.transformExpr("short", expr, model, state);
         assertEquals(value, result);
     }
 
@@ -109,7 +109,7 @@ public class Z3ToJavaTransformerTest {
         char value = 'a';
         Type type = CharType.getInstance();
         BitVecExpr expr = ctx.mkBV(value, Type.getValueBitSize(type));
-        Object result = transformer.transform("char", expr, model, state);
+        Object result = transformer.transformExpr("char", expr, model, state);
         assertEquals(value, result);
     }
 
@@ -118,7 +118,7 @@ public class Z3ToJavaTransformerTest {
         boolean value = true;
         Type type = BooleanType.getInstance();
         BitVecExpr expr = ctx.mkBV(value ? 1 : 0, Type.getValueBitSize(type));
-        Object result = transformer.transform("boolean", expr, model, state);
+        Object result = transformer.transformExpr("boolean", expr, model, state);
         assertEquals(value, result);
     }
 
@@ -127,7 +127,7 @@ public class Z3ToJavaTransformerTest {
             Float.NEGATIVE_INFINITY, Float.NaN })
     public void testTransform_FPExpr_Float(float value) {
         FPNum expr = ctx.mkFP(value, ctx.mkFPSort32());
-        Object result = transformer.transform("float", expr, model, state);
+        Object result = transformer.transformExpr("float", expr, model, state);
         assertEquals(value, result);
     }
 
@@ -136,7 +136,7 @@ public class Z3ToJavaTransformerTest {
             Double.NEGATIVE_INFINITY, Double.NaN })
     public void testTransform_FPExpr_Double(double value) {
         FPNum expr = ctx.mkFP(value, ctx.mkFPSort64());
-        Object result = transformer.transform("double", expr, model, state);
+        Object result = transformer.transformExpr("double", expr, model, state);
         assertEquals(value, result);
     }
 }
