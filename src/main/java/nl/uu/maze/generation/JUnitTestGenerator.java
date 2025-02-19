@@ -18,7 +18,6 @@ import com.palantir.javapoet.*;
 
 import nl.uu.maze.execution.ArgMap;
 import nl.uu.maze.execution.MethodType;
-import nl.uu.maze.util.ArrayUtils;
 
 /**
  * Generates JUnit test cases from a given Z3 model and symbolic state for a
@@ -90,61 +89,11 @@ public class JUnitTestGenerator {
         for (int i = 0; i < paramTypes.size(); i++) {
             String var = ArgMap.getSymbolicName(methodType, i);
             params.add(var);
-            addDefinitionStmt(methodBuilder, paramTypes.get(i), var, argMap);
+            Object value = argMap.get(var);
+            String valueStr = value == null ? getDefaultValue(paramTypes.get(i)) : valueToString(value);
+            methodBuilder.addStatement("$L $L = $L", paramTypes.get(i), var, valueStr);
         }
         return params;
-    }
-
-    /*
-     * Adds a statement to the given method builder that defines a variable of the
-     * given type with the given value.
-     * 
-     * TODO: add support for objects
-     */
-    private void addDefinitionStmt(MethodSpec.Builder methodBuilder, Type type, String var, ArgMap argMap) {
-        Object value = argMap.get(var);
-
-        if (type instanceof ArrayType && value instanceof Object[]) {
-            // TODO: multi-dimensional arrays
-            methodBuilder.addStatement("$L $L = $L", type, var, ArrayUtils.toString((Object[]) value, true));
-        }
-        // If value is a primitive type, handle it as a literal
-        else if (value != null) {
-            // Handle special cases for float and double
-            String overrideValue = "";
-            if (value instanceof Float) {
-                if (Float.isNaN((float) value)) {
-                    overrideValue = "Float.NaN";
-                } else if (Float.isInfinite((float) value)) {
-                    overrideValue = ((float) value > 0) ? "Float.POSITIVE_INFINITY" : "Float.NEGATIVE_INFINITY";
-                }
-            } else if (value instanceof Double) {
-                if (Double.isNaN((double) value)) {
-                    overrideValue = "Double.NaN";
-                } else if (Double.isInfinite((double) value)) {
-                    overrideValue = ((double) value > 0) ? "Double.POSITIVE_INFINITY" : "Double.NEGATIVE_INFINITY";
-                }
-            }
-            if (!overrideValue.isEmpty()) {
-                methodBuilder.addStatement("$L $L = $L", type, var, overrideValue);
-                return;
-            }
-            if (value instanceof String) {
-                methodBuilder.addStatement("String $L = \"$L\"", var, value);
-                return;
-            }
-
-            // Add a "F" or "L" postfix for float and long literals
-            String postfix = value instanceof Float && !Float.isInfinite((float) value)
-                    && !Float.isNaN((float) value) ? "F"
-                            : value instanceof Long ? "L" : "";
-            methodBuilder.addStatement("$L $L = $L$L", type, var, value, postfix);
-        }
-        // If value is not known, use a default value
-        else {
-            methodBuilder.addStatement("$L $L = $L", type, var,
-                    getDefaultValue(type));
-        }
     }
 
     /**
@@ -181,6 +130,69 @@ public class JUnitTestGenerator {
         } catch (Exception e) {
             logger.error("Failed to generate JUnit test cases: " + e.getMessage());
         }
+    }
+
+    /**
+     * Converts a value to a string representation that can be used in a Java
+     * source file.
+     */
+    private String valueToString(Object value) {
+        if (value instanceof String) {
+            return "\"" + value + "\"";
+        }
+        if (value instanceof Object[]) {
+            return arrayToString((Object[]) value);
+        }
+
+        // Handle special cases for float and double
+        if (value instanceof Float) {
+            if (Float.isNaN((float) value)) {
+                return "Float.NaN";
+            } else if (Float.isInfinite((float) value)) {
+                return ((float) value > 0) ? "Float.POSITIVE_INFINITY" : "Float.NEGATIVE_INFINITY";
+            }
+        } else if (value instanceof Double) {
+            if (Double.isNaN((double) value)) {
+                return "Double.NaN";
+            } else if (Double.isInfinite((double) value)) {
+                return ((double) value > 0) ? "Double.POSITIVE_INFINITY" : "Double.NEGATIVE_INFINITY";
+            }
+        }
+
+        // Add a "F" or "L" postfix for float and long literals
+        String postfix = value instanceof Float && !Float.isInfinite((float) value)
+                && !Float.isNaN((float) value) ? "F"
+                        : value instanceof Long ? "L" : "";
+        return value + postfix;
+    }
+
+    /**
+     * Converts an array to a string representation that can be used in a Java
+     * source file.
+     */
+    private String arrayToString(Object[] arr) {
+        if (arr == null) {
+            return "null";
+        }
+        if (arr.length == 0) {
+            return "{}";
+        }
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("{ ");
+        for (int i = 0; i < arr.length; i++) {
+            if (arr[i] instanceof Object[]) {
+                sb.append(arrayToString((Object[]) arr[i]));
+            } else {
+                sb.append(valueToString(arr[i]));
+            }
+
+            if (i < arr.length - 1) {
+                sb.append(", ");
+            }
+        }
+        sb.append(" }");
+        return sb.toString();
     }
 
     /**

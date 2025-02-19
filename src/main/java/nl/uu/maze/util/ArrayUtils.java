@@ -21,22 +21,15 @@ public class ArrayUtils {
     }
 
     public static String toString(Object[] arr) {
-        return toString(arr, false);
-    }
-
-    public static String toString(Object[] arr, boolean useCurlyBraces) {
         if (arr == null) {
             return "null";
         }
-        if (arr.length == 0) {
-            return useCurlyBraces ? "{}" : "[]";
-        }
 
         StringBuilder sb = new StringBuilder();
-        sb.append(useCurlyBraces ? "{ " : '[');
+        sb.append('[');
         for (int i = 0; i < arr.length; i++) {
             if (arr[i] instanceof Object[]) {
-                sb.append(toString((Object[]) arr[i], useCurlyBraces));
+                sb.append(toString((Object[]) arr[i]));
             } else {
                 sb.append(arr[i]);
             }
@@ -45,7 +38,8 @@ public class ArrayUtils {
                 sb.append(", ");
             }
         }
-        sb.append(useCurlyBraces ? " }" : ']');
+        sb.append(']');
         return sb.toString();
+
     }
 }
