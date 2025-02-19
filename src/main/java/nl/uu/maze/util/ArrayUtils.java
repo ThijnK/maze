@@ -35,7 +35,12 @@ public class ArrayUtils {
         StringBuilder sb = new StringBuilder();
         sb.append(useCurlyBraces ? "{ " : '[');
         for (int i = 0; i < arr.length; i++) {
-            sb.append(arr[i]);
+            if (arr[i] instanceof Object[]) {
+                sb.append(toString((Object[]) arr[i], useCurlyBraces));
+            } else {
+                sb.append(arr[i]);
+            }
+
             if (i < arr.length - 1) {
                 sb.append(", ");
             }

@@ -385,9 +385,20 @@ public class SymbolicState {
      * @return The Z3 expr representing the array elements
      */
     public Expr<?> getArray(Expr<?> arrRef) {
+        ArrayObject arrObj = getArrayObject(arrRef);
+        return arrObj != null ? arrObj.getElems() : null;
+    }
+
+    /**
+     * Retrieves the array object identified by 'arrRef'.
+     * 
+     * @return The array object, or null if the object does not exist or is not an
+     *         array
+     */
+    public ArrayObject getArrayObject(Expr<?> arrRef) {
         HeapObject arrObj = heap.get(arrRef);
         if (arrObj != null && arrObj instanceof ArrayObject) {
-            return ((ArrayObject) arrObj).getElems();
+            return (ArrayObject) arrObj;
         }
         return null;
     }
@@ -456,7 +467,7 @@ public class SymbolicState {
      */
     public class HeapObject {
         // A mapping from field names to symbolic expressions.
-        private Map<String, Expr<?>> fields;
+        protected Map<String, Expr<?>> fields;
 
         public HeapObject() {
             this.fields = new HashMap<>();
@@ -504,6 +515,11 @@ public class SymbolicState {
 
         public Expr<?> getLength() {
             return getField("len");
+        }
+
+        @Override
+        public ArrayObject clone() {
+            return new ArrayObject(getElems(), getLength());
         }
     }
 
@@ -558,6 +574,12 @@ public class SymbolicState {
          */
         public <E extends Sort> void setElem(Expr<E> value, BitVecExpr... indices) {
             super.setElem(calcIndex(indices), value);
+        }
+
+        @SuppressWarnings("unchecked")
+        @Override
+        public MultiArrayObject clone() {
+            return new MultiArrayObject(dim, getElems(), (ArrayExpr<BitVecSort, BitVecSort>) getLength());
         }
     }
 }

@@ -98,9 +98,10 @@ public class SymbolicStateValidator {
             Expr<?> expr = model.getConstInterp(decl);
 
             // For arrays
-            boolean isElems = var.endsWith("_elems"), isLen = var.endsWith("_len");
+            boolean isElems = var.endsWith("_elems"), isLen = var.contains("_len");
             if (isElems || isLen) {
                 var = var.substring(0, var.lastIndexOf('_'));
+
                 // If the model contains a _len decl for an array, but no _elems decl for the
                 // same array, we still need to evaluate the array
                 // So, if this array var is not yet in the ArgMap (_elems not present or not yet
