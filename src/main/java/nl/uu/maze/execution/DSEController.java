@@ -248,6 +248,7 @@ public class DSEController {
 
         while (current.isCtor() || !current.isFinalState(cfg)) {
             logger.debug("Current state: " + current);
+            logger.debug("Next stmt: " + current.getCurrentStmt());
             List<SymbolicState> newStates = symbolic.step(current.isCtor() ? ctorCfg : cfg, current, iterator);
             // Note: newStates will always contain exactly one element, because we pass the
             // iterator to the step function

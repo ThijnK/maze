@@ -1,7 +1,11 @@
 package nl.uu.maze.execution.concrete;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.util.Random;
+
+import javax.management.openmbean.ArrayType;
+
 import java.lang.reflect.Parameter;
 
 import org.slf4j.Logger;
@@ -113,8 +117,16 @@ public class ObjectInstantiator {
                 arguments[i] = argMap.get(name);
                 continue;
             }
+            Class<?> type = params[i].getType();
 
-            switch (params[i].getType().getName()) {
+            // Create empty array of the right dimension
+            if (type.isArray()) {
+                int dimension = ArrayUtils.getDimension(type);
+                arguments[i] = Array.newInstance(type.getComponentType(), new int[dimension]);
+                continue;
+            }
+
+            switch (type.getName()) {
                 case "int":
                     arguments[i] = rand.nextInt(Integer.MIN_VALUE, Integer.MAX_VALUE);
                     break;
@@ -141,7 +153,9 @@ public class ObjectInstantiator {
                 case "boolean":
                     arguments[i] = rand.nextBoolean();
                     break;
-                // TODO: strings, arrays?
+                case "java.lang.String":
+                    arguments[i] = ""; // A very random string indeed
+                    break;
                 default:
                     // If depth allows, recursively generate instances of objects
                     if (depth < MAX_INSTANTIATION_DEPTH && !params[i].getType().isPrimitive())

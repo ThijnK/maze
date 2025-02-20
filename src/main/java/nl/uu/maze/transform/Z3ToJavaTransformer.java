@@ -36,7 +36,7 @@ public class Z3ToJavaTransformer {
         } else if (expr instanceof FPNum) {
             return transformFP((FPNum) expr, type);
         } else if (expr.isString()) {
-            return expr.getString();
+            return expr.getString().intern();
         } else {
             return null;
         }
