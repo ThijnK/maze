@@ -110,11 +110,25 @@ public class ObjectInstantiator {
         for (int i = 0; i < params.length; i++) {
             // If the parameter is known, use the known value
             String name = ArgMap.getSymbolicName(methodType, i);
+            Class<?> type = params[i].getType();
             if (argMap != null && argMap.containsKey(name)) {
-                arguments[i] = argMap.get(name);
+                Object value = argMap.get(name);
+                if (value == null) {
+                    arguments[i] = null;
+                    continue;
+                    // TODO: type.isArray() is not returning true even for arrays because it's
+                    // wrapped in a Class or whatever
+                } else if (type.isArray() && type.getComponentType().isPrimitive()) {
+                    // For arrays of primitives, we need to make sure the array is typed correctly
+                    // So we have to create a typed instance and copy the values
+                    arguments[i] = convertArray(value, type);
+
+                } else {
+                    // Handle objects and object arrays
+                    arguments[i] = type.cast(argMap.get(name));
+                }
                 continue;
             }
-            Class<?> type = params[i].getType();
 
             // Create empty array
             if (type.isArray()) {
@@ -164,5 +178,29 @@ public class ObjectInstantiator {
             }
         }
         return arguments;
+    }
+
+    /**
+     * Convert an array of objects to an array of the given type.
+     * 
+     * @param value The array to convert
+     * @param type  The type of the array
+     * @return A typed array
+     */
+    private static Object convertArray(Object value, Class<?> type) {
+        int length = Array.getLength(value);
+        Object typedArray = Array.newInstance(type.getComponentType(), length);
+
+        for (int j = 0; j < length; j++) {
+            Object element = Array.get(value, j);
+            if (type.getComponentType().isArray()) {
+                // Recursively copy subarrays
+                Array.set(typedArray, j, convertArray(element, type.getComponentType()));
+            } else {
+                // Copy primitive elements
+                Array.set(typedArray, j, element);
+            }
+        }
+        return typedArray;
     }
 }
