@@ -45,10 +45,17 @@ public class ConcreteExecutor {
         Object[] args = ObjectInstantiator.generateArgs(method.getParameters(), argMap, MethodType.METHOD);
         argMap.addAll(args, MethodType.METHOD);
 
-        logger.debug("Executing method " + method.getName() + " with args: " + ArrayUtils.toString(args));
-        Object result = method.invoke(instance, args);
-        logger.debug("Retval: " + (result == null ? "null" : result.toString()));
+        try {
+            logger.debug("Executing method " + method.getName() + " with args: " + ArrayUtils.toString(args));
+            Object result = method.invoke(instance, args);
+            logger.debug("Retval: " + (result == null ? "null" : result.toString()));
 
-        return result;
+            return result;
+        } catch (InvocationTargetException e) {
+            throw e;
+        } catch (Exception e) {
+            logger.warn("Execution of method " + method.getName() + " threw an exception: " + e);
+            return null;
+        }
     }
 }
