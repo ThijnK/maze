@@ -151,6 +151,33 @@ public class SymbolicState {
     }
 
     /**
+     * Determine which of two given symbolic reference expressions is contained in
+     * more path constraints.
+     * This is needed to determine which reference should be set equal to which
+     * other one, in cases where they are interpreted to be equal.
+     * If one of the references is contained in more references, settting it to be
+     * equal to the other one may violate the path constraints.
+     * 
+     * @return <code>true</code> if the first reference is contained in more path
+     *         constraints than the second one, <code>false</code> otherwise
+     */
+    public boolean isMoreConstrained(String var1, String var2) {
+        Expr<?> ref1 = mkHeapRef(var1);
+        Expr<?> ref2 = mkHeapRef(var2);
+        int count1 = 0, count2 = 0;
+        for (BoolExpr constraint : pathConstraints) {
+            // This assumes naming convention of arguments
+            if (constraint.toString().contains(ref1.toString())) {
+                count1++;
+            }
+            if (constraint.toString().contains(ref2.toString())) {
+                count2++;
+            }
+        }
+        return count1 > count2;
+    }
+
+    /**
      * Allocates a new heap object and returns its unique reference.
      * 
      * @return The reference to the newly allocated object

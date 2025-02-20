@@ -18,6 +18,7 @@ import com.palantir.javapoet.*;
 
 import nl.uu.maze.execution.ArgMap;
 import nl.uu.maze.execution.MethodType;
+import nl.uu.maze.execution.symbolic.SymbolicStateValidator.ObjectRef;
 
 /**
  * Generates JUnit test cases from a given Z3 model and symbolic state for a
@@ -83,19 +84,47 @@ public class JUnitTestGenerator {
         classBuilder.addMethod(methodBuilder.build());
     }
 
+    // Helper class to store parameter information
+    private static class ParamInfo {
+        public String name;
+        public Type type;
+        public String value;
+
+        public ParamInfo(String name, Type type, String value) {
+            this.name = name;
+            this.type = type;
+            this.value = value;
+        }
+    }
+
     private List<String> addParamDefinitions(MethodSpec.Builder methodBuilder, List<Type> paramTypes, ArgMap argMap,
             MethodType methodType) {
         List<String> params = new ArrayList<>();
+        // Store a list of parameter info objects for params that reference other
+        // parameters, so we can make sure to define that after the params they
+        // reference are defined first
+        List<ParamInfo> refParams = new ArrayList<>();
         for (int i = 0; i < paramTypes.size(); i++) {
             String var = ArgMap.getSymbolicName(methodType, i);
-            params.add(var);
             Object value = argMap.get(var);
+            params.add(var);
             // If the ArgMap contains no value, use a default value
             // Note that it's possible that it contains a null value, in which case it's
             // intentional
             String valueStr = !argMap.containsKey(var) ? getDefaultValue(paramTypes.get(i)) : valueToString(value);
-            methodBuilder.addStatement("$L $L = $L", paramTypes.get(i), var, valueStr);
+            // If the value is a reference to another parameter, store it in refParams
+            if (value instanceof ObjectRef) {
+                refParams.add(new ParamInfo(var, paramTypes.get(i), valueStr));
+            } else {
+                // Other parameters can be defined immediately
+                methodBuilder.addStatement("$L $L = $L", paramTypes.get(i), var, valueStr);
+            }
         }
+        // Define the refParams after the params they reference
+        for (ParamInfo param : refParams) {
+            methodBuilder.addStatement("$L $L = $L", param.type, param.name, param.value);
+        }
+
         return params;
     }
 

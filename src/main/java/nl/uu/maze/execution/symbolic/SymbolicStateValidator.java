@@ -1,7 +1,9 @@
 package nl.uu.maze.execution.symbolic;
 
 import java.util.List;
+import java.util.Map;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Optional;
 
 import org.slf4j.Logger;
@@ -28,6 +30,7 @@ import sootup.core.types.Type;
  */
 public class SymbolicStateValidator {
     private static final Logger logger = LoggerFactory.getLogger(SymbolicStateValidator.class);
+    private static final Z3Sorts sorts = Z3Sorts.getInstance();
 
     private Solver solver;
     private Z3ToJavaTransformer transformer;
@@ -100,6 +103,10 @@ public class SymbolicStateValidator {
         // This would be the case if there was a null comparison in the path condition
         Expr<?> nullExpr = model.eval(Z3Sorts.getInstance().getNullConst(), true);
 
+        // Keep track of reference values that we've encountered, to be able to set two
+        // arguments to the same object when they are interpreted to be equal
+        Map<Expr<?>, ObjectRef> refValues = new HashMap<>();
+
         // TODO: handle cases where references are interpreted to be equal
         // need to set those arguments to the same object somehow
 
@@ -114,16 +121,39 @@ public class SymbolicStateValidator {
             var = var.contains("_") ? var.substring(0, var.indexOf('_')) : var;
             Type type = state.getParamType(var);
 
-            // If the variable is interpreted as null, set it to null
-            if (expr.equals(nullExpr)) {
-                argMap.set(var, null);
-                continue;
+            // For reference types (arrays + objects)
+            if (expr.getSort().equals(sorts.getRefSort())) {
+                // If the variable is interpreted as null, set it to null
+                if (expr.equals(nullExpr)) {
+                    argMap.set(var, null);
+                    continue;
+                }
+                // If interpreted equal to another reference, set it to the same value, choosing
+                // the value of the more constrained reference
+                if (refValues.containsKey(expr)) {
+                    ObjectRef ref = refValues.get(expr);
+                    // Compare the two references, whichever one is more constrained in path
+                    // condition is the "base" reference
+                    if (state.isMoreConstrained(var, ref.getVar())) {
+                        // If the current var is more constrained, set it as new base reference
+                        // and evaluate it (so no continue)
+                        refValues.put(expr, new ObjectRef(var));
+                        argMap.set(ref.getVar(), new ObjectRef(var));
+                    } else {
+                        // If the other var is more constrained, set the current var to the same value
+                        argMap.set(var, ref);
+                        continue;
+                    }
+                }
             }
 
             // For arrays
             if (type instanceof ArrayType) {
                 // There can be multiple declarations for the same array (elems and len)
                 if (argMap.containsKey(var)) {
+                    if (expr.getSort().equals(sorts.getRefSort())) {
+                        refValues.put(expr, new ObjectRef(var));
+                    }
                     continue;
                 }
 
@@ -132,6 +162,9 @@ public class SymbolicStateValidator {
                 Type elemType = ((ArrayType) type).getBaseType();
                 Object arr = transformer.transformArray(arrObj, model, elemType);
                 argMap.set(var, arr);
+                if (expr.getSort().equals(sorts.getRefSort())) {
+                    refValues.put(expr, new ObjectRef(var));
+                }
             } else {
                 // Primitive types
                 Object value = transformer.transformExpr(model.getConstInterp(decl), type);
@@ -165,5 +198,26 @@ public class SymbolicStateValidator {
             params.ifPresent(result::add);
         }
         return result;
+    }
+
+    /**
+     * Object value representing that the value of an argument is a reference to
+     * another object of the given variable name.
+     */
+    public static class ObjectRef {
+        private final String var;
+
+        public ObjectRef(String var) {
+            this.var = var;
+        }
+
+        public String getVar() {
+            return var;
+        }
+
+        @Override
+        public String toString() {
+            return var;
+        }
     }
 }
