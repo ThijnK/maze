@@ -3,9 +3,6 @@ package nl.uu.maze.execution.concrete;
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.util.Random;
-
-import javax.management.openmbean.ArrayType;
-
 import java.lang.reflect.Parameter;
 
 import org.slf4j.Logger;
@@ -119,10 +116,10 @@ public class ObjectInstantiator {
             }
             Class<?> type = params[i].getType();
 
-            // Create empty array of the right dimension
+            // Create empty array
             if (type.isArray()) {
-                int dimension = ArrayUtils.getDimension(type);
-                arguments[i] = Array.newInstance(type.getComponentType(), new int[dimension]);
+                // The newInstance method automatically deals with multi-dimensional arrays
+                arguments[i] = Array.newInstance(type.getComponentType(), 0);
                 continue;
             }
 

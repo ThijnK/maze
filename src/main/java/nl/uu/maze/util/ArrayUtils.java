@@ -41,13 +41,4 @@ public class ArrayUtils {
         sb.append(']');
         return sb.toString();
     }
-
-    public static int getDimension(Class<?> clazz) {
-        int dimension = 0;
-        while (clazz.isArray()) {
-            dimension++;
-            clazz = clazz.getComponentType();
-        }
-        return dimension;
-    }
 }
