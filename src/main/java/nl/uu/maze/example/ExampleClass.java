@@ -4,49 +4,48 @@ package nl.uu.maze.example;
  * Example class to test the application on.
  */
 public class ExampleClass {
-    int a;
+    Inner inner;
 
     public ExampleClass(int x) {
-        if (x > 0) {
-            a = 1;
+        inner = new Inner();
+        inner.x = x;
+    }
+
+    public int aliasing(int[] arr, int[] arr2) {
+        if (arr2 == null || arr2.length == 0 || arr2[0] != 77 || arr.length == 0) {
+            return -1;
+        }
+
+        if (arr == arr2) {
+            return 1;
         } else {
-            a = -1;
+            return 0;
         }
     }
 
-    public void print(int x) {
-        if (x > 0) {
-            System.out.println("Positive");
-        } else if (x < 0) {
-            System.out.println("Negative");
+    public int multiarray(int[][] arr) {
+        if (arr.length == 0 || arr[0].length == 0) {
+            return -1;
+        }
+
+        if (arr[0][0] == 77) {
+            return 1;
         } else {
-            System.out.println("Zero");
+            return 0;
         }
     }
 
-    public int switchInt(int x) {
-        switch (x) {
-            case 0:
-                return 0;
-            case 1:
-                return 1;
-            case 2:
-                return 2;
-            default:
-                return -1;
+    public int instancefield() {
+        if (inner.x > 0) {
+            return 1;
+        } else if (inner.x < 0) {
+            return -1;
+        } else {
+            return 0;
         }
     }
 
-    // public int switchString(String x) {
-    // switch (x) {
-    // case "zero":
-    // return 0;
-    // case "one":
-    // return 1;
-    // case "two":
-    // return 2;
-    // default:
-    // return -1;
-    // }
-    // }
+    public static class Inner {
+        int x;
+    }
 }
