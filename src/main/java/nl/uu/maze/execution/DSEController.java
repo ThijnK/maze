@@ -105,7 +105,7 @@ public class DSEController {
         this.sootClass = analyzer.getSootClass(classType);
         this.clazz = analyzer.getJavaClass(classType);
         this.instrumented = concreteDriven ? BytecodeInstrumenter.instrument(classPath, className) : null;
-        this.generator = new JUnitTestGenerator(clazz);
+        this.generator = new JUnitTestGenerator(clazz, analyzer);
     }
 
     /**

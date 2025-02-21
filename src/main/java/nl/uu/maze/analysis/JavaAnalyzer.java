@@ -11,6 +11,7 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -66,6 +67,20 @@ public class JavaAnalyzer {
     public JavaClassType getClassType(String className) {
         JavaIdentifierFactory identifierFactory = view.getIdentifierFactory();
         return identifierFactory.getClassType(className);
+    }
+
+    /**
+     * Attempts to get the Java class of a given SootUp type.
+     * 
+     * @param type The type for which to return the Java class
+     * @return An optional containing the Java class if it could be found
+     */
+    public Optional<Class<?>> tryGetJavaClass(Type type) {
+        try {
+            return Optional.of(getJavaClass(type));
+        } catch (ClassNotFoundException e) {
+            return Optional.empty();
+        }
     }
 
     /**

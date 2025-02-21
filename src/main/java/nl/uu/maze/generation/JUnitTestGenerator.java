@@ -12,12 +12,14 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.palantir.javapoet.*;
 
+import nl.uu.maze.analysis.JavaAnalyzer;
 import nl.uu.maze.execution.ArgMap;
 import nl.uu.maze.execution.MethodType;
 import nl.uu.maze.execution.symbolic.SymbolicStateValidator.ObjectFields;
@@ -29,6 +31,7 @@ import nl.uu.maze.execution.symbolic.SymbolicStateValidator.ObjectRef;
  */
 public class JUnitTestGenerator {
     private static final Logger logger = LoggerFactory.getLogger(JUnitTestGenerator.class);
+    private final JavaAnalyzer analyzer;
 
     private String testClassName;
     private TypeSpec.Builder classBuilder;
@@ -36,13 +39,18 @@ public class JUnitTestGenerator {
 
     /** Map of method names to the number of test cases generated for each method */
     private Map<String, Integer> methodCount;
+    /**
+     * Number of objects created in the current method, to avoid naming conflicts.
+     */
+    private int methodObjCount = 0;
 
-    public JUnitTestGenerator(Class<?> clazz) throws ClassNotFoundException {
+    public JUnitTestGenerator(Class<?> clazz, JavaAnalyzer analyzer) throws ClassNotFoundException {
         testClassName = clazz.getSimpleName() + "Test";
         classBuilder = TypeSpec.classBuilder(testClassName)
                 .addModifiers(Modifier.PUBLIC);
         this.clazz = clazz;
         this.methodCount = new java.util.HashMap<>();
+        this.analyzer = analyzer;
     }
 
     /**
@@ -54,6 +62,7 @@ public class JUnitTestGenerator {
      *               method invocation
      */
     public void addMethodTestCase(JavaSootMethod method, JavaSootMethod ctor, ArgMap argMap) {
+        methodObjCount = 0;
         methodCount.compute(method.getName(), (k, v) -> v == null ? 1 : v + 1);
         String testMethodName = "test" + capitalizeFirstLetter(method.getName()) + methodCount.get(method.getName());
         MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder(testMethodName)
@@ -125,15 +134,30 @@ public class JUnitTestGenerator {
                 buildObjectInstance(methodBuilder, var, (ClassType) paramTypes.get(i), (ObjectFields) value);
             } else {
                 // Other parameters can be defined immediately
-                methodBuilder.addStatement("$L $L = $L", paramTypes.get(i), var, valueStr);
+                addStatementTriple(methodBuilder, paramTypes.get(i), var, valueStr);
             }
         }
         // Define the refParams after the params they reference
         for (ParamInfo param : refParams) {
-            methodBuilder.addStatement("$L $L = $L", param.type, param.name, param.value);
+            addStatementTriple(methodBuilder, param.type, param.name, param.value);
         }
 
         return params;
+    }
+
+    /**
+     * Adds a statement to the given method builder that defines a variable of the
+     * given type with the given value.
+     * This attempts to use the Java class for the given type if available, falling
+     * back to using the type's string representation if not.
+     */
+    private void addStatementTriple(MethodSpec.Builder methodBuilder, Type type, String var, String valueStr) {
+        Optional<Class<?>> typeClass = analyzer.tryGetJavaClass(type);
+        if (typeClass.isPresent()) {
+            methodBuilder.addStatement("$T $L = $L", typeClass.get(), var, valueStr);
+        } else {
+            methodBuilder.addStatement("$L $L = $L", type, var, valueStr);
+        }
     }
 
     /**
@@ -154,15 +178,23 @@ public class JUnitTestGenerator {
 
     private void buildObjectInstance(MethodSpec.Builder methodBuilder, String var, ClassType type,
             ObjectFields fields) {
-        // TODO: for simplicity, this assumes that the class has a zero-argument ctor
-        // This should be extended to support constructors with arguments, for which
-        // we'll need the Class<?> object for this class type
-        methodBuilder.addStatement("$L $L = new $L()", type, var, type);
+        Optional<Class<?>> typeClass = analyzer.tryGetJavaClass(type);
+        methodObjCount++;
+        if (typeClass.isPresent()) {
+            Class<?> clazz = typeClass.get();
+            // TODO: find constructor and generate args (using ObjectInstantiator) to create
+            // a valid instance
+            methodBuilder.addStatement("$T $L = new $T()", clazz, var, clazz);
+        } else {
+            // Default to assuming (hoping) that the class has a zero-argument constructor
+            methodBuilder.addStatement("$L $L = new $L()", type, var, type);
+        }
+
         for (Map.Entry<String, Object> entry : fields.getFields().entrySet()) {
             String fieldName = entry.getKey();
             Object fieldValue = entry.getValue();
-            String fieldVar = var + "_" + fieldName; // TODO: make this unique
-            methodBuilder.addStatement("$T $L = $L.class.getDeclaredField(\"$L\")", Field.class, fieldVar, type,
+            String fieldVar = var + "_" + fieldName + "_" + methodObjCount;
+            methodBuilder.addStatement("$T $L = $L.getClass().getDeclaredField(\"$L\")", Field.class, fieldVar, var,
                     fieldName);
             methodBuilder.addStatement("$L.setAccessible(true)", fieldVar);
             methodBuilder.addStatement("$L.set($L, $L)", fieldVar, var, valueToString(fieldValue));
