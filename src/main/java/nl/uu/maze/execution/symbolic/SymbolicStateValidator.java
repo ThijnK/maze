@@ -18,7 +18,7 @@ import com.microsoft.z3.Solver;
 import com.microsoft.z3.Status;
 
 import nl.uu.maze.execution.ArgMap;
-import nl.uu.maze.execution.symbolic.SymbolicState.ArrayObject;
+import nl.uu.maze.execution.symbolic.SymbolicHeap.ArrayObject;
 import nl.uu.maze.transform.Z3ToJavaTransformer;
 import nl.uu.maze.util.Z3Sorts;
 import sootup.core.types.ArrayType;
@@ -106,9 +106,6 @@ public class SymbolicStateValidator {
         // Keep track of reference values that we've encountered, to be able to set two
         // arguments to the same object when they are interpreted to be equal
         Map<Expr<?>, ObjectRef> refValues = new HashMap<>();
-
-        // TODO: handle cases where references are interpreted to be equal
-        // need to set those arguments to the same object somehow
 
         for (FuncDecl<?> decl : model.getConstDecls()) {
             String var = decl.getName().toString();

@@ -8,8 +8,8 @@ import com.microsoft.z3.Expr;
 import com.microsoft.z3.FPNum;
 import com.microsoft.z3.Model;
 
-import nl.uu.maze.execution.symbolic.SymbolicState.ArrayObject;
-import nl.uu.maze.execution.symbolic.SymbolicState.MultiArrayObject;
+import nl.uu.maze.execution.symbolic.SymbolicHeap.ArrayObject;
+import nl.uu.maze.execution.symbolic.SymbolicHeap.MultiArrayObject;
 import sootup.core.types.Type;
 import sootup.core.types.PrimitiveType.*;
 
