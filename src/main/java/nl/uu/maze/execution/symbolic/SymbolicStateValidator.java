@@ -154,7 +154,7 @@ public class SymbolicStateValidator {
                     continue;
                 }
 
-                Expr<?> arrRef = state.mkHeapRef(var);
+                Expr<?> arrRef = state.heap.newRef(var);
                 ArrayObject arrObj = state.getArrayObject(arrRef);
                 Type elemType = ((ArrayType) type).getBaseType();
                 Object arr = transformer.transformArray(arrObj, model, elemType);

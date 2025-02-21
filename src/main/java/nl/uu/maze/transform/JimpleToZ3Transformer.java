@@ -383,7 +383,7 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
         if (state.containsVariable("this")) {
             setResult(state.getVariable("this"));
         } else {
-            Expr<?> thisRef = state.allocateObject(ref.getType());
+            Expr<?> thisRef = state.newObject(ref.getType());
             state.setVariable("this", thisRef);
             setResult(thisRef);
         }
@@ -392,7 +392,7 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
     @Override
     public void caseNewExpr(@Nonnull JNewExpr expr) {
         // Allocate a new object on the heap
-        setResult(state.allocateObject(expr.getType()));
+        setResult(state.newObject(expr.getType()));
     }
 
     @Override
@@ -414,7 +414,7 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
     @Override
     public void caseCaughtExceptionRef(@Nonnull JCaughtExceptionRef ref) {
         // TODO: may have to instantiate the Throwable object here with symbolic values
-        setResult(state.allocateObject(ref.getType()));
+        setResult(state.newObject(ref.getType()));
     }
     // #endregion
 
@@ -423,7 +423,7 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
     public void caseNewArrayExpr(@Nonnull JNewArrayExpr expr) {
         Sort elemSort = sorts.determineSort(expr.getBaseType());
         Expr<?> size = transform(expr.getSize());
-        setResult(state.allocateArray(expr.getType(), size, elemSort));
+        setResult(state.newArray(expr.getType(), size, elemSort));
     }
 
     @Override
@@ -433,7 +433,7 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
         for (int i = 0; i < expr.getSizes().size(); i++) {
             sizes.add((BitVecExpr) transform(expr.getSizes().get(i)));
         }
-        setResult(state.allocateMultiArray(expr.getType(), sizes, elemSort));
+        setResult(state.newMultiArray(expr.getType(), sizes, elemSort));
     }
 
     @Override
@@ -491,26 +491,29 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
         Type sootType = ref.getType();
         state.setParamType(var, sootType);
 
+        Expr<?> param;
         if (sootType instanceof ArrayType) {
             // Allocate new array on the heap
             ArrayType arrType = (ArrayType) sootType;
             if (arrType.getDimension() > 1) {
-                setResult(state.allocateMultiArray(var, ref.getType(), arrType.getDimension(),
-                        sorts.determineSort(arrType.getBaseType())));
+                param = state.newMultiArray(var, arrType, sorts.determineSort(arrType.getBaseType()));
             } else {
-                setResult(state.allocateArray(var, ref.getType(), sorts.determineSort(arrType.getBaseType())));
+                param = state.newArray(var, arrType, sorts.determineSort(arrType.getBaseType()));
             }
         } else if (sootType instanceof ClassType && !sootType.toString().equals("java.lang.String")) {
             // Allocate new object on the heap
-            setResult(state.allocateObject(var, ref.getType()));
+            param = state.newObject(var, ref.getType());
         } else {
             // Create a new variable for the parameter
-            setResult(ctx.mkConst(var, sorts.determineSort(sootType)));
+            param = ctx.mkConst(var, sorts.determineSort(sootType));
         }
+
+        setResult(param);
 
         // For object/array parameters, need to track potential aliases
         if (sootType instanceof ArrayType || sootType instanceof ClassType) {
-            state.resolveAliases(var);
+            state.heap.resolveAliases(var);
+            state.heap.setIsArg(param);
         }
     }
 

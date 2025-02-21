@@ -14,6 +14,7 @@ import nl.uu.maze.execution.symbolic.SymbolicHeap.MultiArrayObject;
 import nl.uu.maze.util.Z3Sorts;
 import sootup.core.graph.StmtGraph;
 import sootup.core.jimple.common.stmt.Stmt;
+import sootup.core.types.ArrayType;
 import sootup.core.types.Type;
 import sootup.core.types.PrimitiveType.IntType;
 
@@ -38,14 +39,14 @@ public class SymbolicState {
     private static final int MAX_ARRAY_LENGTH = 100;
     private static final Z3Sorts sorts = Z3Sorts.getInstance();
 
-    private Context ctx;
+    private final Context ctx;
     private Stmt currentStmt;
     private int currentDepth = 0;
     private MethodType methodType = MethodType.METHOD;
 
     private Map<String, Expr<?>> symbolicVariables;
     private List<BoolExpr> pathConstraints;
-    private SymbolicHeap heap;
+    public final SymbolicHeap heap;
     /**
      * Tracks the SootUp types of symbolic variables representing method parameters.
      */
@@ -81,7 +82,7 @@ public class SymbolicState {
         this.methodType = methodType;
         this.symbolicVariables = new HashMap<>(symbolicVariables);
         this.pathConstraints = new ArrayList<>(pathConstraints);
-        this.heap = heap;
+        this.heap = heap.clone();
         // Share the same variable types map to avoid copying
         this.paramTypes = paramTypes;
         this.arrayIndices = new HashMap<>(arrayIndices);
@@ -146,6 +147,43 @@ public class SymbolicState {
     }
 
     /**
+     * Allocates a new heap object and returns its unique reference.
+     * 
+     * @see SymbolicHeap#allocateObject(String, Type)
+     */
+    public Expr<?> newObject(Type type) {
+        return heap.allocateObject(type);
+    }
+
+    /**
+     * Allocates a new heap object and returns its unique reference.
+     * 
+     * @see SymbolicHeap#allocateObject(String, Type)
+     */
+    public Expr<?> newObject(String key, Type type) {
+        return heap.allocateObject(key, type);
+    }
+
+    /**
+     * Sets the field of the object referenced by 'objRef' to the given value.
+     */
+    public void setField(Expr<?> objRef, String fieldName, Expr<?> value) {
+        HeapObject obj = heap.get(objRef);
+        if (obj == null) {
+            throw new IllegalArgumentException("Object does not exist: " + objRef);
+        }
+        obj.setField(fieldName, value);
+    }
+
+    /**
+     * Returns the value of the field of the object referenced by 'objRef'.
+     */
+    public Expr<?> getField(Expr<?> objRef, String fieldName) {
+        HeapObject obj = heap.get(objRef);
+        return obj != null ? obj.getField(fieldName) : null;
+    }
+
+    /**
      * Determine which of two given symbolic reference expressions is contained in
      * more path constraints.
      * This is needed to determine which reference should be set equal to which
@@ -157,8 +195,8 @@ public class SymbolicState {
      *         constraints than the second one, <code>false</code> otherwise
      */
     public boolean isMoreConstrained(String var1, String var2) {
-        Expr<?> ref1 = mkHeapRef(var1);
-        Expr<?> ref2 = mkHeapRef(var2);
+        Expr<?> ref1 = heap.newRef(var1);
+        Expr<?> ref2 = heap.newRef(var2);
         int count1 = 0, count2 = 0;
         for (BoolExpr constraint : pathConstraints) {
             // This assumes naming convention of arguments
@@ -173,68 +211,12 @@ public class SymbolicState {
     }
 
     /**
-     * Resolves aliases for the given variable.
+     * Creates a new array on the heap with symbolic length and returns its
+     * reference.
      * 
-     * @see SymbolicHeap#resolveAliases(String)
+     * @see SymbolicHeap#allocateArray(String, Type, Expr, Sort)
      */
-    public void resolveAliases(String var) {
-        heap.resolveAliases(var);
-    }
-
-    /**
-     * Allocates a new heap object and returns its unique reference.
-     * 
-     * @return The reference to the newly allocated object
-     * @see SymbolicHeap#allocateObject(String)
-     */
-    public Expr<?> allocateObject(String var, Type type) {
-        return heap.allocateObject(var, type);
-    }
-
-    /**
-     * Allocates a new heap object and returns its unique reference.
-     * 
-     * @return The reference to the newly allocated object
-     * @see SymbolicHeap#allocateObject(String)
-     */
-    public Expr<?> allocateObject(Type type) {
-        return heap.allocateObject(heap.newKey(), type);
-    }
-
-    /**
-     * Sets the field 'fieldName' of the object identified by 'objRef' to the given
-     * symbolic value.
-     */
-    public void setField(Expr<?> objRef, String fieldName, Expr<?> value) {
-        HeapObject obj = heap.get(objRef);
-        if (obj != null) {
-            obj.setField(fieldName, value);
-        } else {
-            throw new RuntimeException("Heap object " + objRef + " not found");
-        }
-    }
-
-    /**
-     * Retrieves the symbolic value stored in field 'fieldName' of the object
-     * identified by 'objRef'.
-     * 
-     * @return The symbolic value stored in the field, or null if the object does
-     *         not exist or the field is not set
-     */
-    public Expr<?> getField(Expr<?> objRef, String fieldName) {
-        HeapObject obj = heap.get(objRef);
-        if (obj != null) {
-            return obj.getField(fieldName);
-        }
-        return null;
-    }
-
-    /**
-     * Allocates a new array of the given element sort with a symbolic length.
-     * 
-     * @see SymbolicHeap#allocateArray(String, Expr, Sort)
-     */
-    public <E extends Sort> Expr<?> allocateArray(String var, Type type, E elemSort) {
+    public <E extends Sort> Expr<?> newArray(String var, Type type, E elemSort) {
         Expr<BitVecSort> len = ctx.mkConst(var + "_len", sorts.getIntSort());
         // Make sure array size is non-negative and does not exceed the max length
         addPathConstraint(ctx.mkBVSGE(len, ctx.mkBV(0, Type.getValueBitSize(IntType.getInstance()))));
@@ -244,20 +226,23 @@ public class SymbolicState {
     }
 
     /**
-     * Allocates a new array of the given element sort with a symbolic length.
+     * Creates a new array on the heap with the given length and returns its
+     * reference.
      * 
-     * @see SymbolicHeap#allocateArray(String, Expr, Sort)
+     * @see SymbolicHeap#allocateArray(String, Type, Expr, Sort)
      */
-    public <E extends Sort> Expr<?> allocateArray(Type type, Expr<?> size, E elemSort) {
-        return heap.allocateArray(heap.newKey(true), type, size, elemSort);
+    public <E extends Sort> Expr<?> newArray(Type type, Expr<?> len, E elemSort) {
+        return heap.allocateArray(type, len, elemSort);
     }
 
     /**
-     * Allocates a multi-dimensional array with the given sizes and element sort.
+     * Allocates a multi-dimensional array with symbolic sizes and returns its
+     * reference.
      * 
-     * @see SymbolicHeap#allocateMultiArray(String, List, Sort)
+     * @see SymbolicHeap#allocateMultiArray(String, Type, List, Sort)
      */
-    public <E extends Sort> Expr<?> allocateMultiArray(String var, Type type, int dim, E elemSort) {
+    public <E extends Sort> Expr<?> newMultiArray(String var, ArrayType type, E elemSort) {
+        int dim = type.getDimension();
         List<BitVecExpr> sizes = new ArrayList<>(dim);
         for (int i = 0; i < dim; i++) {
             Expr<BitVecSort> size = ctx.mkConst(var + "_len" + i, sorts.getIntSort());
@@ -272,12 +257,13 @@ public class SymbolicState {
     }
 
     /**
-     * Allocates a multi-dimensional array with the given sizes and element sort.
+     * Allocates a multi-dimensional array with the given sizes and returns its
+     * reference.
      * 
-     * @see SymbolicHeap#allocateMultiArray(String, List, Sort)
+     * @see SymbolicHeap#allocateMultiArray(String, Type, List, Sort)
      */
-    public <E extends Sort> Expr<?> allocateMultiArray(Type type, List<BitVecExpr> sizes, E elemSort) {
-        return heap.allocateMultiArray(heap.newKey(true), type, sizes, elemSort);
+    public <E extends Sort> Expr<?> newMultiArray(Type type, List<BitVecExpr> sizes, E elemSort) {
+        return heap.allocateMultiArray(type, sizes, elemSort);
     }
 
     /**
@@ -447,16 +433,6 @@ public class SymbolicState {
     }
 
     /**
-     * Creates a new Z3 constant representing a reference to a heap object.
-     * 
-     * @param var The name of the reference variable
-     * @return The Z3 expr representing the heap reference
-     */
-    public Expr<?> mkHeapRef(String var) {
-        return heap.newRef(var);
-    }
-
-    /**
      * Returns the path condition of the current state as the conjunction of all
      * path constraints.
      * 
@@ -472,7 +448,7 @@ public class SymbolicState {
 
     public SymbolicState clone(Stmt stmt) {
         return new SymbolicState(ctx, stmt, currentDepth, methodType, symbolicVariables, pathConstraints,
-                paramTypes, heap.clone(), arrayIndices);
+                paramTypes, heap, arrayIndices);
     }
 
     public SymbolicState clone() {

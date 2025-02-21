@@ -25,7 +25,6 @@ public class SymbolicHeap {
     public static final Z3Sorts sorts = Z3Sorts.getInstance();
     private Context ctx;
     private Map<Expr<?>, HeapObject> heap = new HashMap<>();
-    private Map<Expr<?>, Set<Expr<?>>> aliasMap = new HashMap<>();
     private int heapCounter = 0;
 
     public SymbolicHeap(Context ctx) {
@@ -35,6 +34,10 @@ public class SymbolicHeap {
     public SymbolicHeap(Context ctx, int heapCounter) {
         this(ctx);
         this.heapCounter = heapCounter;
+    }
+
+    public void setIsArg(Expr<?> key) {
+        heap.get(key).setIsArg(true);
     }
 
     public HeapObject get(Expr<?> key) {
@@ -57,19 +60,17 @@ public class SymbolicHeap {
         if (obj == null || !obj.isArg) {
             return;
         }
-        Set<Expr<?>> aliases = new HashSet<>();
         for (Map.Entry<Expr<?>, HeapObject> entry : heap.entrySet()) {
             HeapObject other = entry.getValue();
             if (entry.getKey().equals(ref) || !other.isArg) {
                 continue;
             }
             if (obj.type.equals(other.type)) {
-                aliases.add(entry.getKey());
+                obj.addAlias(entry.getKey());
                 // Add this ref also as a potential alias of the one found
-                aliasMap.computeIfAbsent(entry.getKey(), k -> new HashSet<>()).add(ref);
+                other.addAlias(ref);
             }
         }
-        aliasMap.put(ref, aliases);
     }
 
     public boolean containsKey(Expr<?> key) {
@@ -88,16 +89,46 @@ public class SymbolicHeap {
         return ctx.mkConst(var, sorts.getRefSort());
     }
 
+    public SymbolicHeap clone() {
+        // Deep copy heap
+        SymbolicHeap newHeap = new SymbolicHeap(ctx, heapCounter);
+        for (Map.Entry<Expr<?>, HeapObject> entry : heap.entrySet()) {
+            newHeap.heap.put(entry.getKey(), entry.getValue().clone());
+        }
+        return newHeap;
+    }
+
+    // #region Heap Allocations
     /**
      * Allocates a new heap object and returns its unique reference.
      * 
-     * @param key The name to use for the object on the heap
+     * @see #allocateObject(String, Type)
+     */
+    public Expr<?> allocateObject(Type type) {
+        return allocateObject(newKey(), type);
+    }
+
+    /**
+     * Allocates a new heap object and returns its unique reference.
+     * 
+     * @param key  The name to use for the object on the heap
+     * @param type The SootUp type of the object
      * @return The reference to the newly allocated object
      */
     public Expr<?> allocateObject(String key, Type type) {
         Expr<?> objRef = newRef(key);
-        heap.put(objRef, new HeapObject(type, objRef));
+        heap.put(objRef, new HeapObject(type));
         return objRef;
+    }
+
+    /**
+     * Allocates a new array of the given size and element sort, and returns its
+     * reference.
+     * 
+     * @see #allocateArray(String, Type, Expr, Sort)
+     */
+    public <E extends Sort> Expr<?> allocateArray(Type type, Expr<?> size, E elemSort) {
+        return allocateArray(newKey(true), type, size, elemSort);
     }
 
     /**
@@ -115,9 +146,18 @@ public class SymbolicHeap {
         BitVecSort indexSort = sorts.getIntSort();
         Expr<?> arrRef = newRef(key);
         ArrayExpr<BitVecSort, E> arr = ctx.mkArrayConst(key + "_elems", indexSort, elemSort);
-        ArrayObject arrObj = new ArrayObject(type, arrRef, arr, size);
+        ArrayObject arrObj = new ArrayObject(type, arr, size);
         heap.put(arrRef, arrObj);
         return arrRef;
+    }
+
+    /**
+     * Allocates a multi-dimensional array with the given sizes and element sort.
+     * 
+     * @see #allocateMultiArray(String, Type, List, Sort)
+     */
+    public <E extends Sort> Expr<?> allocateMultiArray(Type type, List<BitVecExpr> sizes, E elemSort) {
+        return allocateMultiArray(newKey(true), type, sizes, elemSort);
     }
 
     /**
@@ -139,42 +179,35 @@ public class SymbolicHeap {
             lengths = ctx.mkStore(lengths, ctx.mkBV(i, Type.getValueBitSize(IntType.getInstance())), sizes.get(i));
         }
 
-        MultiArrayObject arrObj = new MultiArrayObject(type, arrRef, arr, lengths);
+        MultiArrayObject arrObj = new MultiArrayObject(type, arr, lengths);
         heap.put(arrRef, arrObj);
         return arrRef;
     }
+    // #endregion
 
-    public SymbolicHeap clone() {
-        SymbolicHeap newHeap = new SymbolicHeap(ctx, heapCounter);
-        // Deep copy heap and alias map
-        for (Map.Entry<Expr<?>, HeapObject> entry : heap.entrySet()) {
-            newHeap.heap.put(entry.getKey(), entry.getValue().clone());
-        }
-        for (Map.Entry<Expr<?>, Set<Expr<?>>> entry : aliasMap.entrySet()) {
-            newHeap.aliasMap.put(entry.getKey(), new HashSet<Expr<?>>(entry.getValue()));
-        }
-        return newHeap;
-    }
-
+    // #region Heap Object Classes
     /**
      * Represents an object in the heap.
      */
     public class HeapObject {
         // A mapping from field names to symbolic expressions.
         protected Map<String, Expr<?>> fields;
-        protected Expr<?> ref;
+        protected Set<Expr<?>> aliases;
         protected Type type;
         /**
          * Whether this object is a method argument, and thus whether it may be involved
          * in implicit aliasing.
          */
-        protected boolean isArg;
+        protected boolean isArg = false;
 
-        public HeapObject(Type type, Expr<?> ref) {
+        public HeapObject(Type type) {
             this.fields = new HashMap<>();
+            this.aliases = new HashSet<>();
             this.type = type;
-            this.ref = ref;
-            this.isArg = ref.toString().contains("arg");
+        }
+
+        public void setIsArg(boolean isArg) {
+            this.isArg = isArg;
         }
 
         public void setField(String fieldName, Expr<?> value) {
@@ -185,9 +218,14 @@ public class SymbolicHeap {
             return fields.get(fieldName);
         }
 
+        public void addAlias(Expr<?> ref) {
+            aliases.add(ref);
+        }
+
         public HeapObject clone() {
-            HeapObject obj = new HeapObject(type, ref);
+            HeapObject obj = new HeapObject(type);
             obj.fields.putAll(fields);
+            obj.aliases.addAll(aliases);
             return obj;
         }
 
@@ -198,8 +236,8 @@ public class SymbolicHeap {
     }
 
     public class ArrayObject extends HeapObject {
-        public ArrayObject(Type type, Expr<?> ref, Expr<?> elems, Expr<?> length) {
-            super(type, ref);
+        public ArrayObject(Type type, Expr<?> elems, Expr<?> length) {
+            super(type);
             setField("elems", elems);
             setField("len", length);
         }
@@ -223,15 +261,15 @@ public class SymbolicHeap {
 
         @Override
         public ArrayObject clone() {
-            return new ArrayObject(type, ref, getElems(), getLength());
+            return new ArrayObject(type, getElems(), getLength());
         }
     }
 
     public class MultiArrayObject extends ArrayObject {
         private int dim;
 
-        public MultiArrayObject(Type type, Expr<?> ref, Expr<?> elems, ArrayExpr<BitVecSort, BitVecSort> lengths) {
-            super(type, ref, elems, lengths);
+        public MultiArrayObject(Type type, Expr<?> elems, ArrayExpr<BitVecSort, BitVecSort> lengths) {
+            super(type, elems, lengths);
             this.dim = ((ArrayType) type).getDimension();
         }
 
@@ -283,7 +321,8 @@ public class SymbolicHeap {
         @SuppressWarnings("unchecked")
         @Override
         public MultiArrayObject clone() {
-            return new MultiArrayObject(type, ref, getElems(), (ArrayExpr<BitVecSort, BitVecSort>) getLength());
+            return new MultiArrayObject(type, getElems(), (ArrayExpr<BitVecSort, BitVecSort>) getLength());
         }
     }
+    // #endregion
 }
