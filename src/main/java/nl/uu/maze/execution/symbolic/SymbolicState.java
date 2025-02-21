@@ -173,20 +173,37 @@ public class SymbolicState {
     }
 
     /**
+     * Resolves aliases for the given variable.
+     * 
+     * @see SymbolicHeap#resolveAliases(String)
+     */
+    public void resolveAliases(String var) {
+        heap.resolveAliases(var);
+    }
+
+    /**
      * Allocates a new heap object and returns its unique reference.
      * 
      * @return The reference to the newly allocated object
-     * @see SymbolicHeap#allocateObject()
+     * @see SymbolicHeap#allocateObject(String)
      */
-    public Expr<?> allocateObject() {
-        return heap.allocateObject();
+    public Expr<?> allocateObject(String var, Type type) {
+        return heap.allocateObject(var, type);
+    }
+
+    /**
+     * Allocates a new heap object and returns its unique reference.
+     * 
+     * @return The reference to the newly allocated object
+     * @see SymbolicHeap#allocateObject(String)
+     */
+    public Expr<?> allocateObject(Type type) {
+        return heap.allocateObject(heap.newKey(), type);
     }
 
     /**
      * Sets the field 'fieldName' of the object identified by 'objRef' to the given
      * symbolic value.
-     * 
-     * @return The reference to the object
      */
     public void setField(Expr<?> objRef, String fieldName, Expr<?> value) {
         HeapObject obj = heap.get(objRef);
@@ -217,13 +234,13 @@ public class SymbolicState {
      * 
      * @see SymbolicHeap#allocateArray(String, Expr, Sort)
      */
-    public <E extends Sort> Expr<?> allocateArray(String var, E elemSort) {
+    public <E extends Sort> Expr<?> allocateArray(String var, Type type, E elemSort) {
         Expr<BitVecSort> len = ctx.mkConst(var + "_len", sorts.getIntSort());
         // Make sure array size is non-negative and does not exceed the max length
         addPathConstraint(ctx.mkBVSGE(len, ctx.mkBV(0, Type.getValueBitSize(IntType.getInstance()))));
         addPathConstraint(ctx.mkBVSLT(len, ctx.mkBV(MAX_ARRAY_LENGTH, Type.getValueBitSize(IntType.getInstance()))));
 
-        return heap.allocateArray(var, len, elemSort);
+        return heap.allocateArray(var, type, len, elemSort);
     }
 
     /**
@@ -231,8 +248,8 @@ public class SymbolicState {
      * 
      * @see SymbolicHeap#allocateArray(String, Expr, Sort)
      */
-    public <E extends Sort> Expr<?> allocateArray(Expr<?> size, E elemSort) {
-        return heap.allocateArray(heap.newKey(true), size, elemSort);
+    public <E extends Sort> Expr<?> allocateArray(Type type, Expr<?> size, E elemSort) {
+        return heap.allocateArray(heap.newKey(true), type, size, elemSort);
     }
 
     /**
@@ -240,7 +257,7 @@ public class SymbolicState {
      * 
      * @see SymbolicHeap#allocateMultiArray(String, List, Sort)
      */
-    public <E extends Sort> Expr<?> allocateMultiArray(String var, int dim, E elemSort) {
+    public <E extends Sort> Expr<?> allocateMultiArray(String var, Type type, int dim, E elemSort) {
         List<BitVecExpr> sizes = new ArrayList<>(dim);
         for (int i = 0; i < dim; i++) {
             Expr<BitVecSort> size = ctx.mkConst(var + "_len" + i, sorts.getIntSort());
@@ -251,7 +268,7 @@ public class SymbolicState {
                     ctx.mkBVSLT(size, ctx.mkBV(MAX_ARRAY_LENGTH, Type.getValueBitSize(IntType.getInstance()))));
         }
 
-        return heap.allocateMultiArray(var, sizes, elemSort);
+        return heap.allocateMultiArray(var, type, sizes, elemSort);
     }
 
     /**
@@ -259,8 +276,8 @@ public class SymbolicState {
      * 
      * @see SymbolicHeap#allocateMultiArray(String, List, Sort)
      */
-    public <E extends Sort> Expr<?> allocateMultiArray(List<BitVecExpr> sizes, E elemSort) {
-        return heap.allocateMultiArray(heap.newKey(true), sizes, elemSort);
+    public <E extends Sort> Expr<?> allocateMultiArray(Type type, List<BitVecExpr> sizes, E elemSort) {
+        return heap.allocateMultiArray(heap.newKey(true), type, sizes, elemSort);
     }
 
     /**
