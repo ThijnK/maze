@@ -28,7 +28,6 @@ public class Z3Sorts {
     /** Null constant, used for null comparisons etc. */
     private Expr<?> nullConst;
     private Sort voidSort;
-    private Sort classSort;
     private Sort stringSort;
 
     private BitVecSort intSort;
@@ -41,7 +40,6 @@ public class Z3Sorts {
         refSort = ctx.mkUninterpretedSort("Ref");
         nullConst = ctx.mkConst("null", refSort);
         voidSort = ctx.mkUninterpretedSort("Void");
-        classSort = ctx.mkUninterpretedSort("Class");
         stringSort = ctx.mkStringSort();
 
         intSort = ctx.mkBitVecSort(Type.getValueBitSize(IntType.getInstance()));
@@ -73,10 +71,6 @@ public class Z3Sorts {
 
     public Sort getVoidSort() {
         return voidSort;
-    }
-
-    public Sort getClassSort() {
-        return classSort;
     }
 
     public Sort getStringSort() {
@@ -126,8 +120,7 @@ public class Z3Sorts {
             if (sootType.toString().equals("java.lang.String")) {
                 return getStringSort();
             }
-            // Note: sootType.toString() will return the fully qualified name of the class
-            return ctx.mkUninterpretedSort(sootType.toString());
+            return getRefSort();
         } else if (sootType instanceof NullType) {
             return getRefSort();
         } else if (sootType instanceof VoidType) {

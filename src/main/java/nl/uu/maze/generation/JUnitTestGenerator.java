@@ -182,8 +182,7 @@ public class JUnitTestGenerator {
         methodObjCount++;
         if (typeClass.isPresent()) {
             Class<?> clazz = typeClass.get();
-            // TODO: find constructor and generate args (using ObjectInstantiator) to create
-            // a valid instance
+            // TODO: find constructor and generate args (using ObjectInstantiator)
             methodBuilder.addStatement("$T $L = new $T()", clazz, var, clazz);
         } else {
             // Default to assuming (hoping) that the class has a zero-argument constructor

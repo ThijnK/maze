@@ -374,7 +374,7 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
     @Override
     public void caseClassConstant(@Nonnull ClassConstant constant) {
         // Ignore class constants (e.g. MyClass.class), outside of scope
-        setResult(ctx.mkConst(constant.getValue(), sorts.getClassSort()));
+        throw new UnsupportedOperationException("Class constants are not supported");
     }
     // #endregion
 
