@@ -167,7 +167,8 @@ public class SymbolicState {
     /**
      * Sets the field of the object referenced by 'objRef' to the given value.
      */
-    public void setField(Expr<?> objRef, String fieldName, Expr<?> value) {
+    public void setField(String var, String fieldName, Expr<?> value) {
+        Expr<?> objRef = getVariable(var);
         HeapObject obj = heap.get(objRef);
         if (obj == null) {
             throw new IllegalArgumentException("Object does not exist: " + objRef);
@@ -178,9 +179,21 @@ public class SymbolicState {
     /**
      * Returns the value of the field of the object referenced by 'objRef'.
      */
-    public Expr<?> getField(Expr<?> objRef, String fieldName) {
+    public Expr<?> getField(String var, String fieldName, Type fieldType) {
+        Expr<?> objRef = getVariable(var);
         HeapObject obj = heap.get(objRef);
-        return obj != null ? obj.getField(fieldName) : null;
+        if (obj == null) {
+            return null;
+        }
+        Expr<?> field = obj.getField(fieldName);
+        if (field == null && obj.isArg) {
+            String varName = objRef.toString();
+            // TODO: what if the field is another object or array?
+            // Create a symbolic value for the field if the object is an argument
+            field = ctx.mkConst(varName + "_" + fieldName, sorts.determineSort(fieldType));
+            obj.setField(fieldName, field);
+        }
+        return field;
     }
 
     /**

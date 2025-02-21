@@ -22,6 +22,7 @@ import nl.uu.maze.execution.symbolic.SymbolicHeap.ArrayObject;
 import nl.uu.maze.transform.Z3ToJavaTransformer;
 import nl.uu.maze.util.Z3Sorts;
 import sootup.core.types.ArrayType;
+import sootup.core.types.ClassType;
 import sootup.core.types.Type;
 
 /**
@@ -115,14 +116,14 @@ public class SymbolicStateValidator {
             Expr<?> expr = model.getConstInterp(decl);
 
             // Remove potential suffixes (e.g., _elems, _len)
-            var = var.contains("_") ? var.substring(0, var.indexOf('_')) : var;
-            Type type = state.getParamType(var);
+            String varBase = var.contains("_") ? var.substring(0, var.indexOf('_')) : var;
+            Type type = state.getParamType(varBase);
 
             // For reference types (arrays + objects)
             if (expr.getSort().equals(sorts.getRefSort())) {
                 // If the variable is interpreted as null, set it to null
                 if (expr.equals(nullExpr)) {
-                    argMap.set(var, null);
+                    argMap.set(varBase, null);
                     continue;
                 }
                 // If interpreted equal to another reference, set it to the same value, choosing
@@ -131,36 +132,52 @@ public class SymbolicStateValidator {
                     ObjectRef ref = refValues.get(expr);
                     // Compare the two references, whichever one is more constrained in path
                     // condition is the "base" reference
-                    if (state.isMoreConstrained(var, ref.getVar())) {
+                    if (state.isMoreConstrained(varBase, ref.getVar())) {
                         // If the current var is more constrained, set it as new base reference
                         // and evaluate it (so no continue)
-                        refValues.put(expr, new ObjectRef(var));
-                        argMap.set(ref.getVar(), new ObjectRef(var));
+                        refValues.put(expr, new ObjectRef(varBase));
+                        argMap.set(ref.getVar(), new ObjectRef(varBase));
                     } else {
                         // If the other var is more constrained, set the current var to the same value
-                        argMap.set(var, ref);
+                        argMap.set(varBase, ref);
                         continue;
                     }
                 }
             }
 
+            // For objects
+            if (type instanceof ClassType) {
+                if (!var.contains("_")) {
+                    continue;
+                }
+                if (!argMap.containsKey(varBase)) {
+                    ObjectFields objFields = new ObjectFields();
+                    argMap.set(varBase, objFields);
+                }
+                String fieldName = var.substring(var.indexOf('_') + 1);
+                if (fieldName.length() > 0) {
+                    ObjectFields objFields = (ObjectFields) argMap.get(varBase);
+                    Object value = transformer.transformExpr(model.getConstInterp(decl), type);
+                    objFields.setField(fieldName, value);
+                }
+            }
             // For arrays
-            if (type instanceof ArrayType) {
+            else if (type instanceof ArrayType) {
                 // There can be multiple declarations for the same array (elems and len)
-                if (argMap.containsKey(var)) {
+                if (argMap.containsKey(varBase)) {
                     if (expr.getSort().equals(sorts.getRefSort())) {
-                        refValues.put(expr, new ObjectRef(var));
+                        refValues.put(expr, new ObjectRef(varBase));
                     }
                     continue;
                 }
 
-                Expr<?> arrRef = state.heap.newRef(var);
+                Expr<?> arrRef = state.heap.newRef(varBase);
                 ArrayObject arrObj = state.getArrayObject(arrRef);
                 Type elemType = ((ArrayType) type).getBaseType();
                 Object arr = transformer.transformArray(arrObj, model, elemType);
-                argMap.set(var, arr);
+                argMap.set(varBase, arr);
                 if (expr.getSort().equals(sorts.getRefSort())) {
-                    refValues.put(expr, new ObjectRef(var));
+                    refValues.put(expr, new ObjectRef(varBase));
                 }
             } else {
                 // Primitive types
@@ -198,8 +215,7 @@ public class SymbolicStateValidator {
     }
 
     /**
-     * Object value representing that the value of an argument is a reference to
-     * another object of the given variable name.
+     * Represents a reference to another variable.
      */
     public static class ObjectRef {
         private final String var;
@@ -215,6 +231,25 @@ public class SymbolicStateValidator {
         @Override
         public String toString() {
             return var;
+        }
+    }
+
+    /**
+     * Represents a object and its fields.
+     */
+    public static class ObjectFields {
+        private final Map<String, Object> fields;
+
+        public ObjectFields() {
+            this.fields = new HashMap<>();
+        }
+
+        public Map<String, Object> getFields() {
+            return fields;
+        }
+
+        public void setField(String name, Object value) {
+            fields.put(name, value);
         }
     }
 }

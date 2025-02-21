@@ -1,11 +1,13 @@
 package nl.uu.maze.generation;
 
 import sootup.core.types.ArrayType;
+import sootup.core.types.ClassType;
 import sootup.core.types.Type;
 import sootup.java.core.JavaSootMethod;
 
 import javax.lang.model.element.Modifier;
 
+import java.lang.reflect.Field;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +20,7 @@ import com.palantir.javapoet.*;
 
 import nl.uu.maze.execution.ArgMap;
 import nl.uu.maze.execution.MethodType;
+import nl.uu.maze.execution.symbolic.SymbolicStateValidator.ObjectFields;
 import nl.uu.maze.execution.symbolic.SymbolicStateValidator.ObjectRef;
 
 /**
@@ -56,6 +59,7 @@ public class JUnitTestGenerator {
         MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder(testMethodName)
                 .addModifiers(Modifier.PUBLIC)
                 .addAnnotation(Test.class)
+                .addException(Exception.class)
                 .returns(void.class);
 
         // For static methods, just call the method
@@ -115,6 +119,10 @@ public class JUnitTestGenerator {
             // If the value is a reference to another parameter, store it in refParams
             if (value instanceof ObjectRef) {
                 refParams.add(new ParamInfo(var, paramTypes.get(i), valueStr));
+            }
+            // If the value is an object, construct it using reflection
+            else if (value instanceof ObjectFields && paramTypes.get(i) instanceof ClassType) {
+                buildObjectInstance(methodBuilder, var, (ClassType) paramTypes.get(i), (ObjectFields) value);
             } else {
                 // Other parameters can be defined immediately
                 methodBuilder.addStatement("$L $L = $L", paramTypes.get(i), var, valueStr);
@@ -141,6 +149,23 @@ public class JUnitTestGenerator {
         logger.info("Generating JUnit test cases...");
         for (int i = 0; i < argMaps.size(); i++) {
             addMethodTestCase(method, ctor, argMaps.get(i));
+        }
+    }
+
+    private void buildObjectInstance(MethodSpec.Builder methodBuilder, String var, ClassType type,
+            ObjectFields fields) {
+        // TODO: for simplicity, this assumes that the class has a zero-argument ctor
+        // This should be extended to support constructors with arguments, for which
+        // we'll need the Class<?> object for this class type
+        methodBuilder.addStatement("$L $L = new $L()", type, var, type);
+        for (Map.Entry<String, Object> entry : fields.getFields().entrySet()) {
+            String fieldName = entry.getKey();
+            Object fieldValue = entry.getValue();
+            String fieldVar = var + "_" + fieldName; // TODO: make this unique
+            methodBuilder.addStatement("$T $L = $L.class.getDeclaredField(\"$L\")", Field.class, fieldVar, type,
+                    fieldName);
+            methodBuilder.addStatement("$L.setAccessible(true)", fieldVar);
+            methodBuilder.addStatement("$L.set($L, $L)", fieldVar, var, valueToString(fieldValue));
         }
     }
 

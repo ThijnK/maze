@@ -14,6 +14,7 @@ import nl.uu.maze.execution.symbolic.SymbolicState;
 import nl.uu.maze.util.Pair;
 import nl.uu.maze.util.Z3Sorts;
 import sootup.core.jimple.visitor.AbstractValueVisitor;
+import sootup.core.signatures.FieldSignature;
 import sootup.core.jimple.basic.*;
 import sootup.core.jimple.common.constant.*;
 import sootup.core.jimple.common.expr.*;
@@ -404,8 +405,8 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
 
     @Override
     public void caseInstanceFieldRef(@Nonnull JInstanceFieldRef ref) {
-        Expr<?> objRef = state.getVariable(ref.getBase().getName());
-        setResult(state.getField(objRef, ref.getFieldSignature().getName()));
+        FieldSignature field = ref.getFieldSignature();
+        setResult(state.getField(ref.getBase().getName(), field.getName(), field.getType()));
     }
 
     /**

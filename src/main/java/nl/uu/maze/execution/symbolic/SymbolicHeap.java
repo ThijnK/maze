@@ -98,6 +98,11 @@ public class SymbolicHeap {
         return newHeap;
     }
 
+    @Override
+    public String toString() {
+        return heap.toString();
+    }
+
     // #region Heap Allocations
     /**
      * Allocates a new heap object and returns its unique reference.
@@ -201,8 +206,8 @@ public class SymbolicHeap {
         protected boolean isArg = false;
 
         public HeapObject(Type type) {
-            this.fields = new HashMap<>();
-            this.aliases = new HashSet<>();
+            this.fields = new HashMap<>(4);
+            this.aliases = new HashSet<>(0);
             this.type = type;
         }
 
