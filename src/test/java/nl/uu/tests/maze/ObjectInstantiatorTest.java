@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.lang.reflect.Parameter;
-import java.util.Map;
 
 class ObjectInstantiatorTest {
     @Test
@@ -62,15 +61,18 @@ class ObjectInstantiatorTest {
         assertEquals((byte) 6, args[5]);
         assertEquals('7', args[6]);
         assertEquals(true, args[7]);
-        assertEquals(argMap.get("arg8"), args[8]);
+        assertEquals(argMap.get("marg8"), args[8]);
     }
 
     @Test
     public void testGenerateArgs_WithIncompleteArgMap() {
         // Tests that the arguments not present in the argMap are generated
         Parameter[] params = TestClassManyArgs.class.getConstructors()[0].getParameters();
-        ArgMap argMap = new ArgMap(Map.of("arg0", 1, "arg3", 4L, "arg4", (short) 5,
-                "arg5", (byte) 6));
+        ArgMap argMap = new ArgMap();
+        argMap.set("marg0", 1);
+        argMap.set("marg3", 4L);
+        argMap.set("marg4", (short) 5);
+        argMap.set("marg5", (byte) 6);
         Object[] args = ObjectInstantiator.generateArgs(params, argMap, MethodType.METHOD);
         assertEquals(9, args.length);
         assertEquals(1, args[0]);
