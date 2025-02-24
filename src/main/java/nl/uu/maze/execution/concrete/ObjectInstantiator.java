@@ -2,6 +2,8 @@ package nl.uu.maze.execution.concrete;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.util.Map;
 import java.util.Random;
 import java.lang.reflect.Parameter;
 
@@ -10,6 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import nl.uu.maze.execution.ArgMap;
 import nl.uu.maze.execution.MethodType;
+import nl.uu.maze.execution.symbolic.SymbolicStateValidator.ObjectFields;
 import nl.uu.maze.execution.symbolic.SymbolicStateValidator.ObjectRef;
 import nl.uu.maze.util.ArrayUtils;
 
@@ -116,11 +119,24 @@ public class ObjectInstantiator {
                 Object value = argMap.get(name);
                 if (value == null) {
                     arguments[i] = null;
-                    continue;
                 } else if (value instanceof ObjectRef) {
                     // ObjectRef's are preserved and handled after all other arguments are generated
                     arguments[i] = value;
-                    continue;
+                } else if (value instanceof ObjectFields) {
+                    // Construct instance and set the given fields
+                    Object instance = createInstance(type);
+                    ObjectFields fields = (ObjectFields) value;
+
+                    for (Map.Entry<String, Object> entry : fields.getFields().entrySet()) {
+                        try {
+                            Field field = type.getDeclaredField(entry.getKey());
+                            field.setAccessible(true);
+                            field.set(instance, entry.getValue());
+                        } catch (Exception e) {
+                            logger.error("Failed to set field: " + entry.getKey() + " in class: " + type.getName());
+                        }
+                    }
+                    arguments[i] = instance;
                 } else if (type.isArray()) {
                     // For arrays of primitives, we need to make sure the array is typed correctly
                     // So we have to create a typed instance and copy the values
@@ -180,9 +196,24 @@ public class ObjectInstantiator {
                         arguments[i] = null;
             }
 
-            // Add new argument to argMap
+            // Add new arguments to argMap
             if (argMap != null) {
-                argMap.set(name, arguments[i]);
+                if (type.isPrimitive() || arguments[i] == null) {
+                    argMap.set(name, arguments[i]);
+                } else {
+                    ObjectFields fields = new ObjectFields();
+                    // Try to set the fields of the object to the randomly generated values
+                    for (Field field : type.getDeclaredFields()) {
+                        try {
+                            field.setAccessible(true);
+                            fields.setField(field.getName(), field.get(arguments[i]));
+                        } catch (Exception e) {
+                            logger.error("Failed to set field: " + field.getName() + " in class: " + type.getName());
+                        }
+                    }
+
+                    argMap.set(name, fields);
+                }
             }
         }
 
