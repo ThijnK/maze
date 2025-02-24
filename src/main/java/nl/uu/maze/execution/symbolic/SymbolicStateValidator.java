@@ -68,7 +68,7 @@ public class SymbolicStateValidator {
      * @return An optional model if the path condition is satisfiable
      */
     public Optional<Model> validate(SymbolicState state) {
-        return validate(state.getPathConstraints());
+        return validate(state.getAllConstraints());
     }
 
     /**

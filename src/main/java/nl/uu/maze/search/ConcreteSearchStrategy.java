@@ -40,8 +40,13 @@ public abstract class ConcreteSearchStrategy implements SearchStrategy {
         }
 
         // Add a candidate for every constraint in the path condition
-        for (int i = 0; i < state.getPathConstraints().size(); i++) {
-            add(new PathConditionCandidate(state.getPathConstraints(), i, state.getContext()));
+        List<BoolExpr> pathConstraints = state.getPathConstraints();
+        int length = pathConstraints.size();
+        // Add engine constraints, but don't include them as candidates for negation
+        // Note: this does not make a copy of the list, so the original list is modified
+        pathConstraints.addAll(state.getEngineConstraints());
+        for (int i = 0; i < length; i++) {
+            add(new PathConditionCandidate(pathConstraints, i, state.getContext()));
         }
         return true;
     }

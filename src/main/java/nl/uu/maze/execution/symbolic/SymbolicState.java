@@ -46,6 +46,11 @@ public class SymbolicState {
 
     private Map<String, Expr<?>> symbolicVariables;
     private List<BoolExpr> pathConstraints;
+    /**
+     * Constraints imposed by the engine, e.g., to put a max and min bound on array
+     * sizes.
+     */
+    private List<BoolExpr> engineConstraints;
     public final SymbolicHeap heap;
     /**
      * Tracks the SootUp types of symbolic variables representing method parameters.
@@ -68,25 +73,26 @@ public class SymbolicState {
         this.currentStmt = stmt;
         this.symbolicVariables = new HashMap<>();
         this.pathConstraints = new ArrayList<>();
+        this.engineConstraints = new ArrayList<>();
         this.paramTypes = new HashMap<>();
         this.heap = new SymbolicHeap(ctx);
         this.arrayIndices = new HashMap<>();
     }
 
     public SymbolicState(Context ctx, Stmt stmt, int depth, MethodType methodType,
-            Map<String, Expr<?>> symbolicVariables, List<BoolExpr> pathConstraints, Map<String, Type> paramTypes,
-            SymbolicHeap heap, Map<String, BitVecExpr[]> arrayIndices) {
+            Map<String, Expr<?>> symbolicVariables, List<BoolExpr> pathConstraints, List<BoolExpr> engineConstraints,
+            Map<String, Type> paramTypes, SymbolicHeap heap, Map<String, BitVecExpr[]> arrayIndices) {
         this.ctx = ctx;
         this.currentStmt = stmt;
         this.currentDepth = depth;
         this.methodType = methodType;
         this.symbolicVariables = new HashMap<>(symbolicVariables);
         this.pathConstraints = new ArrayList<>(pathConstraints);
+        this.engineConstraints = new ArrayList<>(engineConstraints);
         this.heap = heap.clone();
         // Share the same variable types map to avoid copying
         this.paramTypes = paramTypes;
         this.arrayIndices = new HashMap<>(arrayIndices);
-
     }
 
     public void setMethodType(MethodType methodType) {
@@ -232,8 +238,9 @@ public class SymbolicState {
     public <E extends Sort> Expr<?> newArray(String var, Type type, E elemSort) {
         Expr<BitVecSort> len = ctx.mkConst(var + "_len", sorts.getIntSort());
         // Make sure array size is non-negative and does not exceed the max length
-        addPathConstraint(ctx.mkBVSGE(len, ctx.mkBV(0, Type.getValueBitSize(IntType.getInstance()))));
-        addPathConstraint(ctx.mkBVSLT(len, ctx.mkBV(MAX_ARRAY_LENGTH, Type.getValueBitSize(IntType.getInstance()))));
+        engineConstraints.add(ctx.mkBVSGE(len, ctx.mkBV(0, Type.getValueBitSize(IntType.getInstance()))));
+        engineConstraints
+                .add(ctx.mkBVSLT(len, ctx.mkBV(MAX_ARRAY_LENGTH, Type.getValueBitSize(IntType.getInstance()))));
 
         return heap.allocateArray(var, type, len, elemSort);
     }
@@ -261,8 +268,8 @@ public class SymbolicState {
             Expr<BitVecSort> size = ctx.mkConst(var + "_len" + i, sorts.getIntSort());
             sizes.add((BitVecExpr) size);
             // Make sure array size is non-negative and does not exceed the max length
-            addPathConstraint(ctx.mkBVSGE(size, ctx.mkBV(0, Type.getValueBitSize(IntType.getInstance()))));
-            addPathConstraint(
+            engineConstraints.add(ctx.mkBVSGE(size, ctx.mkBV(0, Type.getValueBitSize(IntType.getInstance()))));
+            engineConstraints.add(
                     ctx.mkBVSLT(size, ctx.mkBV(MAX_ARRAY_LENGTH, Type.getValueBitSize(IntType.getInstance()))));
         }
 
@@ -446,13 +453,27 @@ public class SymbolicState {
     }
 
     /**
-     * Returns the path condition of the current state as the conjunction of all
-     * path constraints.
-     * 
-     * @return The path condition as a Z3 BoolExpr
+     * Returns the list of path constraints for this state.
      */
     public List<BoolExpr> getPathConstraints() {
         return pathConstraints;
+    }
+
+    /**
+     * Returns the list of engine constraints for this state.
+     */
+    public List<BoolExpr> getEngineConstraints() {
+        return engineConstraints;
+    }
+
+    /**
+     * Returns the list of all constraints (path + engine constraints) for this
+     * state.
+     */
+    public List<BoolExpr> getAllConstraints() {
+        List<BoolExpr> allConstraints = new ArrayList<>(pathConstraints);
+        allConstraints.addAll(engineConstraints);
+        return allConstraints;
     }
 
     public boolean isFinalState(StmtGraph<?> cfg) {
@@ -461,7 +482,7 @@ public class SymbolicState {
 
     public SymbolicState clone(Stmt stmt) {
         return new SymbolicState(ctx, stmt, currentDepth, methodType, symbolicVariables, pathConstraints,
-                paramTypes, heap, arrayIndices);
+                engineConstraints, paramTypes, heap, arrayIndices);
     }
 
     public SymbolicState clone() {
