@@ -84,9 +84,7 @@ public class SymbolicExecutor {
         List<SymbolicState> newStates = new ArrayList<SymbolicState>();
 
         // If replaying a trace, follow the branch indicated by the trace
-        if (iterator != null) {
-            if (!iterator.hasNext())
-                throw new IllegalArgumentException("Trace is too short");
+        if (iterator != null && iterator.hasNext()) {
             TraceEntry entry = iterator.next();
             int branchIndex = entry.getValue();
             state.addPathConstraint(branchIndex == 0 ? Z3Utils.negate(ctx, cond) : cond);
@@ -128,7 +126,7 @@ public class SymbolicExecutor {
         List<SymbolicState> newStates = new ArrayList<SymbolicState>();
 
         // If replaying a trace, follow the branch indicated by the trace
-        if (iterator != null) {
+        if (iterator != null && iterator.hasNext()) {
             TraceEntry entry = iterator.next();
             int branchIndex = entry.getValue();
             if (branchIndex >= values.size()) {

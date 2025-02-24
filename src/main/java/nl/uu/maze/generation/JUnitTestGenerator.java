@@ -44,6 +44,7 @@ public class JUnitTestGenerator {
      * Number of objects created in the current method, to avoid naming conflicts.
      */
     private int methodObjCount = 0;
+    private boolean setFieldAdded = false;
 
     public JUnitTestGenerator(Class<?> clazz, JavaAnalyzer analyzer) throws ClassNotFoundException {
         testClassName = clazz.getSimpleName() + "Test";
@@ -214,13 +215,36 @@ public class JUnitTestGenerator {
             return;
         }
         for (Map.Entry<String, Object> entry : fields.getFields().entrySet()) {
-            String fieldName = entry.getKey();
-            String fieldVar = var + methodObjCount + "_" + fieldName;
-            methodBuilder.addStatement("$T $L = $L.getClass().getDeclaredField(\"$L\")", Field.class, fieldVar, var,
-                    fieldName);
-            methodBuilder.addStatement("$L.setAccessible(true)", fieldVar);
-            methodBuilder.addStatement("$L.set($L, $L)", fieldVar, var, valueToString(entry.getValue()));
+            addSetFieldMethod();
+            methodBuilder.addStatement("setField($L, \"$L\", $L)", var, entry.getKey(),
+                    valueToString(entry.getValue()));
         }
+    }
+
+    /**
+     * Adds a method to the test class that sets the value of a field in an object
+     * using reflection.
+     */
+    private void addSetFieldMethod() {
+        // Make sure to only add the method once
+        if (setFieldAdded) {
+            return;
+        }
+
+        MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder("setField")
+                .addModifiers(Modifier.PRIVATE)
+                .addException(Exception.class)
+                .addParameters(List.of(ParameterSpec.builder(Object.class, "obj").build(),
+                        ParameterSpec.builder(String.class, "fieldName").build(),
+                        ParameterSpec.builder(Object.class, "value").build()))
+                .returns(void.class);
+
+        methodBuilder.addStatement("$T field = obj.getClass().getDeclaredField($L)", Field.class, "fieldName");
+        methodBuilder.addStatement("field.setAccessible(true)");
+        methodBuilder.addStatement("field.set(obj, value)");
+
+        setFieldAdded = true;
+        classBuilder.addMethod(methodBuilder.build());
     }
 
     /**
