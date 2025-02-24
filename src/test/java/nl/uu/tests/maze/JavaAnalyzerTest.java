@@ -22,7 +22,7 @@ public class JavaAnalyzerTest {
 
     @BeforeAll
     public static void setUp() throws Exception {
-        analyzer = new JavaAnalyzer(classPath);
+        analyzer = new JavaAnalyzer(classPath, null);
     }
 
     @Test

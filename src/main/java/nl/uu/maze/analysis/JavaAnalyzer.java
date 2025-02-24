@@ -88,12 +88,12 @@ public class JavaAnalyzer {
      * @throws ClassNotFoundException If a class cannot be found
      */
     public Class<?> getJavaClass(Type type) throws ClassNotFoundException {
-        if (type instanceof ClassType) {
-            return getJavaClass((ClassType) type);
-        } else if (type instanceof PrimitiveType) {
+        if (type instanceof PrimitiveType) {
             return getJavaClass((PrimitiveType) type);
         } else if (type instanceof ArrayType) {
             return getJavaClass((ArrayType) type);
+        } else if (type instanceof ClassType) {
+            return getJavaClass((ClassType) type);
         } else if (type instanceof VoidType) {
             return void.class;
         } else if (type instanceof NullType) {

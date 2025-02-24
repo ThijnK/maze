@@ -198,7 +198,7 @@ public class ObjectInstantiator {
 
             // Add new arguments to argMap
             if (argMap != null) {
-                if (type.isPrimitive() || arguments[i] == null) {
+                if (type.isPrimitive() || type.getName().equals("java.lang.String") || arguments[i] == null) {
                     argMap.set(name, arguments[i]);
                 } else {
                     ObjectFields fields = new ObjectFields();

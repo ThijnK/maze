@@ -146,7 +146,7 @@ public class SymbolicStateValidator {
             }
 
             // For objects
-            if (type instanceof ClassType) {
+            if (type instanceof ClassType && !type.toString().equals("java.lang.String")) {
                 if (!var.contains("_")) {
                     continue;
                 }
