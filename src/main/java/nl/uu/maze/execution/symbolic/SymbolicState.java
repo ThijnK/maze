@@ -67,6 +67,8 @@ public class SymbolicState {
      * Only used for multi-dimensional arrays.
      */
     private Map<String, BitVecExpr[]> arrayIndices = new HashMap<>();
+    /** Indicates whether an exception was thrown during symbolic execution. */
+    private boolean exceptionThrown = false;
 
     public SymbolicState(Context ctx, Stmt stmt) {
         this.ctx = ctx;
@@ -150,6 +152,45 @@ public class SymbolicState {
      */
     public void addPathConstraint(BoolExpr constraint) {
         pathConstraints.add(constraint);
+    }
+
+    /**
+     * Sets the exceptionThrown flag to true.
+     */
+    public void setExceptionThrown() {
+        this.exceptionThrown = true;
+    }
+
+    public boolean isExceptionThrown() {
+        return exceptionThrown;
+    }
+
+    /**
+     * Returns the list of path constraints for this state.
+     */
+    public List<BoolExpr> getPathConstraints() {
+        return pathConstraints;
+    }
+
+    /**
+     * Returns the list of engine constraints for this state.
+     */
+    public List<BoolExpr> getEngineConstraints() {
+        return engineConstraints;
+    }
+
+    /**
+     * Returns the list of all constraints (path + engine constraints) for this
+     * state.
+     */
+    public List<BoolExpr> getAllConstraints() {
+        List<BoolExpr> allConstraints = new ArrayList<>(pathConstraints);
+        allConstraints.addAll(engineConstraints);
+        return allConstraints;
+    }
+
+    public boolean isFinalState(StmtGraph<?> cfg) {
+        return exceptionThrown || cfg.getAllSuccessors(currentStmt).isEmpty();
     }
 
     /**
@@ -450,34 +491,6 @@ public class SymbolicState {
         if (indices != null) {
             arrayIndices.put(to, indices);
         }
-    }
-
-    /**
-     * Returns the list of path constraints for this state.
-     */
-    public List<BoolExpr> getPathConstraints() {
-        return pathConstraints;
-    }
-
-    /**
-     * Returns the list of engine constraints for this state.
-     */
-    public List<BoolExpr> getEngineConstraints() {
-        return engineConstraints;
-    }
-
-    /**
-     * Returns the list of all constraints (path + engine constraints) for this
-     * state.
-     */
-    public List<BoolExpr> getAllConstraints() {
-        List<BoolExpr> allConstraints = new ArrayList<>(pathConstraints);
-        allConstraints.addAll(engineConstraints);
-        return allConstraints;
-    }
-
-    public boolean isFinalState(StmtGraph<?> cfg) {
-        return cfg.getAllSuccessors(currentStmt).isEmpty();
     }
 
     public SymbolicState clone(Stmt stmt) {

@@ -84,7 +84,16 @@ public class SymbolicExecutor {
         List<SymbolicState> newStates = new ArrayList<SymbolicState>();
 
         // If replaying a trace, follow the branch indicated by the trace
-        if (iterator != null && iterator.hasNext()) {
+        if (iterator != null) {
+            // If end of iterator is reached, it means exception was thrown
+            if (!iterator.hasNext()) {
+                // Set this state as an exceptional state and return it so it will be counted as
+                // a final state
+                state.setExceptionThrown();
+                newStates.add(state);
+                return newStates;
+            }
+
             TraceEntry entry = iterator.next();
             int branchIndex = entry.getValue();
             state.addPathConstraint(branchIndex == 0 ? Z3Utils.negate(ctx, cond) : cond);
@@ -126,7 +135,14 @@ public class SymbolicExecutor {
         List<SymbolicState> newStates = new ArrayList<SymbolicState>();
 
         // If replaying a trace, follow the branch indicated by the trace
-        if (iterator != null && iterator.hasNext()) {
+        if (iterator != null) {
+            // If end of iterator is reached, it means exception was thrown
+            if (!iterator.hasNext()) {
+                state.setExceptionThrown();
+                newStates.add(state);
+                return newStates;
+            }
+
             TraceEntry entry = iterator.next();
             int branchIndex = entry.getValue();
             if (branchIndex >= values.size()) {

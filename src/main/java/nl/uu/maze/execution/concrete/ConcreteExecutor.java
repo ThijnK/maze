@@ -30,20 +30,20 @@ public class ConcreteExecutor {
      */
     public Object execute(Constructor<?> ctor, Method method, ArgMap argMap)
             throws IllegalAccessException, InvocationTargetException, InstantiationException, IllegalArgumentException {
-        // If not static, create an instance of the class
-        Object instance = null;
-        if (!Modifier.isStatic(method.getModifiers())) {
-            // Call generateArgs with argMap to use argumens from the map if present
-            Object[] args = ObjectInstantiator.generateArgs(ctor.getParameters(), argMap, MethodType.CTOR);
-            logger.debug("Creating instance of class " + ctor.getDeclaringClass().getName() + " with args: "
-                    + ArrayUtils.toString(args));
-            instance = ctor.newInstance(args);
-        }
-
-        // Generate args for the method invocation
-        Object[] args = ObjectInstantiator.generateArgs(method.getParameters(), argMap, MethodType.METHOD);
-
         try {
+            // If not static, create an instance of the class
+            Object instance = null;
+            if (!Modifier.isStatic(method.getModifiers())) {
+                // Call generateArgs with argMap to use argumens from the map if present
+                Object[] args = ObjectInstantiator.generateArgs(ctor.getParameters(), argMap, MethodType.CTOR);
+                logger.debug("Creating instance of class " + ctor.getDeclaringClass().getName() + " with args: "
+                        + ArrayUtils.toString(args));
+                instance = ctor.newInstance(args);
+            }
+
+            // Generate args for the method invocation
+            Object[] args = ObjectInstantiator.generateArgs(method.getParameters(), argMap, MethodType.METHOD);
+
             logger.debug("Executing method " + method.getName() + " with args: " + ArrayUtils.toString(args));
             Object result = method.invoke(instance, args);
             logger.debug("Retval: " + (result == null ? "null" : result.toString()));

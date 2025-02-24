@@ -200,6 +200,14 @@ public class DSEController {
                 // statement to the starting statement of the target method
                 for (SymbolicState state : newStates) {
                     if (state.isFinalState(ctorCfg)) {
+                        // If the state is an exception-throwing state, immediately add it to the
+                        // final states
+                        if (state.isExceptionThrown()) {
+                            finalStates.add(state);
+                            searchStrategy.remove(state);
+                            continue;
+                        }
+
                         state.setMethodType(MethodType.METHOD);
                         // Clone the state to avoid modifying the original in subsequent execution (want
                         // to reuse this final ctor state for multiple methods)
@@ -255,6 +263,12 @@ public class DSEController {
             current = newStates.get(0);
             // At the end of the ctor, start with the target method
             if (current.isCtor() && current.isFinalState(ctorCfg)) {
+                // If the state is an exception-throwing state, we stop immediately
+                if (current.isExceptionThrown()) {
+                    initStates.put(pathHash, current);
+                    break;
+                }
+
                 current.setMethodType(MethodType.METHOD);
                 // Save the final ctor state for reuse in other methods
                 initStates.put(pathHash, current.clone());
