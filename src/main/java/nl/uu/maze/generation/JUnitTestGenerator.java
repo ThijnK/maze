@@ -177,23 +177,46 @@ public class JUnitTestGenerator {
         }
     }
 
+    /**
+     * Builds an object instance for the given Class<?> with randomly generated
+     * constructor arguments.
+     */
+    private void buildObjectInstance(MethodSpec.Builder methodBuilder, String var, Class<?> clazz) {
+        methodObjCount++;
+        Object[] arguments = analyzer.getJavaConstructor(clazz).getSecond();
+        String[] argNames = new String[arguments.length];
+        for (int i = 0; i < arguments.length; i++) {
+            Object arg = arguments[i];
+            String argName = var + methodObjCount + "_carg" + i;
+            argNames[i] = argName;
+            // TODO: if arg here is an object, recursively build it
+            methodBuilder.addStatement("$T $L = $L", arg.getClass(), argName, valueToString(arg));
+        }
+        methodBuilder.addStatement("$T $L = new $T($L)", clazz, var, clazz, String.join(", ", argNames));
+    }
+
+    /**
+     * Builds an object instance for the given ClassType with randomly generated
+     * constructor arguments, but overwrites any fields defiend in the given
+     * ObjectFields argument with the given values.
+     */
     private void buildObjectInstance(MethodSpec.Builder methodBuilder, String var, ClassType type,
             ObjectFields fields) {
         Optional<Class<?>> typeClass = analyzer.tryGetJavaClass(type);
-        methodObjCount++;
         if (typeClass.isPresent()) {
-            Class<?> clazz = typeClass.get();
-            // TODO: find constructor and generate args (using ObjectInstantiator)
-            methodBuilder.addStatement("$T $L = new $T()", clazz, var, clazz);
+            buildObjectInstance(methodBuilder, var, typeClass.get());
         } else {
             // Default to assuming (hoping) that the class has a zero-argument constructor
             methodBuilder.addStatement("$L $L = new $L()", type, var, type);
         }
 
+        if (fields == null) {
+            return;
+        }
         for (Map.Entry<String, Object> entry : fields.getFields().entrySet()) {
             String fieldName = entry.getKey();
             Object fieldValue = entry.getValue();
-            String fieldVar = var + "_" + fieldName + "_" + methodObjCount;
+            String fieldVar = var + methodObjCount + "_" + fieldName;
             methodBuilder.addStatement("$T $L = $L.getClass().getDeclaredField(\"$L\")", Field.class, fieldVar, var,
                     fieldName);
             methodBuilder.addStatement("$L.setAccessible(true)", fieldVar);

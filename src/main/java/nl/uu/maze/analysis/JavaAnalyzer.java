@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 
 import nl.uu.maze.execution.MethodType;
 import nl.uu.maze.execution.concrete.ObjectInstantiator;
+import nl.uu.maze.util.Pair;
 import sootup.core.graph.StmtGraph;
 import sootup.core.inputlocation.AnalysisInputLocation;
 import sootup.core.types.*;
@@ -239,12 +240,12 @@ public class JavaAnalyzer {
      * @implNote This will fail if the class has a single constructor which requires
      *           an instance of an inner class as an argument.
      */
-    public Constructor<?> getJavaConstructor(Class<?> clazz) {
+    public Pair<Constructor<?>, Object[]> getJavaConstructor(Class<?> clazz) {
         // Find a constructor for which arguments can be generated
         for (Constructor<?> ctor : clazz.getConstructors()) {
             try {
-                ObjectInstantiator.generateArgs(ctor.getParameters(), null, MethodType.CTOR);
-                return ctor;
+                Object[] args = ObjectInstantiator.generateArgs(ctor.getParameters(), null, MethodType.CTOR);
+                return Pair.of(ctor, args);
             } catch (Exception e) {
                 e.printStackTrace();
             }

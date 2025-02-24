@@ -192,7 +192,7 @@ public class SymbolicExecutor {
             BitVecExpr index = (BitVecExpr) transformer.transform(ref.getIndex(), state);
             state.setArrayElement(var, index, value);
         } else if (leftOp instanceof JStaticFieldRef) {
-            // TODO: handle static field assignment in <cinit>
+            // Static field assignments are considered out of scope
         } else if (leftOp instanceof JInstanceFieldRef) {
             JInstanceFieldRef ref = (JInstanceFieldRef) leftOp;
             state.setField(ref.getBase().getName(), ref.getFieldSignature().getName(), value);
