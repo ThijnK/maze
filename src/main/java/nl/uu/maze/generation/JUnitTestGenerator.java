@@ -7,6 +7,7 @@ import sootup.java.core.JavaSootMethod;
 
 import javax.lang.model.element.Modifier;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -234,8 +235,8 @@ public class JUnitTestGenerator {
         if (value instanceof Character) {
             return "\'" + Character.toString((char) value) + "\'";
         }
-        if (value instanceof Object[]) {
-            return arrayToString((Object[]) value);
+        if (value.getClass().isArray()) {
+            return arrayToString(value);
         }
 
         // Handle special cases for float and double
@@ -264,24 +265,25 @@ public class JUnitTestGenerator {
      * Converts an array to a string representation that can be used in a Java
      * source file.
      */
-    private String arrayToString(Object[] arr) {
+    private String arrayToString(Object arr) {
         if (arr == null) {
             return "null";
         }
-        if (arr.length == 0) {
+        // If it's not an array, just return its string representation
+        if (!arr.getClass().isArray()) {
+            return valueToString(arr);
+        }
+
+        int length = Array.getLength(arr);
+        if (length == 0) {
             return "{}";
         }
 
         StringBuilder sb = new StringBuilder();
         sb.append("{ ");
-        for (int i = 0; i < arr.length; i++) {
-            if (arr[i] instanceof Object[]) {
-                sb.append(arrayToString((Object[]) arr[i]));
-            } else {
-                sb.append(valueToString(arr[i]));
-            }
-
-            if (i < arr.length - 1) {
+        for (int i = 0; i < length; i++) {
+            sb.append(arrayToString(Array.get(arr, i)));
+            if (i < length - 1) {
                 sb.append(", ");
             }
         }

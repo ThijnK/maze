@@ -116,9 +116,7 @@ public class ObjectInstantiator {
                 if (value == null) {
                     arguments[i] = null;
                     continue;
-                    // TODO: type.isArray() is not returning true even for arrays because it's
-                    // wrapped in a Class or whatever
-                } else if (type.isArray() && type.getComponentType().isPrimitive()) {
+                } else if (type.isArray()) {
                     // For arrays of primitives, we need to make sure the array is typed correctly
                     // So we have to create a typed instance and copy the values
                     arguments[i] = convertArray(value, type);
@@ -197,7 +195,7 @@ public class ObjectInstantiator {
                 // Recursively copy subarrays
                 Array.set(typedArray, j, convertArray(element, type.getComponentType()));
             } else {
-                // Copy primitive elements
+                // Copy elements
                 Array.set(typedArray, j, element);
             }
         }
