@@ -38,12 +38,10 @@ public class ConcreteExecutor {
             logger.debug("Creating instance of class " + ctor.getDeclaringClass().getName() + " with args: "
                     + ArrayUtils.toString(args));
             instance = ctor.newInstance(args);
-            argMap.addAll(args, MethodType.CTOR);
         }
 
         // Generate args for the method invocation
         Object[] args = ObjectInstantiator.generateArgs(method.getParameters(), argMap, MethodType.METHOD);
-        argMap.addAll(args, MethodType.METHOD);
 
         try {
             logger.debug("Executing method " + method.getName() + " with args: " + ArrayUtils.toString(args));

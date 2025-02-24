@@ -228,6 +228,11 @@ public class SymbolicStateValidator {
             return var;
         }
 
+        public int getIndex() {
+            // Everything after "arg" is the index, but there can be other prefixes before
+            return Integer.parseInt(var.substring(var.indexOf("arg") + 3));
+        }
+
         @Override
         public String toString() {
             return var;

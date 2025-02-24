@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import nl.uu.maze.execution.ArgMap;
 import nl.uu.maze.execution.MethodType;
+import nl.uu.maze.execution.symbolic.SymbolicStateValidator.ObjectRef;
 import nl.uu.maze.util.ArrayUtils;
 
 /**
@@ -116,6 +117,10 @@ public class ObjectInstantiator {
                 if (value == null) {
                     arguments[i] = null;
                     continue;
+                } else if (value instanceof ObjectRef) {
+                    // ObjectRef's are preserved and handled after all other arguments are generated
+                    arguments[i] = value;
+                    continue;
                 } else if (type.isArray()) {
                     // For arrays of primitives, we need to make sure the array is typed correctly
                     // So we have to create a typed instance and copy the values
@@ -174,7 +179,22 @@ public class ObjectInstantiator {
                     else
                         arguments[i] = null;
             }
+
+            // Add new argument to argMap
+            if (argMap != null) {
+                argMap.set(name, arguments[i]);
+            }
         }
+
+        // Handle references to other arguments
+        for (int i = 0; i < arguments.length; i++) {
+            // If an argument is an ObjectRef it is a reference to another argument
+            if (arguments[i] instanceof ObjectRef) {
+                ObjectRef ref = (ObjectRef) arguments[i];
+                arguments[i] = arguments[ref.getIndex()];
+            }
+        }
+
         return arguments;
     }
 
