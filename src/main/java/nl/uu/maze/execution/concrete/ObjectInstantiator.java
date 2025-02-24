@@ -143,8 +143,8 @@ public class ObjectInstantiator {
                     arguments[i] = convertArray(value, type);
 
                 } else {
-                    // Handle objects and object arrays
-                    arguments[i] = type.cast(argMap.get(name));
+                    // Cast to expected type to make sure it is correct
+                    arguments[i] = type.isPrimitive() ? wrap(type).cast(value) : type.cast(value);
                 }
                 continue;
             }
@@ -227,6 +227,31 @@ public class ObjectInstantiator {
         }
 
         return arguments;
+    }
+
+    /**
+     * Wrap a primitive type in its corresponding wrapper class.
+     */
+    private static Class<?> wrap(Class<?> clazz) {
+        if (!clazz.isPrimitive())
+            return clazz;
+        if (clazz == int.class)
+            return Integer.class;
+        if (clazz == long.class)
+            return Long.class;
+        if (clazz == boolean.class)
+            return Boolean.class;
+        if (clazz == double.class)
+            return Double.class;
+        if (clazz == float.class)
+            return Float.class;
+        if (clazz == char.class)
+            return Character.class;
+        if (clazz == byte.class)
+            return Byte.class;
+        if (clazz == short.class)
+            return Short.class;
+        throw new IllegalArgumentException("Unknown primitive type: " + clazz);
     }
 
     /**
