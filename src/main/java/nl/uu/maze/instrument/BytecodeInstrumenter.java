@@ -83,7 +83,7 @@ public class BytecodeInstrumenter {
     /**
      * Custom class loader that allows us to define classes from byte arrays.
      */
-    static class BytecodeClassLoader extends ClassLoader {
+    public static class BytecodeClassLoader extends ClassLoader {
         private final Map<String, Class<?>> classes = new HashMap<>();
 
         /**

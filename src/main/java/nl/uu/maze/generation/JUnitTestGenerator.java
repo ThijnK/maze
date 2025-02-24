@@ -215,12 +215,11 @@ public class JUnitTestGenerator {
         }
         for (Map.Entry<String, Object> entry : fields.getFields().entrySet()) {
             String fieldName = entry.getKey();
-            Object fieldValue = entry.getValue();
             String fieldVar = var + methodObjCount + "_" + fieldName;
             methodBuilder.addStatement("$T $L = $L.getClass().getDeclaredField(\"$L\")", Field.class, fieldVar, var,
                     fieldName);
             methodBuilder.addStatement("$L.setAccessible(true)", fieldVar);
-            methodBuilder.addStatement("$L.set($L, $L)", fieldVar, var, valueToString(fieldValue));
+            methodBuilder.addStatement("$L.set($L, $L)", fieldVar, var, valueToString(entry.getValue()));
         }
     }
 

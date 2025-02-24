@@ -43,19 +43,15 @@ public class JavaAnalyzer {
     private static final Logger logger = LoggerFactory.getLogger(JavaAnalyzer.class);
 
     private final AnalysisInputLocation inputLocation;
-    private final URLClassLoader classLoader;
+    private final ClassLoader classLoader;
     private final JavaView view;
 
-    public JavaAnalyzer(String classPath) throws MalformedURLException, URISyntaxException {
+    public JavaAnalyzer(String classPath, ClassLoader classLoader) throws MalformedURLException, URISyntaxException {
         inputLocation = new JavaClassPathAnalysisInputLocation(classPath);
         // Set up a custom URL loader for the class path
         URL classUrl = Paths.get(classPath).toUri().toURL();
-        this.classLoader = new URLClassLoader(new URL[] { classUrl });
+        this.classLoader = classLoader != null ? classLoader : new URLClassLoader(new URL[] { classUrl });
         view = new JavaView(inputLocation);
-    }
-
-    public JavaAnalyzer() throws MalformedURLException, URISyntaxException {
-        this("target/classes");
     }
 
     /**
