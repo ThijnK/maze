@@ -49,8 +49,6 @@ public class ConcreteExecutor {
             logger.debug("Retval: " + (result == null ? "null" : result.toString()));
 
             return result;
-        } catch (InvocationTargetException e) {
-            throw e;
         } catch (Exception e) {
             logger.warn("Execution of method " + method.getName() + " threw an exception: " + e);
             return null;
