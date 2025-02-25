@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import com.microsoft.z3.ArrayExpr;
@@ -30,22 +31,45 @@ public class SymbolicHeap {
     private static final int MAX_ARRAY_LENGTH = 100;
     public static final Z3Sorts sorts = Z3Sorts.getInstance();
 
-    private Context ctx;
-    private SymbolicState state;
-    private Map<Expr<?>, HeapObject> heap = new HashMap<>();
+    private final Context ctx;
+    private final SymbolicState state;
+
     private int heapCounter = 0;
     private int refCounter = 0;
+    private Map<Expr<?>, HeapObject> heap = new HashMap<>();
     private Map<Expr<?>, Set<Expr<?>>> aliasMap = new HashMap<>();
+    /**
+     * Tracks indices of multi-dimensional array accesses.
+     * In JVM bytecode, accessing a multi-dimensional array is done by accessing the
+     * array at each dimension separately, i.e., <code>arr[0][1]</code> becomes
+     * <code>$stack0 = arr[0]; $stack1 = $stack0[1];</code>
+     * This map stores the indices of each dimension accessed so far for a given
+     * array variable. In the example, the map would store
+     * <code>$stack0 -> [0]</code>.
+     * Only used for multi-dimensional arrays.
+     */
+    private Map<String, BitVecExpr[]> arrayIndices = new HashMap<>();
 
     public SymbolicHeap(SymbolicState state) {
         this.state = state;
         this.ctx = state.getContext();
     }
 
-    public SymbolicHeap(SymbolicState state, int heapCounter, int refCounter) {
+    public SymbolicHeap(SymbolicState state, int heapCounter, int refCounter, Map<Expr<?>, HeapObject> heap,
+            Map<Expr<?>, Set<Expr<?>>> aliasMap, Map<String, BitVecExpr[]> arrayIndices) {
         this(state);
         this.heapCounter = heapCounter;
         this.refCounter = refCounter;
+        // Deep copy heap objects
+        for (Map.Entry<Expr<?>, HeapObject> entry : heap.entrySet()) {
+            this.heap.put(entry.getKey(), entry.getValue().clone());
+        }
+        // Deap copy alias map
+        for (Map.Entry<Expr<?>, Set<Expr<?>>> entry : aliasMap.entrySet()) {
+            Set<Expr<?>> aliases = new HashSet<>(entry.getValue());
+            this.aliasMap.put(entry.getKey(), aliases);
+        }
+        this.arrayIndices = new HashMap<>(arrayIndices);
     }
 
     public HeapObject get(Expr<?> key) {
@@ -61,7 +85,7 @@ public class SymbolicHeap {
      * corresponding to the key and stores them in the alias map.
      * Only heap objects with the same type are considered potential aliases.
      */
-    public void resolveAliases(Expr<?> ref) {
+    public void findAliases(Expr<?> ref) {
         Set<Expr<?>> aliases = aliasMap.get(ref);
         HeapObject obj = heap.get(aliases.iterator().next());
         if (obj == null) {
@@ -102,13 +126,8 @@ public class SymbolicHeap {
         return ctx.mkConst(key, sorts.getRefSort());
     }
 
-    public SymbolicHeap clone() {
-        // Deep copy heap
-        SymbolicHeap newHeap = new SymbolicHeap(state, heapCounter, refCounter);
-        for (Map.Entry<Expr<?>, HeapObject> entry : heap.entrySet()) {
-            newHeap.heap.put(entry.getKey(), entry.getValue().clone());
-        }
-        return newHeap;
+    public SymbolicHeap clone(SymbolicState state) {
+        return new SymbolicHeap(state, heapCounter, refCounter, heap, aliasMap, arrayIndices);
     }
 
     @Override
@@ -263,7 +282,42 @@ public class SymbolicHeap {
     }
     // #endregion
 
-    // #region Heap Access
+    // #region Helper Methods
+    /**
+     * Retrieves a heap object from the heap using the given variable name.
+     */
+    private HeapObject getHeapObject(String var) {
+        return getHeapObject(state.getVariable(var));
+    }
+
+    /**
+     * Retrieves a heap object from the heap using the given symbolic reference.
+     * If the reference has more than one alias, an exception is thrown.
+     */
+    private HeapObject getHeapObject(Expr<?> ref) {
+        Set<Expr<?>> aliases = aliasMap.get(ref);
+        if (aliases == null || aliases.isEmpty()) {
+            return null;
+        }
+        if (aliases.size() > 1) {
+            throw new RuntimeException("More than one alias for reference " + ref);
+        }
+
+        return heap.get(aliases.iterator().next());
+    }
+
+    /**
+     * Retrieves an array object from the heap using the given symbolic reference.
+     * If the reference has more than one alias, an exception is thrown.
+     */
+    private ArrayObject getArrayObject(Expr<?> ref) {
+        HeapObject obj = getHeapObject(ref);
+        if (obj != null && obj instanceof ArrayObject) {
+            return (ArrayObject) obj;
+        }
+        return null;
+    }
+
     /**
      * Determines whether the given expression contains a symbolic reference with
      * more than one alias, and returns the symbolic reference if so.
@@ -277,8 +331,10 @@ public class SymbolicHeap {
      * more than one alias, and returns the symbolic reference if so.
      */
     public Optional<Expr<?>> isAliased(Expr<?> expr) {
-        // Check if the current expression is a symbolic reference with more than one
-        // alias
+        if (expr == null) {
+            return Optional.empty();
+        }
+        // Check if the current expression is a sym reference with more than one alias
         Set<Expr<?>> aliases = aliasMap.get(expr);
         if (aliases != null && aliases.size() > 1) {
             return Optional.of(expr);
@@ -292,6 +348,204 @@ public class SymbolicHeap {
         }
         return Optional.empty();
     }
+
+    /**
+     * Determines whether the given variable references an array.
+     */
+    public boolean isArray(String var) {
+        return getArrayObject(state.getVariable(var)) != null;
+    }
+
+    /**
+     * Determines whether the given variable references a multi-dimensional array.
+     */
+    public boolean isMultiArray(String var) {
+        HeapObject obj = getHeapObject(var);
+        return obj != null && obj instanceof MultiArrayObject;
+    }
+    // #endregion
+
+    // #region Object Access
+    /**
+     * Sets the value of an object's field.
+     */
+    public void setField(String var, String fieldName, Expr<?> value) {
+        HeapObject obj = getHeapObject(var);
+        if (obj == null) {
+            throw new IllegalArgumentException("Object does not exist: " + var);
+        }
+
+        obj.setField(fieldName, value);
+    }
+
+    /**
+     * Retrieves the value of an object's field.
+     */
+    public Expr<?> getField(String var, String fieldName, Type fieldType) {
+        HeapObject obj = getHeapObject(var);
+        if (obj == null) {
+            return null;
+        }
+
+        Expr<?> field = obj.getField(fieldName);
+        if (field == null && obj.isArg) {
+            String varName = state.getVariable(var).toString();
+            // Create a symbolic value for the field if the object is an argument
+            field = ctx.mkConst(varName + "_" + fieldName, sorts.determineSort(fieldType));
+            obj.setField(fieldName, field);
+        }
+
+        return field;
+    }
+    // #endregion
+
+    // #region Array Access
+    /**
+     * Copies the array indices for the given variable to the new variable.
+     * Useful when the array reference is reassigned to another variable.
+     */
+    public void copyArrayIndices(String from, String to) {
+        BitVecExpr[] indices = arrayIndices.get(from);
+        if (indices != null) {
+            arrayIndices.put(to, indices);
+        }
+    }
+
+    /**
+     * Retrieves the array indices collected so far for the given array variable and
+     * adds the new index.
+     */
+    private BitVecExpr[] getArrayIndices(String var, int dim, BitVecExpr newIndex) {
+        BitVecExpr[] indices = arrayIndices.get(var);
+        if (indices == null || indices.length < dim) {
+            indices = new BitVecExpr[indices == null ? 1 : indices.length + 1];
+            if (indices.length == 1) {
+                indices[0] = newIndex;
+            } else {
+                System.arraycopy(arrayIndices.get(var), 0, indices, 0, indices.length - 1);
+                indices[indices.length - 1] = newIndex;
+            }
+        }
+        return indices;
+    }
+
+    /**
+     * Retrieves the value stored at the given index for the given array variable.
+     * 
+     * @return The symbolic value stored at the index, or null if the array does not
+     *         exist
+     */
+    public Expr<?> getArrayElement(String lhs, String var, BitVecExpr index) {
+        return getArrayElement(lhs, var, state.getVariable(var), index);
+    }
+
+    /**
+     * Retrieves the value stored at the given index for the given symbolic array
+     * reference.
+     * 
+     * @return The symbolic value stored at the index, or null if the array does not
+     *         exist
+     */
+    public Expr<?> getArrayElement(String lhs, String var, Expr<?> symRef, BitVecExpr index) {
+        ArrayObject arrObj = getArrayObject(symRef);
+        if (arrObj != null) {
+            if (arrObj instanceof MultiArrayObject) {
+                MultiArrayObject multiArrObj = (MultiArrayObject) arrObj;
+                int dim = multiArrObj.getDim();
+                BitVecExpr[] indices = getArrayIndices(var, dim, index);
+
+                // When enough indices collected, return the element
+                if (dim == indices.length) {
+                    return multiArrObj.getElem(indices);
+                } else {
+                    // Otherwise, store new indices for the lhs of the assignment this is part of
+                    if (lhs != null) {
+                        arrayIndices.put(lhs, indices);
+                    }
+                    return state.getVariable(var);
+                }
+            }
+
+            return arrObj.getElem(index);
+        }
+        return null;
+    }
+
+    /**
+     * Sets the value at the given index for the given array variable.
+     */
+    public <E extends Sort> void setArrayElement(String var, BitVecExpr index, Expr<E> value) {
+        setArrayElement(var, state.getVariable(var), index, value);
+    }
+
+    /**
+     * Sets the value at the given index for the given symbolic array reference.
+     */
+    public <E extends Sort> void setArrayElement(String var, Expr<?> symRef, BitVecExpr index, Expr<E> value) {
+        ArrayObject arrObj = getArrayObject(symRef);
+        if (arrObj == null) {
+            return;
+        }
+
+        if (arrObj instanceof MultiArrayObject) {
+            if (value.getSort().equals(sorts.getRefSort())) {
+                // Reassigning part of a multi-dimensional array to another array not supported
+                // TODO: but possibly if the value is an object reference it's fine?
+                throw new RuntimeException("Cannot assign reference to multi-dimensional array element");
+            }
+
+            MultiArrayObject multiArrObj = (MultiArrayObject) arrObj;
+            int dim = multiArrObj.getDim();
+            BitVecExpr[] indices = getArrayIndices(var, dim, index);
+
+            // If not enough indices collected, throw an exception
+            if (dim != indices.length) {
+                throw new RuntimeException("Not enough indices collected for multi-dimensional array access");
+            }
+
+            multiArrObj.setElem(value, indices);
+        } else {
+            arrObj.setElem(index, value);
+        }
+    }
+
+    /**
+     * Retrieves the length for the given array variable.
+     * 
+     * @return The Z3 expr representing the length of the array
+     */
+    public Expr<?> getArrayLength(String var) {
+        return getArrayLength(var, state.getVariable(var));
+    }
+
+    /**
+     * Retrieves the length for the given symbolic array reference.
+     * 
+     * @return The Z3 expr representing the length of the array
+     */
+    public Expr<?> getArrayLength(String var, Expr<?> symRef) {
+        Set<Expr<?>> aliases = aliasMap.get(symRef);
+        if (aliases == null || aliases.isEmpty()) {
+            return null;
+        }
+        if (aliases.size() > 1) {
+            throw new RuntimeException("More than one alias for array reference " + symRef);
+        }
+
+        Expr<?> conRef = aliases.iterator().next();
+        HeapObject arrObj = heap.get(conRef);
+        if (arrObj != null && arrObj instanceof ArrayObject) {
+            if (arrObj instanceof MultiArrayObject) {
+                BitVecExpr[] indices = arrayIndices.get(var);
+                int dim = indices == null ? 0 : indices.length;
+                return ((MultiArrayObject) arrObj).getLength(dim);
+            }
+
+            return ((ArrayObject) arrObj).getLength();
+        }
+        return null;
+    }
+    // #endregion
 
     // #region Heap Object Classes
     /**

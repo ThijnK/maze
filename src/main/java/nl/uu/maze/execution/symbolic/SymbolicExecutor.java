@@ -199,30 +199,35 @@ public class SymbolicExecutor {
     private List<SymbolicState> handleDefStmt(StmtGraph<?> cfg, AbstractDefinitionStmt stmt, SymbolicState state) {
         LValue leftOp = stmt.getLeftOp();
         Expr<?> value = transformer.transform(stmt.getRightOp(), state, leftOp.toString());
+        String var = leftOp instanceof JArrayRef ? ((JArrayRef) leftOp).getBase().getName()
+                : leftOp instanceof JInstanceFieldRef ? ((JInstanceFieldRef) leftOp).getBase().getName()
+                        : leftOp.toString();
+
+        // TODO: have to check this BEFORE transforming the rightOp
 
         // If either the lhs or the rhs contains a symbolic reference (e.g., an object
         // or array reference) with more than one potential alias, then we split the
         // state into one state for each alias, and set the symbolic reference to the
         // corresponding alias in each state
-        String var = leftOp instanceof JArrayRef ? ((JArrayRef) leftOp).getBase().getName()
-                : leftOp instanceof JInstanceFieldRef ? ((JInstanceFieldRef) leftOp).getBase().getName()
-                        : leftOp.toString();
-        Expr<?> symRef = state.heap.isAliased(var).orElse(state.heap.isAliased(value).orElse(null));
-        if (symRef != null) {
-            List<SymbolicState> newStates = new ArrayList<SymbolicState>();
-            // TODO: Implement alias splitting
-            return newStates;
+        // But only for assignments, not for identity statements
+        if (stmt instanceof JAssignStmt) {
+            Expr<?> symRef = state.heap.isAliased(var).orElse(state.heap.isAliased(value).orElse(null));
+            if (symRef != null) {
+                List<SymbolicState> newStates = new ArrayList<SymbolicState>();
+                // TODO: Implement alias splitting
+                return newStates;
+            }
         }
 
         if (leftOp instanceof JArrayRef) {
             JArrayRef ref = (JArrayRef) leftOp;
             BitVecExpr index = (BitVecExpr) transformer.transform(ref.getIndex(), state);
-            state.setArrayElement(var, index, value);
+            state.heap.setArrayElement(var, index, value);
         } else if (leftOp instanceof JStaticFieldRef) {
             // Static field assignments are considered out of scope
         } else if (leftOp instanceof JInstanceFieldRef) {
             JInstanceFieldRef ref = (JInstanceFieldRef) leftOp;
-            state.setField(var, ref.getFieldSignature().getName(), value);
+            state.heap.setField(var, ref.getFieldSignature().getName(), value);
         } else {
             state.setVariable(leftOp.toString(), value);
         }
