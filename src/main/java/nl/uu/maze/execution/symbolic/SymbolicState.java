@@ -184,8 +184,8 @@ public class SymbolicState {
      * state.
      */
     public List<BoolExpr> getAllConstraints() {
-        List<BoolExpr> allConstraints = new ArrayList<>(pathConstraints);
-        allConstraints.addAll(engineConstraints);
+        List<BoolExpr> allConstraints = new ArrayList<>(getPathConstraints());
+        allConstraints.addAll(getEngineConstraints());
         return allConstraints;
     }
 

@@ -1,10 +1,8 @@
 package nl.uu.maze.execution.symbolic;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import com.microsoft.z3.ArrayExpr;
 import com.microsoft.z3.BitVecExpr;
@@ -66,9 +64,9 @@ public class SymbolicHeap {
                 continue;
             }
             if (obj.type.equals(other.type)) {
-                obj.addAlias(entry.getKey());
+                // obj.addAlias(entry.getKey());
                 // Add this ref also as a potential alias of the one found
-                other.addAlias(ref);
+                // other.addAlias(ref);
             }
         }
     }
@@ -197,7 +195,6 @@ public class SymbolicHeap {
     public class HeapObject {
         // A mapping from field names to symbolic expressions.
         protected Map<String, Expr<?>> fields;
-        protected Set<Expr<?>> aliases;
         protected Type type;
         /**
          * Whether this object is a method argument, and thus whether it may be involved
@@ -207,7 +204,6 @@ public class SymbolicHeap {
 
         public HeapObject(Type type) {
             this.fields = new HashMap<>(4);
-            this.aliases = new HashSet<>(0);
             this.type = type;
         }
 
@@ -223,14 +219,9 @@ public class SymbolicHeap {
             return fields.get(fieldName);
         }
 
-        public void addAlias(Expr<?> ref) {
-            aliases.add(ref);
-        }
-
         public HeapObject clone() {
             HeapObject obj = new HeapObject(type);
             obj.fields.putAll(fields);
-            obj.aliases.addAll(aliases);
             return obj;
         }
 
