@@ -1,8 +1,11 @@
 package nl.uu.maze.execution.symbolic;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.microsoft.z3.ArrayExpr;
 import com.microsoft.z3.BitVecExpr;
@@ -20,22 +23,29 @@ import sootup.core.types.Type;
  * Represents a symbolic heap that maps references to heap objects.
  */
 public class SymbolicHeap {
+    /**
+     * The maximum length of an array to avoid memory issues trying to reconstruct
+     * really large arrays.
+     */
+    private static final int MAX_ARRAY_LENGTH = 100;
     public static final Z3Sorts sorts = Z3Sorts.getInstance();
+
     private Context ctx;
+    private SymbolicState state;
     private Map<Expr<?>, HeapObject> heap = new HashMap<>();
     private int heapCounter = 0;
+    private int refCounter = 0;
+    private Map<Expr<?>, Set<Expr<?>>> aliasMap = new HashMap<>();
 
-    public SymbolicHeap(Context ctx) {
-        this.ctx = ctx;
+    public SymbolicHeap(SymbolicState state) {
+        this.state = state;
+        this.ctx = state.getContext();
     }
 
-    public SymbolicHeap(Context ctx, int heapCounter) {
-        this(ctx);
+    public SymbolicHeap(SymbolicState state, int heapCounter, int refCounter) {
+        this(state);
         this.heapCounter = heapCounter;
-    }
-
-    public void setIsArg(Expr<?> key) {
-        heap.get(key).setIsArg(true);
+        this.refCounter = refCounter;
     }
 
     public HeapObject get(Expr<?> key) {
@@ -51,45 +61,50 @@ public class SymbolicHeap {
      * corresponding to the key and stores them in the alias map.
      * Only heap objects with the same type are considered potential aliases.
      */
-    public void resolveAliases(String key) {
-        Expr<?> ref = newRef(key);
-        HeapObject obj = heap.get(ref);
-        // Implicit aliasing only applies to method arguments
-        if (obj == null || !obj.isArg) {
+    public void resolveAliases(Expr<?> ref) {
+        Set<Expr<?>> aliases = aliasMap.get(ref);
+        HeapObject obj = heap.get(aliases.iterator().next());
+        if (obj == null) {
             return;
         }
-        for (Map.Entry<Expr<?>, HeapObject> entry : heap.entrySet()) {
-            HeapObject other = entry.getValue();
-            if (entry.getKey().equals(ref) || !other.isArg) {
+
+        obj.setIsArg(true);
+        for (Map.Entry<Expr<?>, Set<Expr<?>>> entry : aliasMap.entrySet()) {
+            Expr<?> otherRef = entry.getKey();
+            Set<Expr<?>> otherAliases = entry.getValue();
+            if (otherRef.equals(ref)) {
                 continue;
             }
-            if (obj.type.equals(other.type)) {
-                // obj.addAlias(entry.getKey());
-                // Add this ref also as a potential alias of the one found
-                // other.addAlias(ref);
+
+            // Take one object from the heap for this other ref to see if it refers to the
+            // same type
+            HeapObject other = heap.get(otherAliases.iterator().next());
+            if (obj.type.equals(other.type) && obj.isArg) {
+                aliases.addAll(otherAliases);
+                otherAliases.addAll(aliases);
             }
         }
     }
 
-    public boolean containsKey(Expr<?> key) {
-        return heap.containsKey(key);
+    public boolean containsRef(Expr<?> ref) {
+        return heap.containsKey(ref);
     }
 
-    public String newKey() {
-        return newKey(false);
+    public String newObjKey() {
+        return "obj" + heapCounter++;
     }
 
-    public String newKey(boolean isArray) {
-        return isArray ? "arr" + heapCounter++ : "obj" + heapCounter++;
+    public String newRefKey() {
+        return "ref" + refCounter++;
     }
 
-    public Expr<?> newRef(String var) {
-        return ctx.mkConst(var, sorts.getRefSort());
+    public Expr<?> newRef(String key) {
+        return ctx.mkConst(key, sorts.getRefSort());
     }
 
     public SymbolicHeap clone() {
         // Deep copy heap
-        SymbolicHeap newHeap = new SymbolicHeap(ctx, heapCounter);
+        SymbolicHeap newHeap = new SymbolicHeap(state, heapCounter, refCounter);
         for (Map.Entry<Expr<?>, HeapObject> entry : heap.entrySet()) {
             newHeap.heap.put(entry.getKey(), entry.getValue().clone());
         }
@@ -108,7 +123,7 @@ public class SymbolicHeap {
      * @see #allocateObject(String, Type)
      */
     public Expr<?> allocateObject(Type type) {
-        return allocateObject(newKey(), type);
+        return allocateObject(newRefKey(), type);
     }
 
     /**
@@ -119,9 +134,15 @@ public class SymbolicHeap {
      * @return The reference to the newly allocated object
      */
     public Expr<?> allocateObject(String key, Type type) {
-        Expr<?> objRef = newRef(key);
-        heap.put(objRef, new HeapObject(type));
-        return objRef;
+        Expr<?> symRef = newRef(key);
+        String conKey = newObjKey();
+        Expr<?> conRef = newRef(conKey);
+        heap.put(conRef, new HeapObject(type));
+
+        Set<Expr<?>> aliases = new HashSet<Expr<?>>();
+        aliases.add(conRef);
+        aliasMap.put(symRef, aliases);
+        return symRef;
     }
 
     /**
@@ -130,8 +151,16 @@ public class SymbolicHeap {
      * 
      * @see #allocateArray(String, Type, Expr, Sort)
      */
-    public <E extends Sort> Expr<?> allocateArray(Type type, Expr<?> size, E elemSort) {
-        return allocateArray(newKey(true), type, size, elemSort);
+    public <E extends Sort> Expr<?> allocateArray(ArrayType type, Expr<?> size, E elemSort) {
+        return allocateArray(newRefKey(), type, size, elemSort);
+    }
+
+    /**
+     * Allocates a new array of the given element sort, using a symbolic variable
+     * for the size, and returns its reference.
+     */
+    public <E extends Sort> Expr<?> allocateArray(String key, ArrayType type, E elemSort) {
+        return allocateArray(key, type, null, elemSort);
     }
 
     /**
@@ -145,13 +174,30 @@ public class SymbolicHeap {
      * @param elemSort The Z3 sort of the elements in the array
      * @return The reference to the newly allocated array object
      */
-    public <E extends Sort> Expr<?> allocateArray(String key, Type type, Expr<?> size, E elemSort) {
+    public <E extends Sort> Expr<?> allocateArray(String key, ArrayType type, Expr<?> size, E elemSort) {
         BitVecSort indexSort = sorts.getIntSort();
-        Expr<?> arrRef = newRef(key);
-        ArrayExpr<BitVecSort, E> arr = ctx.mkArrayConst(key + "_elems", indexSort, elemSort);
+        Expr<?> symRef = newRef(key);
+        String conKey = newObjKey();
+        Expr<?> conRef = newRef(conKey);
+
+        // If no size given, make it symbolic (e.g., for method arguments)
+        if (size == null) {
+            Expr<BitVecSort> len = ctx.mkConst(conKey + "_len", sorts.getIntSort());
+            // Make sure array size is non-negative and does not exceed the max length
+            state.addEngineConstraint(ctx.mkBVSGE(len, ctx.mkBV(0, Type.getValueBitSize(IntType.getInstance()))));
+            state.addEngineConstraint(
+                    ctx.mkBVSLT(len, ctx.mkBV(MAX_ARRAY_LENGTH, Type.getValueBitSize(IntType.getInstance()))));
+            size = len;
+        }
+
+        ArrayExpr<BitVecSort, E> arr = ctx.mkArrayConst(conKey + "_elems", indexSort, elemSort);
         ArrayObject arrObj = new ArrayObject(type, arr, size);
-        heap.put(arrRef, arrObj);
-        return arrRef;
+        heap.put(conRef, arrObj);
+
+        Set<Expr<?>> aliases = new HashSet<Expr<?>>();
+        aliases.add(conRef);
+        aliasMap.put(symRef, aliases);
+        return symRef;
     }
 
     /**
@@ -159,8 +205,16 @@ public class SymbolicHeap {
      * 
      * @see #allocateMultiArray(String, Type, List, Sort)
      */
-    public <E extends Sort> Expr<?> allocateMultiArray(Type type, List<BitVecExpr> sizes, E elemSort) {
-        return allocateMultiArray(newKey(true), type, sizes, elemSort);
+    public <E extends Sort> Expr<?> allocateMultiArray(ArrayType type, List<BitVecExpr> sizes, E elemSort) {
+        return allocateMultiArray(newRefKey(), type, sizes, elemSort);
+    }
+
+    /**
+     * Allocates a multi-dimensional array with the given element sort, using
+     * symbolic variables for the sizes, and returns its reference.
+     */
+    public <E extends Sort> Expr<?> allocateMultiArray(String key, ArrayType type, E elemSort) {
+        return allocateMultiArray(key, type, null, elemSort);
     }
 
     /**
@@ -173,18 +227,39 @@ public class SymbolicHeap {
      * @param elemSort The Z3 sort of the elements in the array
      * @return The reference to the newly allocated array object
      */
-    public <E extends Sort> Expr<?> allocateMultiArray(String key, Type type, List<BitVecExpr> sizes, E elemSort) {
+    public <E extends Sort> Expr<?> allocateMultiArray(String key, ArrayType type, List<BitVecExpr> sizes, E elemSort) {
         BitVecSort indexSort = sorts.getIntSort();
-        Expr<?> arrRef = newRef(key);
-        ArrayExpr<BitVecSort, E> arr = ctx.mkArrayConst(key + "_elems", indexSort, elemSort);
-        ArrayExpr<BitVecSort, BitVecSort> lengths = ctx.mkArrayConst(key + "_lens", indexSort, indexSort);
+        Expr<?> symRef = newRef(key);
+        String conKey = newObjKey();
+        Expr<?> conRef = newRef(conKey);
+
+        // If no sizes given, make them symbolic (e.g., for method arguments)
+        if (sizes == null) {
+            int dim = type.getDimension();
+            sizes = new ArrayList<>(dim);
+            for (int i = 0; i < dim; i++) {
+                Expr<BitVecSort> size = ctx.mkConst(conKey + "_len" + i, sorts.getIntSort());
+                sizes.add((BitVecExpr) size);
+                // Make sure array size is non-negative and does not exceed the max length
+                state.addEngineConstraint(ctx.mkBVSGE(size, ctx.mkBV(0, Type.getValueBitSize(IntType.getInstance()))));
+                state.addEngineConstraint(
+                        ctx.mkBVSLT(size, ctx.mkBV(MAX_ARRAY_LENGTH, Type.getValueBitSize(IntType.getInstance()))));
+            }
+        }
+
+        ArrayExpr<BitVecSort, E> arr = ctx.mkArrayConst(conKey + "_elems", indexSort, elemSort);
+        ArrayExpr<BitVecSort, BitVecSort> lengths = ctx.mkArrayConst(conKey + "_lens", indexSort, indexSort);
         for (int i = 0; i < sizes.size(); i++) {
             lengths = ctx.mkStore(lengths, ctx.mkBV(i, Type.getValueBitSize(IntType.getInstance())), sizes.get(i));
         }
 
         MultiArrayObject arrObj = new MultiArrayObject(type, arr, lengths);
-        heap.put(arrRef, arrObj);
-        return arrRef;
+        heap.put(symRef, arrObj);
+
+        Set<Expr<?>> aliases = new HashSet<Expr<?>>();
+        aliases.add(conRef);
+        aliasMap.put(symRef, aliases);
+        return symRef;
     }
     // #endregion
 

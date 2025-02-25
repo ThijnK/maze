@@ -424,7 +424,7 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
     public void caseNewArrayExpr(@Nonnull JNewArrayExpr expr) {
         Sort elemSort = sorts.determineSort(expr.getBaseType());
         Expr<?> size = transform(expr.getSize());
-        setResult(state.newArray(expr.getType(), size, elemSort));
+        setResult(state.newArray((ArrayType) expr.getType(), size, elemSort));
     }
 
     @Override
@@ -434,7 +434,7 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
         for (int i = 0; i < expr.getSizes().size(); i++) {
             sizes.add((BitVecExpr) transform(expr.getSizes().get(i)));
         }
-        setResult(state.newMultiArray(expr.getType(), sizes, elemSort));
+        setResult(state.newMultiArray((ArrayType) expr.getType(), sizes, elemSort));
     }
 
     @Override
@@ -514,8 +514,7 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
         // For object/array parameters, need to track potential aliases
         if ((sootType instanceof ArrayType || sootType instanceof ClassType)
                 && !sootType.toString().equals("java.lang.String")) {
-            state.heap.resolveAliases(var);
-            state.heap.setIsArg(param);
+            state.heap.resolveAliases(param);
         }
     }
 

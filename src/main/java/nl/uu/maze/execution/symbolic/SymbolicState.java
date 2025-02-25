@@ -16,7 +16,6 @@ import sootup.core.graph.StmtGraph;
 import sootup.core.jimple.common.stmt.Stmt;
 import sootup.core.types.ArrayType;
 import sootup.core.types.Type;
-import sootup.core.types.PrimitiveType.IntType;
 
 /**
  * Represents a symbolic state in the symbolic execution engine.
@@ -32,11 +31,6 @@ import sootup.core.types.PrimitiveType.IntType;
  * </p>
  */
 public class SymbolicState {
-    /**
-     * The maximum length of an array to avoid memory issues trying to reconstruct
-     * really large arrays.
-     */
-    private static final int MAX_ARRAY_LENGTH = 100;
     private static final Z3Sorts sorts = Z3Sorts.getInstance();
 
     private final Context ctx;
@@ -77,7 +71,7 @@ public class SymbolicState {
         this.pathConstraints = new ArrayList<>();
         this.engineConstraints = new ArrayList<>();
         this.paramTypes = new HashMap<>();
-        this.heap = new SymbolicHeap(ctx);
+        this.heap = new SymbolicHeap(this);
         this.arrayIndices = new HashMap<>();
     }
 
@@ -152,6 +146,10 @@ public class SymbolicState {
      */
     public void addPathConstraint(BoolExpr constraint) {
         pathConstraints.add(constraint);
+    }
+
+    public void addEngineConstraint(BoolExpr constraint) {
+        engineConstraints.add(constraint);
     }
 
     /**
@@ -248,7 +246,7 @@ public class SymbolicState {
      * more path constraints.
      * This is needed to determine which reference should be set equal to which
      * other one, in cases where they are interpreted to be equal.
-     * If one of the references is contained in more references, settting it to be
+     * If one of the references is contained in more constraints, settting it to be
      * equal to the other one may violate the path constraints.
      * 
      * @return <code>true</code> if the first reference is contained in more path
@@ -276,14 +274,8 @@ public class SymbolicState {
      * 
      * @see SymbolicHeap#allocateArray(String, Type, Expr, Sort)
      */
-    public <E extends Sort> Expr<?> newArray(String var, Type type, E elemSort) {
-        Expr<BitVecSort> len = ctx.mkConst(var + "_len", sorts.getIntSort());
-        // Make sure array size is non-negative and does not exceed the max length
-        engineConstraints.add(ctx.mkBVSGE(len, ctx.mkBV(0, Type.getValueBitSize(IntType.getInstance()))));
-        engineConstraints
-                .add(ctx.mkBVSLT(len, ctx.mkBV(MAX_ARRAY_LENGTH, Type.getValueBitSize(IntType.getInstance()))));
-
-        return heap.allocateArray(var, type, len, elemSort);
+    public <E extends Sort> Expr<?> newArray(String var, ArrayType type, E elemSort) {
+        return heap.allocateArray(var, type, elemSort);
     }
 
     /**
@@ -292,7 +284,7 @@ public class SymbolicState {
      * 
      * @see SymbolicHeap#allocateArray(String, Type, Expr, Sort)
      */
-    public <E extends Sort> Expr<?> newArray(Type type, Expr<?> len, E elemSort) {
+    public <E extends Sort> Expr<?> newArray(ArrayType type, Expr<?> len, E elemSort) {
         return heap.allocateArray(type, len, elemSort);
     }
 
@@ -303,18 +295,7 @@ public class SymbolicState {
      * @see SymbolicHeap#allocateMultiArray(String, Type, List, Sort)
      */
     public <E extends Sort> Expr<?> newMultiArray(String var, ArrayType type, E elemSort) {
-        int dim = type.getDimension();
-        List<BitVecExpr> sizes = new ArrayList<>(dim);
-        for (int i = 0; i < dim; i++) {
-            Expr<BitVecSort> size = ctx.mkConst(var + "_len" + i, sorts.getIntSort());
-            sizes.add((BitVecExpr) size);
-            // Make sure array size is non-negative and does not exceed the max length
-            engineConstraints.add(ctx.mkBVSGE(size, ctx.mkBV(0, Type.getValueBitSize(IntType.getInstance()))));
-            engineConstraints.add(
-                    ctx.mkBVSLT(size, ctx.mkBV(MAX_ARRAY_LENGTH, Type.getValueBitSize(IntType.getInstance()))));
-        }
-
-        return heap.allocateMultiArray(var, type, sizes, elemSort);
+        return heap.allocateMultiArray(var, type, elemSort);
     }
 
     /**
@@ -323,7 +304,7 @@ public class SymbolicState {
      * 
      * @see SymbolicHeap#allocateMultiArray(String, Type, List, Sort)
      */
-    public <E extends Sort> Expr<?> newMultiArray(Type type, List<BitVecExpr> sizes, E elemSort) {
+    public <E extends Sort> Expr<?> newMultiArray(ArrayType type, List<BitVecExpr> sizes, E elemSort) {
         return heap.allocateMultiArray(type, sizes, elemSort);
     }
 
@@ -470,7 +451,7 @@ public class SymbolicState {
      * Determines whether the given variable references an array.
      */
     public boolean isArray(String var) {
-        return heap.containsKey(symbolicVariables.get(var))
+        return heap.containsRef(symbolicVariables.get(var))
                 && heap.get(symbolicVariables.get(var)) instanceof ArrayObject;
     }
 
@@ -478,7 +459,7 @@ public class SymbolicState {
      * Determines whether the given variable references a multi-dimensional array.
      */
     public boolean isMultiArray(String var) {
-        return heap.containsKey(symbolicVariables.get(var))
+        return heap.containsRef(symbolicVariables.get(var))
                 && heap.get(symbolicVariables.get(var)) instanceof MultiArrayObject;
     }
 
