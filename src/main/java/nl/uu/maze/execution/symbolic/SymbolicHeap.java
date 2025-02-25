@@ -263,6 +263,36 @@ public class SymbolicHeap {
     }
     // #endregion
 
+    // #region Heap Access
+    /**
+     * Determines whether the given expression contains a symbolic reference with
+     * more than one alias, and returns the symbolic reference if so.
+     */
+    public Optional<Expr<?>> isAliased(String var) {
+        return isAliased(state.getVariable(var));
+    }
+
+    /**
+     * Determines whether the given expression contains a symbolic reference with
+     * more than one alias, and returns the symbolic reference if so.
+     */
+    public Optional<Expr<?>> isAliased(Expr<?> expr) {
+        // Check if the current expression is a symbolic reference with more than one
+        // alias
+        Set<Expr<?>> aliases = aliasMap.get(expr);
+        if (aliases != null && aliases.size() > 1) {
+            return Optional.of(expr);
+        }
+        // Recursively check the sub-expressions of the current expression
+        for (Expr<?> subExpr : expr.getArgs()) {
+            Optional<Expr<?>> result = isAliased(subExpr);
+            if (result.isPresent()) {
+                return result;
+            }
+        }
+        return Optional.empty();
+    }
+
     // #region Heap Object Classes
     /**
      * Represents an object in the heap.
