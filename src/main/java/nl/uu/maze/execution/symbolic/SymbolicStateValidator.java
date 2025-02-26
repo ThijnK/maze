@@ -4,7 +4,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -106,6 +108,7 @@ public class SymbolicStateValidator {
         // Keep track of reference values that we've encountered, to be able to set two
         // arguments to the same object when they are interpreted to be equal
         Map<Expr<?>, ObjectRef> refValues = new HashMap<>();
+        Set<String> nonNullVars = new HashSet<>();
 
         for (FuncDecl<?> decl : model.getConstDecls()) {
             String var = decl.getName().toString();
@@ -131,6 +134,7 @@ public class SymbolicStateValidator {
                 }
                 // Store the reference value for equality checks to other argument references
                 refValues.put(expr, new ObjectRef(var));
+                nonNullVars.add(var);
                 continue;
             }
 
@@ -178,6 +182,11 @@ public class SymbolicStateValidator {
             String var = symRef.toString();
             if (!argMap.containsKey(var)) {
                 Object value = argMap.get(state.heap.getSingleAlias(symRef).toString());
+                // For objects (not arrays), it's possible that a symbolic reference is
+                // evaluated to not be equal to null, but still not have a value in the model
+                if (value == null && nonNullVars.contains(var)) {
+                    value = new ObjectFields();
+                }
                 argMap.set(var, value);
             }
         }
