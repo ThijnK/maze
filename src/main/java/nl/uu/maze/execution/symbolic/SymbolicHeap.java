@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import com.microsoft.z3.ArrayExpr;
 import com.microsoft.z3.BitVecExpr;
@@ -38,6 +39,8 @@ public class SymbolicHeap {
     private int refCounter = 0;
     private Map<Expr<?>, HeapObject> heap = new HashMap<>();
     private Map<Expr<?>, Set<Expr<?>>> aliasMap = new HashMap<>();
+    /** Refs for which the state has been split to resolve aliasing. */
+    private Set<Expr<?>> resolvedRefs;
     /**
      * Tracks indices of multi-dimensional array accesses.
      * In JVM bytecode, accessing a multi-dimensional array is done by accessing the
@@ -53,10 +56,11 @@ public class SymbolicHeap {
     public SymbolicHeap(SymbolicState state) {
         this.state = state;
         this.ctx = state.getContext();
+        this.resolvedRefs = new HashSet<>();
     }
 
     public SymbolicHeap(SymbolicState state, int heapCounter, int refCounter, Map<Expr<?>, HeapObject> heap,
-            Map<Expr<?>, Set<Expr<?>>> aliasMap, Map<String, BitVecExpr[]> arrayIndices) {
+            Map<Expr<?>, Set<Expr<?>>> aliasMap, Set<Expr<?>> resolvedRefs, Map<String, BitVecExpr[]> arrayIndices) {
         this(state);
         this.heapCounter = heapCounter;
         this.refCounter = refCounter;
@@ -69,6 +73,7 @@ public class SymbolicHeap {
             Set<Expr<?>> aliases = new HashSet<>(entry.getValue());
             this.aliasMap.put(entry.getKey(), aliases);
         }
+        this.resolvedRefs = new HashSet<>(resolvedRefs);
         this.arrayIndices = new HashMap<>(arrayIndices);
     }
 
@@ -97,7 +102,7 @@ public class SymbolicHeap {
     }
 
     public SymbolicHeap clone(SymbolicState state) {
-        return new SymbolicHeap(state, heapCounter, refCounter, heap, aliasMap, arrayIndices);
+        return new SymbolicHeap(state, heapCounter, refCounter, heap, aliasMap, resolvedRefs, arrayIndices);
     }
 
     @Override
@@ -115,18 +120,19 @@ public class SymbolicHeap {
      * corresponding to the key and stores them in the alias map.
      * Only heap objects with the same type are considered potential aliases.
      */
-    public void findAliases(Expr<?> ref) {
-        Set<Expr<?>> aliases = aliasMap.get(ref);
-        HeapObject obj = heap.get(aliases.iterator().next());
+    public void findAliases(Expr<?> symRef) {
+        Set<Expr<?>> aliases = aliasMap.get(symRef);
+        Expr<?> conRef = aliases.iterator().next();
+        HeapObject obj = heap.get(conRef);
         if (obj == null) {
             return;
         }
 
         obj.setIsArg(true);
+        Set<Expr<?>> distinctConRefs = new HashSet<>();
         for (Map.Entry<Expr<?>, Set<Expr<?>>> entry : aliasMap.entrySet()) {
-            Expr<?> otherRef = entry.getKey();
             Set<Expr<?>> otherAliases = entry.getValue();
-            if (otherRef.equals(ref)) {
+            if (entry.getKey().equals(symRef)) {
                 continue;
             }
 
@@ -135,19 +141,29 @@ public class SymbolicHeap {
             HeapObject other = heap.get(otherAliases.iterator().next());
             if (obj.type.equals(other.type) && obj.isArg) {
                 aliases.addAll(otherAliases);
-                otherAliases.addAll(aliases);
+                // otherAliases.addAll(aliases); TODO: add this back if needed
+                distinctConRefs.addAll(otherAliases);
             }
+        }
+
+        // Make sure this concrete reference is never equal to any other concrete
+        // reference referring to an argument object of the same type
+        distinctConRefs.remove(conRef);
+        Expr<?>[] args = Stream.concat(Stream.of(conRef), distinctConRefs.stream())
+                .toArray(Expr<?>[]::new);
+        if (args.length > 1) {
+            state.addEngineConstraint(ctx.mkDistinct(args));
         }
     }
 
     /**
-     * Determines whether the given symbolic reference may refer to more than one
-     * object on the heap (i.e., has multiple potential aliases).
+     * Determines whether the given symbolic reference may refer to at least one
+     * object on the heap.
      */
     public boolean isAliased(Expr<?> symRef) {
-        // Check if the current expression is a sym reference with more than one alias
+        // Check if the current expression is a sym reference with at least one alias
         Set<Expr<?>> aliases = aliasMap.get(symRef);
-        if (aliases != null && aliases.size() > 1) {
+        if (aliases != null && aliases.size() > 0) {
             return true;
         }
         return false;
@@ -161,12 +177,22 @@ public class SymbolicHeap {
     }
 
     /**
-     * Sets the given symbolic reference to have a single alias.
+     * Sets the given symbolic reference to have a single alias, considering it
+     * "resolved".
      */
     public void setSingleAlias(Expr<?> symRef, Expr<?> alias) {
         Set<Expr<?>> aliases = new HashSet<>();
         aliases.add(alias);
         aliasMap.put(symRef, aliases);
+        resolvedRefs.add(symRef);
+    }
+
+    /**
+     * Determines whether the given symbolic reference has been resolved to a single
+     * alias.
+     */
+    public boolean isResolved(Expr<?> symRef) {
+        return resolvedRefs.contains(symRef);
     }
 
     /**
@@ -182,6 +208,15 @@ public class SymbolicHeap {
     // #endregion
 
     // #region Heap Allocations
+    private void allocateHeapObject(Expr<?> symRef, Expr<?> conRef, HeapObject obj) {
+        heap.put(conRef, obj);
+
+        // Set aliases for the symbolic reference
+        Set<Expr<?>> aliases = new HashSet<Expr<?>>();
+        aliases.add(conRef);
+        aliasMap.put(symRef, aliases);
+    }
+
     /**
      * Allocates a new heap object and returns its unique reference.
      * 
@@ -202,11 +237,7 @@ public class SymbolicHeap {
         Expr<?> symRef = newRef(key);
         String conKey = newObjKey();
         Expr<?> conRef = newRef(conKey);
-        heap.put(conRef, new HeapObject(type));
-
-        Set<Expr<?>> aliases = new HashSet<Expr<?>>();
-        aliases.add(conRef);
-        aliasMap.put(symRef, aliases);
+        allocateHeapObject(symRef, conRef, new HeapObject(type));
         return symRef;
     }
 
@@ -257,11 +288,7 @@ public class SymbolicHeap {
 
         ArrayExpr<BitVecSort, E> arr = ctx.mkArrayConst(conKey + "_elems", indexSort, elemSort);
         ArrayObject arrObj = new ArrayObject(type, arr, size);
-        heap.put(conRef, arrObj);
-
-        Set<Expr<?>> aliases = new HashSet<Expr<?>>();
-        aliases.add(conRef);
-        aliasMap.put(symRef, aliases);
+        allocateHeapObject(symRef, conRef, arrObj);
         return symRef;
     }
 
@@ -319,11 +346,7 @@ public class SymbolicHeap {
         }
 
         MultiArrayObject arrObj = new MultiArrayObject(type, arr, lengths);
-        heap.put(symRef, arrObj);
-
-        Set<Expr<?>> aliases = new HashSet<Expr<?>>();
-        aliases.add(conRef);
-        aliasMap.put(symRef, aliases);
+        allocateHeapObject(symRef, conRef, arrObj);
         return symRef;
     }
     // #endregion

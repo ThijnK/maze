@@ -13,14 +13,14 @@ import sootup.core.jimple.common.ref.JInstanceFieldRef;
 import sootup.core.jimple.visitor.AbstractValueVisitor;
 
 /**
- * Extracts symbolic references which reference more than one alias from a
+ * Extracts symbolic references which may reference at least one alias from a
  * Jimple value ({@link Value}).
  */
 public class SymbolicRefExtractor extends AbstractValueVisitor<Expr<?>> {
     private SymbolicState state;
 
     /**
-     * Extracts symbolic references which reference more than one alias from a
+     * Extracts symbolic references which reference at least one alias from a
      * Jimple value.
      * 
      * @param value the Jimple value to extract symbolic references from

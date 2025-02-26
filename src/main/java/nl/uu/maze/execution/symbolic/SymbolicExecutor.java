@@ -207,7 +207,7 @@ public class SymbolicExecutor {
         if (stmt instanceof JAssignStmt) {
             Expr<?> symRef = refExtractor.extract(stmt.getRightOp(), state);
             symRef = symRef == null ? refExtractor.extract(stmt.getLeftOp(), state) : symRef;
-            if (symRef != null) {
+            if (symRef != null && !state.heap.isResolved(symRef)) {
                 Set<Expr<?>> aliases = state.heap.getAliases(symRef);
                 List<SymbolicState> newStates = new ArrayList<SymbolicState>(aliases.size());
                 int i = 0;
@@ -218,7 +218,9 @@ public class SymbolicExecutor {
                     newStates.add(newState);
                     i++;
                 }
-                return newStates;
+                if (newStates.size() > 0) {
+                    return newStates;
+                }
             }
         }
 
