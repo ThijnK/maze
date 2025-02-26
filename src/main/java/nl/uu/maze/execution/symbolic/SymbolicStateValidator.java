@@ -113,7 +113,9 @@ public class SymbolicStateValidator {
 
             // For reference types (arrays + objects)
             if (expr.getSort().equals(sorts.getRefSort()) && !var.contains("_")) {
-                boolean isArg = var.contains("arg");
+                if (!var.contains("arg")) {
+                    continue;
+                }
 
                 // If the variable is interpreted as null, set it to null
                 if (expr.equals(nullExpr)) {
@@ -122,17 +124,14 @@ public class SymbolicStateValidator {
                 }
                 // If interpreted equal to another argument's reference, set it to the same
                 // value
-                if (refValues.containsKey(expr) && isArg) {
+                if (refValues.containsKey(expr)) {
                     ObjectRef ref = refValues.get(expr);
                     argMap.set(var, ref);
                     continue;
                 }
-                // For arguments, store the reference value for equality checks to other
-                // argument references
-                if (isArg) {
-                    refValues.put(expr, new ObjectRef(var));
-                    continue;
-                }
+                // Store the reference value for equality checks to other argument references
+                refValues.put(expr, new ObjectRef(var));
+                continue;
             }
 
             // Remove potential suffixes (e.g., _elems, _len)
