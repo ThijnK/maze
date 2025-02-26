@@ -3,12 +3,14 @@ package nl.uu.maze.execution.symbolic;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import com.microsoft.z3.*;
 
 import nl.uu.maze.instrument.TraceManager.TraceEntry;
 import nl.uu.maze.transform.JimpleToZ3Transformer;
+import nl.uu.maze.util.Z3Sorts;
 import nl.uu.maze.util.Z3Utils;
 import sootup.core.graph.*;
 import sootup.core.jimple.basic.LValue;
@@ -81,6 +83,14 @@ public class SymbolicExecutor {
      */
     private List<SymbolicState> handleIfStmt(StmtGraph<?> cfg, JIfStmt stmt, SymbolicState state,
             Iterator<TraceEntry> iterator) {
+        // Split the state if the condition contains a symbolic reference with multiple
+        // aliases (i.e. reference comparisons)
+        Expr<?> symRef = refExtractor.extract(stmt.getCondition(), state);
+        Optional<List<SymbolicState>> splitStates = splitOnAliases(state, symRef);
+        if (splitStates.isPresent()) {
+            return splitStates.get();
+        }
+
         List<Stmt> succs = cfg.getAllSuccessors(stmt);
         BoolExpr cond = (BoolExpr) transformer.transform(stmt.getCondition(), state);
         List<SymbolicState> newStates = new ArrayList<SymbolicState>();
@@ -207,20 +217,9 @@ public class SymbolicExecutor {
         if (stmt instanceof JAssignStmt) {
             Expr<?> symRef = refExtractor.extract(stmt.getRightOp(), state);
             symRef = symRef == null ? refExtractor.extract(stmt.getLeftOp(), state) : symRef;
-            if (symRef != null && !state.heap.isResolved(symRef)) {
-                Set<Expr<?>> aliases = state.heap.getAliases(symRef);
-                List<SymbolicState> newStates = new ArrayList<SymbolicState>(aliases.size());
-                int i = 0;
-                for (Expr<?> alias : aliases) {
-                    SymbolicState newState = i == aliases.size() - 1 ? state : state.clone();
-                    newState.heap.setSingleAlias(symRef, alias);
-                    newState.addEngineConstraint(ctx.mkEq(symRef, alias));
-                    newStates.add(newState);
-                    i++;
-                }
-                if (newStates.size() > 0) {
-                    return newStates;
-                }
+            Optional<List<SymbolicState>> splitStates = splitOnAliases(state, symRef);
+            if (splitStates.isPresent()) {
+                return splitStates.get();
             }
         }
 
@@ -264,5 +263,35 @@ public class SymbolicExecutor {
         }
 
         return newStates;
+    }
+
+    /**
+     * Split the current symbolic state into multiple states based if the given
+     * symbolic reference has multiple aliases.
+     */
+    private Optional<List<SymbolicState>> splitOnAliases(SymbolicState state, Expr<?> symRef) {
+        if (symRef == null || state.heap.isResolved(symRef)) {
+            return Optional.empty();
+        }
+        Set<Expr<?>> aliases = state.heap.getAliases(symRef);
+        if (aliases != null && aliases.size() > 1) {
+            List<SymbolicState> newStates = new ArrayList<SymbolicState>(aliases.size());
+            int i = 0;
+            for (Expr<?> alias : aliases) {
+                SymbolicState newState = i == aliases.size() - 1 ? state : state.clone();
+                newState.heap.setSingleAlias(symRef, alias);
+                newState.addEngineConstraint(ctx.mkEq(symRef, alias));
+                if (alias.equals(Z3Sorts.getInstance().getNullConst())) {
+                    newState.setExceptionThrown();
+                }
+                newStates.add(newState);
+                i++;
+            }
+            // TODO: make this > 1?
+            if (newStates.size() > 0) {
+                return Optional.of(newStates);
+            }
+        }
+        return Optional.empty();
     }
 }

@@ -187,7 +187,8 @@ public class SymbolicState {
 
     @Override
     public String toString() {
-        return "Vars: " + symbolicVariables + ", Heap: " + heap + ", PC: " + pathConstraints;
+        return "Vars: " + symbolicVariables + ", Heap: " + heap + ", PC: " + pathConstraints + ", EC: "
+                + engineConstraints;
     }
 
     @Override

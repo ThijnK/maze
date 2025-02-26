@@ -6,8 +6,10 @@ import com.microsoft.z3.Expr;
 
 import sootup.core.jimple.basic.Local;
 import sootup.core.jimple.basic.Value;
+import sootup.core.jimple.common.expr.JEqExpr;
 import sootup.core.jimple.common.expr.JInstanceOfExpr;
 import sootup.core.jimple.common.expr.JLengthExpr;
+import sootup.core.jimple.common.expr.JNeExpr;
 import sootup.core.jimple.common.ref.JArrayRef;
 import sootup.core.jimple.common.ref.JInstanceFieldRef;
 import sootup.core.jimple.visitor.AbstractValueVisitor;
@@ -36,12 +38,35 @@ public class SymbolicRefExtractor extends AbstractValueVisitor<Expr<?>> {
         return res;
     }
 
+    private Expr<?> extract(Value value) {
+        return extract(value, state);
+    }
+
     private Expr<?> extract(String name) {
         Expr<?> var = state.getVariable(name);
         if (state.heap.isAliased(var)) {
             return var;
         }
         return null;
+    }
+
+    private void handleBinaryExpr(Value op1, Value op2) {
+        Expr<?> left = extract(op1);
+        if (left != null) {
+            setResult(left);
+            return;
+        }
+        setResult(extract(op2));
+    }
+
+    @Override
+    public void caseEqExpr(@Nonnull JEqExpr expr) {
+        handleBinaryExpr(expr.getOp1(), expr.getOp2());
+    }
+
+    @Override
+    public void caseNeExpr(@Nonnull JNeExpr expr) {
+        handleBinaryExpr(expr.getOp1(), expr.getOp2());
     }
 
     @Override

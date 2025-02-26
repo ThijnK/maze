@@ -3,9 +3,9 @@ package nl.uu.maze.execution.symbolic;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -107,7 +107,7 @@ public class SymbolicHeap {
 
     @Override
     public String toString() {
-        return heap.toString();
+        return heap.toString() + ", AliasMap: " + aliasMap.toString();
     }
 
     // #region Aliasing
@@ -122,13 +122,14 @@ public class SymbolicHeap {
      */
     public void findAliases(Expr<?> symRef) {
         Set<Expr<?>> aliases = aliasMap.get(symRef);
-        Expr<?> conRef = aliases.iterator().next();
+        // Add null reference as a potential alias
+        Expr<?> conRef = getSingleAlias(aliases);
         HeapObject obj = heap.get(conRef);
         if (obj == null) {
             return;
         }
 
-        obj.setIsArg(true);
+        aliases.add(sorts.getNullConst());
         Set<Expr<?>> distinctConRefs = new HashSet<>();
         for (Map.Entry<Expr<?>, Set<Expr<?>>> entry : aliasMap.entrySet()) {
             Set<Expr<?>> otherAliases = entry.getValue();
@@ -138,22 +139,22 @@ public class SymbolicHeap {
 
             // Take one object from the heap for this other ref to see if it refers to the
             // same type
-            HeapObject other = heap.get(otherAliases.iterator().next());
-            if (obj.type.equals(other.type) && obj.isArg) {
+            HeapObject other = heap.get(getSingleAlias(otherAliases));
+            if (other != null && obj.type.equals(other.type)) {
                 aliases.addAll(otherAliases);
                 // otherAliases.addAll(aliases); TODO: add this back if needed
                 distinctConRefs.addAll(otherAliases);
             }
         }
 
+        // TODO: this need only be done once, after all arguments are allocated on heap
         // Make sure this concrete reference is never equal to any other concrete
-        // reference referring to an argument object of the same type
+        // reference referring to an argument object of the same type (or null)
         distinctConRefs.remove(conRef);
+        distinctConRefs.add(sorts.getNullConst());
         Expr<?>[] args = Stream.concat(Stream.of(conRef), distinctConRefs.stream())
                 .toArray(Expr<?>[]::new);
-        if (args.length > 1) {
-            state.addEngineConstraint(ctx.mkDistinct(args));
-        }
+        state.addEngineConstraint(ctx.mkDistinct(args));
     }
 
     /**
@@ -173,7 +174,7 @@ public class SymbolicHeap {
      * Retrieves the aliases for the given symbolic reference.
      */
     public Set<Expr<?>> getAliases(Expr<?> symRef) {
-        return Optional.ofNullable(aliasMap.get(symRef)).orElse(new HashSet<>());
+        return aliasMap.get(symRef);
     }
 
     /**
@@ -196,15 +197,23 @@ public class SymbolicHeap {
     }
 
     /**
-     * Retrieves the single alias for the given symbolic reference, if it exists.
+     * Retrieves a single non-null alias for the given symbolic reference, if it
+     * exists.
      */
     public Expr<?> getSingleAlias(Expr<?> symRef) {
         Set<Expr<?>> aliases = aliasMap.get(symRef);
-        if (aliases != null) {
-            return aliases.iterator().next();
-        }
-        return null;
+        return aliases != null ? getSingleAlias(aliases) : null;
     }
+
+    private Expr<?> getSingleAlias(Set<Expr<?>> aliases) {
+        Iterator<Expr<?>> it = aliases.iterator();
+        Expr<?> alias = it.hasNext() ? it.next() : null;
+        if (sorts.getNullConst().equals(alias) && it.hasNext()) {
+            alias = it.next();
+        }
+        return alias;
+    }
+
     // #endregion
 
     // #region Heap Allocations
@@ -372,7 +381,7 @@ public class SymbolicHeap {
             throw new RuntimeException("More than one alias for reference " + symRef);
         }
 
-        return heap.get(aliases.iterator().next());
+        return heap.get(getSingleAlias(aliases));
     }
 
     /**
@@ -426,8 +435,8 @@ public class SymbolicHeap {
         }
 
         Expr<?> field = obj.getField(fieldName);
-        if (field == null && obj.isArg) {
-            String varName = state.getVariable(var).toString();
+        if (field == null) {
+            String varName = getSingleAlias(state.getVariable(var)).toString();
             // Create a symbolic value for the field if the object is an argument
             field = ctx.mkConst(varName + "_" + fieldName, sorts.determineSort(fieldType));
             obj.setField(fieldName, field);
