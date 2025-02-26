@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 import java.util.stream.Stream;
 
 import com.microsoft.z3.ArrayExpr;
@@ -130,7 +131,6 @@ public class SymbolicHeap {
         }
 
         aliases.add(sorts.getNullConst());
-        Set<Expr<?>> distinctConRefs = new HashSet<>();
         for (Map.Entry<Expr<?>, Set<Expr<?>>> entry : aliasMap.entrySet()) {
             Set<Expr<?>> otherAliases = entry.getValue();
             if (entry.getKey().equals(symRef)) {
@@ -143,18 +143,8 @@ public class SymbolicHeap {
             if (other != null && obj.type.equals(other.type)) {
                 aliases.addAll(otherAliases);
                 // otherAliases.addAll(aliases); TODO: add this back if needed
-                distinctConRefs.addAll(otherAliases);
             }
         }
-
-        // TODO: this need only be done once, after all arguments are allocated on heap
-        // Make sure this concrete reference is never equal to any other concrete
-        // reference referring to an argument object of the same type (or null)
-        distinctConRefs.remove(conRef);
-        distinctConRefs.add(sorts.getNullConst());
-        Expr<?>[] args = Stream.concat(Stream.of(conRef), distinctConRefs.stream())
-                .toArray(Expr<?>[]::new);
-        state.addEngineConstraint(ctx.mkDistinct(args));
     }
 
     /**
@@ -218,6 +208,19 @@ public class SymbolicHeap {
 
     // #region Heap Allocations
     private void allocateHeapObject(Expr<?> symRef, Expr<?> conRef, HeapObject obj) {
+        // Make sure this concrete reference is never equal to any other concrete
+        // reference pointing to an argument object of the same type (or null)
+        Set<Expr<?>> distinctConRefs = new HashSet<>();
+        for (Entry<Expr<?>, HeapObject> entry : heap.entrySet()) {
+            if (entry.getValue().getType().equals(obj.getType())) {
+                distinctConRefs.add(entry.getKey());
+            }
+        }
+        distinctConRefs.add(sorts.getNullConst());
+        Expr<?>[] args = Stream.concat(Stream.of(conRef), distinctConRefs.stream())
+                .toArray(Expr<?>[]::new);
+        state.addEngineConstraint(ctx.mkDistinct(args));
+
         heap.put(conRef, obj);
 
         // Set aliases for the symbolic reference
