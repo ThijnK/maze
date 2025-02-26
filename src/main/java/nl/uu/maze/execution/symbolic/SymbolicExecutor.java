@@ -3,6 +3,7 @@ package nl.uu.maze.execution.symbolic;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import com.microsoft.z3.*;
 
@@ -22,8 +23,9 @@ import sootup.core.types.PrimitiveType.IntType;
  * Provides symbolic execution capabilities.
  */
 public class SymbolicExecutor {
-    private Context ctx;
-    private JimpleToZ3Transformer transformer;
+    private final Context ctx;
+    private final JimpleToZ3Transformer transformer;
+    private final SymbolicRefExtractor refExtractor = new SymbolicRefExtractor();
 
     public SymbolicExecutor(Context ctx) {
         this.ctx = ctx;
@@ -197,37 +199,41 @@ public class SymbolicExecutor {
      * @return A list of new symbolic states after executing the statement
      */
     private List<SymbolicState> handleDefStmt(StmtGraph<?> cfg, AbstractDefinitionStmt stmt, SymbolicState state) {
-        LValue leftOp = stmt.getLeftOp();
-        Expr<?> value = transformer.transform(stmt.getRightOp(), state, leftOp.toString());
-        String var = leftOp instanceof JArrayRef ? ((JArrayRef) leftOp).getBase().getName()
-                : leftOp instanceof JInstanceFieldRef ? ((JInstanceFieldRef) leftOp).getBase().getName()
-                        : leftOp.toString();
-
-        // TODO: have to check this BEFORE transforming the rightOp
-
         // If either the lhs or the rhs contains a symbolic reference (e.g., an object
         // or array reference) with more than one potential alias, then we split the
         // state into one state for each alias, and set the symbolic reference to the
         // corresponding alias in each state
         // But only for assignments, not for identity statements
         if (stmt instanceof JAssignStmt) {
-            Expr<?> symRef = state.heap.isAliased(var).orElse(state.heap.isAliased(value).orElse(null));
+            Expr<?> symRef = refExtractor.extract(stmt.getRightOp(), state);
+            symRef = symRef == null ? refExtractor.extract(stmt.getLeftOp(), state) : symRef;
             if (symRef != null) {
-                List<SymbolicState> newStates = new ArrayList<SymbolicState>();
-                // TODO: Implement alias splitting
+                Set<Expr<?>> aliases = state.heap.getAliases(symRef);
+                List<SymbolicState> newStates = new ArrayList<SymbolicState>(aliases.size());
+                int i = 0;
+                for (Expr<?> alias : aliases) {
+                    SymbolicState newState = i == aliases.size() - 1 ? state : state.clone();
+                    newState.heap.setSingleAlias(symRef, alias);
+                    newState.addEngineConstraint(ctx.mkEq(symRef, alias));
+                    newStates.add(newState);
+                    i++;
+                }
                 return newStates;
             }
         }
 
+        LValue leftOp = stmt.getLeftOp();
+        Expr<?> value = transformer.transform(stmt.getRightOp(), state, leftOp.toString());
+
         if (leftOp instanceof JArrayRef) {
             JArrayRef ref = (JArrayRef) leftOp;
             BitVecExpr index = (BitVecExpr) transformer.transform(ref.getIndex(), state);
-            state.heap.setArrayElement(var, index, value);
+            state.heap.setArrayElement(ref.getBase().getName(), index, value);
         } else if (leftOp instanceof JStaticFieldRef) {
             // Static field assignments are considered out of scope
         } else if (leftOp instanceof JInstanceFieldRef) {
             JInstanceFieldRef ref = (JInstanceFieldRef) leftOp;
-            state.heap.setField(var, ref.getFieldSignature().getName(), value);
+            state.heap.setField(ref.getBase().getName(), ref.getFieldSignature().getName(), value);
         } else {
             state.setVariable(leftOp.toString(), value);
         }

@@ -319,37 +319,6 @@ public class SymbolicHeap {
     }
 
     /**
-     * Determines whether the given expression contains a symbolic reference with
-     * more than one alias, and returns the symbolic reference if so.
-     */
-    public Optional<Expr<?>> isAliased(String var) {
-        return isAliased(state.getVariable(var));
-    }
-
-    /**
-     * Determines whether the given expression contains a symbolic reference with
-     * more than one alias, and returns the symbolic reference if so.
-     */
-    public Optional<Expr<?>> isAliased(Expr<?> expr) {
-        if (expr == null) {
-            return Optional.empty();
-        }
-        // Check if the current expression is a sym reference with more than one alias
-        Set<Expr<?>> aliases = aliasMap.get(expr);
-        if (aliases != null && aliases.size() > 1) {
-            return Optional.of(expr);
-        }
-        // Recursively check the sub-expressions of the current expression
-        for (Expr<?> subExpr : expr.getArgs()) {
-            Optional<Expr<?>> result = isAliased(subExpr);
-            if (result.isPresent()) {
-                return result;
-            }
-        }
-        return Optional.empty();
-    }
-
-    /**
      * Determines whether the given variable references an array.
      */
     public boolean isArray(String var) {
@@ -362,6 +331,35 @@ public class SymbolicHeap {
     public boolean isMultiArray(String var) {
         HeapObject obj = getHeapObject(var);
         return obj != null && obj instanceof MultiArrayObject;
+    }
+
+    /**
+     * Determines whether the given symbolic reference may refer to more than one
+     * object on the heap (i.e., has multiple potential aliases).
+     */
+    public boolean isAliased(Expr<?> symRef) {
+        // Check if the current expression is a sym reference with more than one alias
+        Set<Expr<?>> aliases = aliasMap.get(symRef);
+        if (aliases != null && aliases.size() > 1) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Retrieves the aliases for the given symbolic reference.
+     */
+    public Set<Expr<?>> getAliases(Expr<?> symRef) {
+        return Optional.ofNullable(aliasMap.get(symRef)).orElse(new HashSet<>());
+    }
+
+    /**
+     * Sets the given symbolic reference to have a single alias.
+     */
+    public void setSingleAlias(Expr<?> symRef, Expr<?> alias) {
+        Set<Expr<?>> aliases = new HashSet<>();
+        aliases.add(alias);
+        aliasMap.put(symRef, aliases);
     }
     // #endregion
 
