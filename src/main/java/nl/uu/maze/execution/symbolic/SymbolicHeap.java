@@ -602,11 +602,6 @@ public class SymbolicHeap {
         // A mapping from field names to symbolic expressions.
         protected Map<String, Expr<?>> fields;
         protected Type type;
-        /**
-         * Whether this object is a method argument, and thus whether it may be involved
-         * in implicit aliasing.
-         */
-        protected boolean isArg = false;
 
         public HeapObject(Type type) {
             this.fields = new HashMap<>(4);
@@ -615,10 +610,6 @@ public class SymbolicHeap {
 
         public Type getType() {
             return type;
-        }
-
-        public void setIsArg(boolean isArg) {
-            this.isArg = isArg;
         }
 
         public void setField(String fieldName, Expr<?> value) {
