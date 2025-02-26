@@ -274,7 +274,7 @@ public class SymbolicExecutor {
             return Optional.empty();
         }
         Set<Expr<?>> aliases = state.heap.getAliases(symRef);
-        if (aliases != null && aliases.size() > 1) {
+        if (aliases != null) {
             List<SymbolicState> newStates = new ArrayList<SymbolicState>(aliases.size());
             int i = 0;
             for (Expr<?> alias : aliases) {
@@ -287,8 +287,7 @@ public class SymbolicExecutor {
                 newStates.add(newState);
                 i++;
             }
-            // TODO: make this > 1?
-            if (newStates.size() > 0) {
+            if (newStates.size() > 1) {
                 return Optional.of(newStates);
             }
         }

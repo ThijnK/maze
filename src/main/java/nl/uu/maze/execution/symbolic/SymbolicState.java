@@ -205,6 +205,8 @@ public class SymbolicState {
 
     @Override
     public int hashCode() {
-        return currentStmt.hashCode() + symbolicVariables.hashCode() + pathConstraints.hashCode() + heap.hashCode();
+        return currentStmt.hashCode() + symbolicVariables.hashCode() + pathConstraints.hashCode()
+                + engineConstraints.hashCode()
+                + heap.hashCode();
     }
 }

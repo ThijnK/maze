@@ -111,6 +111,11 @@ public class SymbolicHeap {
         return heap.toString() + ", AliasMap: " + aliasMap.toString();
     }
 
+    @Override
+    public int hashCode() {
+        return heap.hashCode() + aliasMap.hashCode();
+    }
+
     // #region Aliasing
     public Set<Expr<?>> getAliasMapKeys() {
         return aliasMap.keySet();
