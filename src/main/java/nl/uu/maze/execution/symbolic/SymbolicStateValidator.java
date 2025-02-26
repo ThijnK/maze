@@ -19,10 +19,9 @@ import com.microsoft.z3.Status;
 
 import nl.uu.maze.execution.ArgMap;
 import nl.uu.maze.execution.symbolic.SymbolicHeap.ArrayObject;
+import nl.uu.maze.execution.symbolic.SymbolicHeap.HeapObject;
 import nl.uu.maze.transform.Z3ToJavaTransformer;
 import nl.uu.maze.util.Z3Sorts;
-import sootup.core.types.ArrayType;
-import sootup.core.types.ClassType;
 import sootup.core.types.Type;
 
 /**
@@ -110,81 +109,80 @@ public class SymbolicStateValidator {
 
         for (FuncDecl<?> decl : model.getConstDecls()) {
             String var = decl.getName().toString();
-            if (!var.contains("arg")) {
-                continue;
-            }
             Expr<?> expr = model.getConstInterp(decl);
+
+            // For reference types (arrays + objects)
+            if (expr.getSort().equals(sorts.getRefSort()) && !var.contains("_")) {
+                boolean isArg = var.contains("arg");
+
+                // If the variable is interpreted as null, set it to null
+                if (expr.equals(nullExpr)) {
+                    argMap.set(var, null);
+                    continue;
+                }
+                // If interpreted equal to another argument's reference, set it to the same
+                // value
+                if (refValues.containsKey(expr) && isArg) {
+                    ObjectRef ref = refValues.get(expr);
+                    argMap.set(var, ref);
+                    continue;
+                }
+                // For arguments, store the reference value for equality checks to other
+                // argument references
+                if (isArg) {
+                    refValues.put(expr, new ObjectRef(var));
+                    continue;
+                }
+            }
 
             // Remove potential suffixes (e.g., _elems, _len)
             String varBase = var.contains("_") ? var.substring(0, var.indexOf('_')) : var;
-            Type type = state.getParamType(varBase);
-
-            // For reference types (arrays + objects)
-            if (expr.getSort().equals(sorts.getRefSort())) {
-                // If the variable is interpreted as null, set it to null
-                if (expr.equals(nullExpr)) {
-                    argMap.set(varBase, null);
-                    continue;
-                }
-                // If interpreted equal to another reference, set it to the same value, choosing
-                // the value of the more constrained reference
-                if (refValues.containsKey(expr)) {
-                    ObjectRef ref = refValues.get(expr);
-                    // Compare the two references, whichever one is more constrained in path
-                    // condition is the "base" reference
-                    if (state.isMoreConstrained(varBase, ref.getVar())) {
-                        // If the current var is more constrained, set it as new base reference
-                        // and evaluate it (so no continue)
-                        refValues.put(expr, new ObjectRef(varBase));
-                        argMap.set(ref.getVar(), new ObjectRef(varBase));
-                    } else {
-                        // If the other var is more constrained, set the current var to the same value
-                        argMap.set(varBase, ref);
+            // If on the heap, then either array or object
+            HeapObject heapObj = state.heap.get(varBase);
+            if (heapObj != null) {
+                // Arrays
+                if (heapObj instanceof ArrayObject) {
+                    // There can be multiple declarations for the same array (elems and len)
+                    if (argMap.containsKey(varBase)) {
                         continue;
                     }
+                    ArrayObject arrObj = (ArrayObject) heapObj;
+                    Type elemType = arrObj.getType().getBaseType();
+                    Object arr = transformer.transformArray(arrObj, model, elemType);
+                    argMap.set(varBase, arr);
                 }
-            }
-
-            // For objects
-            if (type instanceof ClassType && !type.toString().equals("java.lang.String")) {
-                if (!var.contains("_")) {
-                    continue;
-                }
-                if (!argMap.containsKey(varBase)) {
-                    ObjectFields objFields = new ObjectFields();
-                    argMap.set(varBase, objFields);
-                }
-                String fieldName = var.substring(var.indexOf('_') + 1);
-                if (fieldName.length() > 0) {
-                    ObjectFields objFields = (ObjectFields) argMap.get(varBase);
-                    Object value = transformer.transformExpr(model.getConstInterp(decl), type);
-                    objFields.setField(fieldName, value);
-                }
-            }
-            // For arrays
-            else if (type instanceof ArrayType) {
-                // There can be multiple declarations for the same array (elems and len)
-                if (argMap.containsKey(varBase)) {
-                    if (expr.getSort().equals(sorts.getRefSort())) {
-                        refValues.put(expr, new ObjectRef(varBase));
+                // Objects
+                else {
+                    if (!var.contains("_")) {
+                        continue;
                     }
-                    continue;
+                    if (!argMap.containsKey(varBase)) {
+                        argMap.set(varBase, new ObjectFields());
+                    }
+                    String fieldName = var.substring(var.indexOf('_') + 1);
+                    if (fieldName.length() > 0) {
+                        ObjectFields objFields = (ObjectFields) argMap.get(varBase);
+                        Object value = transformer.transformExpr(model.getConstInterp(decl), heapObj.getType());
+                        objFields.setField(fieldName, value);
+                    }
                 }
+                continue;
+            }
+            // Primitive types
+            Object value = transformer.transformExpr(model.getConstInterp(decl), state.getParamType(var));
+            argMap.set(var, value);
+        }
 
-                Expr<?> arrRef = state.heap.newRef(varBase);
-                ArrayObject arrObj = state.getArrayObject(arrRef);
-                Type elemType = ((ArrayType) type).getBaseType();
-                Object arr = transformer.transformArray(arrObj, model, elemType);
-                argMap.set(varBase, arr);
-                if (expr.getSort().equals(sorts.getRefSort())) {
-                    refValues.put(expr, new ObjectRef(varBase));
-                }
-            } else {
-                // Primitive types
-                Object value = transformer.transformExpr(model.getConstInterp(decl), type);
+        // Go through any entries in the alias map which are not yet in the argMap
+        // and add them (with value equal to their alias)
+        for (Expr<?> symRef : state.heap.getAliasMapKeys()) {
+            String var = symRef.toString();
+            if (!argMap.containsKey(var)) {
+                Object value = argMap.get(state.heap.getSingleAlias(symRef).toString());
                 argMap.set(var, value);
             }
         }
+
         return argMap;
     }
 

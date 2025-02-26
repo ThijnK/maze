@@ -72,12 +72,42 @@ public class SymbolicHeap {
         this.arrayIndices = new HashMap<>(arrayIndices);
     }
 
+    public HeapObject get(String var) {
+        return get(newRef(var));
+    }
+
     public HeapObject get(Expr<?> key) {
         return heap.get(key);
     }
 
-    public void put(Expr<?> key, HeapObject value) {
-        heap.put(key, value);
+    public boolean containsRef(Expr<?> ref) {
+        return heap.containsKey(ref);
+    }
+
+    public String newObjKey() {
+        return "obj" + heapCounter++;
+    }
+
+    public String newRefKey() {
+        return "ref" + refCounter++;
+    }
+
+    public Expr<?> newRef(String key) {
+        return ctx.mkConst(key, sorts.getRefSort());
+    }
+
+    public SymbolicHeap clone(SymbolicState state) {
+        return new SymbolicHeap(state, heapCounter, refCounter, heap, aliasMap, arrayIndices);
+    }
+
+    @Override
+    public String toString() {
+        return heap.toString();
+    }
+
+    // #region Aliasing
+    public Set<Expr<?>> getAliasMapKeys() {
+        return aliasMap.keySet();
     }
 
     /**
@@ -110,30 +140,46 @@ public class SymbolicHeap {
         }
     }
 
-    public boolean containsRef(Expr<?> ref) {
-        return heap.containsKey(ref);
+    /**
+     * Determines whether the given symbolic reference may refer to more than one
+     * object on the heap (i.e., has multiple potential aliases).
+     */
+    public boolean isAliased(Expr<?> symRef) {
+        // Check if the current expression is a sym reference with more than one alias
+        Set<Expr<?>> aliases = aliasMap.get(symRef);
+        if (aliases != null && aliases.size() > 1) {
+            return true;
+        }
+        return false;
     }
 
-    public String newObjKey() {
-        return "obj" + heapCounter++;
+    /**
+     * Retrieves the aliases for the given symbolic reference.
+     */
+    public Set<Expr<?>> getAliases(Expr<?> symRef) {
+        return Optional.ofNullable(aliasMap.get(symRef)).orElse(new HashSet<>());
     }
 
-    public String newRefKey() {
-        return "ref" + refCounter++;
+    /**
+     * Sets the given symbolic reference to have a single alias.
+     */
+    public void setSingleAlias(Expr<?> symRef, Expr<?> alias) {
+        Set<Expr<?>> aliases = new HashSet<>();
+        aliases.add(alias);
+        aliasMap.put(symRef, aliases);
     }
 
-    public Expr<?> newRef(String key) {
-        return ctx.mkConst(key, sorts.getRefSort());
+    /**
+     * Retrieves the single alias for the given symbolic reference, if it exists.
+     */
+    public Expr<?> getSingleAlias(Expr<?> symRef) {
+        Set<Expr<?>> aliases = aliasMap.get(symRef);
+        if (aliases != null) {
+            return aliases.iterator().next();
+        }
+        return null;
     }
-
-    public SymbolicHeap clone(SymbolicState state) {
-        return new SymbolicHeap(state, heapCounter, refCounter, heap, aliasMap, arrayIndices);
-    }
-
-    @Override
-    public String toString() {
-        return heap.toString();
-    }
+    // #endregion
 
     // #region Heap Allocations
     /**
@@ -294,13 +340,13 @@ public class SymbolicHeap {
      * Retrieves a heap object from the heap using the given symbolic reference.
      * If the reference has more than one alias, an exception is thrown.
      */
-    private HeapObject getHeapObject(Expr<?> ref) {
-        Set<Expr<?>> aliases = aliasMap.get(ref);
+    private HeapObject getHeapObject(Expr<?> symRef) {
+        Set<Expr<?>> aliases = aliasMap.get(symRef);
         if (aliases == null || aliases.isEmpty()) {
             return null;
         }
         if (aliases.size() > 1) {
-            throw new RuntimeException("More than one alias for reference " + ref);
+            throw new RuntimeException("More than one alias for reference " + symRef);
         }
 
         return heap.get(aliases.iterator().next());
@@ -310,8 +356,8 @@ public class SymbolicHeap {
      * Retrieves an array object from the heap using the given symbolic reference.
      * If the reference has more than one alias, an exception is thrown.
      */
-    private ArrayObject getArrayObject(Expr<?> ref) {
-        HeapObject obj = getHeapObject(ref);
+    private ArrayObject getArrayObject(Expr<?> symRef) {
+        HeapObject obj = getHeapObject(symRef);
         if (obj != null && obj instanceof ArrayObject) {
             return (ArrayObject) obj;
         }
@@ -331,35 +377,6 @@ public class SymbolicHeap {
     public boolean isMultiArray(String var) {
         HeapObject obj = getHeapObject(var);
         return obj != null && obj instanceof MultiArrayObject;
-    }
-
-    /**
-     * Determines whether the given symbolic reference may refer to more than one
-     * object on the heap (i.e., has multiple potential aliases).
-     */
-    public boolean isAliased(Expr<?> symRef) {
-        // Check if the current expression is a sym reference with more than one alias
-        Set<Expr<?>> aliases = aliasMap.get(symRef);
-        if (aliases != null && aliases.size() > 1) {
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Retrieves the aliases for the given symbolic reference.
-     */
-    public Set<Expr<?>> getAliases(Expr<?> symRef) {
-        return Optional.ofNullable(aliasMap.get(symRef)).orElse(new HashSet<>());
-    }
-
-    /**
-     * Sets the given symbolic reference to have a single alias.
-     */
-    public void setSingleAlias(Expr<?> symRef, Expr<?> alias) {
-        Set<Expr<?>> aliases = new HashSet<>();
-        aliases.add(alias);
-        aliasMap.put(symRef, aliases);
     }
     // #endregion
 
@@ -564,6 +581,10 @@ public class SymbolicHeap {
             this.type = type;
         }
 
+        public Type getType() {
+            return type;
+        }
+
         public void setIsArg(boolean isArg) {
             this.isArg = isArg;
         }
@@ -589,10 +610,15 @@ public class SymbolicHeap {
     }
 
     public class ArrayObject extends HeapObject {
-        public ArrayObject(Type type, Expr<?> elems, Expr<?> length) {
+        public ArrayObject(ArrayType type, Expr<?> elems, Expr<?> length) {
             super(type);
             setField("elems", elems);
             setField("len", length);
+        }
+
+        @Override
+        public ArrayType getType() {
+            return (ArrayType) type;
         }
 
         @SuppressWarnings("unchecked")
@@ -614,14 +640,14 @@ public class SymbolicHeap {
 
         @Override
         public ArrayObject clone() {
-            return new ArrayObject(type, getElems(), getLength());
+            return new ArrayObject((ArrayType) type, getElems(), getLength());
         }
     }
 
     public class MultiArrayObject extends ArrayObject {
         private int dim;
 
-        public MultiArrayObject(Type type, Expr<?> elems, ArrayExpr<BitVecSort, BitVecSort> lengths) {
+        public MultiArrayObject(ArrayType type, Expr<?> elems, ArrayExpr<BitVecSort, BitVecSort> lengths) {
             super(type, elems, lengths);
             this.dim = ((ArrayType) type).getDimension();
         }
@@ -674,7 +700,7 @@ public class SymbolicHeap {
         @SuppressWarnings("unchecked")
         @Override
         public MultiArrayObject clone() {
-            return new MultiArrayObject(type, getElems(), (ArrayExpr<BitVecSort, BitVecSort>) getLength());
+            return new MultiArrayObject((ArrayType) type, getElems(), (ArrayExpr<BitVecSort, BitVecSort>) getLength());
         }
     }
     // #endregion
