@@ -115,7 +115,8 @@ public class JUnitTestGenerator {
             // If the value is a reference to another object
             if (value instanceof ObjectRef) {
                 ObjectRef ref = (ObjectRef) value;
-                ObjectFields fields = getObjectFields(ref, argMap);
+                // TODO: this might be array!
+                ObjectFields fields = getObjectFields(ref, argMap, (ClassType) type);
                 if (fields == null) {
                     addStatementTriple(methodBuilder, type, var, "null");
                     continue;
@@ -139,13 +140,18 @@ public class JUnitTestGenerator {
      * Recursively follows object references to get the ObjectFields for the given
      * object.
      */
-    private ObjectFields getObjectFields(Object value, ArgMap argMap) {
+    private ObjectFields getObjectFields(Object value, ArgMap argMap, ClassType expectedType) {
         if (value instanceof ObjectFields) {
             return (ObjectFields) value;
         }
         if (value instanceof ObjectRef) {
             ObjectRef ref = (ObjectRef) value;
-            return getObjectFields(argMap.get(ref.getVar()), argMap);
+            // If a reference is not contained int the argMap, create arbitrary object
+            // Note: if the value in the map is null, that's intentional
+            if (argMap.containsKey(ref.getVar())) {
+                return new ObjectFields(expectedType);
+            }
+            return getObjectFields(argMap.get(ref.getVar()), argMap, expectedType);
         }
         return null;
     }
@@ -243,7 +249,7 @@ public class JUnitTestGenerator {
                 ObjectRef ref = (ObjectRef) value;
                 // If the reference is to another object, build that object first
                 if (!builtObjects.contains(ref.getVar())) {
-                    ObjectFields recFields = getObjectFields(ref, argMap);
+                    ObjectFields recFields = getObjectFields(ref, argMap, fields.getType());
                     buildObjectInstance(methodBuilder, argMap, builtObjects, ref.getVar(), recFields);
                 }
                 methodBuilder.addStatement("setField($L, \"$L\", $L)", var, entry.getKey(), ref.getVar());
