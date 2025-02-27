@@ -110,6 +110,9 @@ public class SymbolicStateValidator {
 
         for (FuncDecl<?> decl : model.getConstDecls()) {
             String var = decl.getName().toString();
+            if (var.equals("null")) {
+                continue;
+            }
             Expr<?> expr = model.getConstInterp(decl);
 
             // For reference types (arrays + objects)
