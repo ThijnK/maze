@@ -11,9 +11,11 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -40,10 +42,6 @@ public class JUnitTestGenerator {
 
     /** Map of method names to the number of test cases generated for each method */
     private Map<String, Integer> methodCount;
-    /**
-     * Number of objects created in the current method, to avoid naming conflicts.
-     */
-    private int methodObjCount = 0;
     private boolean setFieldAdded = false;
 
     public JUnitTestGenerator(Class<?> clazz, JavaAnalyzer analyzer) throws ClassNotFoundException {
@@ -64,7 +62,6 @@ public class JUnitTestGenerator {
      *               method invocation
      */
     public void addMethodTestCase(JavaSootMethod method, JavaSootMethod ctor, ArgMap argMap) {
-        methodObjCount = 0;
         methodCount.compute(method.getName(), (k, v) -> v == null ? 1 : v + 1);
         String testMethodName = "test" + capitalizeFirstLetter(method.getName()) + methodCount.get(method.getName());
         MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder(testMethodName)
@@ -99,52 +96,58 @@ public class JUnitTestGenerator {
         classBuilder.addMethod(methodBuilder.build());
     }
 
-    // Helper class to store parameter information
-    private static class ParamInfo {
-        public String name;
-        public Type type;
-        public String value;
-
-        public ParamInfo(String name, Type type, String value) {
-            this.name = name;
-            this.type = type;
-            this.value = value;
-        }
-    }
-
     private List<String> addParamDefinitions(MethodSpec.Builder methodBuilder, List<Type> paramTypes, ArgMap argMap,
             MethodType methodType) {
         List<String> params = new ArrayList<>();
-        // Store a list of parameter info objects for params that reference other
-        // parameters, so we can make sure to define that after the params they
-        // reference are defined first
-        List<ParamInfo> refParams = new ArrayList<>();
+        Set<String> builtObjects = new HashSet<>();
         for (int i = 0; i < paramTypes.size(); i++) {
             String var = ArgMap.getSymbolicName(methodType, i);
             Object value = argMap.get(var);
+            Type type = paramTypes.get(i);
             params.add(var);
-            // If the ArgMap contains no value, use a default value
-            // Note that it's possible that it contains a null value, in which case it's
-            // intentional
-            String valueStr = !argMap.containsKey(var) ? getDefaultValue(paramTypes.get(i)) : valueToString(value);
-            // If the value is a reference to another parameter, store it in refParams
+
+            // For object paramters create an instance of the object
+            // If the argMap does not contain a value for the param, create arbitrary object
+            if (type instanceof ClassType && (!argMap.containsKey(var) || value instanceof ObjectFields)) {
+                buildObjectInstance(methodBuilder, argMap, builtObjects, var,
+                        value instanceof ObjectFields ? (ObjectFields) value : new ObjectFields((ClassType) type));
+            }
+            // If the value is a reference to another object
             if (value instanceof ObjectRef) {
-                refParams.add(new ParamInfo(var, paramTypes.get(i), valueStr));
+                ObjectRef ref = (ObjectRef) value;
+                ObjectFields fields = getObjectFields(ref, argMap);
+                if (fields == null) {
+                    addStatementTriple(methodBuilder, type, var, "null");
+                    continue;
+                }
+                buildObjectInstance(methodBuilder, argMap, builtObjects, ref.getVar(), fields);
+                // Add a statement to set the reference to the other object
+                methodBuilder.addStatement("$T $L = $L", fields.getTypeClass(), var, ref.getVar());
             }
-            // If the value is an object, construct it using reflection
-            else if (value instanceof ObjectFields && paramTypes.get(i) instanceof ClassType) {
-                buildObjectInstance(methodBuilder, var, (ClassType) paramTypes.get(i), (ObjectFields) value);
-            } else {
-                // Other parameters can be defined immediately
-                addStatementTriple(methodBuilder, paramTypes.get(i), var, valueStr);
+            // Other paramters (non-object) can be defined immediately
+            else {
+                // If the ArgMap contains no value, use a default value
+                String valueStr = !argMap.containsKey(var) ? getDefaultValue(paramTypes.get(i)) : valueToString(value);
+                addStatementTriple(methodBuilder, type, var, valueStr);
             }
-        }
-        // Define the refParams after the params they reference
-        for (ParamInfo param : refParams) {
-            addStatementTriple(methodBuilder, param.type, param.name, param.value);
         }
 
         return params;
+    }
+
+    /**
+     * Recursively follows object references to get the ObjectFields for the given
+     * object.
+     */
+    private ObjectFields getObjectFields(Object value, ArgMap argMap) {
+        if (value instanceof ObjectFields) {
+            return (ObjectFields) value;
+        }
+        if (value instanceof ObjectRef) {
+            ObjectRef ref = (ObjectRef) value;
+            return getObjectFields(argMap.get(ref.getVar()), argMap);
+        }
+        return null;
     }
 
     /**
@@ -183,12 +186,11 @@ public class JUnitTestGenerator {
      * constructor arguments.
      */
     private void buildObjectInstance(MethodSpec.Builder methodBuilder, String var, Class<?> clazz) {
-        methodObjCount++;
         Object[] arguments = analyzer.getJavaConstructor(clazz).getSecond();
         String[] argNames = new String[arguments.length];
         for (int i = 0; i < arguments.length; i++) {
             Object arg = arguments[i];
-            String argName = var + methodObjCount + "_carg" + i;
+            String argName = var + "_carg" + i;
             argNames[i] = argName;
             // TODO: if arg here is an object, recursively build it
             methodBuilder.addStatement("$T $L = $L", arg.getClass(), argName, valueToString(arg));
@@ -196,28 +198,59 @@ public class JUnitTestGenerator {
         methodBuilder.addStatement("$T $L = new $T($L)", clazz, var, clazz, String.join(", ", argNames));
     }
 
+    private void buildObjectInstance(MethodSpec.Builder methodBuilder, ArgMap argMap, Set<String> builtObjects,
+            String var, ObjectFields fields) {
+        if (builtObjects.contains(var)) {
+            return;
+        }
+        builtObjects.add(var);
+        Class<?> typeClass = fields.getTypeClass();
+        if (typeClass == null) {
+            Type type = fields.getType();
+            if (type != null) {
+                Optional<Class<?>> typeClassOpt = analyzer.tryGetJavaClass(fields.getType());
+                if (typeClassOpt.isPresent()) {
+                    typeClass = typeClassOpt.get();
+                }
+            }
+        }
+        if (typeClass != null) {
+            fields.setTypeClass(typeClass);
+            buildObjectInstance(methodBuilder, var, typeClass);
+        } else {
+            // Default to assuming (hoping) that the class has a zero-argument constructor
+            methodBuilder.addStatement("$L $L = new $L()", fields.getType(), var, fields.getType());
+        }
+
+        addFieldDefinitions(methodBuilder, argMap, builtObjects, var, fields);
+    }
+
     /**
      * Builds an object instance for the given ClassType with randomly generated
      * constructor arguments, but overwrites any fields defiend in the given
      * ObjectFields argument with the given values.
      */
-    private void buildObjectInstance(MethodSpec.Builder methodBuilder, String var, ClassType type,
-            ObjectFields fields) {
-        Optional<Class<?>> typeClass = analyzer.tryGetJavaClass(type);
-        if (typeClass.isPresent()) {
-            buildObjectInstance(methodBuilder, var, typeClass.get());
-        } else {
-            // Default to assuming (hoping) that the class has a zero-argument constructor
-            methodBuilder.addStatement("$L $L = new $L()", type, var, type);
-        }
-
+    private void addFieldDefinitions(MethodSpec.Builder methodBuilder, ArgMap argMap, Set<String> builtObjects,
+            String var, ObjectFields fields) {
         if (fields == null) {
             return;
         }
         for (Map.Entry<String, Object> entry : fields.getFields().entrySet()) {
             addSetFieldMethod();
-            methodBuilder.addStatement("setField($L, \"$L\", $L)", var, entry.getKey(),
-                    valueToString(entry.getValue()));
+
+            Object value = entry.getValue();
+            if (value instanceof ObjectRef) {
+                ObjectRef ref = (ObjectRef) value;
+                // If the reference is to another object, build that object first
+                if (!builtObjects.contains(ref.getVar())) {
+                    ObjectFields recFields = getObjectFields(ref, argMap);
+                    buildObjectInstance(methodBuilder, argMap, builtObjects, ref.getVar(), recFields);
+                }
+                methodBuilder.addStatement("setField($L, \"$L\", $L)", var, entry.getKey(), ref.getVar());
+            } else {
+                methodBuilder.addStatement("setField($L, \"$L\", $L)", var, entry.getKey(),
+                        valueToString(entry.getValue()));
+            }
         }
     }
 

@@ -201,7 +201,7 @@ public class ObjectInstantiator {
                 if (type.isPrimitive() || type.getName().equals("java.lang.String") || arguments[i] == null) {
                     argMap.set(name, arguments[i]);
                 } else {
-                    ObjectFields fields = new ObjectFields();
+                    ObjectFields fields = new ObjectFields(type);
                     // Try to set the fields of the object to the randomly generated values
                     for (Field field : type.getDeclaredFields()) {
                         try {

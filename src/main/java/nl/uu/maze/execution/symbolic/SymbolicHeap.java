@@ -20,6 +20,7 @@ import com.microsoft.z3.Sort;
 import nl.uu.maze.util.Z3Sorts;
 import sootup.core.types.PrimitiveType.IntType;
 import sootup.core.types.ArrayType;
+import sootup.core.types.ClassType;
 import sootup.core.types.Type;
 
 /**
@@ -189,6 +190,13 @@ public class SymbolicHeap {
      */
     public boolean isResolved(Expr<?> symRef) {
         return resolvedRefs.contains(symRef);
+    }
+
+    /**
+     * Retrieves a single non-null alias for the given variable, if it exists.
+     */
+    public Expr<?> getSingleAlias(String var) {
+        return getSingleAlias(newRef(var));
     }
 
     /**
@@ -445,9 +453,18 @@ public class SymbolicHeap {
         Expr<?> field = obj.getField(fieldName);
         if (field == null) {
             String varName = getSingleAlias(state.getVariable(var)).toString();
-            // Create a symbolic value for the field if the object is an argument
-            field = ctx.mkConst(varName + "_" + fieldName, sorts.determineSort(fieldType));
-            obj.setField(fieldName, field);
+            if (fieldType instanceof ArrayType) {
+                // Create a new array object
+                field = allocateArray(varName + "_" + fieldName, (ArrayType) fieldType, sorts.getIntSort());
+            } else if (fieldType instanceof ClassType && !fieldType.toString().equals("java.lang.String")) {
+                // Create a new object
+                field = allocateObject(varName + "_" + fieldName, fieldType);
+                // aliasMap.get(field).add(sorts.getNullConst()); // TODO: allow null for fields
+            } else {
+                // Create a symbolic value for the field
+                field = ctx.mkConst(varName + "_" + fieldName, sorts.determineSort(fieldType));
+                obj.setField(fieldName, field);
+            }
         }
 
         return field;

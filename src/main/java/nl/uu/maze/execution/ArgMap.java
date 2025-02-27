@@ -43,6 +43,18 @@ public class ArgMap {
         return args.get(key);
     }
 
+    public Object getOrDefault(String key, Object defaultValue) {
+        return args.getOrDefault(key, defaultValue);
+    }
+
+    public Object getOrNew(String key, Object newValue) {
+        if (!args.containsKey(key)) {
+            args.put(key, newValue);
+            return newValue;
+        }
+        return args.get(key);
+    }
+
     public boolean containsKey(String key) {
         return args.containsKey(key);
     }

@@ -4,9 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Optional;
-import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +22,7 @@ import nl.uu.maze.execution.symbolic.SymbolicHeap.ArrayObject;
 import nl.uu.maze.execution.symbolic.SymbolicHeap.HeapObject;
 import nl.uu.maze.transform.Z3ToJavaTransformer;
 import nl.uu.maze.util.Z3Sorts;
+import sootup.core.types.ClassType;
 import sootup.core.types.Type;
 
 /**
@@ -108,34 +107,27 @@ public class SymbolicStateValidator {
         // Keep track of reference values that we've encountered, to be able to set two
         // arguments to the same object when they are interpreted to be equal
         Map<Expr<?>, ObjectRef> refValues = new HashMap<>();
-        Set<String> nonNullVars = new HashSet<>();
 
         for (FuncDecl<?> decl : model.getConstDecls()) {
             String var = decl.getName().toString();
             Expr<?> expr = model.getConstInterp(decl);
 
             // For reference types (arrays + objects)
-            if (expr.getSort().equals(sorts.getRefSort()) && !var.contains("_")) {
-                if (!var.contains("arg")) {
-                    continue;
-                }
-
+            boolean isNull = false;
+            if (expr.getSort().equals(sorts.getRefSort())) {
                 // If the variable is interpreted as null, set it to null
                 if (expr.equals(nullExpr)) {
                     argMap.set(var, null);
-                    continue;
+                    isNull = true;
                 }
                 // If interpreted equal to another argument's reference, set it to the same
                 // value
                 if (refValues.containsKey(expr)) {
                     ObjectRef ref = refValues.get(expr);
                     argMap.set(var, ref);
-                    continue;
                 }
                 // Store the reference value for equality checks to other argument references
                 refValues.put(expr, new ObjectRef(var));
-                nonNullVars.add(var);
-                continue;
             }
 
             // Remove potential suffixes (e.g., _elems, _len)
@@ -159,12 +151,28 @@ public class SymbolicStateValidator {
                     if (!var.contains("_")) {
                         continue;
                     }
-                    if (!argMap.containsKey(varBase)) {
-                        argMap.set(varBase, new ObjectFields());
-                    }
                     String fieldName = var.substring(var.indexOf('_') + 1);
-                    if (fieldName.length() > 0) {
-                        ObjectFields objFields = (ObjectFields) argMap.get(varBase);
+
+                    ObjectFields objFields = (ObjectFields) argMap.getOrNew(varBase,
+                            new ObjectFields((ClassType) heapObj.getType()));
+                    // If the field is a heap reference, handle it accordingly
+                    Expr<?> conRef = state.heap.getSingleAlias(var);
+                    if (conRef != null) {
+                        // If heap reference is null, set field to null
+                        if (isNull) {
+                            objFields.setField(fieldName, null);
+                        }
+                        // Otherwise, set field to reference the heap object
+                        else {
+                            ObjectRef ref = new ObjectRef(conRef.toString());
+                            objFields.setField(fieldName, ref);
+                        }
+                    }
+                    // Otherwise, it's a primitive type
+                    else {
+                        // TODO: heapObj.getType() is not the correct type here, should be the type for
+                        // the field, which we can achieve by storing the type of fields in HeapObject!
+
                         Object value = transformer.transformExpr(model.getConstInterp(decl), heapObj.getType());
                         objFields.setField(fieldName, value);
                     }
@@ -172,23 +180,12 @@ public class SymbolicStateValidator {
                 continue;
             }
             // Primitive types
+            if (argMap.containsKey(var)) {
+                // Skip if already set (e.g., to null)
+                continue;
+            }
             Object value = transformer.transformExpr(model.getConstInterp(decl), state.getParamType(var));
             argMap.set(var, value);
-        }
-
-        // Go through any entries in the alias map which are not yet in the argMap
-        // and add them (with value equal to their alias)
-        for (Expr<?> symRef : state.heap.getAliasMapKeys()) {
-            String var = symRef.toString();
-            if (!argMap.containsKey(var)) {
-                Object value = argMap.get(state.heap.getSingleAlias(symRef).toString());
-                // For objects (not arrays), it's possible that a symbolic reference is
-                // evaluated to not be equal to null, but still not have a value in the model
-                if (value == null && nonNullVars.contains(var)) {
-                    value = new ObjectFields();
-                }
-                argMap.set(var, value);
-            }
         }
 
         return argMap;
@@ -249,10 +246,32 @@ public class SymbolicStateValidator {
      * Represents a object and its fields.
      */
     public static class ObjectFields {
+        private final ClassType type;
+        private Class<?> typeClass;
         private final Map<String, Object> fields;
 
-        public ObjectFields() {
+        public ObjectFields(ClassType type) {
+            this.type = type;
+            this.typeClass = null;
             this.fields = new HashMap<>();
+        }
+
+        public ObjectFields(Class<?> type) {
+            this.typeClass = type;
+            this.type = null;
+            this.fields = new HashMap<>();
+        }
+
+        public ClassType getType() {
+            return type;
+        }
+
+        public Class<?> getTypeClass() {
+            return typeClass;
+        }
+
+        public void setTypeClass(Class<?> typeClass) {
+            this.typeClass = typeClass;
         }
 
         public Map<String, Object> getFields() {
