@@ -7,8 +7,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Map.Entry;
-import java.util.stream.Stream;
 
 import com.microsoft.z3.ArrayExpr;
 import com.microsoft.z3.BitVecExpr;
@@ -118,8 +116,8 @@ public class SymbolicHeap {
     }
 
     // #region Aliasing
-    public Set<Expr<?>> getAliasMapKeys() {
-        return aliasMap.keySet();
+    public Set<Expr<?>> getAllConcreteRefs() {
+        return heap.keySet();
     }
 
     /**
@@ -221,22 +219,10 @@ public class SymbolicHeap {
 
     // #region Heap Allocations
     private void allocateHeapObject(Expr<?> symRef, Expr<?> conRef, HeapObject obj) {
-        // Make sure this concrete reference is never equal to any other concrete
-        // reference pointing to an argument object of the same type (or null)
-        Set<Expr<?>> distinctConRefs = new HashSet<>();
-        for (Entry<Expr<?>, HeapObject> entry : heap.entrySet()) {
-            if (entry.getValue().getType().equals(obj.getType())) {
-                distinctConRefs.add(entry.getKey());
-            }
-        }
-        distinctConRefs.add(sorts.getNullConst());
-        Expr<?>[] args = Stream.concat(Stream.of(conRef), distinctConRefs.stream())
-                .toArray(Expr<?>[]::new);
-        state.addEngineConstraint(ctx.mkDistinct(args));
-
         heap.put(conRef, obj);
 
         // Set aliases for the symbolic reference
+        // TODO: may need null here as well
         Set<Expr<?>> aliases = new HashSet<Expr<?>>();
         aliases.add(conRef);
         aliasMap.put(symRef, aliases);

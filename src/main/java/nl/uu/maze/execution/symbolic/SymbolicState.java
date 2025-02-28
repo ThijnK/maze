@@ -4,10 +4,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import com.microsoft.z3.*;
 
 import nl.uu.maze.execution.MethodType;
+import nl.uu.maze.util.Z3Sorts;
 import sootup.core.graph.StmtGraph;
 import sootup.core.jimple.common.stmt.Stmt;
 import sootup.core.types.Type;
@@ -155,6 +157,13 @@ public class SymbolicState {
      * Returns the list of engine constraints for this state.
      */
     public List<BoolExpr> getEngineConstraints() {
+        // Add constraint that all concrete references are distinct
+        // So not equal to any other concrete ref, and not equal to null
+        List<BoolExpr> engineConstraints = new ArrayList<>(this.engineConstraints);
+        Expr<?>[] conRefs = Stream
+                .concat(Stream.of(Z3Sorts.getInstance().getNullConst()), heap.getAllConcreteRefs().stream())
+                .toArray(Expr<?>[]::new);
+        engineConstraints.add(ctx.mkDistinct(conRefs));
         return engineConstraints;
     }
 
