@@ -127,13 +127,13 @@ public class SymbolicHeap {
      */
     public void findAliases(Expr<?> symRef) {
         Set<Expr<?>> aliases = aliasMap.get(symRef);
-        // Add null reference as a potential alias
         Expr<?> conRef = getSingleAlias(aliases);
         HeapObject obj = heap.get(conRef);
         if (obj == null) {
             return;
         }
 
+        // Add null reference as a potential alias
         aliases.add(sorts.getNullConst());
         for (Map.Entry<Expr<?>, Set<Expr<?>>> entry : aliasMap.entrySet()) {
             Set<Expr<?>> otherAliases = entry.getValue();
@@ -146,7 +146,6 @@ public class SymbolicHeap {
             HeapObject other = heap.get(getSingleAlias(otherAliases));
             if (other != null && obj.type.equals(other.type)) {
                 aliases.addAll(otherAliases);
-                // otherAliases.addAll(aliases); TODO: add this back if needed
             }
         }
     }
@@ -421,7 +420,9 @@ public class SymbolicHeap {
     public void setField(String var, String fieldName, Expr<?> value) {
         HeapObject obj = getHeapObject(var);
         if (obj == null) {
-            throw new IllegalArgumentException("Object does not exist: " + var);
+            // For null references
+            state.setExceptionThrown();
+            return;
         }
 
         obj.setField(fieldName, value);
@@ -433,19 +434,29 @@ public class SymbolicHeap {
     public Expr<?> getField(String var, String fieldName, Type fieldType) {
         HeapObject obj = getHeapObject(var);
         if (obj == null) {
+            // Null reference
+            state.setExceptionThrown();
             return null;
         }
 
         Expr<?> field = obj.getField(fieldName);
         if (field == null) {
-            String varName = getSingleAlias(state.getVariable(var)).toString();
+            Expr<?> objRef = getSingleAlias(state.getVariable(var));
+            String varName = objRef.toString();
             if (fieldType instanceof ArrayType) {
                 // Create a new array object
                 field = allocateArray(varName + "_" + fieldName, (ArrayType) fieldType, sorts.getIntSort());
             } else if (fieldType instanceof ClassType && !fieldType.toString().equals("java.lang.String")) {
                 // Create a new object
                 field = allocateObject(varName + "_" + fieldName, fieldType);
-                // aliasMap.get(field).add(sorts.getNullConst()); // TODO: allow null for fields
+                if (!resolvedRefs.contains(field)) {
+                    // If this symbolic ref has not been resolved (constrained to a particular
+                    // concrete reference), then find potential aliases for it
+                    findAliases(field);
+                    // For now, disallow field of an object to point to itself
+                    // TODO: allow this
+                    aliasMap.get(field).remove(objRef);
+                }
             } else {
                 // Create a symbolic value for the field
                 field = ctx.mkConst(varName + "_" + fieldName, sorts.determineSort(fieldType));
@@ -548,7 +559,6 @@ public class SymbolicHeap {
         if (arrObj instanceof MultiArrayObject) {
             if (value.getSort().equals(sorts.getRefSort())) {
                 // Reassigning part of a multi-dimensional array to another array not supported
-                // TODO: but possibly if the value is an object reference it's fine?
                 throw new RuntimeException("Cannot assign reference to multi-dimensional array element");
             }
 
