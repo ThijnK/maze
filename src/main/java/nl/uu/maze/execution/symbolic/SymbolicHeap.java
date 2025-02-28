@@ -221,7 +221,6 @@ public class SymbolicHeap {
         heap.put(conRef, obj);
 
         // Set aliases for the symbolic reference
-        // TODO: may need null here as well
         Set<Expr<?>> aliases = new HashSet<Expr<?>>();
         aliases.add(conRef);
         aliasMap.put(symRef, aliases);
@@ -417,7 +416,7 @@ public class SymbolicHeap {
     /**
      * Sets the value of an object's field.
      */
-    public void setField(String var, String fieldName, Expr<?> value) {
+    public void setField(String var, String fieldName, Expr<?> value, Type type) {
         HeapObject obj = getHeapObject(var);
         if (obj == null) {
             // For null references
@@ -425,7 +424,7 @@ public class SymbolicHeap {
             return;
         }
 
-        obj.setField(fieldName, value);
+        obj.setField(fieldName, value, type);
     }
 
     /**
@@ -439,32 +438,35 @@ public class SymbolicHeap {
             return null;
         }
 
-        Expr<?> field = obj.getField(fieldName);
+        HeapObjectField field = obj.getField(fieldName);
         if (field == null) {
             Expr<?> objRef = getSingleAlias(state.getVariable(var));
             String varName = objRef.toString();
+            Expr<?> newValue;
             if (fieldType instanceof ArrayType) {
                 // Create a new array object
-                field = allocateArray(varName + "_" + fieldName, (ArrayType) fieldType, sorts.getIntSort());
+                newValue = allocateArray(varName + "_" + fieldName, (ArrayType) fieldType, sorts.getIntSort());
             } else if (fieldType instanceof ClassType && !fieldType.toString().equals("java.lang.String")) {
                 // Create a new object
-                field = allocateObject(varName + "_" + fieldName, fieldType);
-                if (!resolvedRefs.contains(field)) {
+                newValue = allocateObject(varName + "_" + fieldName, fieldType);
+                if (!resolvedRefs.contains(newValue)) {
                     // If this symbolic ref has not been resolved (constrained to a particular
                     // concrete reference), then find potential aliases for it
-                    findAliases(field);
+                    findAliases(newValue);
                     // For now, disallow field of an object to point to itself
                     // TODO: allow this
-                    aliasMap.get(field).remove(objRef);
+                    aliasMap.get(newValue).remove(objRef);
                 }
             } else {
                 // Create a symbolic value for the field
-                field = ctx.mkConst(varName + "_" + fieldName, sorts.determineSort(fieldType));
+                newValue = ctx.mkConst(varName + "_" + fieldName, sorts.determineSort(fieldType));
             }
-            obj.setField(fieldName, field);
+            // Set the field to the new value
+            obj.setField(fieldName, newValue, fieldType);
+            return newValue;
+        } else {
+            return field.getValue();
         }
-
-        return field;
     }
     // #endregion
 
@@ -616,11 +618,41 @@ public class SymbolicHeap {
 
     // #region Heap Object Classes
     /**
+     * Represents a field in an object on the heap.
+     */
+    public class HeapObjectField {
+        private Expr<?> value;
+        private Type type;
+
+        public HeapObjectField(Expr<?> value, Type type) {
+            this.value = value;
+            this.type = type;
+        }
+
+        public Expr<?> getValue() {
+            return value;
+        }
+
+        public Type getType() {
+            return type;
+        }
+
+        public void setValue(Expr<?> value) {
+            this.value = value;
+        }
+
+        @Override
+        public String toString() {
+            return value.toString();
+        }
+    }
+
+    /**
      * Represents an object in the heap.
      */
     public class HeapObject {
         // A mapping from field names to symbolic expressions.
-        protected Map<String, Expr<?>> fields;
+        private Map<String, HeapObjectField> fields;
         protected Type type;
 
         public HeapObject(Type type) {
@@ -632,12 +664,21 @@ public class SymbolicHeap {
             return type;
         }
 
-        public void setField(String fieldName, Expr<?> value) {
-            fields.put(fieldName, value);
+        public void setField(String name, Expr<?> value, Type type) {
+            if (fields.containsKey(name)) {
+                fields.get(name).setValue(value);
+            } else {
+                fields.put(name, new HeapObjectField(value, type));
+            }
         }
 
-        public Expr<?> getField(String fieldName) {
-            return fields.get(fieldName);
+        public HeapObjectField getField(String name) {
+            return fields.get(name);
+        }
+
+        public Type getFieldType(String name) {
+            HeapObjectField field = fields.get(name);
+            return field != null ? field.getType() : null;
         }
 
         public HeapObject clone() {
@@ -655,8 +696,8 @@ public class SymbolicHeap {
     public class ArrayObject extends HeapObject {
         public ArrayObject(ArrayType type, Expr<?> elems, Expr<?> length) {
             super(type);
-            setField("elems", elems);
-            setField("len", length);
+            setField("elems", elems, type);
+            setField("len", length, IntType.getInstance());
         }
 
         @Override
@@ -666,7 +707,7 @@ public class SymbolicHeap {
 
         @SuppressWarnings("unchecked")
         public <E extends Sort> ArrayExpr<BitVecSort, E> getElems() {
-            return (ArrayExpr<BitVecSort, E>) getField("elems");
+            return (ArrayExpr<BitVecSort, E>) getField("elems").getValue();
         }
 
         public <E extends Sort> Expr<E> getElem(BitVecExpr index) {
@@ -674,11 +715,11 @@ public class SymbolicHeap {
         }
 
         public <E extends Sort> void setElem(BitVecExpr index, Expr<E> value) {
-            setField("elems", ctx.mkStore(getElems(), index, value));
+            setField("elems", ctx.mkStore(getElems(), index, value), type);
         }
 
         public Expr<?> getLength() {
-            return getField("len");
+            return getField("len").getValue();
         }
 
         @Override

@@ -12,7 +12,8 @@ import org.slf4j.LoggerFactory;
 
 import nl.uu.maze.execution.ArgMap;
 import nl.uu.maze.execution.MethodType;
-import nl.uu.maze.execution.symbolic.SymbolicStateValidator.ObjectFields;
+import nl.uu.maze.execution.symbolic.SymbolicStateValidator.ObjectField;
+import nl.uu.maze.execution.symbolic.SymbolicStateValidator.ObjectInstance;
 import nl.uu.maze.execution.symbolic.SymbolicStateValidator.ObjectRef;
 import nl.uu.maze.util.ArrayUtils;
 
@@ -122,16 +123,18 @@ public class ObjectInstantiator {
                 } else if (value instanceof ObjectRef) {
                     // ObjectRef's are preserved and handled after all other arguments are generated
                     arguments[i] = value;
-                } else if (value instanceof ObjectFields) {
+                } else if (value instanceof ObjectInstance) {
                     // Construct instance and set the given fields
                     Object instance = createInstance(type);
-                    ObjectFields fields = (ObjectFields) value;
+                    ObjectInstance inst = (ObjectInstance) value;
 
-                    for (Map.Entry<String, Object> entry : fields.getFields().entrySet()) {
+                    for (Map.Entry<String, ObjectField> entry : inst.getFields().entrySet()) {
+                        ObjectField instField = entry.getValue();
                         try {
+                            // TODO: handle object fields and arrays
                             Field field = type.getDeclaredField(entry.getKey());
                             field.setAccessible(true);
-                            field.set(instance, entry.getValue());
+                            field.set(instance, instField.getValue());
                         } catch (Exception e) {
                             logger.error("Failed to set field: " + entry.getKey() + " in class: " + type.getName());
                         }
@@ -201,18 +204,19 @@ public class ObjectInstantiator {
                 if (type.isPrimitive() || type.getName().equals("java.lang.String") || arguments[i] == null) {
                     argMap.set(name, arguments[i]);
                 } else {
-                    ObjectFields fields = new ObjectFields(type);
+                    ObjectInstance inst = new ObjectInstance(type);
                     // Try to set the fields of the object to the randomly generated values
                     for (Field field : type.getDeclaredFields()) {
                         try {
                             field.setAccessible(true);
-                            fields.setField(field.getName(), field.get(arguments[i]));
+                            // TODO: get the sootUp type of the field here
+                            inst.setField(field.getName(), field.get(arguments[i]), null);
                         } catch (Exception e) {
                             logger.error("Failed to set field: " + field.getName() + " in class: " + type.getName());
                         }
                     }
 
-                    argMap.set(name, fields);
+                    argMap.set(name, inst);
                 }
             }
         }

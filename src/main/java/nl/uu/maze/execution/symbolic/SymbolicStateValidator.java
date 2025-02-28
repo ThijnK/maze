@@ -156,19 +156,19 @@ public class SymbolicStateValidator {
                     }
                     String fieldName = var.substring(var.indexOf('_') + 1);
 
-                    ObjectFields objFields = (ObjectFields) argMap.getOrNew(varBase,
-                            new ObjectFields((ClassType) heapObj.getType()));
+                    ObjectInstance objFields = (ObjectInstance) argMap.getOrNew(varBase,
+                            new ObjectInstance((ClassType) heapObj.getType()));
                     // If the field is a heap reference, handle it accordingly
                     Expr<?> conRef = state.heap.getSingleAlias(var);
                     if (conRef != null) {
                         // If heap reference is null, set field to null
                         if (isNull) {
-                            objFields.setField(fieldName, null);
+                            objFields.setField(fieldName, null, heapObj.getFieldType(fieldName));
                         }
                         // Otherwise, set field to reference the heap object
                         else {
                             ObjectRef ref = new ObjectRef(conRef.toString());
-                            objFields.setField(fieldName, ref);
+                            objFields.setField(fieldName, ref, heapObj.getFieldType(fieldName));
                         }
                     }
                     // Otherwise, it's a primitive type
@@ -177,7 +177,7 @@ public class SymbolicStateValidator {
                         // the field, which we can achieve by storing the type of fields in HeapObject!
 
                         Object value = transformer.transformExpr(model.getConstInterp(decl), heapObj.getType());
-                        objFields.setField(fieldName, value);
+                        objFields.setField(fieldName, value, heapObj.getFieldType(fieldName));
                     }
                 }
                 continue;
@@ -246,20 +246,41 @@ public class SymbolicStateValidator {
     }
 
     /**
+     * Represents a field of an object instance.
+     */
+    public static class ObjectField {
+        private final Object value;
+        private final Type type;
+
+        public ObjectField(Object value, Type type) {
+            this.value = value;
+            this.type = type;
+        }
+
+        public Object getValue() {
+            return value;
+        }
+
+        public Type getType() {
+            return type;
+        }
+    }
+
+    /**
      * Represents a object and its fields.
      */
-    public static class ObjectFields {
+    public static class ObjectInstance {
         private final ClassType type;
         private Class<?> typeClass;
-        private final Map<String, Object> fields;
+        private final Map<String, ObjectField> fields;
 
-        public ObjectFields(ClassType type) {
+        public ObjectInstance(ClassType type) {
             this.type = type;
             this.typeClass = null;
             this.fields = new HashMap<>();
         }
 
-        public ObjectFields(Class<?> type) {
+        public ObjectInstance(Class<?> type) {
             this.typeClass = type;
             this.type = null;
             this.fields = new HashMap<>();
@@ -277,12 +298,12 @@ public class SymbolicStateValidator {
             this.typeClass = typeClass;
         }
 
-        public Map<String, Object> getFields() {
+        public Map<String, ObjectField> getFields() {
             return fields;
         }
 
-        public void setField(String name, Object value) {
-            fields.put(name, value);
+        public void setField(String name, Object value, Type type) {
+            fields.put(name, new ObjectField(value, type));
         }
     }
 }

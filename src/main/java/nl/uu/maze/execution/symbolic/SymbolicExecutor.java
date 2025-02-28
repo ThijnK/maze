@@ -233,7 +233,8 @@ public class SymbolicExecutor {
             // Static field assignments are considered out of scope
         } else if (leftOp instanceof JInstanceFieldRef) {
             JInstanceFieldRef ref = (JInstanceFieldRef) leftOp;
-            state.heap.setField(ref.getBase().getName(), ref.getFieldSignature().getName(), value);
+            state.heap.setField(ref.getBase().getName(), ref.getFieldSignature().getName(), value,
+                    ref.getFieldSignature().getType());
         } else {
             state.setVariable(leftOp.toString(), value);
         }

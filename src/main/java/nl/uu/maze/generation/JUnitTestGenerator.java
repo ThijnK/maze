@@ -25,7 +25,8 @@ import com.palantir.javapoet.*;
 import nl.uu.maze.analysis.JavaAnalyzer;
 import nl.uu.maze.execution.ArgMap;
 import nl.uu.maze.execution.MethodType;
-import nl.uu.maze.execution.symbolic.SymbolicStateValidator.ObjectFields;
+import nl.uu.maze.execution.symbolic.SymbolicStateValidator.ObjectField;
+import nl.uu.maze.execution.symbolic.SymbolicStateValidator.ObjectInstance;
 import nl.uu.maze.execution.symbolic.SymbolicStateValidator.ObjectRef;
 
 /**
@@ -127,9 +128,10 @@ public class JUnitTestGenerator {
 
             // For object paramters create an instance of the object
             // If the argMap does not contain a value for the param, create arbitrary object
-            if (type instanceof ClassType && (!argMap.containsKey(var) || value instanceof ObjectFields)) {
+            if (type instanceof ClassType && (!argMap.containsKey(var) || value instanceof ObjectInstance)) {
                 buildObjectInstance(methodBuilder, argMap, builtObjects, var,
-                        value instanceof ObjectFields ? (ObjectFields) value : new ObjectFields((ClassType) type));
+                        value instanceof ObjectInstance ? (ObjectInstance) value
+                                : new ObjectInstance((ClassType) type));
             }
             // If the value is a reference to another object
             else if (value instanceof ObjectRef) {
@@ -173,13 +175,13 @@ public class JUnitTestGenerator {
     private void buildFromReference(MethodSpec.Builder methodBuilder, ArgMap argMap, Set<String> builtObjects,
             ObjectRef ref, Type type, String var) {
         Object value = argMap.getOrDefault(ref.getVar(),
-                type instanceof ClassType ? new ObjectFields((ClassType) type) : getDefaultValue(type));
+                type instanceof ClassType ? new ObjectInstance((ClassType) type) : getDefaultValue(type));
         if (value == null) {
             // If the reference is null, just define the variable itself as null without
             // referencing
             addStatementTriple(methodBuilder, type, var, "null");
-        } else if (value instanceof ObjectFields) {
-            buildObjectInstance(methodBuilder, argMap, builtObjects, ref.getVar(), (ObjectFields) value);
+        } else if (value instanceof ObjectInstance) {
+            buildObjectInstance(methodBuilder, argMap, builtObjects, ref.getVar(), (ObjectInstance) value);
             if (var != null) {
                 addStatementTriple(methodBuilder, type, var, ref.getVar());
             }
@@ -223,30 +225,30 @@ public class JUnitTestGenerator {
     }
 
     private void buildObjectInstance(MethodSpec.Builder methodBuilder, ArgMap argMap, Set<String> builtObjects,
-            String var, ObjectFields fields) {
+            String var, ObjectInstance inst) {
         if (builtObjects.contains(var)) {
             return;
         }
         builtObjects.add(var);
-        Class<?> typeClass = fields.getTypeClass();
+        Class<?> typeClass = inst.getTypeClass();
         if (typeClass == null) {
-            Type type = fields.getType();
+            Type type = inst.getType();
             if (type != null) {
-                Optional<Class<?>> typeClassOpt = analyzer.tryGetJavaClass(fields.getType());
+                Optional<Class<?>> typeClassOpt = analyzer.tryGetJavaClass(inst.getType());
                 if (typeClassOpt.isPresent()) {
                     typeClass = typeClassOpt.get();
                 }
             }
         }
         if (typeClass != null) {
-            fields.setTypeClass(typeClass);
+            inst.setTypeClass(typeClass);
             buildObjectInstance(methodBuilder, var, typeClass);
         } else {
             // Default to assuming (hoping) that the class has a zero-argument constructor
-            methodBuilder.addStatement("$L $L = new $L()", fields.getType(), var, fields.getType());
+            methodBuilder.addStatement("$L $L = new $L()", inst.getType(), var, inst.getType());
         }
 
-        addFieldDefinitions(methodBuilder, argMap, builtObjects, var, fields);
+        addFieldDefinitions(methodBuilder, argMap, builtObjects, var, inst);
     }
 
     /**
@@ -255,19 +257,19 @@ public class JUnitTestGenerator {
      * ObjectFields argument with the given values.
      */
     private void addFieldDefinitions(MethodSpec.Builder methodBuilder, ArgMap argMap, Set<String> builtObjects,
-            String var, ObjectFields fields) {
-        if (fields == null) {
+            String var, ObjectInstance inst) {
+        if (inst == null) {
             return;
         }
-        for (Map.Entry<String, Object> entry : fields.getFields().entrySet()) {
+        for (Map.Entry<String, ObjectField> entry : inst.getFields().entrySet()) {
             addSetFieldMethod();
 
-            Object value = entry.getValue();
-            if (value instanceof ObjectRef) {
-                ObjectRef ref = (ObjectRef) value;
+            ObjectField field = entry.getValue();
+            if (field.getValue() instanceof ObjectRef) {
+                ObjectRef ref = (ObjectRef) field.getValue();
                 // If the reference is to another object, build that object first
                 if (!builtObjects.contains(ref.getVar())) {
-                    buildFromReference(methodBuilder, argMap, builtObjects, ref, fields.getType());
+                    buildFromReference(methodBuilder, argMap, builtObjects, ref, field.getType());
                 }
                 methodBuilder.addStatement("setField($L, \"$L\", $L)", var, entry.getKey(), ref.getVar());
             } else {
