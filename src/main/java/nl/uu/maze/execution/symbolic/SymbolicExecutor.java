@@ -10,7 +10,6 @@ import com.microsoft.z3.*;
 
 import nl.uu.maze.instrument.TraceManager.TraceEntry;
 import nl.uu.maze.transform.JimpleToZ3Transformer;
-import nl.uu.maze.util.Z3Sorts;
 import nl.uu.maze.util.Z3Utils;
 import sootup.core.graph.*;
 import sootup.core.jimple.basic.LValue;
@@ -281,9 +280,6 @@ public class SymbolicExecutor {
                 SymbolicState newState = i == aliases.size() - 1 ? state : state.clone();
                 newState.heap.setSingleAlias(symRef, alias);
                 newState.addEngineConstraint(ctx.mkEq(symRef, alias));
-                if (alias.equals(Z3Sorts.getInstance().getNullConst())) {
-                    newState.setExceptionThrown();
-                }
                 newStates.add(newState);
                 i++;
             }
