@@ -102,9 +102,12 @@ public class JUnitTestGenerator {
         Set<String> builtObjects = new HashSet<>();
         for (int i = 0; i < paramTypes.size(); i++) {
             String var = ArgMap.getSymbolicName(methodType, i);
+            params.add(var);
+            if (builtObjects.contains(var)) {
+                continue;
+            }
             Object value = argMap.get(var);
             Type type = paramTypes.get(i);
-            params.add(var);
 
             // For object paramters create an instance of the object
             // If the argMap does not contain a value for the param, create arbitrary object
@@ -113,7 +116,7 @@ public class JUnitTestGenerator {
                         value instanceof ObjectFields ? (ObjectFields) value : new ObjectFields((ClassType) type));
             }
             // If the value is a reference to another object
-            if (value instanceof ObjectRef) {
+            else if (value instanceof ObjectRef) {
                 ObjectRef ref = (ObjectRef) value;
                 // TODO: this might be array!
                 ObjectFields fields = getObjectFields(ref, argMap, (ClassType) type);
@@ -148,7 +151,7 @@ public class JUnitTestGenerator {
             ObjectRef ref = (ObjectRef) value;
             // If a reference is not contained int the argMap, create arbitrary object
             // Note: if the value in the map is null, that's intentional
-            if (argMap.containsKey(ref.getVar())) {
+            if (!argMap.containsKey(ref.getVar())) {
                 return new ObjectFields(expectedType);
             }
             return getObjectFields(argMap.get(ref.getVar()), argMap, expectedType);
