@@ -517,27 +517,30 @@ public class SymbolicHeap {
      */
     public Expr<?> getArrayElement(String lhs, String var, Expr<?> symRef, BitVecExpr index) {
         ArrayObject arrObj = getArrayObject(symRef);
-        if (arrObj != null) {
-            if (arrObj instanceof MultiArrayObject) {
-                MultiArrayObject multiArrObj = (MultiArrayObject) arrObj;
-                int dim = multiArrObj.getDim();
-                BitVecExpr[] indices = getArrayIndices(var, dim, index);
-
-                // When enough indices collected, return the element
-                if (dim == indices.length) {
-                    return multiArrObj.getElem(indices);
-                } else {
-                    // Otherwise, store new indices for the lhs of the assignment this is part of
-                    if (lhs != null) {
-                        arrayIndices.put(lhs, indices);
-                    }
-                    return state.getVariable(var);
-                }
-            }
-
-            return arrObj.getElem(index);
+        if (arrObj == null) {
+            // Null reference
+            state.setExceptionThrown();
+            return null;
         }
-        return null;
+
+        if (arrObj instanceof MultiArrayObject) {
+            MultiArrayObject multiArrObj = (MultiArrayObject) arrObj;
+            int dim = multiArrObj.getDim();
+            BitVecExpr[] indices = getArrayIndices(var, dim, index);
+
+            // When enough indices collected, return the element
+            if (dim == indices.length) {
+                return multiArrObj.getElem(indices);
+            } else {
+                // Otherwise, store new indices for the lhs of the assignment this is part of
+                if (lhs != null) {
+                    arrayIndices.put(lhs, indices);
+                }
+                return state.getVariable(var);
+            }
+        }
+
+        return arrObj.getElem(index);
     }
 
     /**
@@ -553,6 +556,8 @@ public class SymbolicHeap {
     public <E extends Sort> void setArrayElement(String var, Expr<?> symRef, BitVecExpr index, Expr<E> value) {
         ArrayObject arrObj = getArrayObject(symRef);
         if (arrObj == null) {
+            // Null reference
+            state.setExceptionThrown();
             return;
         }
 
@@ -592,26 +597,20 @@ public class SymbolicHeap {
      * @return The Z3 expr representing the length of the array
      */
     public Expr<?> getArrayLength(String var, Expr<?> symRef) {
-        Set<Expr<?>> aliases = aliasMap.get(symRef);
-        if (aliases == null || aliases.isEmpty()) {
+        ArrayObject arrObj = getArrayObject(symRef);
+        if (arrObj == null) {
+            // Null reference
+            state.setExceptionThrown();
             return null;
         }
-        if (aliases.size() > 1) {
-            throw new RuntimeException("More than one alias for array reference " + symRef);
+
+        if (arrObj instanceof MultiArrayObject) {
+            BitVecExpr[] indices = arrayIndices.get(var);
+            int dim = indices == null ? 0 : indices.length;
+            return ((MultiArrayObject) arrObj).getLength(dim);
         }
 
-        Expr<?> conRef = aliases.iterator().next();
-        HeapObject arrObj = heap.get(conRef);
-        if (arrObj != null && arrObj instanceof ArrayObject) {
-            if (arrObj instanceof MultiArrayObject) {
-                BitVecExpr[] indices = arrayIndices.get(var);
-                int dim = indices == null ? 0 : indices.length;
-                return ((MultiArrayObject) arrObj).getLength(dim);
-            }
-
-            return ((ArrayObject) arrObj).getLength();
-        }
-        return null;
+        return ((ArrayObject) arrObj).getLength();
     }
     // #endregion
 
