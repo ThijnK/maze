@@ -3,11 +3,12 @@ package nl.uu.maze.execution;
 import java.util.Map;
 
 import nl.uu.maze.execution.concrete.ObjectInstantiator;
+import nl.uu.maze.execution.symbolic.SymbolicStateValidator;
 
 /**
  * Represents a map of arguments to be passed to a method.
  * Created either by the {@link ObjectInstantiator} randomly or from a Z3 model
- * by the {@link SymbolicValidator}.
+ * by the {@link SymbolicStateValidator}.
  */
 public class ArgMap {
     private Map<String, Object> args;

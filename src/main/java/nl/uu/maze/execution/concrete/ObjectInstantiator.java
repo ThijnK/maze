@@ -24,9 +24,6 @@ import nl.uu.maze.util.ArrayUtils;
 public class ObjectInstantiator {
     private static final Logger logger = LoggerFactory.getLogger(ObjectInstantiator.class);
 
-    /** Max depth for recursively generating arguments */
-    private static final int MAX_INSTANTIATION_DEPTH = 5;
-
     private static Random rand = new Random();
 
     /**
@@ -57,7 +54,7 @@ public class ObjectInstantiator {
         for (Constructor<?> ctor : clazz.getConstructors()) {
             try {
                 logger.debug("Param types: " + ctor.getParameterTypes());
-                Object[] args = generateArgs(ctor.getParameters(), depth, argMap, MethodType.CTOR);
+                Object[] args = generateArgs(ctor.getParameters(), argMap, MethodType.CTOR);
                 logger.debug(
                         "Creating instance of class: " + clazz.getName() + " with args: " + ArrayUtils.toString(args));
                 return ctor.newInstance(args);
@@ -71,31 +68,15 @@ public class ObjectInstantiator {
     }
 
     /**
-     * Generate random values for the given parameters, except for the ones present
-     * in the {@link ArgMap}, in which case the known value is used.
-     * This will attempt to recursively create instances of objects if the parameter
-     * type is not a primitive type, up to a certain depth.
-     * 
-     * @param params The parameters of the method
-     * @param argMap {@link ArgMap} containing the arguments to pass to the method
-     *               invocation
-     * @param isCtor Whether the parameters are for a constructor
-     * @return An array of random arguments
-     */
-    public static Object[] generateArgs(Parameter[] params, ArgMap argMap, MethodType methodType) {
-        return generateArgs(params, 0, argMap, methodType);
-    }
-
-    /**
      * Generate random values for the given parameters.
      * This will attempt to recursively create instances of objects if the parameter
      * type is not a primitive type, up to a certain depth.
      * 
      * @param params The parameters of the method
-     * @return An array of random arguments
+     * @return An array of arguments corresponding to the given parameters
      */
     public static Object[] generateArgs(Parameter[] params) {
-        return generateArgs(params, 0, null, MethodType.METHOD);
+        return generateArgs(params, null, MethodType.METHOD);
     }
 
     /**
@@ -104,13 +85,14 @@ public class ObjectInstantiator {
      * This will attempt to recursively create instances of objects if the parameter
      * type is not a primitive type, up to a certain depth.
      * 
-     * @param params The parameters of the method
-     * @param depth  The current depth of the recursive instantiation
-     * @param argMap {@link ArgMap} containing the arguments to pass to the method
-     *               invocation
-     * @return An array of random arguments
+     * @param params     The parameters of the method
+     * @param argMap     {@link ArgMap} containing the arguments to pass to the
+     *                   method
+     *                   invocation
+     * @param methodType The type of the method
+     * @return An array of arguments corresponding to the given parameters
      */
-    private static Object[] generateArgs(Parameter[] params, int depth, ArgMap argMap, MethodType methodType) {
+    public static Object[] generateArgs(Parameter[] params, ArgMap argMap, MethodType methodType) {
         Object[] arguments = new Object[params.length];
         for (int i = 0; i < params.length; i++) {
             // If the parameter is known, use the known value
@@ -153,30 +135,11 @@ public class ObjectInstantiator {
             }
 
             // Generate random value for the parameter
-            arguments[i] = generateRandom(type, depth);
+            arguments[i] = generateRandom(type);
 
-            // Add new arguments to argMap
+            // Add new argument to argMap
             if (argMap != null) {
                 argMap.set(name, arguments[i]);
-                if (type.isPrimitive() || type.getName().equals("java.lang.String") ||
-                        arguments[i] == null) {
-                    argMap.set(name, arguments[i]);
-                } else {
-                    ObjectInstance inst = new ObjectInstance(type);
-                    // Try to set the fields of the object to the randomly generated values
-                    for (Field field : type.getDeclaredFields()) {
-                        try {
-                            field.setAccessible(true);
-                            // TODO: get the sootUp type of the field here
-                            inst.setField(field.getName(), field.get(arguments[i]), null);
-                        } catch (Exception e) {
-                            logger.error("Failed to set field: " + field.getName() + " in class: " +
-                                    type.getName());
-                        }
-                    }
-
-                    argMap.set(name, inst);
-                }
             }
         }
 
@@ -200,9 +163,9 @@ public class ObjectInstantiator {
      * 
      * @param type  The type of the value to generate
      * @param depth The current depth of the recursive instantiation
-     * @return A random value of the given type
+     * @return A random value or default of the given type
      */
-    private static Object generateRandom(Class<?> type, int depth) {
+    private static Object generateRandom(Class<?> type) {
         // Create empty array
         if (type.isArray()) {
             // The newInstance method automatically deals with multi-dimensional arrays
@@ -231,13 +194,8 @@ public class ObjectInstantiator {
             case "java.lang.String":
                 return ""; // A very random string indeed
             default:
-                // If depth allows, recursively generate instances of objects
-                if (depth < MAX_INSTANTIATION_DEPTH && !type.isPrimitive())
-                    // Note that the argMap is intentionally only used for the first level of
-                    // recursion, so we pass null here
-                    return createInstance(type, ++depth, null);
-                else
-                    return null;
+                // Objects are set to null
+                return null;
         }
     }
 
