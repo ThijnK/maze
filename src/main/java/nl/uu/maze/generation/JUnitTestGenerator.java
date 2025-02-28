@@ -54,6 +54,22 @@ public class JUnitTestGenerator {
     }
 
     /**
+     * Generates JUnit test cases for the method under test, passing the given
+     * parameter values as arguments to the method invocations. One test case is
+     * generated for each set of known parameter values.
+     * 
+     * @param method  The {@link JavaSootMethod} to generate test cases for
+     * @param argMaps List of {@link ArgMap} containing the arguments to pass to the
+     *                method invocations
+     */
+    public void addMethodTestCases(JavaSootMethod method, JavaSootMethod ctor, List<ArgMap> argMaps) {
+        logger.info("Generating JUnit test cases...");
+        for (int i = 0; i < argMaps.size(); i++) {
+            addMethodTestCase(method, ctor, argMaps.get(i));
+        }
+    }
+
+    /**
      * Generates a single JUnit test case for a method under test, passing the given
      * parameter values as arguments to the method invocation.
      * 
@@ -117,16 +133,7 @@ public class JUnitTestGenerator {
             }
             // If the value is a reference to another object
             else if (value instanceof ObjectRef) {
-                ObjectRef ref = (ObjectRef) value;
-                // TODO: this might be array!
-                ObjectFields fields = getObjectFields(ref, argMap, (ClassType) type);
-                if (fields == null) {
-                    addStatementTriple(methodBuilder, type, var, "null");
-                    continue;
-                }
-                buildObjectInstance(methodBuilder, argMap, builtObjects, ref.getVar(), fields);
-                // Add a statement to set the reference to the other object
-                methodBuilder.addStatement("$T $L = $L", fields.getTypeClass(), var, ref.getVar());
+                buildFromReference(methodBuilder, argMap, builtObjects, (ObjectRef) value, type, var);
             }
             // Other paramters (non-object) can be defined immediately
             else {
@@ -137,26 +144,6 @@ public class JUnitTestGenerator {
         }
 
         return params;
-    }
-
-    /**
-     * Recursively follows object references to get the ObjectFields for the given
-     * object.
-     */
-    private ObjectFields getObjectFields(Object value, ArgMap argMap, ClassType expectedType) {
-        if (value instanceof ObjectFields) {
-            return (ObjectFields) value;
-        }
-        if (value instanceof ObjectRef) {
-            ObjectRef ref = (ObjectRef) value;
-            // If a reference is not contained int the argMap, create arbitrary object
-            // Note: if the value in the map is null, that's intentional
-            if (!argMap.containsKey(ref.getVar())) {
-                return new ObjectFields(expectedType);
-            }
-            return getObjectFields(argMap.get(ref.getVar()), argMap, expectedType);
-        }
-        return null;
     }
 
     /**
@@ -174,19 +161,47 @@ public class JUnitTestGenerator {
         }
     }
 
+    private void buildFromReference(MethodSpec.Builder methodBuilder, ArgMap argMap, Set<String> builtObjects,
+            ObjectRef ref, Type type) {
+        buildFromReference(methodBuilder, argMap, builtObjects, ref, type, null);
+    }
+
     /**
-     * Generates JUnit test cases for the method under test, passing the given
-     * parameter values as arguments to the method invocations. One test case is
-     * generated for each set of known parameter values.
-     * 
-     * @param method  The {@link JavaSootMethod} to generate test cases for
-     * @param argMaps List of {@link ArgMap} containing the arguments to pass to the
-     *                method invocations
+     * Builds an object instance for the given ObjectRef, defining the referenced
+     * value recursively first.
      */
-    public void addMethodTestCases(JavaSootMethod method, JavaSootMethod ctor, List<ArgMap> argMaps) {
-        logger.info("Generating JUnit test cases...");
-        for (int i = 0; i < argMaps.size(); i++) {
-            addMethodTestCase(method, ctor, argMaps.get(i));
+    private void buildFromReference(MethodSpec.Builder methodBuilder, ArgMap argMap, Set<String> builtObjects,
+            ObjectRef ref, Type type, String var) {
+        Object value = argMap.getOrDefault(ref.getVar(),
+                type instanceof ClassType ? new ObjectFields((ClassType) type) : getDefaultValue(type));
+        if (value == null) {
+            // If the reference is null, just define the variable itself as null without
+            // referencing
+            addStatementTriple(methodBuilder, type, var, "null");
+        } else if (value instanceof ObjectFields) {
+            buildObjectInstance(methodBuilder, argMap, builtObjects, ref.getVar(), (ObjectFields) value);
+            if (var != null) {
+                addStatementTriple(methodBuilder, type, var, ref.getVar());
+            }
+        } else if (value instanceof ObjectRef) {
+            ObjectRef refValue = (ObjectRef) value;
+            buildFromReference(methodBuilder, argMap, builtObjects, refValue, type, ref.getVar());
+            if (var != null) {
+                addStatementTriple(methodBuilder, type, var, ref.getVar());
+            }
+            builtObjects.add(ref.getVar());
+        } else if (value.getClass().isArray()) {
+            // For arrays, need to reference the array variable
+            addStatementTriple(methodBuilder, type, ref.getVar(), valueToString(value));
+            if (var != null) {
+                addStatementTriple(methodBuilder, type, var, ref.getVar());
+            }
+            builtObjects.add(ref.getVar());
+        } else if (value instanceof String) {
+            // Other primitive values can be directly defined on the variable itself
+            addStatementTriple(methodBuilder, type, var, (String) value);
+        } else {
+            addStatementTriple(methodBuilder, type, var, valueToString(value));
         }
     }
 
@@ -252,8 +267,7 @@ public class JUnitTestGenerator {
                 ObjectRef ref = (ObjectRef) value;
                 // If the reference is to another object, build that object first
                 if (!builtObjects.contains(ref.getVar())) {
-                    ObjectFields recFields = getObjectFields(ref, argMap, fields.getType());
-                    buildObjectInstance(methodBuilder, argMap, builtObjects, ref.getVar(), recFields);
+                    buildFromReference(methodBuilder, argMap, builtObjects, ref, fields.getType());
                 }
                 methodBuilder.addStatement("setField($L, \"$L\", $L)", var, entry.getKey(), ref.getVar());
             } else {
