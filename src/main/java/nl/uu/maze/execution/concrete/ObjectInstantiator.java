@@ -31,8 +31,6 @@ public class ObjectInstantiator {
      * 
      * @param clazz The class to instantiate
      * @return An instance of the class
-     * @implNote This will fail if the class has a single constructor which requires
-     *           an instance of an inner class as an argument.
      */
     public static Object createInstance(Class<?> clazz) {
         return createInstance(clazz, 0, null);
@@ -46,8 +44,6 @@ public class ObjectInstantiator {
      * @param argMap Optional {@link ArgMap} containing the arguments to pass to the
      *               constructor
      * @return An instance of the class
-     * @implNote This will fail if the class has a single constructor which requires
-     *           an instance of an inner class as an argument.
      */
     private static Object createInstance(Class<?> clazz, int depth, ArgMap argMap) {
         // Try to create an instance using one of the constructors

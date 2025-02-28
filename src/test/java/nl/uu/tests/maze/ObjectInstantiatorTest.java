@@ -43,7 +43,7 @@ class ObjectInstantiatorTest {
         assertTrue(args[5] instanceof Byte);
         assertTrue(args[6] instanceof Character);
         assertTrue(args[7] instanceof Boolean);
-        assertTrue(args[8] instanceof TestClassWithArgs);
+        assertTrue(args[8] == null); // Object arguments are not generated, they are left as null
     }
 
     @Test
@@ -83,7 +83,7 @@ class ObjectInstantiatorTest {
         assertEquals((byte) 6, args[5]);
         assertTrue(args[6] instanceof Character);
         assertTrue(args[7] instanceof Boolean);
-        assertTrue(args[8] instanceof TestClassWithArgs);
+        assertTrue(args[8] == null);
     }
 
     public static class TestClassNoArgs {
