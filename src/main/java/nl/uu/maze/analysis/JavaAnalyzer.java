@@ -240,7 +240,7 @@ public class JavaAnalyzer {
         // Find a constructor for which arguments can be generated
         for (Constructor<?> ctor : clazz.getConstructors()) {
             try {
-                Object[] args = ObjectInstantiator.generateArgs(ctor.getParameters(), null, MethodType.CTOR);
+                Object[] args = ObjectInstantiator.generateArgs(ctor.getParameters(), MethodType.CTOR, null, this);
                 return Pair.of(ctor, args);
             } catch (Exception e) {
                 e.printStackTrace();

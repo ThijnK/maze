@@ -17,6 +17,7 @@ import com.microsoft.z3.Model;
 import com.microsoft.z3.Solver;
 import com.microsoft.z3.Status;
 
+import nl.uu.maze.analysis.JavaAnalyzer;
 import nl.uu.maze.execution.ArgMap;
 import nl.uu.maze.execution.symbolic.SymbolicHeap.ArrayObject;
 import nl.uu.maze.execution.symbolic.SymbolicHeap.HeapObject;
@@ -291,6 +292,13 @@ public class SymbolicStateValidator {
         }
 
         public Class<?> getTypeClass() {
+            return typeClass;
+        }
+
+        public Class<?> getTypeClass(JavaAnalyzer analyzer) {
+            if (typeClass == null) {
+                typeClass = analyzer.tryGetJavaClass(type).orElse(null);
+            }
             return typeClass;
         }
 

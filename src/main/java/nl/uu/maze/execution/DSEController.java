@@ -97,15 +97,15 @@ public class DSEController {
         logger.info("Using search strategy: " + searchStrategy.getClass().getSimpleName());
         this.ctx = new Context();
         Z3Sorts.initialize(ctx);
-        this.symbolic = new SymbolicExecutor(ctx);
-        this.validator = new SymbolicStateValidator(ctx);
-        this.concrete = new ConcreteExecutor();
         this.instrumented = concreteDriven ? BytecodeInstrumenter.instrument(classPath, className) : null;
         this.analyzer = new JavaAnalyzer(classPath, instrumented != null ? instrumented.getClassLoader() : null);
         this.classType = analyzer.getClassType(className);
         this.sootClass = analyzer.getSootClass(classType);
         this.clazz = analyzer.getJavaClass(classType);
         this.generator = new JUnitTestGenerator(clazz, analyzer);
+        this.symbolic = new SymbolicExecutor(ctx);
+        this.validator = new SymbolicStateValidator(ctx);
+        this.concrete = new ConcreteExecutor(analyzer);
     }
 
     /**

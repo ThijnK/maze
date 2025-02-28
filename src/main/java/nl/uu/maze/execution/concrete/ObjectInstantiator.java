@@ -5,11 +5,13 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.util.Map;
 import java.util.Random;
+import java.util.Map.Entry;
 import java.lang.reflect.Parameter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import nl.uu.maze.analysis.JavaAnalyzer;
 import nl.uu.maze.execution.ArgMap;
 import nl.uu.maze.execution.MethodType;
 import nl.uu.maze.execution.symbolic.SymbolicStateValidator.ObjectField;
@@ -33,24 +35,23 @@ public class ObjectInstantiator {
      * @return An instance of the class
      */
     public static Object createInstance(Class<?> clazz) {
-        return createInstance(clazz, 0, null);
+        return createInstance(clazz, null, null);
     }
 
     /**
      * Create an instance of the given class using the first constructor found.
      * 
      * @param clazz  The class to instantiate
-     * @param depth  The current depth of the recursive instantiation
      * @param argMap Optional {@link ArgMap} containing the arguments to pass to the
      *               constructor
      * @return An instance of the class
      */
-    private static Object createInstance(Class<?> clazz, int depth, ArgMap argMap) {
+    private static Object createInstance(Class<?> clazz, ArgMap argMap, JavaAnalyzer analyzer) {
         // Try to create an instance using one of the constructors
         for (Constructor<?> ctor : clazz.getConstructors()) {
             try {
                 logger.debug("Param types: " + ctor.getParameterTypes());
-                Object[] args = generateArgs(ctor.getParameters(), argMap, MethodType.CTOR);
+                Object[] args = generateArgs(ctor.getParameters(), MethodType.CTOR, argMap, analyzer);
                 logger.debug(
                         "Creating instance of class: " + clazz.getName() + " with args: " + ArrayUtils.toString(args));
                 return ctor.newInstance(args);
@@ -72,7 +73,7 @@ public class ObjectInstantiator {
      * @return An array of arguments corresponding to the given parameters
      */
     public static Object[] generateArgs(Parameter[] params) {
-        return generateArgs(params, null, MethodType.METHOD);
+        return generateArgs(params, MethodType.METHOD, null, null);
     }
 
     /**
@@ -88,45 +89,16 @@ public class ObjectInstantiator {
      * @param methodType The type of the method
      * @return An array of arguments corresponding to the given parameters
      */
-    public static Object[] generateArgs(Parameter[] params, ArgMap argMap, MethodType methodType) {
+    public static Object[] generateArgs(Parameter[] params, MethodType methodType, ArgMap argMap,
+            JavaAnalyzer analyzer) {
         Object[] arguments = new Object[params.length];
+        ArgMap convertedArgMap = argMap != null ? convertArgMap(argMap, analyzer) : null;
         for (int i = 0; i < params.length; i++) {
             // If the parameter is known, use the known value
             String name = ArgMap.getSymbolicName(methodType, i);
             Class<?> type = params[i].getType();
-            if (argMap != null && argMap.containsKey(name)) {
-                Object value = argMap.get(name);
-                if (value == null) {
-                    arguments[i] = null;
-                } else if (value instanceof ObjectRef) {
-                    // ObjectRef's are preserved and handled after all other arguments are generated
-                    arguments[i] = value;
-                } else if (value instanceof ObjectInstance) {
-                    // Construct instance and set the given fields
-                    Object instance = createInstance(type);
-                    ObjectInstance inst = (ObjectInstance) value;
-
-                    for (Map.Entry<String, ObjectField> entry : inst.getFields().entrySet()) {
-                        ObjectField instField = entry.getValue();
-                        try {
-                            // TODO: handle object fields and arrays
-                            Field field = type.getDeclaredField(entry.getKey());
-                            field.setAccessible(true);
-                            field.set(instance, instField.getValue());
-                        } catch (Exception e) {
-                            logger.error("Failed to set field: " + entry.getKey() + " in class: " + type.getName());
-                        }
-                    }
-                    arguments[i] = instance;
-                } else if (type.isArray()) {
-                    // For arrays of primitives, we need to make sure the array is typed correctly
-                    // So we have to create a typed instance and copy the values
-                    arguments[i] = convertArray(value, type);
-
-                } else {
-                    // Cast to expected type to make sure it is correct
-                    arguments[i] = type.isPrimitive() ? wrap(type).cast(value) : type.cast(value);
-                }
+            if (convertedArgMap != null && convertedArgMap.containsKey(name)) {
+                arguments[i] = convertedArgMap.get(name);
                 continue;
             }
 
@@ -136,18 +108,6 @@ public class ObjectInstantiator {
             // Add new argument to argMap
             if (argMap != null) {
                 argMap.set(name, arguments[i]);
-            }
-        }
-
-        // Handle references to other arguments
-        for (int i = 0; i < arguments.length; i++) {
-            // If an argument is an ObjectRef it is a reference to another argument
-            // TODO: problem is that ObjectRef may now point to any other object, not just
-            // arguments
-            // so have to convert those too, and follow the trail of references
-            if (arguments[i] instanceof ObjectRef) {
-                ObjectRef ref = (ObjectRef) arguments[i];
-                arguments[i] = arguments[ref.getIndex()];
             }
         }
 
@@ -196,28 +156,65 @@ public class ObjectInstantiator {
     }
 
     /**
-     * Wrap a primitive type in its corresponding wrapper class.
+     * Convert the arguments in the ArgMap to the correct Java types.
+     * 
+     * @return A new ArgMap containing the converted elements in the ArgMap
      */
-    private static Class<?> wrap(Class<?> clazz) {
-        if (!clazz.isPrimitive())
-            return clazz;
-        if (clazz == int.class)
-            return Integer.class;
-        if (clazz == long.class)
-            return Long.class;
-        if (clazz == boolean.class)
-            return Boolean.class;
-        if (clazz == double.class)
-            return Double.class;
-        if (clazz == float.class)
-            return Float.class;
-        if (clazz == char.class)
-            return Character.class;
-        if (clazz == byte.class)
-            return Byte.class;
-        if (clazz == short.class)
-            return Short.class;
-        throw new IllegalArgumentException("Unknown primitive type: " + clazz);
+    public static ArgMap convertArgMap(ArgMap argMap, JavaAnalyzer analyzer) {
+        ArgMap newArgMap = new ArgMap();
+        for (Entry<String, Object> entry : argMap.entrySet()) {
+            convertEntry(entry.getKey(), entry.getValue(), argMap, newArgMap, analyzer);
+        }
+        return newArgMap;
+    }
+
+    /**
+     * Convert an entry in the ArgMap to the correct Java type.
+     */
+    private static Object convertEntry(String name, Object value, ArgMap argMap, ArgMap newArgMap,
+            JavaAnalyzer analyzer) {
+        // If already defined from resolving a reference, skip
+        if (newArgMap.containsKey(name)) {
+            return newArgMap.get(name);
+        }
+
+        if (value == null) {
+            newArgMap.set(name, null);
+        } else if (value instanceof ObjectRef) {
+            String var = ((ObjectRef) value).getVar();
+            Object obj = convertEntry(var, argMap.get(var), argMap, newArgMap, analyzer);
+            newArgMap.set(name, obj);
+        } else if (value instanceof ObjectInstance) {
+            // Convert ObjectInstance to Object
+            ObjectInstance inst = (ObjectInstance) value;
+            Class<?> type = inst.getTypeClass(analyzer);
+            // Create a dummy instance that will be filled with the correct values
+            Object obj = createInstance(type);
+
+            for (Map.Entry<String, ObjectField> fieldEntry : inst.getFields().entrySet()) {
+                Object fieldValue = fieldEntry.getValue().getValue();
+                Object convertedValue = convertEntry(name + "_" + fieldEntry.getKey(), fieldValue, argMap, newArgMap,
+                        analyzer);
+                try {
+                    Field field = type.getDeclaredField(fieldEntry.getKey());
+                    field.setAccessible(true);
+                    field.set(obj, convertedValue);
+                } catch (Exception e) {
+                    logger.error("Failed to set field: " + fieldEntry.getKey() + " in class: " + type.getName());
+                }
+            }
+
+            newArgMap.set(name, obj);
+        } else if (value.getClass().isArray()) {
+            // Convert array to correct type
+            newArgMap.set(name, convertArray(value, value.getClass()));
+        } else {
+            // Cast to expected type to make sure it is correct
+            newArgMap.set(name, value.getClass().isPrimitive() ? wrap(value.getClass()).cast(value)
+                    : value.getClass().cast(value));
+        }
+
+        return newArgMap.get(name);
     }
 
     /**
@@ -242,5 +239,30 @@ public class ObjectInstantiator {
             }
         }
         return typedArray;
+    }
+
+    /**
+     * Wrap a primitive type in its corresponding wrapper class.
+     */
+    private static Class<?> wrap(Class<?> clazz) {
+        if (!clazz.isPrimitive())
+            return clazz;
+        if (clazz == int.class)
+            return Integer.class;
+        if (clazz == long.class)
+            return Long.class;
+        if (clazz == boolean.class)
+            return Boolean.class;
+        if (clazz == double.class)
+            return Double.class;
+        if (clazz == float.class)
+            return Float.class;
+        if (clazz == char.class)
+            return Character.class;
+        if (clazz == byte.class)
+            return Byte.class;
+        if (clazz == short.class)
+            return Short.class;
+        throw new IllegalArgumentException("Unknown primitive type: " + clazz);
     }
 }

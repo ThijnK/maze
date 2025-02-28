@@ -218,7 +218,6 @@ public class JUnitTestGenerator {
             Object arg = arguments[i];
             String argName = var + "_carg" + i;
             argNames[i] = argName;
-            // TODO: if arg here is an object, recursively build it
             methodBuilder.addStatement("$T $L = $L", arg.getClass(), argName, valueToString(arg));
         }
         methodBuilder.addStatement("$T $L = new $T($L)", clazz, var, clazz, String.join(", ", argNames));
@@ -268,6 +267,8 @@ public class JUnitTestGenerator {
             if (field.getValue() instanceof ObjectRef) {
                 ObjectRef ref = (ObjectRef) field.getValue();
                 // If the reference is to another object, build that object first
+                // Note: Arrays etc. will always be references, i.e., not directly defined
+                // inside of the ObjectInstance
                 if (!builtObjects.contains(ref.getVar())) {
                     buildFromReference(methodBuilder, argMap, builtObjects, ref, field.getType());
                 }

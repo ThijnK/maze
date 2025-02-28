@@ -1,6 +1,8 @@
 package nl.uu.maze.execution;
 
 import java.util.Map;
+import java.util.Set;
+import java.util.Map.Entry;
 
 import nl.uu.maze.execution.concrete.ObjectInstantiator;
 import nl.uu.maze.execution.symbolic.SymbolicStateValidator;
@@ -58,6 +60,10 @@ public class ArgMap {
 
     public boolean containsKey(String key) {
         return args.containsKey(key);
+    }
+
+    public Set<Entry<String, Object>> entrySet() {
+        return args.entrySet();
     }
 
     /**

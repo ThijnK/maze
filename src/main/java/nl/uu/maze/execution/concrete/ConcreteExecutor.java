@@ -11,12 +11,19 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import nl.uu.maze.analysis.JavaAnalyzer;
 import nl.uu.maze.execution.ArgMap;
 import nl.uu.maze.execution.MethodType;
 import nl.uu.maze.util.ArrayUtils;
 
 public class ConcreteExecutor {
     private static final Logger logger = LoggerFactory.getLogger(ConcreteExecutor.class);
+
+    private JavaAnalyzer analyzer;
+
+    public ConcreteExecutor(JavaAnalyzer analyzer) {
+        this.analyzer = analyzer;
+    }
 
     /**
      * Map of cut instances, indexed by their hash code.
@@ -45,7 +52,8 @@ public class ConcreteExecutor {
             Object instance = null;
             if (!Modifier.isStatic(method.getModifiers())) {
                 // Call generateArgs with argMap to use argumens from the map if present
-                Object[] args = ObjectInstantiator.generateArgs(ctor.getParameters(), argMap, MethodType.CTOR);
+                Object[] args = ObjectInstantiator.generateArgs(ctor.getParameters(), MethodType.CTOR, argMap,
+                        analyzer);
                 int hash = Arrays.hashCode(args);
                 // Check if an instance of the class has already
                 // been created with the same arguments
@@ -72,7 +80,8 @@ public class ConcreteExecutor {
             throws IllegalAccessException, InvocationTargetException, InstantiationException, IllegalArgumentException {
         try {
             // Generate args for the method invocation
-            Object[] args = ObjectInstantiator.generateArgs(method.getParameters(), argMap, MethodType.METHOD);
+            Object[] args = ObjectInstantiator.generateArgs(method.getParameters(), MethodType.METHOD, argMap,
+                    analyzer);
 
             logger.debug("Executing method " + method.getName() + " with args: " + ArrayUtils.toString(args));
             Object result = method.invoke(instance, args);

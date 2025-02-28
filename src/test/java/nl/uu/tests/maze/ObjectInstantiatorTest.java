@@ -1,12 +1,19 @@
 package nl.uu.tests.maze;
 
+import nl.uu.maze.analysis.JavaAnalyzer;
 import nl.uu.maze.execution.ArgMap;
 import nl.uu.maze.execution.MethodType;
 import nl.uu.maze.execution.concrete.ObjectInstantiator;
+import nl.uu.maze.execution.symbolic.SymbolicStateValidator.ObjectInstance;
+import nl.uu.maze.execution.symbolic.SymbolicStateValidator.ObjectRef;
+import sootup.core.types.PrimitiveType.*;
+
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.lang.reflect.Parameter;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 
 class ObjectInstantiatorTest {
     @Test
@@ -47,11 +54,12 @@ class ObjectInstantiatorTest {
     }
 
     @Test
-    public void testGenerateArgs_WithArgMap() {
+    public void testGenerateArgs_WithArgMap() throws MalformedURLException, URISyntaxException {
         Parameter[] params = TestClassManyArgs.class.getConstructors()[0].getParameters();
         ArgMap argMap = new ArgMap(new Object[] { 1, 2.0, 3.0f, 4L, (short) 5, (byte) 6, '7', true,
                 new TestClassWithArgs(1, 2.0, true) }, MethodType.METHOD);
-        Object[] args = ObjectInstantiator.generateArgs(params, argMap, MethodType.METHOD);
+        JavaAnalyzer analyzer = new JavaAnalyzer("target/classes", null);
+        Object[] args = ObjectInstantiator.generateArgs(params, MethodType.METHOD, argMap, analyzer);
         assertEquals(9, args.length);
         assertEquals(1, args[0]);
         assertEquals(2.0, args[1]);
@@ -73,7 +81,7 @@ class ObjectInstantiatorTest {
         argMap.set("marg3", 4L);
         argMap.set("marg4", (short) 5);
         argMap.set("marg5", (byte) 6);
-        Object[] args = ObjectInstantiator.generateArgs(params, argMap, MethodType.METHOD);
+        Object[] args = ObjectInstantiator.generateArgs(params, MethodType.METHOD, argMap, null);
         assertEquals(9, args.length);
         assertEquals(1, args[0]);
         assertTrue(args[1] instanceof Double);
@@ -84,6 +92,40 @@ class ObjectInstantiatorTest {
         assertTrue(args[6] instanceof Character);
         assertTrue(args[7] instanceof Boolean);
         assertTrue(args[8] == null);
+    }
+
+    @Test
+    public void testConvertArgMap() throws MalformedURLException, URISyntaxException {
+        ArgMap argMap = new ArgMap();
+
+        ObjectInstance obj1 = new ObjectInstance(TestClassWithArgs.class);
+        obj1.setField("a", 1, IntType.getInstance());
+        obj1.setField("b", 2.0, DoubleType.getInstance());
+        obj1.setField("c", true, BooleanType.getInstance());
+        argMap.set("obj1", obj1);
+
+        ObjectInstance obj2 = new ObjectInstance(TestClassManyArgs.class);
+        obj2.setField("a", 1, IntType.getInstance());
+        obj2.setField("b", 2.0, DoubleType.getInstance());
+        obj2.setField("c", 3.0f, FloatType.getInstance());
+        obj2.setField("d", 4L, LongType.getInstance());
+        obj2.setField("e", (short) 5, ShortType.getInstance());
+        obj2.setField("f", (byte) 6, ByteType.getInstance());
+        obj2.setField("g", '7', CharType.getInstance());
+        obj2.setField("h", true, BooleanType.getInstance());
+        obj2.setField("i", new ObjectRef("obj1"), null);
+        argMap.set("obj2", obj2);
+
+        argMap.set("obj3", new int[] { 1, 2, 3 });
+
+        argMap.set("marg0", new ObjectRef("obj3"));
+        argMap.set("marg1", new ObjectRef("obj2"));
+
+        JavaAnalyzer analyzer = new JavaAnalyzer("target/classes", null);
+        ArgMap converted = ObjectInstantiator.convertArgMap(argMap, analyzer);
+
+        assertEquals(converted.get("marg0"), converted.get("obj3"));
+        assertEquals(converted.get("marg1"), converted.get("obj2"));
     }
 
     public static class TestClassNoArgs {
