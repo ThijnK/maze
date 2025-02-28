@@ -152,56 +152,14 @@ public class ObjectInstantiator {
                 continue;
             }
 
-            // Create empty array
-            if (type.isArray()) {
-                // The newInstance method automatically deals with multi-dimensional arrays
-                arguments[i] = Array.newInstance(type.getComponentType(), 0);
-                continue;
-            }
-
-            switch (type.getName()) {
-                case "int":
-                    arguments[i] = rand.nextInt(Integer.MIN_VALUE, Integer.MAX_VALUE);
-                    break;
-                case "double":
-                    long randomBits64 = rand.nextLong();
-                    arguments[i] = Double.longBitsToDouble(randomBits64);
-                    break;
-                case "float":
-                    int randomBits32 = rand.nextInt();
-                    arguments[i] = Float.intBitsToFloat(randomBits32);
-                    break;
-                case "long":
-                    arguments[i] = rand.nextLong(Long.MIN_VALUE, Long.MAX_VALUE);
-                    break;
-                case "short":
-                    arguments[i] = (short) rand.nextInt(Short.MIN_VALUE, Short.MAX_VALUE);
-                    break;
-                case "byte":
-                    arguments[i] = (byte) rand.nextInt(Byte.MIN_VALUE, Byte.MAX_VALUE);
-                    break;
-                case "char":
-                    arguments[i] = (char) rand.nextInt(Character.MIN_VALUE, Character.MAX_VALUE);
-                    break;
-                case "boolean":
-                    arguments[i] = rand.nextBoolean();
-                    break;
-                case "java.lang.String":
-                    arguments[i] = ""; // A very random string indeed
-                    break;
-                default:
-                    // If depth allows, recursively generate instances of objects
-                    if (depth < MAX_INSTANTIATION_DEPTH && !params[i].getType().isPrimitive())
-                        // Note that the argMap is intentionally only used for the first level of
-                        // recursion, so we pass null here
-                        arguments[i] = createInstance(params[i].getType(), ++depth, null);
-                    else
-                        arguments[i] = null;
-            }
+            // Generate random value for the parameter
+            arguments[i] = generateRandom(type, depth);
 
             // Add new arguments to argMap
             if (argMap != null) {
-                if (type.isPrimitive() || type.getName().equals("java.lang.String") || arguments[i] == null) {
+                argMap.set(name, arguments[i]);
+                if (type.isPrimitive() || type.getName().equals("java.lang.String") ||
+                        arguments[i] == null) {
                     argMap.set(name, arguments[i]);
                 } else {
                     ObjectInstance inst = new ObjectInstance(type);
@@ -212,7 +170,8 @@ public class ObjectInstantiator {
                             // TODO: get the sootUp type of the field here
                             inst.setField(field.getName(), field.get(arguments[i]), null);
                         } catch (Exception e) {
-                            logger.error("Failed to set field: " + field.getName() + " in class: " + type.getName());
+                            logger.error("Failed to set field: " + field.getName() + " in class: " +
+                                    type.getName());
                         }
                     }
 
@@ -224,6 +183,9 @@ public class ObjectInstantiator {
         // Handle references to other arguments
         for (int i = 0; i < arguments.length; i++) {
             // If an argument is an ObjectRef it is a reference to another argument
+            // TODO: problem is that ObjectRef may now point to any other object, not just
+            // arguments
+            // so have to convert those too, and follow the trail of references
             if (arguments[i] instanceof ObjectRef) {
                 ObjectRef ref = (ObjectRef) arguments[i];
                 arguments[i] = arguments[ref.getIndex()];
@@ -231,6 +193,52 @@ public class ObjectInstantiator {
         }
 
         return arguments;
+    }
+
+    /**
+     * Generate a random value for the given type.
+     * 
+     * @param type  The type of the value to generate
+     * @param depth The current depth of the recursive instantiation
+     * @return A random value of the given type
+     */
+    private static Object generateRandom(Class<?> type, int depth) {
+        // Create empty array
+        if (type.isArray()) {
+            // The newInstance method automatically deals with multi-dimensional arrays
+            return Array.newInstance(type.getComponentType(), 0);
+        }
+
+        switch (type.getName()) {
+            case "int":
+                return rand.nextInt(Integer.MIN_VALUE, Integer.MAX_VALUE);
+            case "double":
+                long randomBits64 = rand.nextLong();
+                return Double.longBitsToDouble(randomBits64);
+            case "float":
+                int randomBits32 = rand.nextInt();
+                return Float.intBitsToFloat(randomBits32);
+            case "long":
+                return rand.nextLong(Long.MIN_VALUE, Long.MAX_VALUE);
+            case "short":
+                return (short) rand.nextInt(Short.MIN_VALUE, Short.MAX_VALUE);
+            case "byte":
+                return (byte) rand.nextInt(Byte.MIN_VALUE, Byte.MAX_VALUE);
+            case "char":
+                return (char) rand.nextInt(Character.MIN_VALUE, Character.MAX_VALUE);
+            case "boolean":
+                return rand.nextBoolean();
+            case "java.lang.String":
+                return ""; // A very random string indeed
+            default:
+                // If depth allows, recursively generate instances of objects
+                if (depth < MAX_INSTANTIATION_DEPTH && !type.isPrimitive())
+                    // Note that the argMap is intentionally only used for the first level of
+                    // recursion, so we pass null here
+                    return createInstance(type, ++depth, null);
+                else
+                    return null;
+        }
     }
 
     /**
