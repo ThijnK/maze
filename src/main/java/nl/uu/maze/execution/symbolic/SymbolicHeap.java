@@ -460,8 +460,8 @@ public class SymbolicHeap {
             } else {
                 // Create a symbolic value for the field
                 field = ctx.mkConst(varName + "_" + fieldName, sorts.determineSort(fieldType));
-                obj.setField(fieldName, field);
             }
+            obj.setField(fieldName, field);
         }
 
         return field;
