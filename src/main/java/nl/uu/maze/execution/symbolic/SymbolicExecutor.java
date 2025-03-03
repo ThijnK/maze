@@ -8,6 +8,7 @@ import java.util.Set;
 
 import com.microsoft.z3.*;
 
+import nl.uu.maze.execution.concrete.ConcreteExecutor;
 import nl.uu.maze.instrument.TraceManager.TraceEntry;
 import nl.uu.maze.transform.JimpleToZ3Transformer;
 import nl.uu.maze.util.Z3Utils;
@@ -28,9 +29,9 @@ public class SymbolicExecutor {
     private final JimpleToZ3Transformer transformer;
     private final SymbolicRefExtractor refExtractor = new SymbolicRefExtractor();
 
-    public SymbolicExecutor(Context ctx) {
+    public SymbolicExecutor(Context ctx, ConcreteExecutor concreteExecutor) {
         this.ctx = ctx;
-        this.transformer = new JimpleToZ3Transformer(ctx);
+        this.transformer = new JimpleToZ3Transformer(ctx, concreteExecutor);
     }
 
     /**

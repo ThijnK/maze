@@ -22,6 +22,7 @@ import nl.uu.maze.execution.concrete.ObjectInstantiator;
 import nl.uu.maze.util.Pair;
 import sootup.core.graph.StmtGraph;
 import sootup.core.inputlocation.AnalysisInputLocation;
+import sootup.core.signatures.MethodSignature;
 import sootup.core.types.*;
 import sootup.core.util.DotExporter;
 import sootup.java.bytecode.inputlocation.JavaClassPathAnalysisInputLocation;
@@ -168,6 +169,21 @@ public class JavaAnalyzer {
     public Method getJavaMethod(JavaSootMethod method, Class<?> clazz)
             throws ClassNotFoundException, NoSuchMethodException {
         return clazz.getMethod(method.getName(), getParameterClasses(method));
+    }
+
+    /**
+     * Returns the Java method of a given SootUp method signature.
+     * 
+     * @param methodSignature The method signature for which to return the Java
+     *                        method
+     * @return The Java method
+     * @throws ClassNotFoundException If a class cannot be found
+     * @throws NoSuchMethodException  If the method cannot be found
+     */
+    public Method getJavaMethod(MethodSignature methodSignature) throws ClassNotFoundException, NoSuchMethodException {
+        JavaSootMethod method = view.getMethod(methodSignature).orElseThrow();
+        Class<?> clazz = getJavaClass(method.getDeclaringClassType());
+        return getJavaMethod(method, clazz);
     }
 
     /**

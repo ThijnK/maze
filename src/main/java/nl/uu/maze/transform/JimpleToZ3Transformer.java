@@ -10,6 +10,7 @@ import com.microsoft.z3.*;
 import com.microsoft.z3.Expr;
 
 import nl.uu.maze.execution.ArgMap;
+import nl.uu.maze.execution.concrete.ConcreteExecutor;
 import nl.uu.maze.execution.symbolic.SymbolicState;
 import nl.uu.maze.util.Pair;
 import nl.uu.maze.util.Z3Sorts;
@@ -27,12 +28,17 @@ import sootup.core.types.*;
 public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
     private static final Z3Sorts sorts = Z3Sorts.getInstance();
 
-    private Context ctx;
+    private final Context ctx;
+    private final ConcreteExecutor executor;
+    private final JavaToZ3Transformer javaToZ3;
+
     private SymbolicState state;
     private String lhs;
 
-    public JimpleToZ3Transformer(Context ctx) {
+    public JimpleToZ3Transformer(Context ctx, ConcreteExecutor executor) {
         this.ctx = ctx;
+        this.executor = executor;
+        this.javaToZ3 = new JavaToZ3Transformer(ctx);
     }
 
     /**
@@ -531,4 +537,35 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
         setResult(state.getVariable(var));
     }
     // #endregion
+
+    // #region Invocations
+    @Override
+    public void caseStaticInvokeExpr(@Nonnull JStaticInvokeExpr expr) {
+        Object retval = executor.execute(expr.getMethodSignature(), null);
+        setResult(javaToZ3.transform(retval, state));
+    }
+
+    @Override
+    public void caseDynamicInvokeExpr(@Nonnull JDynamicInvokeExpr expr) {
+        // TODO Auto-generated method stub
+        super.caseDynamicInvokeExpr(expr);
+    }
+
+    @Override
+    public void caseInterfaceInvokeExpr(@Nonnull JInterfaceInvokeExpr expr) {
+        // TODO Auto-generated method stub
+        super.caseInterfaceInvokeExpr(expr);
+    }
+
+    @Override
+    public void caseSpecialInvokeExpr(@Nonnull JSpecialInvokeExpr expr) {
+        // TODO Auto-generated method stub
+        super.caseSpecialInvokeExpr(expr);
+    }
+
+    @Override
+    public void caseVirtualInvokeExpr(@Nonnull JVirtualInvokeExpr expr) {
+        // TODO Auto-generated method stub
+        super.caseVirtualInvokeExpr(expr);
+    }
 }

@@ -1,7 +1,6 @@
 package nl.uu.maze.execution.concrete;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
@@ -15,6 +14,7 @@ import nl.uu.maze.analysis.JavaAnalyzer;
 import nl.uu.maze.execution.ArgMap;
 import nl.uu.maze.execution.MethodType;
 import nl.uu.maze.util.ArrayUtils;
+import sootup.core.signatures.MethodSignature;
 
 public class ConcreteExecutor {
     private static final Logger logger = LoggerFactory.getLogger(ConcreteExecutor.class);
@@ -32,6 +32,21 @@ public class ConcreteExecutor {
      */
     private Map<Integer, Object> cutInstances = new HashMap<>();
 
+    public Object execute(MethodSignature methodSignature, ArgMap argMap) {
+        try {
+            // Get the method from the method signature
+            Method method = analyzer.getJavaMethod(methodSignature);
+
+            // Get the constructor of the class containing the method
+            Constructor<?> ctor = null; // TODO
+
+            return execute(ctor, method, argMap);
+        } catch (Exception e) {
+            logger.warn("Execution of method " + methodSignature + " threw an exception: " + e);
+            return null;
+        }
+    }
+
     /**
      * Run concrete execution on the given method, using the given constructor to
      * create an instance of the class containing the method if necessary.
@@ -45,8 +60,7 @@ public class ConcreteExecutor {
      * @throws IllegalArgumentException
      * @throws InstantiationException
      */
-    public Object execute(Constructor<?> ctor, Method method, ArgMap argMap)
-            throws IllegalAccessException, InvocationTargetException, InstantiationException, IllegalArgumentException {
+    public Object execute(Constructor<?> ctor, Method method, ArgMap argMap) {
         try {
             // If not static, create an instance of the class
             Object instance = null;
@@ -76,8 +90,7 @@ public class ConcreteExecutor {
         }
     }
 
-    public Object execute(Object instance, Method method, ArgMap argMap)
-            throws IllegalAccessException, InvocationTargetException, InstantiationException, IllegalArgumentException {
+    public Object execute(Object instance, Method method, ArgMap argMap) {
         try {
             // Generate args for the method invocation
             Object[] args = ObjectInstantiator.generateArgs(method.getParameters(), MethodType.METHOD, argMap,
