@@ -147,8 +147,7 @@ public class JavaAnalyzer {
      * @param method The method for which to return the parameter classes
      * @return An array of the Java classes of the parameters
      */
-    private Class<?>[] getParameterClasses(JavaSootMethod method) throws ClassNotFoundException {
-        List<Type> parameterTypes = method.getParameterTypes();
+    private Class<?>[] getParameterClasses(List<Type> parameterTypes) throws ClassNotFoundException {
         Class<?>[] parameterClasses = new Class[parameterTypes.size()];
         for (int i = 0; i < parameterTypes.size(); i++) {
             Type type = parameterTypes.get(i);
@@ -168,7 +167,7 @@ public class JavaAnalyzer {
      */
     public Method getJavaMethod(JavaSootMethod method, Class<?> clazz)
             throws ClassNotFoundException, NoSuchMethodException {
-        return clazz.getMethod(method.getName(), getParameterClasses(method));
+        return clazz.getDeclaredMethod(method.getName(), getParameterClasses(method.getParameterTypes()));
     }
 
     /**
@@ -181,9 +180,10 @@ public class JavaAnalyzer {
      * @throws NoSuchMethodException  If the method cannot be found
      */
     public Method getJavaMethod(MethodSignature methodSignature) throws ClassNotFoundException, NoSuchMethodException {
-        JavaSootMethod method = view.getMethod(methodSignature).orElseThrow();
-        Class<?> clazz = getJavaClass(method.getDeclaringClassType());
-        return getJavaMethod(method, clazz);
+        // JavaSootMethod method = view.getMethod(methodSignature).orElseThrow();
+        Class<?> clazz = getJavaClass(methodSignature.getDeclClassType());
+        return clazz.getDeclaredMethod(methodSignature.getName(),
+                getParameterClasses(methodSignature.getParameterTypes()));
     }
 
     /**
@@ -197,7 +197,7 @@ public class JavaAnalyzer {
      */
     public Constructor<?> getJavaConstructor(JavaSootMethod method, Class<?> clazz)
             throws ClassNotFoundException, NoSuchMethodException {
-        return clazz.getConstructor(getParameterClasses(method));
+        return clazz.getConstructor(getParameterClasses(method.getParameterTypes()));
     }
 
     /**
@@ -229,7 +229,7 @@ public class JavaAnalyzer {
         for (JavaSootMethod method : methods) {
             if (method.getName().equals("<init>")) {
                 try {
-                    Class<?>[] methodParams = getParameterClasses(method);
+                    Class<?>[] methodParams = getParameterClasses(method.getParameterTypes());
                     // Check if parameters match
                     if (Arrays.equals(methodParams, targetParams)) {
                         return method;
