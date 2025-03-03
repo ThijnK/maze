@@ -347,12 +347,12 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
 
     @Override
     public void caseFloatConstant(@Nonnull FloatConstant constant) {
-        setResult(ctx.mkFP(constant.getValue(), (FPSort) sorts.determineSort(constant.getType())));
+        setResult(ctx.mkFP(constant.getValue(), sorts.getFloatSort()));
     }
 
     @Override
     public void caseDoubleConstant(@Nonnull DoubleConstant constant) {
-        setResult(ctx.mkFP(constant.getValue(), (FPSort) sorts.determineSort(constant.getType())));
+        setResult(ctx.mkFP(constant.getValue(), sorts.getDoubleSort()));
     }
 
     @Override
