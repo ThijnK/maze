@@ -163,7 +163,9 @@ public class SymbolicState {
         Expr<?>[] conRefs = Stream
                 .concat(Stream.of(Z3Sorts.getInstance().getNullConst()), heap.getAllConcreteRefs().stream())
                 .toArray(Expr<?>[]::new);
-        engineConstraints.add(ctx.mkDistinct(conRefs));
+        if (conRefs.length > 1) {
+            engineConstraints.add(ctx.mkDistinct(conRefs));
+        }
         return engineConstraints;
     }
 
