@@ -1,10 +1,8 @@
 package nl.uu.maze.execution.symbolic;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -303,15 +301,17 @@ public class SymbolicHeap {
     /**
      * Allocates a multi-dimensional array with the given sizes and element sort.
      * 
-     * @see #allocateMultiArray(String, Type, List, Sort)
+     * @see #allocateMultiArray(String, Type, BitVecExpr[], Sort)
      */
-    public <E extends Sort> Expr<?> allocateMultiArray(ArrayType type, List<BitVecExpr> sizes, E elemSort) {
+    public <E extends Sort> Expr<?> allocateMultiArray(ArrayType type, BitVecExpr[] sizes, E elemSort) {
         return allocateMultiArray(newRefKey(), type, sizes, elemSort);
     }
 
     /**
      * Allocates a multi-dimensional array with the given element sort, using
      * symbolic variables for the sizes, and returns its reference.
+     * 
+     * @see #allocateMultiArray(String, Type, BitVecExpr[], Sort)
      */
     public <E extends Sort> Expr<?> allocateMultiArray(String key, ArrayType type, E elemSort) {
         return allocateMultiArray(key, type, null, elemSort);
@@ -327,19 +327,23 @@ public class SymbolicHeap {
      * @param elemSort The Z3 sort of the elements in the array
      * @return The reference to the newly allocated array object
      */
-    public <E extends Sort> Expr<?> allocateMultiArray(String key, ArrayType type, List<BitVecExpr> sizes, E elemSort) {
+    public <E extends Sort> Expr<?> allocateMultiArray(String key, ArrayType type, BitVecExpr[] sizes, E elemSort) {
         BitVecSort indexSort = sorts.getIntSort();
         Expr<?> symRef = newRef(key);
         String conKey = newObjKey();
         Expr<?> conRef = newRef(conKey);
+        int dim = type.getDimension();
+
+        if (sizes != null && sizes.length != dim) {
+            throw new IllegalArgumentException("Expected " + dim + " sizes, got " + sizes.length);
+        }
 
         // If no sizes given, make them symbolic (e.g., for method arguments)
         if (sizes == null) {
-            int dim = type.getDimension();
-            sizes = new ArrayList<>(dim);
+            sizes = new BitVecExpr[dim];
             for (int i = 0; i < dim; i++) {
                 Expr<BitVecSort> size = ctx.mkConst(conKey + "_len" + i, sorts.getIntSort());
-                sizes.add((BitVecExpr) size);
+                sizes[i] = ((BitVecExpr) size);
                 // Make sure array size is non-negative and does not exceed the max length
                 state.addEngineConstraint(ctx.mkBVSGE(size, ctx.mkBV(0, sorts.getIntBitSize())));
                 state.addEngineConstraint(ctx.mkBVSLT(size, ctx.mkBV(MAX_ARRAY_LENGTH, sorts.getIntBitSize())));
@@ -348,8 +352,8 @@ public class SymbolicHeap {
 
         ArrayExpr<BitVecSort, E> arr = ctx.mkArrayConst(conKey + "_elems", indexSort, elemSort);
         ArrayExpr<BitVecSort, BitVecSort> lengths = ctx.mkArrayConst(conKey + "_lens", indexSort, indexSort);
-        for (int i = 0; i < sizes.size(); i++) {
-            lengths = ctx.mkStore(lengths, ctx.mkBV(i, sorts.getIntBitSize()), sizes.get(i));
+        for (int i = 0; i < dim; i++) {
+            lengths = ctx.mkStore(lengths, ctx.mkBV(i, sorts.getIntBitSize()), sizes[i]);
         }
 
         MultiArrayObject arrObj = new MultiArrayObject(type, arr, lengths);
@@ -548,6 +552,28 @@ public class SymbolicHeap {
      */
     public <E extends Sort> void setArrayElement(String var, BitVecExpr index, Expr<E> value) {
         setArrayElement(var, state.getVariable(var), index, value);
+    }
+
+    /**
+     * Sets the value at the given index for the given symbolic array reference.
+     */
+    public <E extends Sort> void setArrayElement(Expr<?> symRef, BitVecExpr index, Expr<E> value) {
+        setArrayElement(symRef.toString(), symRef, index, value);
+    }
+
+    /**
+     * Sets the value at the given indices for the given symbolic multi-dimensional
+     * array reference.
+     */
+    public <E extends Sort> void setArrayElement(Expr<?> symRef, BitVecExpr[] indices, Expr<E> value) {
+        MultiArrayObject multiArrObj = (MultiArrayObject) getArrayObject(symRef);
+        if (multiArrObj == null) {
+            // Null reference
+            state.setExceptionThrown();
+            return;
+        }
+
+        multiArrObj.setElem(value, indices);
     }
 
     /**

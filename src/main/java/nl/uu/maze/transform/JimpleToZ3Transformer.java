@@ -1,7 +1,5 @@
 package nl.uu.maze.transform;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.function.BiFunction;
 
 import javax.annotation.Nonnull;
@@ -436,9 +434,9 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
     @Override
     public void caseNewMultiArrayExpr(@Nonnull JNewMultiArrayExpr expr) {
         Sort elemSort = sorts.determineSort(expr.getBaseType().getBaseType());
-        List<BitVecExpr> sizes = new ArrayList<>(((ArrayType) expr.getType()).getDimension());
-        for (int i = 0; i < expr.getSizes().size(); i++) {
-            sizes.add((BitVecExpr) transform(expr.getSizes().get(i)));
+        BitVecExpr[] sizes = new BitVecExpr[((ArrayType) expr.getType()).getDimension()];
+        for (int i = 0; i < sizes.length; i++) {
+            sizes[i] = ((BitVecExpr) transform(expr.getSizes().get(i)));
         }
         setResult(state.heap.allocateMultiArray((ArrayType) expr.getType(), sizes, elemSort));
     }
@@ -542,7 +540,8 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
     @Override
     public void caseStaticInvokeExpr(@Nonnull JStaticInvokeExpr expr) {
         Object retval = executor.execute(expr.getMethodSignature(), null);
-        setResult(javaToZ3.transform(retval, state));
+        Type retType = expr.getMethodSignature().getType();
+        setResult(javaToZ3.transform(retval, state, retType));
     }
 
     @Override
