@@ -6,15 +6,10 @@ import com.microsoft.z3.Expr;
 import com.microsoft.z3.FPSort;
 import com.microsoft.z3.Sort;
 
-import sootup.core.types.ArrayType;
-import sootup.core.types.ClassType;
-import sootup.core.types.NullType;
-import sootup.core.types.PrimitiveType;
-import sootup.core.types.Type;
-import sootup.core.types.PrimitiveType.DoubleType;
-import sootup.core.types.PrimitiveType.FloatType;
-import sootup.core.types.PrimitiveType.LongType;
-import sootup.core.types.VoidType;
+import sootup.core.signatures.PackageName;
+import sootup.core.types.*;
+import sootup.core.types.PrimitiveType.*;
+import sootup.java.core.types.JavaClassType;
 
 /**
  * Provides global Z3 sorts.
@@ -128,6 +123,56 @@ public class Z3Sorts {
         } else {
             throw new UnsupportedOperationException("Unsupported type: " + sootType);
         }
+    }
+
+    /**
+     * Determine the SootUp type for the given Java class.
+     * 
+     * @param clazz The Java class
+     * @return The SootUp type
+     * @see Type
+     */
+    public Type determineType(Class<?> clazz) {
+        if (clazz == null) {
+            return null;
+        }
+        if (clazz == int.class || clazz == Integer.class) {
+            return PrimitiveType.getInt();
+        }
+        if (clazz == byte.class || clazz == Byte.class) {
+            return PrimitiveType.getByte();
+        }
+        if (clazz == short.class || clazz == Short.class) {
+            return PrimitiveType.getShort();
+        }
+        if (clazz == char.class || clazz == Character.class) {
+            return PrimitiveType.getChar();
+        }
+        if (clazz == boolean.class || clazz == Boolean.class) {
+            return PrimitiveType.getBoolean();
+        }
+        if (clazz == long.class || clazz == Long.class) {
+            return PrimitiveType.getLong();
+        }
+        if (clazz == float.class || clazz == Float.class) {
+            return PrimitiveType.getFloat();
+        }
+        if (clazz == double.class || clazz == Double.class) {
+            return PrimitiveType.getDouble();
+        }
+        if (clazz.isArray()) {
+            int dim = 0;
+            Class<?> base = clazz;
+            while (base.isArray()) {
+                dim++;
+                base = base.getComponentType();
+            }
+            Type elemType = determineType(base);
+            return ArrayType.createArrayType(elemType, dim);
+        }
+
+        PackageName packageName = new PackageName(clazz.getPackageName());
+        return new JavaClassType(clazz.getName(), packageName);
     }
 
     /**

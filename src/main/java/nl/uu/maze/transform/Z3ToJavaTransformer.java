@@ -177,7 +177,7 @@ public class Z3ToJavaTransformer {
     /** Transform a Z3 single-dimensional array to a Java array */
     private Object transformSingleArray(ArrayObject arrObj, Model model, Type elemType) {
         Expr<?> lenExpr = arrObj.getLength();
-        int length = (int) transformExpr(model.eval(lenExpr, true), elemType);
+        int length = (int) transformExpr(model.eval(lenExpr, true), PrimitiveType.getInt());
         if (length < 0) {
             return null;
         }

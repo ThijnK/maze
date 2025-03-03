@@ -41,33 +41,33 @@ public class JavaToZ3Transformer {
         }
         // All int-like types are considered integers (including boolean)
         if (value instanceof Integer) {
-            return transformInteger(value);
+            return ctx.mkBV((int) value, sorts.getIntBitSize());
         }
         if (value instanceof Byte) {
-            return transformInteger(value);
+            return ctx.mkBV((byte) value, sorts.getIntBitSize());
         }
         if (value instanceof Short) {
-            return transformInteger(value);
+            return ctx.mkBV((short) value, sorts.getIntBitSize());
         }
         if (value instanceof Character) {
-            return transformInteger(value);
+            return ctx.mkBV((char) value, sorts.getIntBitSize());
         }
         if (value instanceof Boolean) {
-            return transformInteger(value);
+            return ctx.mkBV((boolean) value ? 1 : 0, sorts.getIntBitSize());
         }
         if (value instanceof Long) {
-            return ctx.mkBV((Long) value, sorts.getLongBitSize());
+            return ctx.mkBV((long) value, sorts.getLongBitSize());
         }
         if (value instanceof String) {
             return ctx.mkString((String) value);
         }
         if (value instanceof Float) {
             // Assume a float sort is defined in sorts
-            return ctx.mkFP((Float) value, sorts.getFloatSort());
+            return ctx.mkFP((float) value, sorts.getFloatSort());
         }
         if (value instanceof Double) {
             // Assume a double sort is defined in sorts
-            return ctx.mkFP((Double) value, sorts.getDoubleSort());
+            return ctx.mkFP((double) value, sorts.getDoubleSort());
         }
         if (value.getClass().isArray()) {
             return transformArray(value, expectedType);
@@ -78,10 +78,6 @@ public class JavaToZ3Transformer {
 
     private Expr<?> transform(Object value, Type expectedType) {
         return transform(value, state, expectedType);
-    }
-
-    private Expr<?> transformInteger(Object value) {
-        return ctx.mkBV((Integer) value, sorts.getIntBitSize());
     }
 
     private Expr<?> transformArray(Object value, Type expectedType) {
@@ -160,10 +156,9 @@ public class JavaToZ3Transformer {
         for (Field field : value.getClass().getFields()) {
             try {
                 Object fieldValue = field.get(value);
-                // TODO: if the field is an array or another object, we need a way to get the
-                // SootUp type of the field
-                Expr<?> fieldExpr = transform(fieldValue, state, null);
-                state.heap.setField(symRef, field.getName(), fieldExpr, null);
+                Type fieldType = sorts.determineType(field.getType());
+                Expr<?> fieldExpr = transform(fieldValue, state, fieldType);
+                state.heap.setField(symRef, field.getName(), fieldExpr, fieldType);
             } catch (IllegalArgumentException | IllegalAccessException e) {
                 throw new UnsupportedOperationException("Failed to access field: " + field.getName(), e);
             }
