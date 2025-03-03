@@ -9,10 +9,10 @@ import com.microsoft.z3.Sort;
 import sootup.core.types.ArrayType;
 import sootup.core.types.ClassType;
 import sootup.core.types.NullType;
+import sootup.core.types.PrimitiveType;
 import sootup.core.types.Type;
 import sootup.core.types.PrimitiveType.DoubleType;
 import sootup.core.types.PrimitiveType.FloatType;
-import sootup.core.types.PrimitiveType.IntType;
 import sootup.core.types.PrimitiveType.LongType;
 import sootup.core.types.VoidType;
 
@@ -42,8 +42,8 @@ public class Z3Sorts {
         voidSort = ctx.mkUninterpretedSort("Void");
         stringSort = ctx.mkStringSort();
 
-        intSort = ctx.mkBitVecSort(Type.getValueBitSize(IntType.getInstance()));
-        longSort = ctx.mkBitVecSort(Type.getValueBitSize(LongType.getInstance()));
+        intSort = ctx.mkBitVecSort(getIntBitSize());
+        longSort = ctx.mkBitVecSort(getLongBitSize());
         floatSort = ctx.mkFPSort32();
         doubleSort = ctx.mkFPSort64();
     }
@@ -128,5 +128,40 @@ public class Z3Sorts {
         } else {
             throw new UnsupportedOperationException("Unsupported type: " + sootType);
         }
+    }
+
+    /**
+     * Get the bit size of the given Soot type.
+     * 
+     * @param sootType The Soot type
+     * @return The bit size
+     * @throws UnsupportedOperationException If the type is not supported
+     */
+    public int getBitSize(Type sootType) {
+        if (Type.isIntLikeType(sootType)) {
+            return getIntBitSize();
+        } else if (sootType instanceof LongType) {
+            return getLongBitSize();
+        } else if (sootType instanceof DoubleType) {
+            return Type.getValueBitSize(PrimitiveType.getDouble());
+        } else if (sootType instanceof FloatType) {
+            return Type.getValueBitSize(PrimitiveType.getFloat());
+        } else {
+            throw new UnsupportedOperationException("Unsupported type: " + sootType);
+        }
+    }
+
+    /**
+     * Get the bit size of an integer.
+     */
+    public int getIntBitSize() {
+        return Type.getValueBitSize(PrimitiveType.getInt());
+    }
+
+    /**
+     * Get the bit size of a long.
+     */
+    public int getLongBitSize() {
+        return Type.getValueBitSize(PrimitiveType.getLong());
     }
 }

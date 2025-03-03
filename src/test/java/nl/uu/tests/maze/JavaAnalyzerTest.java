@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Test;
 
 import nl.uu.maze.analysis.JavaAnalyzer;
 import sootup.core.types.*;
-import sootup.core.types.PrimitiveType.*;
 import sootup.java.core.JavaSootClass;
 import sootup.java.core.JavaSootMethod;
 import sootup.java.core.types.JavaClassType;
@@ -36,15 +35,15 @@ public class JavaAnalyzerTest {
     public void testGetJavaClass() throws ClassNotFoundException {
         Object[][] testCases = {
                 { analyzer.getClassType(className), TestClass.class },
-                { IntType.getInt(), int.class },
-                { DoubleType.getDouble(), double.class },
-                { FloatType.getFloat(), float.class },
-                { LongType.getLong(), long.class },
-                { ShortType.getShort(), short.class },
-                { ByteType.getByte(), byte.class },
-                { CharType.getChar(), char.class },
-                { BooleanType.getBoolean(), boolean.class },
-                { Type.createArrayType(IntType.getInt(), 1), int[].class },
+                { PrimitiveType.getInt(), int.class },
+                { PrimitiveType.getDouble(), double.class },
+                { PrimitiveType.getFloat(), float.class },
+                { PrimitiveType.getLong(), long.class },
+                { PrimitiveType.getShort(), short.class },
+                { PrimitiveType.getByte(), byte.class },
+                { PrimitiveType.getChar(), char.class },
+                { PrimitiveType.getBoolean(), boolean.class },
+                { Type.createArrayType(PrimitiveType.getInt(), 1), int[].class },
                 { VoidType.getInstance(), void.class },
                 { NullType.getInstance(), null },
                 { UnknownType.getInstance(), Object.class }

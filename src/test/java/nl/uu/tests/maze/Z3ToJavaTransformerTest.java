@@ -15,8 +15,8 @@ import com.microsoft.z3.IntExpr;
 
 import nl.uu.maze.transform.Z3ToJavaTransformer;
 import nl.uu.maze.util.Z3Sorts;
+import sootup.core.types.PrimitiveType;
 import sootup.core.types.Type;
-import sootup.core.types.PrimitiveType.*;
 
 public class Z3ToJavaTransformerTest {
     private static Z3ToJavaTransformer transformer;
@@ -33,8 +33,8 @@ public class Z3ToJavaTransformerTest {
     public void testTransform_BoolExpr() {
         BoolExpr exprTrue = ctx.mkTrue();
         BoolExpr exprFalse = ctx.mkFalse();
-        Object resultTrue = transformer.transformExpr(exprTrue, BooleanType.getInstance());
-        Object resultFalse = transformer.transformExpr(exprFalse, BooleanType.getInstance());
+        Object resultTrue = transformer.transformExpr(exprTrue, PrimitiveType.getBoolean());
+        Object resultFalse = transformer.transformExpr(exprFalse, PrimitiveType.getBoolean());
 
         assert (Boolean) resultTrue;
         assert !(Boolean) resultFalse;
@@ -44,7 +44,7 @@ public class Z3ToJavaTransformerTest {
     @ValueSource(ints = { 0, 1, -1, 69, -69, Integer.MAX_VALUE, Integer.MIN_VALUE })
     public void testTransform_IntExpr(int value) {
         IntExpr expr = ctx.mkInt(value);
-        Object result = transformer.transformExpr(expr, IntType.getInstance());
+        Object result = transformer.transformExpr(expr, PrimitiveType.getInt());
         assertEquals(value, result);
 
     }
@@ -52,7 +52,7 @@ public class Z3ToJavaTransformerTest {
     @ParameterizedTest
     @ValueSource(ints = { 0, 1, -1, 69, -69, Integer.MAX_VALUE, Integer.MIN_VALUE })
     public void testTransform_BVExpr_Int(int value) {
-        Type type = IntType.getInstance();
+        Type type = PrimitiveType.getInt();
         BitVecExpr expr = ctx.mkBV(value, Type.getValueBitSize(type));
         Object result = transformer.transformExpr(expr, type);
         assertEquals(value, result);
@@ -61,7 +61,7 @@ public class Z3ToJavaTransformerTest {
     @ParameterizedTest
     @ValueSource(longs = { 0, 1, -1, 69, -69, Long.MAX_VALUE, Long.MIN_VALUE })
     public void testTransform_BVExpr_Long(long value) {
-        Type type = LongType.getInstance();
+        Type type = PrimitiveType.getLong();
         BitVecExpr expr = ctx.mkBV(value, Type.getValueBitSize(type));
         Object result = transformer.transformExpr(expr, type);
         assertEquals(value, result);
@@ -70,7 +70,7 @@ public class Z3ToJavaTransformerTest {
     @Test
     public void testTransform_BVExpr_Byte() {
         byte value = Byte.MAX_VALUE;
-        Type type = ByteType.getInstance();
+        Type type = PrimitiveType.getByte();
         BitVecExpr expr = ctx.mkBV(value, Type.getValueBitSize(type));
         Object result = transformer.transformExpr(expr, type);
         assertEquals(value, result);
@@ -79,7 +79,7 @@ public class Z3ToJavaTransformerTest {
     @Test
     public void testTransform_BVExpr_Short() {
         short value = Short.MAX_VALUE;
-        Type type = ShortType.getInstance();
+        Type type = PrimitiveType.getShort();
         BitVecExpr expr = ctx.mkBV(value, Type.getValueBitSize(type));
         Object result = transformer.transformExpr(expr, type);
         assertEquals(value, result);
@@ -88,7 +88,7 @@ public class Z3ToJavaTransformerTest {
     @Test
     public void testTransform_BVExpr_Char() {
         char value = 'a';
-        Type type = CharType.getInstance();
+        Type type = PrimitiveType.getChar();
         BitVecExpr expr = ctx.mkBV(value, Type.getValueBitSize(type));
         Object result = transformer.transformExpr(expr, type);
         assertEquals(value, result);
@@ -97,7 +97,7 @@ public class Z3ToJavaTransformerTest {
     @Test
     public void testTransform_BVExpr_Boolean() {
         boolean value = true;
-        Type type = BooleanType.getInstance();
+        Type type = PrimitiveType.getBoolean();
         BitVecExpr expr = ctx.mkBV(value ? 1 : 0, Type.getValueBitSize(type));
         Object result = transformer.transformExpr(expr, type);
         assertEquals(value, result);
@@ -108,7 +108,7 @@ public class Z3ToJavaTransformerTest {
             Float.NEGATIVE_INFINITY, Float.NaN })
     public void testTransform_FPExpr_Float(float value) {
         FPNum expr = ctx.mkFP(value, ctx.mkFPSort32());
-        Object result = transformer.transformExpr(expr, FloatType.getInstance());
+        Object result = transformer.transformExpr(expr, PrimitiveType.getFloat());
         assertEquals(value, result);
     }
 
@@ -117,7 +117,7 @@ public class Z3ToJavaTransformerTest {
             Double.NEGATIVE_INFINITY, Double.NaN })
     public void testTransform_FPExpr_Double(double value) {
         FPNum expr = ctx.mkFP(value, ctx.mkFPSort64());
-        Object result = transformer.transformExpr(expr, DoubleType.getInstance());
+        Object result = transformer.transformExpr(expr, PrimitiveType.getDouble());
         assertEquals(value, result);
     }
 }

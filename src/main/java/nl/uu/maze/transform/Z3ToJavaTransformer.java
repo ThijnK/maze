@@ -10,6 +10,8 @@ import com.microsoft.z3.Model;
 
 import nl.uu.maze.execution.symbolic.SymbolicHeap.ArrayObject;
 import nl.uu.maze.execution.symbolic.SymbolicHeap.MultiArrayObject;
+import nl.uu.maze.util.Z3Sorts;
+import sootup.core.types.PrimitiveType;
 import sootup.core.types.Type;
 import sootup.core.types.PrimitiveType.*;
 
@@ -17,6 +19,8 @@ import sootup.core.types.PrimitiveType.*;
  * Transform Z3 expressions to Java objects.
  */
 public class Z3ToJavaTransformer {
+    private static final Z3Sorts sorts = Z3Sorts.getInstance();
+
     private Context ctx;
 
     public Z3ToJavaTransformer(Context ctx) {
@@ -124,7 +128,7 @@ public class Z3ToJavaTransformer {
         int[] lengths = new int[dim];
         for (int i = 0; i < dim; i++) {
             Expr<BitVecSort> lenExpr = arrObj.getLength(i);
-            lengths[i] = (int) transformExpr(model.eval(lenExpr, true), IntType.getInstance());
+            lengths[i] = (int) transformExpr(model.eval(lenExpr, true), PrimitiveType.getInt());
             // If for whatever reason, the length is negative, return null (should never
             // happen)
             if (lengths[i] < 0) {
@@ -155,7 +159,7 @@ public class Z3ToJavaTransformer {
             // All dimensions filled, evaluate element at flattened index
             BitVecExpr[] idxExprs = new BitVecExpr[lengths.length];
             for (int i = 0; i < lengths.length; i++) {
-                idxExprs[i] = ctx.mkBV(indices[i], Type.getValueBitSize(IntType.getInstance()));
+                idxExprs[i] = ctx.mkBV(indices[i], sorts.getIntBitSize());
             }
             Expr<?> element = model.eval(arrObj.getElem(idxExprs), true);
             return transformExpr(element, elemType);
@@ -180,7 +184,7 @@ public class Z3ToJavaTransformer {
 
         Object[] arr = new Object[length];
         for (int i = 0; i < length; i++) {
-            BitVecExpr index = ctx.mkBV(i, Type.getValueBitSize(IntType.getInstance()));
+            BitVecExpr index = ctx.mkBV(i, sorts.getIntBitSize());
             // Select element at the index
             Expr<?> element = model.eval(arrObj.getElem(index), true);
             arr[i] = transformExpr(element, elemType);

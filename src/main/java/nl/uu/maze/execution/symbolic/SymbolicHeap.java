@@ -16,9 +16,9 @@ import com.microsoft.z3.Expr;
 import com.microsoft.z3.Sort;
 
 import nl.uu.maze.util.Z3Sorts;
-import sootup.core.types.PrimitiveType.IntType;
 import sootup.core.types.ArrayType;
 import sootup.core.types.ClassType;
+import sootup.core.types.PrimitiveType;
 import sootup.core.types.Type;
 
 /**
@@ -289,9 +289,8 @@ public class SymbolicHeap {
         if (size == null) {
             Expr<BitVecSort> len = ctx.mkConst(conKey + "_len", sorts.getIntSort());
             // Make sure array size is non-negative and does not exceed the max length
-            state.addEngineConstraint(ctx.mkBVSGE(len, ctx.mkBV(0, Type.getValueBitSize(IntType.getInstance()))));
-            state.addEngineConstraint(
-                    ctx.mkBVSLT(len, ctx.mkBV(MAX_ARRAY_LENGTH, Type.getValueBitSize(IntType.getInstance()))));
+            state.addEngineConstraint(ctx.mkBVSGE(len, ctx.mkBV(0, sorts.getIntBitSize())));
+            state.addEngineConstraint(ctx.mkBVSLT(len, ctx.mkBV(MAX_ARRAY_LENGTH, sorts.getIntBitSize())));
             size = len;
         }
 
@@ -342,16 +341,15 @@ public class SymbolicHeap {
                 Expr<BitVecSort> size = ctx.mkConst(conKey + "_len" + i, sorts.getIntSort());
                 sizes.add((BitVecExpr) size);
                 // Make sure array size is non-negative and does not exceed the max length
-                state.addEngineConstraint(ctx.mkBVSGE(size, ctx.mkBV(0, Type.getValueBitSize(IntType.getInstance()))));
-                state.addEngineConstraint(
-                        ctx.mkBVSLT(size, ctx.mkBV(MAX_ARRAY_LENGTH, Type.getValueBitSize(IntType.getInstance()))));
+                state.addEngineConstraint(ctx.mkBVSGE(size, ctx.mkBV(0, sorts.getIntBitSize())));
+                state.addEngineConstraint(ctx.mkBVSLT(size, ctx.mkBV(MAX_ARRAY_LENGTH, sorts.getIntBitSize())));
             }
         }
 
         ArrayExpr<BitVecSort, E> arr = ctx.mkArrayConst(conKey + "_elems", indexSort, elemSort);
         ArrayExpr<BitVecSort, BitVecSort> lengths = ctx.mkArrayConst(conKey + "_lens", indexSort, indexSort);
         for (int i = 0; i < sizes.size(); i++) {
-            lengths = ctx.mkStore(lengths, ctx.mkBV(i, Type.getValueBitSize(IntType.getInstance())), sizes.get(i));
+            lengths = ctx.mkStore(lengths, ctx.mkBV(i, sorts.getIntBitSize()), sizes.get(i));
         }
 
         MultiArrayObject arrObj = new MultiArrayObject(type, arr, lengths);
@@ -697,7 +695,7 @@ public class SymbolicHeap {
         public ArrayObject(ArrayType type, Expr<?> elems, Expr<?> length) {
             super(type);
             setField("elems", elems, type);
-            setField("len", length, IntType.getInstance());
+            setField("len", length, PrimitiveType.getInt());
         }
 
         @Override
@@ -745,7 +743,7 @@ public class SymbolicHeap {
          */
         @SuppressWarnings("unchecked")
         public Expr<BitVecSort> getLength(int index) {
-            BitVecExpr indexExpr = ctx.mkBV(index, Type.getValueBitSize(IntType.getInstance()));
+            BitVecExpr indexExpr = ctx.mkBV(index, sorts.getIntBitSize());
             return ctx.mkSelect((ArrayExpr<BitVecSort, BitVecSort>) getLength(), indexExpr);
         }
 

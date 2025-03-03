@@ -51,7 +51,7 @@ public class JavaToZ3Transformer {
             return transformInteger(value);
         }
         if (value instanceof Long) {
-            return ctx.mkBV((Long) value, Type.getValueBitSize(PrimitiveType.getLong()));
+            return ctx.mkBV((Long) value, sorts.getLongBitSize());
         }
         if (value instanceof String) {
             return ctx.mkString((String) value);
@@ -72,7 +72,7 @@ public class JavaToZ3Transformer {
     }
 
     private Expr<?> transformInteger(Object value) {
-        return ctx.mkBV((Integer) value, Type.getValueBitSize(PrimitiveType.getInt()));
+        return ctx.mkBV((Integer) value, sorts.getIntBitSize());
     }
 
     private Expr<?> transformArray(Object value) {

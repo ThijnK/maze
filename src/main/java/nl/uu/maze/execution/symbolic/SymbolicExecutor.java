@@ -11,6 +11,7 @@ import com.microsoft.z3.*;
 import nl.uu.maze.execution.concrete.ConcreteExecutor;
 import nl.uu.maze.instrument.TraceManager.TraceEntry;
 import nl.uu.maze.transform.JimpleToZ3Transformer;
+import nl.uu.maze.util.Z3Sorts;
 import nl.uu.maze.util.Z3Utils;
 import sootup.core.graph.*;
 import sootup.core.jimple.basic.LValue;
@@ -18,13 +19,13 @@ import sootup.core.jimple.common.constant.IntConstant;
 import sootup.core.jimple.common.ref.*;
 import sootup.core.jimple.common.stmt.*;
 import sootup.core.jimple.javabytecode.stmt.JSwitchStmt;
-import sootup.core.types.Type;
-import sootup.core.types.PrimitiveType.IntType;
 
 /**
  * Provides symbolic execution capabilities.
  */
 public class SymbolicExecutor {
+    private static final Z3Sorts sorts = Z3Sorts.getInstance();
+
     private final Context ctx;
     private final JimpleToZ3Transformer transformer;
     private final SymbolicRefExtractor refExtractor = new SymbolicRefExtractor();
@@ -196,7 +197,7 @@ public class SymbolicExecutor {
      * equals the case value)
      */
     private BoolExpr mkSwitchConstraint(Expr<?> var, IntConstant value) {
-        return ctx.mkEq(var, ctx.mkBV(value.getValue(), Type.getValueBitSize(IntType.getInstance())));
+        return ctx.mkEq(var, ctx.mkBV(value.getValue(), sorts.getIntBitSize()));
     }
 
     /**

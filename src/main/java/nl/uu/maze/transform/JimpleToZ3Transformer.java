@@ -337,12 +337,12 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
     // #region Constants
     @Override
     public void caseIntConstant(@Nonnull IntConstant constant) {
-        setResult(ctx.mkBV(constant.getValue(), Type.getValueBitSize(constant.getType())));
+        setResult(ctx.mkBV(constant.getValue(), sorts.getIntBitSize()));
     }
 
     @Override
     public void caseLongConstant(@Nonnull LongConstant constant) {
-        setResult(ctx.mkBV(constant.getValue(), Type.getValueBitSize(constant.getType())));
+        setResult(ctx.mkBV(constant.getValue(), sorts.getLongBitSize()));
     }
 
     @Override
