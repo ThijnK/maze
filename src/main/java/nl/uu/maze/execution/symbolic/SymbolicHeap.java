@@ -416,10 +416,17 @@ public class SymbolicHeap {
 
     // #region Object Access
     /**
-     * Sets the value of an object's field.
+     * Sets the value of an object's field based on the given variable name.
      */
     public void setField(String var, String fieldName, Expr<?> value, Type type) {
-        HeapObject obj = getHeapObject(var);
+        setField(state.getVariable(var), fieldName, value, type);
+    }
+
+    /**
+     * Sets the value of an object's field based on the given symbolic reference.
+     */
+    public void setField(Expr<?> symRef, String fieldName, Expr<?> value, Type type) {
+        HeapObject obj = getHeapObject(symRef);
         if (obj == null) {
             // For null references
             state.setExceptionThrown();

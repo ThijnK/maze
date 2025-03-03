@@ -1,6 +1,7 @@
 package nl.uu.maze.transform;
 
 import java.lang.reflect.Array;
+import java.lang.reflect.Field;
 
 import com.microsoft.z3.BitVecExpr;
 import com.microsoft.z3.Context;
@@ -10,6 +11,7 @@ import com.microsoft.z3.Sort;
 import nl.uu.maze.execution.symbolic.SymbolicState;
 import nl.uu.maze.util.Z3Sorts;
 import sootup.core.types.ArrayType;
+import sootup.core.types.ClassType;
 import sootup.core.types.Type;
 
 /**
@@ -71,7 +73,7 @@ public class JavaToZ3Transformer {
             return transformArray(value, expectedType);
         }
         // For any other object, allocate a new object in the heap
-        return transformObject(value);
+        return transformObject(value, expectedType);
     }
 
     private Expr<?> transform(Object value, Type expectedType) {
@@ -145,8 +147,27 @@ public class JavaToZ3Transformer {
         }
     }
 
-    private Expr<?> transformObject(Object value) {
+    private Expr<?> transformObject(Object value, Type expectedType) {
+        if (!(expectedType instanceof ClassType)) {
+            throw new UnsupportedOperationException("Expected type is not a class type: " + expectedType);
+        }
+
         // Allocate a symbolic object in the heap
-        return null;// state.heap.allocateObject(value.getClass());
+        Expr<?> symRef = state.heap.allocateObject(expectedType);
+
+        // Set the *public* fields of the object (not the private ones)
+        // getFields() returns only the public fields
+        for (Field field : value.getClass().getFields()) {
+            try {
+                Object fieldValue = field.get(value);
+                // TODO: if the field is an array or another object, we need a way to get the
+                // SootUp type of the field
+                Expr<?> fieldExpr = transform(fieldValue, state, null);
+                state.heap.setField(symRef, field.getName(), fieldExpr, null);
+            } catch (IllegalArgumentException | IllegalAccessException e) {
+                throw new UnsupportedOperationException("Failed to access field: " + field.getName(), e);
+            }
+        }
+        return symRef;
     }
 }
