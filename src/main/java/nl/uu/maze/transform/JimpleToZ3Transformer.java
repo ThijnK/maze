@@ -584,17 +584,16 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
             }
         }
 
-        // Get instance object from ArgMap if needed
+        // Get instance object from ArgMap if we need one
         Object instance = null;
         if (base != null) {
             Expr<?> symRef = state.getVariable(base.getName());
-            if (symRef.getSort().equals(sorts.getRefSort())) {
-                Expr<?> conRef = state.heap.getSingleAlias(symRef);
-                if (conRef != null) {
-                    // TODO: problem is that argMap here is not yet converted to concrete values
-                    instance = argMap.get(conRef.toString());
-                }
+            // Let's assume that the base is always a reference to an object
+            if (!symRef.getSort().equals(sorts.getRefSort())) {
+                throw new UnsupportedOperationException("Base of invoke expression is not a reference");
             }
+            String key = symRef.toString();
+            instance = argMap.toJava(key, method.getDeclaringClass());
         }
 
         Object retval = executor.execute(instance, method, argMap);

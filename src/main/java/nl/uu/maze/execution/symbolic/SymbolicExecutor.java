@@ -67,6 +67,7 @@ public class SymbolicExecutor {
             return handleSwitchStmt(cfg, (JSwitchStmt) stmt, state, iterator);
         else if (stmt instanceof AbstractDefinitionStmt)
             return handleDefStmt(cfg, (AbstractDefinitionStmt) stmt, state);
+        // TODO: handle JInvokeStmt (i.e., when method is invoked outside of assignment)
         else
             return handleOtherStmts(cfg, stmt, state);
     }

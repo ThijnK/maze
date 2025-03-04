@@ -106,11 +106,22 @@ public class ArgMap {
 
     /**
      * Convert an entry in the ArgMap to the correct Java type.
+     * 
+     * @param key  The key of the entry
+     * @param type The type to convert the entry to
+     * @return The converted object
+     */
+    public Object toJava(String key, Class<?> type) {
+        return toJava(key, args.get(key), type);
+    }
+
+    /**
+     * Convert an entry in the ArgMap to the correct Java type.
      * Stores the converted object in the converted map to avoid re-converting the
      * same object multiple times and to allow referencing the same object multiple
      * times.
      */
-    public Object toJava(String key, Object value, Class<?> type) {
+    private Object toJava(String key, Object value, Class<?> type) {
         // If already defined from resolving a reference, skip
         if (converted.containsKey(key)) {
             return converted.get(key);

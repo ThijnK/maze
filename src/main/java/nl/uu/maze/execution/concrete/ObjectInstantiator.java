@@ -128,7 +128,7 @@ public class ObjectInstantiator {
             // If the parameter is known, use the known value
             String name = ArgMap.getSymbolicName(methodType, i);
             if (argMap != null && argMap.containsKey(name)) {
-                arguments[i] = argMap.toJava(name, argMap.get(name), params[i].getType());
+                arguments[i] = argMap.toJava(name, params[i].getType());
                 continue;
             }
 
