@@ -156,6 +156,7 @@ public class SymbolicStateValidator {
                         continue;
                     }
                     String fieldName = var.substring(var.indexOf('_') + 1);
+                    Type fieldType = heapObj.getFieldType(fieldName);
 
                     ObjectInstance objFields = (ObjectInstance) argMap.getOrNew(varBase,
                             new ObjectInstance((ClassType) heapObj.getType()));
@@ -164,21 +165,18 @@ public class SymbolicStateValidator {
                     if (conRef != null) {
                         // If heap reference is null, set field to null
                         if (isNull) {
-                            objFields.setField(fieldName, null, heapObj.getFieldType(fieldName));
+                            objFields.setField(fieldName, null, fieldType);
                         }
                         // Otherwise, set field to reference the heap object
                         else {
                             ObjectRef ref = new ObjectRef(conRef.toString());
-                            objFields.setField(fieldName, ref, heapObj.getFieldType(fieldName));
+                            objFields.setField(fieldName, ref, fieldType);
                         }
                     }
                     // Otherwise, it's a primitive type
                     else {
-                        // TODO: heapObj.getType() is not the correct type here, should be the type for
-                        // the field, which we can achieve by storing the type of fields in HeapObject!
-
-                        Object value = transformer.transformExpr(model.getConstInterp(decl), heapObj.getType());
-                        objFields.setField(fieldName, value, heapObj.getFieldType(fieldName));
+                        Object value = transformer.transformExpr(expr, fieldType);
+                        objFields.setField(fieldName, value, fieldType);
                     }
                 }
                 continue;
