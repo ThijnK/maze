@@ -7,19 +7,12 @@ import java.lang.reflect.Modifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import nl.uu.maze.analysis.JavaAnalyzer;
 import nl.uu.maze.execution.ArgMap;
 import nl.uu.maze.execution.MethodType;
 import nl.uu.maze.util.ArrayUtils;
 
 public class ConcreteExecutor {
     private static final Logger logger = LoggerFactory.getLogger(ConcreteExecutor.class);
-
-    private JavaAnalyzer analyzer;
-
-    public ConcreteExecutor(JavaAnalyzer analyzer) {
-        this.analyzer = analyzer;
-    }
 
     /**
      * Run concrete execution on the given method, using the given constructor to
@@ -38,7 +31,7 @@ public class ConcreteExecutor {
         // If not static, create an instance of the class
         Object instance = null;
         if (!Modifier.isStatic(method.getModifiers())) {
-            instance = ObjectInstantiator.createInstance(ctor, argMap, analyzer);
+            instance = ObjectInstantiator.createInstance(ctor, argMap);
         }
         return execute(instance, method, argMap);
     }
@@ -54,8 +47,7 @@ public class ConcreteExecutor {
      */
     public Object execute(Object instance, Method method, ArgMap argMap) {
         try {
-            Object[] args = ObjectInstantiator.generateArgs(method.getParameters(), MethodType.METHOD, argMap,
-                    analyzer);
+            Object[] args = ObjectInstantiator.generateArgs(method.getParameters(), MethodType.METHOD, argMap);
             logger.debug("Executing method " + method.getName() + " with args: " + ArrayUtils.toString(args));
             Object result = method.invoke(instance, args);
             logger.debug("Retval: " + (result == null ? "null" : result.toString()));

@@ -11,7 +11,6 @@ import java.lang.reflect.Parameter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import nl.uu.maze.analysis.JavaAnalyzer;
 import nl.uu.maze.execution.ArgMap;
 import nl.uu.maze.execution.MethodType;
 import nl.uu.maze.util.ArrayUtils;
@@ -41,7 +40,7 @@ public class ObjectInstantiator {
     public static Object createInstance(Class<?> clazz) {
         // Try to create an instance using one of the constructors
         for (Constructor<?> ctor : clazz.getConstructors()) {
-            Object instance = createInstance(ctor, null, null);
+            Object instance = createInstance(ctor, generateArgs(ctor.getParameters(), MethodType.CTOR, null));
             if (instance != null) {
                 return instance;
             }
@@ -55,14 +54,13 @@ public class ObjectInstantiator {
      * Attempt to create an instance of the given class using the given
      * {@link ArgMap} to determine the arguments to pass to the constructor.
      * 
-     * @param clazz    The class to instantiate
-     * @param argMap   {@link ArgMap} containing the arguments to pass to the
-     *                 constructor
-     * @param analyzer The {@link JavaAnalyzer} instance
+     * @param clazz  The class to instantiate
+     * @param argMap {@link ArgMap} containing the arguments to pass to the
+     *               constructor
      * @return An instance of the class or null if the instance could not be created
      */
-    public static Object createInstance(Constructor<?> ctor, ArgMap argMap, JavaAnalyzer analyzer) {
-        return createInstance(ctor, generateArgs(ctor.getParameters(), MethodType.CTOR, argMap, analyzer));
+    public static Object createInstance(Constructor<?> ctor, ArgMap argMap) {
+        return createInstance(ctor, generateArgs(ctor.getParameters(), MethodType.CTOR, argMap));
     }
 
     /**
@@ -104,7 +102,7 @@ public class ObjectInstantiator {
      * @return An array of arguments corresponding to the given parameters
      */
     public static Object[] generateArgs(Parameter[] params) {
-        return generateArgs(params, MethodType.METHOD, null, null);
+        return generateArgs(params, MethodType.METHOD, null);
     }
 
     /**
@@ -120,9 +118,7 @@ public class ObjectInstantiator {
      * @param methodType The type of the method
      * @return An array of arguments corresponding to the given parameters
      */
-    public static Object[] generateArgs(Parameter[] params, MethodType methodType, ArgMap argMap,
-            // TODO: can remove the analyzer here
-            JavaAnalyzer analyzer) {
+    public static Object[] generateArgs(Parameter[] params, MethodType methodType, ArgMap argMap) {
         Object[] arguments = new Object[params.length];
         for (int i = 0; i < params.length; i++) {
             // If the parameter is known, use the known value

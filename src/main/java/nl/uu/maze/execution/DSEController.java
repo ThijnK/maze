@@ -105,7 +105,7 @@ public class DSEController {
         this.sootClass = analyzer.getSootClass(classType);
         this.clazz = analyzer.getJavaClass(classType);
         this.generator = new JUnitTestGenerator(clazz, analyzer);
-        this.concrete = new ConcreteExecutor(analyzer);
+        this.concrete = new ConcreteExecutor();
         this.validator = new SymbolicStateValidator(ctx);
         this.transformer = new JimpleToZ3Transformer(ctx, concrete, validator, analyzer);
         this.symbolic = new SymbolicExecutor(ctx, transformer);
