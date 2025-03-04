@@ -1,5 +1,6 @@
 package nl.uu.maze.transform;
 
+import java.lang.reflect.Method;
 import java.util.function.BiFunction;
 
 import javax.annotation.Nonnull;
@@ -7,13 +8,16 @@ import javax.annotation.Nonnull;
 import com.microsoft.z3.*;
 import com.microsoft.z3.Expr;
 
+import nl.uu.maze.analysis.JavaAnalyzer;
 import nl.uu.maze.execution.ArgMap;
 import nl.uu.maze.execution.concrete.ConcreteExecutor;
 import nl.uu.maze.execution.symbolic.SymbolicState;
+import nl.uu.maze.execution.symbolic.SymbolicStateValidator;
 import nl.uu.maze.util.Pair;
 import nl.uu.maze.util.Z3Sorts;
 import sootup.core.jimple.visitor.AbstractValueVisitor;
 import sootup.core.signatures.FieldSignature;
+import sootup.core.signatures.MethodSignature;
 import sootup.core.jimple.basic.*;
 import sootup.core.jimple.common.constant.*;
 import sootup.core.jimple.common.expr.*;
@@ -28,14 +32,19 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
 
     private final Context ctx;
     private final ConcreteExecutor executor;
+    private final SymbolicStateValidator validator;
+    private final JavaAnalyzer analyzer;
     private final JavaToZ3Transformer javaToZ3;
 
     private SymbolicState state;
     private String lhs;
 
-    public JimpleToZ3Transformer(Context ctx, ConcreteExecutor executor) {
+    public JimpleToZ3Transformer(Context ctx, ConcreteExecutor executor, SymbolicStateValidator validator,
+            JavaAnalyzer analyzer) {
         this.ctx = ctx;
         this.executor = executor;
+        this.validator = validator;
+        this.analyzer = analyzer;
         this.javaToZ3 = new JavaToZ3Transformer(ctx);
     }
 
@@ -537,17 +546,27 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
     // #endregion
 
     // #region Invocations
-    @Override
-    public void caseStaticInvokeExpr(@Nonnull JStaticInvokeExpr expr) {
-        Object retval = executor.execute(expr.getMethodSignature(), null);
-        Type retType = expr.getMethodSignature().getType();
+    private void handleInvokeExpr(MethodSignature methodSig) {
+        // Get the method from the method signature
+        Method method;
+        try {
+            method = analyzer.getJavaMethod(methodSig);
+        } catch (ClassNotFoundException | NoSuchMethodException e) {
+            throw new UnsupportedOperationException("Method not found: " + methodSig);
+        }
+
+        // Get the constructor of the class containing the method
+        Constructor<?> ctor = null; // TODO
+        Object instance = null;
+
+        Object retval = executor.execute(instance, method, null);
+        Type retType = methodSig.getType();
         setResult(javaToZ3.transform(retval, state, retType));
     }
 
     @Override
-    public void caseDynamicInvokeExpr(@Nonnull JDynamicInvokeExpr expr) {
-        // TODO Auto-generated method stub
-        super.caseDynamicInvokeExpr(expr);
+    public void caseStaticInvokeExpr(@Nonnull JStaticInvokeExpr expr) {
+        handleInvokeExpr(expr.getMethodSignature());
     }
 
     @Override
@@ -566,5 +585,11 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
     public void caseVirtualInvokeExpr(@Nonnull JVirtualInvokeExpr expr) {
         // TODO Auto-generated method stub
         super.caseVirtualInvokeExpr(expr);
+    }
+
+    @Override
+    public void caseDynamicInvokeExpr(@Nonnull JDynamicInvokeExpr expr) {
+        // TODO Auto-generated method stub
+        super.caseDynamicInvokeExpr(expr);
     }
 }

@@ -3,6 +3,8 @@ package nl.uu.maze.execution.concrete;
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 import java.util.Map.Entry;
@@ -29,39 +31,73 @@ public class ObjectInstantiator {
     private static Random rand = new Random();
 
     /**
-     * Create an instance of the given class using randomly generated arguments.
-     * 
-     * @param clazz The class to instantiate
-     * @return An instance of the class
+     * Map of cut instances, indexed by their hash code.
+     * Used to keep track of instances of the CUT that have been previously created,
+     * to be able to reuse them when possible.
      */
-    public static Object createInstance(Class<?> clazz) {
-        return createInstance(clazz, null, null);
-    }
+    private static Map<Integer, Object> cutInstances = new HashMap<>();
 
     /**
-     * Create an instance of the given class using the first constructor found.
+     * Attempt to create an instance of the given class.
      * 
-     * @param clazz  The class to instantiate
-     * @param argMap Optional {@link ArgMap} containing the arguments to pass to the
-     *               constructor
-     * @return An instance of the class
+     * @param clazz The class to instantiate
+     * @return An instance of the class or null if the instance could not be created
      */
-    private static Object createInstance(Class<?> clazz, ArgMap argMap, JavaAnalyzer analyzer) {
+    public static Object createInstance(Class<?> clazz) {
         // Try to create an instance using one of the constructors
         for (Constructor<?> ctor : clazz.getConstructors()) {
-            try {
-                logger.debug("Param types: " + ctor.getParameterTypes());
-                Object[] args = generateArgs(ctor.getParameters(), MethodType.CTOR, argMap, analyzer);
-                logger.debug(
-                        "Creating instance of class: " + clazz.getName() + " with args: " + ArrayUtils.toString(args));
-                return ctor.newInstance(args);
-            } catch (Exception e) {
-                e.printStackTrace();
+            Object instance = createInstance(ctor, null, null);
+            if (instance != null) {
+                return instance;
             }
         }
 
         logger.warn("Failed to create instance of class: " + clazz.getName());
         return null;
+    }
+
+    /**
+     * Attempt to create an instance of the given class using the given
+     * {@link ArgMap} to determine the arguments to pass to the constructor.
+     * 
+     * @param clazz    The class to instantiate
+     * @param argMap   {@link ArgMap} containing the arguments to pass to the
+     *                 constructor
+     * @param analyzer The {@link JavaAnalyzer} instance
+     * @return An instance of the class or null if the instance could not be created
+     */
+    public static Object createInstance(Constructor<?> ctor, ArgMap argMap, JavaAnalyzer analyzer) {
+        return createInstance(ctor, generateArgs(ctor.getParameters(), MethodType.CTOR, argMap, analyzer));
+    }
+
+    /**
+     * Attempt to create an instance of the given class using the given arguments.
+     * 
+     * @param ctor The constructor to use to create the instance
+     * @param args The arguments to pass to the constructor
+     * @return An instance of the class or null if the instance could not be created
+     */
+    public static Object createInstance(Constructor<?> ctor, Object[] args) {
+        try {
+            int hash = Arrays.hashCode(args);
+            hash = 31 * hash + ctor.getDeclaringClass().getName().hashCode();
+            // Check if an instance of the class has already
+            // been created with the same arguments
+            if (cutInstances.containsKey(hash)) {
+                return cutInstances.get(hash);
+            } else {
+                logger.debug("Creating instance of class " + ctor.getDeclaringClass().getName() + " with args: "
+                        + ArrayUtils.toString(args));
+                Object instance = ctor.newInstance(args);
+
+                // Store the instance in the cutInstances map
+                cutInstances.put(hash, instance);
+                return instance;
+            }
+        } catch (Exception e) {
+            logger.warn("Constructor of " + ctor.getDeclaringClass().getSimpleName() + " threw an exception: " + e);
+            return null;
+        }
     }
 
     /**

@@ -33,6 +33,7 @@ import nl.uu.maze.search.ConcreteSearchStrategy;
 import nl.uu.maze.search.SearchStrategy;
 import nl.uu.maze.search.SearchStrategyFactory;
 import nl.uu.maze.search.SymbolicSearchStrategy;
+import nl.uu.maze.transform.JimpleToZ3Transformer;
 import nl.uu.maze.util.Z3Sorts;
 import sootup.core.graph.StmtGraph;
 import sootup.java.core.JavaSootClass;
@@ -63,6 +64,7 @@ public class DSEController {
     private final SymbolicStateValidator validator;
     private final ConcreteExecutor concrete;
     private final JUnitTestGenerator generator;
+    private final JimpleToZ3Transformer transformer;
 
     private Constructor<?> ctor;
     private JavaSootMethod ctorSoot;
@@ -104,8 +106,9 @@ public class DSEController {
         this.clazz = analyzer.getJavaClass(classType);
         this.generator = new JUnitTestGenerator(clazz, analyzer);
         this.concrete = new ConcreteExecutor(analyzer);
-        this.symbolic = new SymbolicExecutor(ctx, concrete);
         this.validator = new SymbolicStateValidator(ctx);
+        this.transformer = new JimpleToZ3Transformer(ctx, concrete, validator, analyzer);
+        this.symbolic = new SymbolicExecutor(ctx, transformer);
     }
 
     /**

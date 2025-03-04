@@ -3,9 +3,6 @@ package nl.uu.maze.execution.concrete;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,7 +11,6 @@ import nl.uu.maze.analysis.JavaAnalyzer;
 import nl.uu.maze.execution.ArgMap;
 import nl.uu.maze.execution.MethodType;
 import nl.uu.maze.util.ArrayUtils;
-import sootup.core.signatures.MethodSignature;
 
 public class ConcreteExecutor {
     private static final Logger logger = LoggerFactory.getLogger(ConcreteExecutor.class);
@@ -23,28 +19,6 @@ public class ConcreteExecutor {
 
     public ConcreteExecutor(JavaAnalyzer analyzer) {
         this.analyzer = analyzer;
-    }
-
-    /**
-     * Map of cut instances, indexed by their hash code.
-     * Used to keep track of instances of the CUT that have been previously created,
-     * to be able to reuse them when possible.
-     */
-    private Map<Integer, Object> cutInstances = new HashMap<>();
-
-    public Object execute(MethodSignature methodSignature, ArgMap argMap) {
-        try {
-            // Get the method from the method signature
-            Method method = analyzer.getJavaMethod(methodSignature);
-
-            // Get the constructor of the class containing the method
-            Constructor<?> ctor = null; // TODO
-
-            return execute(ctor, method, argMap);
-        } catch (Exception e) {
-            logger.warn("Execution of method " + methodSignature + " threw an exception: " + e);
-            return null;
-        }
     }
 
     /**
@@ -61,41 +35,27 @@ public class ConcreteExecutor {
      * @throws InstantiationException
      */
     public Object execute(Constructor<?> ctor, Method method, ArgMap argMap) {
-        try {
-            // If not static, create an instance of the class
-            Object instance = null;
-            if (!Modifier.isStatic(method.getModifiers())) {
-                // Call generateArgs with argMap to use argumens from the map if present
-                Object[] args = ObjectInstantiator.generateArgs(ctor.getParameters(), MethodType.CTOR, argMap,
-                        analyzer);
-                int hash = Arrays.hashCode(args);
-                // Check if an instance of the class has already
-                // been created with the same arguments
-                if (cutInstances.containsKey(hash)) {
-                    instance = cutInstances.get(hash);
-                } else {
-                    logger.debug("Creating instance of class " + ctor.getDeclaringClass().getName() + " with args: "
-                            + ArrayUtils.toString(args));
-                    instance = ctor.newInstance(args);
-
-                    // Store the instance in the cutInstances map
-                    cutInstances.put(hash, instance);
-                }
-            }
-
-            return execute(instance, method, argMap);
-        } catch (Exception e) {
-            logger.warn("Constructor of " + method.getDeclaringClass().getSimpleName() + " threw an exception: " + e);
-            return null;
+        // If not static, create an instance of the class
+        Object instance = null;
+        if (!Modifier.isStatic(method.getModifiers())) {
+            instance = ObjectInstantiator.createInstance(ctor, argMap, analyzer);
         }
+        Object[] args = ObjectInstantiator.generateArgs(method.getParameters(), MethodType.METHOD, argMap, analyzer);
+
+        return execute(instance, method, args);
     }
 
-    public Object execute(Object instance, Method method, ArgMap argMap) {
+    /**
+     * Run concrete execution on the given method, using the given instance to
+     * invoke the method with the given arguments.
+     * 
+     * @param instance The instance to invoke the method on
+     * @param method   The method to invoke
+     * @param args     The arguments to pass to the method invocation
+     * @return The return value of the method
+     */
+    public Object execute(Object instance, Method method, Object[] args) {
         try {
-            // Generate args for the method invocation
-            Object[] args = ObjectInstantiator.generateArgs(method.getParameters(), MethodType.METHOD, argMap,
-                    analyzer);
-
             logger.debug("Executing method " + method.getName() + " with args: " + ArrayUtils.toString(args));
             Object result = method.invoke(instance, args);
             logger.debug("Retval: " + (result == null ? "null" : result.toString()));

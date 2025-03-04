@@ -8,7 +8,6 @@ import java.util.Set;
 
 import com.microsoft.z3.*;
 
-import nl.uu.maze.execution.concrete.ConcreteExecutor;
 import nl.uu.maze.instrument.TraceManager.TraceEntry;
 import nl.uu.maze.transform.JimpleToZ3Transformer;
 import nl.uu.maze.util.Z3Sorts;
@@ -30,9 +29,9 @@ public class SymbolicExecutor {
     private final JimpleToZ3Transformer transformer;
     private final SymbolicRefExtractor refExtractor = new SymbolicRefExtractor();
 
-    public SymbolicExecutor(Context ctx, ConcreteExecutor concreteExecutor) {
+    public SymbolicExecutor(Context ctx, JimpleToZ3Transformer transformer) {
         this.ctx = ctx;
-        this.transformer = new JimpleToZ3Transformer(ctx, concreteExecutor);
+        this.transformer = transformer;
     }
 
     /**
@@ -257,7 +256,7 @@ public class SymbolicExecutor {
         List<SymbolicState> newStates = new ArrayList<SymbolicState>();
         List<Stmt> succs = cfg.getAllSuccessors(stmt);
         // Note: generally non-branching statements will not have more than 1 successor,
-        // but it can happen for exception-throwing statements
+        // but it can happen for exception-throwing statements inside a try block
         for (int i = 0; i < succs.size(); i++) {
             SymbolicState newState = i == succs.size() - 1 ? state : state.clone();
             newState.setCurrentStmt(succs.get(i));
