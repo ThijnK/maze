@@ -1,6 +1,8 @@
 package nl.uu.maze.transform;
 
 import java.lang.reflect.Method;
+import java.util.List;
+import java.util.Optional;
 import java.util.function.BiFunction;
 
 import javax.annotation.Nonnull;
@@ -10,6 +12,7 @@ import com.microsoft.z3.Expr;
 
 import nl.uu.maze.analysis.JavaAnalyzer;
 import nl.uu.maze.execution.ArgMap;
+import nl.uu.maze.execution.MethodType;
 import nl.uu.maze.execution.concrete.ConcreteExecutor;
 import nl.uu.maze.execution.symbolic.SymbolicState;
 import nl.uu.maze.execution.symbolic.SymbolicStateValidator;
@@ -546,7 +549,7 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
     // #endregion
 
     // #region Invocations
-    private void handleInvokeExpr(MethodSignature methodSig) {
+    private void handleInvokeExpr(MethodSignature methodSig, List<Immediate> args) {
         // Get the method from the method signature
         Method method;
         try {
@@ -559,14 +562,40 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
         Constructor<?> ctor = null; // TODO
         Object instance = null;
 
-        Object retval = executor.execute(instance, method, null);
+        Optional<ArgMap> argMapOpt = validator.evaluate(state);
+        // If state is not satisfiable at this point, just stop execution of this path
+        if (!argMapOpt.isPresent()) {
+            return; // TODO: indicate in the state that execution is to be aborted?
+        }
+        ArgMap argMap = argMapOpt.get();
+
+        // Overwrite the method arguments (marg0 etc.) with the args for this method
+        // call
+        for (int i = 0; i < args.size(); i++) {
+            Immediate arg = args.get(i);
+            Expr<?> argExpr = transform(arg);
+            String name = ArgMap.getSymbolicName(MethodType.METHOD, i);
+            if (argExpr.getSort().equals(sorts.getRefSort())) {
+                // If the argument is a reference, set it to refer to that ref in ArgMap
+                // TODO: only fields of an object are set if they appear in the Z3 model
+                // TODO: need to also set values for other fields stored in heap!
+                argMap.set(name, argExpr.toString());
+            }
+            // Otherwise, convert the expr to a Java value and set it in the ArgMap
+            else {
+                Object argVal = validator.evaluate(argExpr, arg.getType());
+                argMap.set(name, argVal);
+            }
+        }
+
+        Object retval = executor.execute(instance, method, argMap);
         Type retType = methodSig.getType();
         setResult(javaToZ3.transform(retval, state, retType));
     }
 
     @Override
     public void caseStaticInvokeExpr(@Nonnull JStaticInvokeExpr expr) {
-        handleInvokeExpr(expr.getMethodSignature());
+        handleInvokeExpr(expr.getMethodSignature(), expr.getArgs());
     }
 
     @Override

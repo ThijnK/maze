@@ -36,6 +36,8 @@ public class SymbolicStateValidator {
 
     private Solver solver;
     private Z3ToJavaTransformer transformer;
+    /** Last created Z3 model */
+    private Model model;
 
     public SymbolicStateValidator(Context ctx) {
         this.solver = ctx.mkSolver();
@@ -201,6 +203,7 @@ public class SymbolicStateValidator {
      */
     public Optional<ArgMap> evaluate(SymbolicState state) {
         Optional<Model> model = validate(state);
+        model.ifPresent(m -> this.model = m);
         return model.map(m -> evaluate(m, state));
     }
 
@@ -217,6 +220,20 @@ public class SymbolicStateValidator {
             params.ifPresent(result::add);
         }
         return result;
+    }
+
+    /**
+     * Evaluates the given expression with the given type.
+     * 
+     * @param expr The expression to evaluate
+     * @param type The type of the expression
+     * @return The evaluated object
+     */
+    public Object evaluate(Expr<?> expr, Type type) {
+        if (model != null) {
+            return transformer.transformExpr(model.eval(expr, true), type);
+        }
+        return transformer.transformExpr(expr, type);
     }
 
     /**

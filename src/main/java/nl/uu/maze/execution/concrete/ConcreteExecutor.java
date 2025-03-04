@@ -40,9 +40,7 @@ public class ConcreteExecutor {
         if (!Modifier.isStatic(method.getModifiers())) {
             instance = ObjectInstantiator.createInstance(ctor, argMap, analyzer);
         }
-        Object[] args = ObjectInstantiator.generateArgs(method.getParameters(), MethodType.METHOD, argMap, analyzer);
-
-        return execute(instance, method, args);
+        return execute(instance, method, argMap);
     }
 
     /**
@@ -54,8 +52,10 @@ public class ConcreteExecutor {
      * @param args     The arguments to pass to the method invocation
      * @return The return value of the method
      */
-    public Object execute(Object instance, Method method, Object[] args) {
+    public Object execute(Object instance, Method method, ArgMap argMap) {
         try {
+            Object[] args = ObjectInstantiator.generateArgs(method.getParameters(), MethodType.METHOD, argMap,
+                    analyzer);
             logger.debug("Executing method " + method.getName() + " with args: " + ArrayUtils.toString(args));
             Object result = method.invoke(instance, args);
             logger.debug("Retval: " + (result == null ? "null" : result.toString()));
