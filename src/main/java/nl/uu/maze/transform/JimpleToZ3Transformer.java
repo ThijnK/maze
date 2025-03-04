@@ -7,6 +7,9 @@ import java.util.function.BiFunction;
 
 import javax.annotation.Nonnull;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.microsoft.z3.*;
 import com.microsoft.z3.Expr;
 
@@ -32,6 +35,7 @@ import sootup.core.types.*;
  * Transforms a Jimple value ({@link Value}) to a Z3 expression ({@link Expr}).
  */
 public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
+    private static final Logger logger = LoggerFactory.getLogger(JimpleToZ3Transformer.class);
     private static final Z3Sorts sorts = Z3Sorts.getInstance();
 
     private final Context ctx;
@@ -556,7 +560,9 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
         try {
             method = analyzer.getJavaMethod(methodSig);
         } catch (ClassNotFoundException | NoSuchMethodException e) {
-            throw new UnsupportedOperationException("Method not found: " + methodSig);
+            logger.error("Failed to find method: " + methodSig);
+            setResult(null);
+            return;
         }
 
         // Evaluate the state and fill object fields with their current values

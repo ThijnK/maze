@@ -256,7 +256,7 @@ public class JavaAnalyzer {
         // Find a constructor for which arguments can be generated
         for (Constructor<?> ctor : clazz.getConstructors()) {
             try {
-                Object[] args = ObjectInstantiator.generateArgs(ctor.getParameters(), MethodType.CTOR, null, this);
+                Object[] args = ObjectInstantiator.generateArgs(ctor.getParameters(), MethodType.CTOR, null);
                 return Pair.of(ctor, args);
             } catch (Exception e) {
                 e.printStackTrace();

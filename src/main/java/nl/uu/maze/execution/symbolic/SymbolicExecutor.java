@@ -15,6 +15,7 @@ import nl.uu.maze.util.Z3Utils;
 import sootup.core.graph.*;
 import sootup.core.jimple.basic.LValue;
 import sootup.core.jimple.common.constant.IntConstant;
+import sootup.core.jimple.common.expr.AbstractInvokeExpr;
 import sootup.core.jimple.common.ref.*;
 import sootup.core.jimple.common.stmt.*;
 import sootup.core.jimple.javabytecode.stmt.JSwitchStmt;
@@ -67,7 +68,8 @@ public class SymbolicExecutor {
             return handleSwitchStmt(cfg, (JSwitchStmt) stmt, state, iterator);
         else if (stmt instanceof AbstractDefinitionStmt)
             return handleDefStmt(cfg, (AbstractDefinitionStmt) stmt, state);
-        // TODO: handle JInvokeStmt (i.e., when method is invoked outside of assignment)
+        else if (stmt instanceof JInvokeStmt)
+            return handleInvokeStmt(cfg, (JInvokeStmt) stmt, state);
         else
             return handleOtherStmts(cfg, stmt, state);
     }
@@ -242,6 +244,31 @@ public class SymbolicExecutor {
         }
 
         // Definition statements follow the same control flow as other statements
+        return handleOtherStmts(cfg, stmt, state);
+    }
+
+    /**
+     * Handle invoke statements during symbolic execution.
+     * 
+     * @param cfg   The control flow graph
+     * @param stmt  The invoke statement as a Jimple statement ({@link JInvokeStmt})
+     * @param state The current symbolic state
+     * @return A list of new symbolic states after executing the invoke statement
+     */
+    private List<SymbolicState> handleInvokeStmt(StmtGraph<?> cfg, JInvokeStmt stmt, SymbolicState state) {
+        // TODO: may need special handling for contructors
+        AbstractInvokeExpr invokeExpr = stmt.getInvokeExpr();
+        // Resolve aliases
+        Expr<?> symRef = refExtractor.extract(invokeExpr, state);
+        Optional<List<SymbolicState>> splitStates = splitOnAliases(state, symRef);
+        if (splitStates.isPresent()) {
+            return splitStates.get();
+        }
+
+        // Handle method invocation
+        transformer.transform(invokeExpr, state);
+
+        // Invoke statements follow the same control flow as other statements
         return handleOtherStmts(cfg, stmt, state);
     }
 
