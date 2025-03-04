@@ -561,7 +561,6 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
             method = analyzer.getJavaMethod(methodSig);
         } catch (ClassNotFoundException | NoSuchMethodException e) {
             logger.error("Failed to find method: " + methodSig);
-            setResult(null);
             return;
         }
 
@@ -570,7 +569,8 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
         // If state is not satisfiable at this point, stop execution (prune) of this
         // path
         if (!argMapOpt.isPresent()) {
-            return; // TODO: indicate in the state that execution is to be aborted?
+            state.setInfeasible();
+            return;
         }
         ArgMap argMap = argMapOpt.get();
 

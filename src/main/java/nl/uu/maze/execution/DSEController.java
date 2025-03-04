@@ -188,7 +188,8 @@ public class DSEController {
             logger.debug("Current state: " + current);
             logger.debug("Next stmt: " + current.getCurrentStmt());
             if (!current.isCtor() && current.isFinalState(cfg) || current.incrementDepth() >= MAX_DEPTH) {
-                finalStates.add(current);
+                if (!current.isInfeasible())
+                    finalStates.add(current);
                 searchStrategy.remove(current);
                 continue;
             }
@@ -204,9 +205,10 @@ public class DSEController {
                 for (SymbolicState state : newStates) {
                     if (state.isFinalState(ctorCfg)) {
                         // If the state is an exception-throwing state, immediately add it to the
-                        // final states
-                        if (state.isExceptionThrown()) {
-                            finalStates.add(state);
+                        // final states, or if it is infeasible, skip it
+                        if (state.isExceptionThrown() || state.isInfeasible()) {
+                            if (!state.isInfeasible())
+                                finalStates.add(state);
                             searchStrategy.remove(state);
                             continue;
                         }
@@ -267,8 +269,9 @@ public class DSEController {
             // At the end of the ctor, start with the target method
             if (current.isCtor() && current.isFinalState(ctorCfg)) {
                 // If the state is an exception-throwing state, we stop immediately
-                if (current.isExceptionThrown()) {
-                    initStates.put(pathHash, current);
+                if (current.isExceptionThrown() || current.isInfeasible()) {
+                    if (!current.isInfeasible())
+                        initStates.put(pathHash, current);
                     break;
                 }
 
@@ -296,6 +299,8 @@ public class DSEController {
             TraceManager.clearEntries();
             concrete.execute(ctor, javaMethod, argMap);
             SymbolicState finalState = replaySymbolic(cfg, method);
+
+            // TODO: what to do if the final state is infeasible?
 
             boolean isNew = searchStrategy.add(finalState);
             // Only add a new test case if this path has not been explored before

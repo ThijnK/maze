@@ -48,6 +48,11 @@ public class SymbolicState {
 
     /** Indicates whether an exception was thrown during symbolic execution. */
     private boolean exceptionThrown = false;
+    /**
+     * Indicates whether the state is infeasible, i.e., path constraints
+     * unsatisfiable.
+     */
+    private boolean isInfeasible = false;
 
     public SymbolicState(Context ctx, Stmt stmt) {
         this.ctx = ctx;
@@ -146,6 +151,14 @@ public class SymbolicState {
         return exceptionThrown;
     }
 
+    public void setInfeasible() {
+        this.isInfeasible = true;
+    }
+
+    public boolean isInfeasible() {
+        return isInfeasible;
+    }
+
     /**
      * Returns the list of path constraints for this state.
      */
@@ -180,7 +193,7 @@ public class SymbolicState {
     }
 
     public boolean isFinalState(StmtGraph<?> cfg) {
-        return exceptionThrown || cfg.getAllSuccessors(currentStmt).isEmpty();
+        return exceptionThrown || isInfeasible || cfg.getAllSuccessors(currentStmt).isEmpty();
     }
 
     public SymbolicState clone(Stmt stmt) {
