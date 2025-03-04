@@ -242,10 +242,13 @@ public class ObjectInstantiator {
 
             newArgMap.set(name, obj);
         } else if (value.getClass().isArray()) {
+            // TODO: need the expected class of the array, not its current one
+            // TODO: can get it from heap as SootUp type, then need to convert to Class<?>
             // Convert array to correct type
             newArgMap.set(name, convertArray(value, value.getClass()));
         } else {
             // Cast to expected type to make sure it is correct
+            // TODO: casting to its current class..! Need actual type
             newArgMap.set(name, value.getClass().isPrimitive() ? wrap(value.getClass()).cast(value)
                     : value.getClass().cast(value));
         }

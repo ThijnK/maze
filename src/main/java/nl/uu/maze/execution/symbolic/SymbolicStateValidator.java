@@ -5,22 +5,16 @@ import java.util.Map;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Optional;
+import java.util.Map.Entry;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.microsoft.z3.BoolExpr;
-import com.microsoft.z3.Context;
-import com.microsoft.z3.Expr;
-import com.microsoft.z3.FuncDecl;
-import com.microsoft.z3.Model;
-import com.microsoft.z3.Solver;
-import com.microsoft.z3.Status;
+import com.microsoft.z3.*;
 
 import nl.uu.maze.analysis.JavaAnalyzer;
 import nl.uu.maze.execution.ArgMap;
-import nl.uu.maze.execution.symbolic.SymbolicHeap.ArrayObject;
-import nl.uu.maze.execution.symbolic.SymbolicHeap.HeapObject;
+import nl.uu.maze.execution.symbolic.SymbolicHeap.*;
 import nl.uu.maze.transform.Z3ToJavaTransformer;
 import nl.uu.maze.util.Z3Sorts;
 import sootup.core.types.ClassType;
@@ -95,10 +89,13 @@ public class SymbolicStateValidator {
     /**
      * Evaluates the model and returns a map of known parameters.
      * 
-     * @param model The Z3 model to evaluate
+     * @param model            The Z3 model to evaluate
+     * @param state            The symbolic state to evaluate
+     * @param fillObjectFields Whether to fill object fields with their current
+     *                         values on the heap
      * @return A map of known parameters
      */
-    public ArgMap evaluate(Model model, SymbolicState state) {
+    public ArgMap evaluate(Model model, SymbolicState state, boolean fillObjectFields) {
         ArgMap argMap = new ArgMap();
 
         // nullValue is the interpreted value of the null constant
@@ -192,26 +189,45 @@ public class SymbolicStateValidator {
             argMap.set(var, value);
         }
 
+        if (fillObjectFields) {
+            fillObjectFields(state, argMap);
+        }
         return argMap;
     }
 
     /**
      * Validates and evaluates the given symbolic state.
      * 
-     * @param state The symbolic state to validate and evaluate
-     * @return A map of known parameters if the path condition is satisfiable
+     * @param state            The symbolic state to validate and evaluate
+     * @param fillObjectFields Whether to fill object fields with their current
+     *                         values on the heap
+     * @@return A map of values extracted from the model if the path condition is
+     *          satisfiable
      */
-    public Optional<ArgMap> evaluate(SymbolicState state) {
+    public Optional<ArgMap> evaluate(SymbolicState state, boolean fillObjectFields) {
         Optional<Model> model = validate(state);
         model.ifPresent(m -> this.model = m);
-        return model.map(m -> evaluate(m, state));
+        return model.map(m -> evaluate(m, state, fillObjectFields));
+    }
+
+    /**
+     * Validates and evaluates the given symbolic state.
+     * 
+     * @param state The symbolic state to validate and evaluate
+     * @return A map of values extracted from the model if the path condition is
+     *         satisfiable
+     */
+    public Optional<ArgMap> evaluate(SymbolicState state) {
+        return evaluate(state, false);
     }
 
     /**
      * Validates and evaluates the given list of symbolic states.
      * 
      * @param states The symbolic states to validate and evaluate
-     * @return A list of known parameters for the satisfiable path conditions
+     * @return A list of maps of values extracted from the model if the path
+     *         condition is
+     *         satisfiable
      */
     public List<ArgMap> evaluate(List<SymbolicState> states) {
         List<ArgMap> result = new ArrayList<>();
@@ -227,13 +243,48 @@ public class SymbolicStateValidator {
      * 
      * @param expr The expression to evaluate
      * @param type The type of the expression
-     * @return The evaluated object
+     * @return The evaluated objects
      */
     public Object evaluate(Expr<?> expr, Type type) {
         if (model != null) {
             return transformer.transformExpr(model.eval(expr, true), type);
         }
         return transformer.transformExpr(expr, type);
+    }
+
+    /**
+     * Fills the fields of objects in the given symbolic state with their current
+     * values on the heap, if not already set in the argument map.
+     */
+    private void fillObjectFields(SymbolicState state, ArgMap argMap) {
+        // Go through the heap and set fields of objects that are not in the model
+        for (Entry<Expr<?>, HeapObject> entry : state.heap.entrySet()) {
+            String var = entry.getKey().toString();
+            HeapObject heapObj = entry.getValue();
+            if (heapObj instanceof ArrayObject) {
+                // Arrays will already be defined in the argument map
+                continue;
+            }
+            ObjectInstance objFields = (ObjectInstance) argMap.getOrNew(var,
+                    new ObjectInstance((ClassType) heapObj.getType()));
+            for (Entry<String, HeapObjectField> fieldEntry : heapObj.getFields()) {
+                String fieldName = fieldEntry.getKey();
+                if (objFields.hasField(fieldName)) {
+                    continue;
+                }
+                HeapObjectField field = fieldEntry.getValue();
+
+                Type fieldType = field.getType();
+                Expr<?> fieldValue = field.getValue();
+                // References to other objects stored as ObjectRef
+                if (field.getValue().getSort().equals(sorts.getRefSort())) {
+                    objFields.setField(fieldName, new ObjectRef(fieldValue.toString()), fieldType);
+                } else {
+                    Object value = transformer.transformExpr(fieldValue, fieldType);
+                    objFields.setField(fieldName, value, fieldType);
+                }
+            }
+        }
     }
 
     /**
@@ -327,6 +378,10 @@ public class SymbolicStateValidator {
 
         public void setField(String name, Object value, Type type) {
             fields.put(name, new ObjectField(value, type));
+        }
+
+        public boolean hasField(String name) {
+            return fields.containsKey(name);
         }
     }
 }

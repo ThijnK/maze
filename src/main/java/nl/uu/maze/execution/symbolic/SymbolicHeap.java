@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import com.microsoft.z3.ArrayExpr;
 import com.microsoft.z3.BitVecExpr;
@@ -81,6 +82,10 @@ public class SymbolicHeap {
 
     public HeapObject get(Expr<?> key) {
         return heap.get(key);
+    }
+
+    public Set<Entry<Expr<?>, HeapObject>> entrySet() {
+        return heap.entrySet();
     }
 
     public boolean containsRef(Expr<?> ref) {
@@ -710,6 +715,10 @@ public class SymbolicHeap {
         public Type getFieldType(String name) {
             HeapObjectField field = fields.get(name);
             return field != null ? field.getType() : null;
+        }
+
+        public Set<Entry<String, HeapObjectField>> getFields() {
+            return fields.entrySet();
         }
 
         public HeapObject clone() {

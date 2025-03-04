@@ -16,6 +16,7 @@ import nl.uu.maze.execution.MethodType;
 import nl.uu.maze.execution.concrete.ConcreteExecutor;
 import nl.uu.maze.execution.symbolic.SymbolicState;
 import nl.uu.maze.execution.symbolic.SymbolicStateValidator;
+import nl.uu.maze.execution.symbolic.SymbolicStateValidator.ObjectRef;
 import nl.uu.maze.util.Pair;
 import nl.uu.maze.util.Z3Sorts;
 import sootup.core.jimple.visitor.AbstractValueVisitor;
@@ -558,28 +559,28 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
             throw new UnsupportedOperationException("Method not found: " + methodSig);
         }
 
-        // Get the constructor of the class containing the method
+        // Get the constructor of the class containing the metho
+        method.getDeclaringClass();
         Constructor<?> ctor = null; // TODO
         Object instance = null;
 
-        Optional<ArgMap> argMapOpt = validator.evaluate(state);
-        // If state is not satisfiable at this point, just stop execution of this path
+        // Evaluate the state and fill object fields with their current values
+        Optional<ArgMap> argMapOpt = validator.evaluate(state, true);
+        // If state is not satisfiable at this point, stop execution (prune) of this
+        // path
         if (!argMapOpt.isPresent()) {
             return; // TODO: indicate in the state that execution is to be aborted?
         }
         ArgMap argMap = argMapOpt.get();
 
-        // Overwrite the method arguments (marg0 etc.) with the args for this method
-        // call
+        // Overwrite the method args (marg0 etc.) with the args for this method call
         for (int i = 0; i < args.size(); i++) {
             Immediate arg = args.get(i);
             Expr<?> argExpr = transform(arg);
             String name = ArgMap.getSymbolicName(MethodType.METHOD, i);
             if (argExpr.getSort().equals(sorts.getRefSort())) {
                 // If the argument is a reference, set it to refer to that ref in ArgMap
-                // TODO: only fields of an object are set if they appear in the Z3 model
-                // TODO: need to also set values for other fields stored in heap!
-                argMap.set(name, argExpr.toString());
+                argMap.set(name, new ObjectRef(argExpr.toString()));
             }
             // Otherwise, convert the expr to a Java value and set it in the ArgMap
             else {

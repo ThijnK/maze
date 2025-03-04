@@ -275,7 +275,7 @@ public class JUnitTestGenerator {
                 methodBuilder.addStatement("setField($L, \"$L\", $L)", var, entry.getKey(), ref.getVar());
             } else {
                 methodBuilder.addStatement("setField($L, \"$L\", $L)", var, entry.getKey(),
-                        valueToString(entry.getValue()));
+                        valueToString(entry.getValue().getValue()));
             }
         }
     }
