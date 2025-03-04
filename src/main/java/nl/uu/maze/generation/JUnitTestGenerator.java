@@ -24,10 +24,8 @@ import com.palantir.javapoet.*;
 
 import nl.uu.maze.analysis.JavaAnalyzer;
 import nl.uu.maze.execution.ArgMap;
+import nl.uu.maze.execution.ArgMap.*;
 import nl.uu.maze.execution.MethodType;
-import nl.uu.maze.execution.symbolic.SymbolicStateValidator.ObjectField;
-import nl.uu.maze.execution.symbolic.SymbolicStateValidator.ObjectInstance;
-import nl.uu.maze.execution.symbolic.SymbolicStateValidator.ObjectRef;
 
 /**
  * Generates JUnit test cases from a given Z3 model and symbolic state for a

@@ -315,7 +315,7 @@ public class DSEController {
 
             // If a new path condition is found, evaluate it to get the next set of
             // arguments which will be used in the next iteration for concrete execution
-            argMap = validator.evaluate(model.get(), finalState);
+            argMap = validator.evaluate(model.get(), finalState, false);
         }
     }
 

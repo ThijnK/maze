@@ -15,10 +15,8 @@ import org.slf4j.LoggerFactory;
 
 import nl.uu.maze.analysis.JavaAnalyzer;
 import nl.uu.maze.execution.ArgMap;
+import nl.uu.maze.execution.ArgMap.*;
 import nl.uu.maze.execution.MethodType;
-import nl.uu.maze.execution.symbolic.SymbolicStateValidator.ObjectField;
-import nl.uu.maze.execution.symbolic.SymbolicStateValidator.ObjectInstance;
-import nl.uu.maze.execution.symbolic.SymbolicStateValidator.ObjectRef;
 import nl.uu.maze.util.ArrayUtils;
 
 /**
@@ -132,14 +130,13 @@ public class ObjectInstantiator {
         for (int i = 0; i < params.length; i++) {
             // If the parameter is known, use the known value
             String name = ArgMap.getSymbolicName(methodType, i);
-            Class<?> type = params[i].getType();
             if (convertedArgMap != null && convertedArgMap.containsKey(name)) {
                 arguments[i] = convertedArgMap.get(name);
                 continue;
             }
 
             // Generate random value for the parameter
-            arguments[i] = generateRandom(type);
+            arguments[i] = generateRandom(params[i].getType());
 
             // Add new argument to argMap
             if (argMap != null) {

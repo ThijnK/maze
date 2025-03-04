@@ -2,10 +2,9 @@ package nl.uu.tests.maze;
 
 import nl.uu.maze.analysis.JavaAnalyzer;
 import nl.uu.maze.execution.ArgMap;
+import nl.uu.maze.execution.ArgMap.*;
 import nl.uu.maze.execution.MethodType;
 import nl.uu.maze.execution.concrete.ObjectInstantiator;
-import nl.uu.maze.execution.symbolic.SymbolicStateValidator.ObjectInstance;
-import nl.uu.maze.execution.symbolic.SymbolicStateValidator.ObjectRef;
 import sootup.core.types.PrimitiveType;
 
 import org.junit.jupiter.api.Test;

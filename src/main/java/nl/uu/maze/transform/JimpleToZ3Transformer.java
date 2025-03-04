@@ -12,11 +12,11 @@ import com.microsoft.z3.Expr;
 
 import nl.uu.maze.analysis.JavaAnalyzer;
 import nl.uu.maze.execution.ArgMap;
+import nl.uu.maze.execution.ArgMap.*;
 import nl.uu.maze.execution.MethodType;
 import nl.uu.maze.execution.concrete.ConcreteExecutor;
 import nl.uu.maze.execution.symbolic.SymbolicState;
 import nl.uu.maze.execution.symbolic.SymbolicStateValidator;
-import nl.uu.maze.execution.symbolic.SymbolicStateValidator.ObjectRef;
 import nl.uu.maze.util.Pair;
 import nl.uu.maze.util.Z3Sorts;
 import sootup.core.jimple.visitor.AbstractValueVisitor;
@@ -550,7 +550,7 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
     // #endregion
 
     // #region Invocations
-    private void handleInvokeExpr(MethodSignature methodSig, List<Immediate> args) {
+    private void handleInvokeExpr(MethodSignature methodSig, List<Immediate> args, Local base) {
         // Get the method from the method signature
         Method method;
         try {
@@ -558,11 +558,6 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
         } catch (ClassNotFoundException | NoSuchMethodException e) {
             throw new UnsupportedOperationException("Method not found: " + methodSig);
         }
-
-        // Get the constructor of the class containing the metho
-        method.getDeclaringClass();
-        Constructor<?> ctor = null; // TODO
-        Object instance = null;
 
         // Evaluate the state and fill object fields with their current values
         Optional<ArgMap> argMapOpt = validator.evaluate(state, true);
@@ -589,6 +584,19 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
             }
         }
 
+        // Get instance object from ArgMap if needed
+        Object instance = null;
+        if (base != null) {
+            Expr<?> symRef = state.getVariable(base.getName());
+            if (symRef.getSort().equals(sorts.getRefSort())) {
+                Expr<?> conRef = state.heap.getSingleAlias(symRef);
+                if (conRef != null) {
+                    // TODO: problem is that argMap here is not yet converted to concrete values
+                    instance = argMap.get(conRef.toString());
+                }
+            }
+        }
+
         Object retval = executor.execute(instance, method, argMap);
         Type retType = methodSig.getType();
         setResult(javaToZ3.transform(retval, state, retType));
@@ -596,30 +604,26 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
 
     @Override
     public void caseStaticInvokeExpr(@Nonnull JStaticInvokeExpr expr) {
-        handleInvokeExpr(expr.getMethodSignature(), expr.getArgs());
+        handleInvokeExpr(expr.getMethodSignature(), expr.getArgs(), null);
     }
 
     @Override
     public void caseInterfaceInvokeExpr(@Nonnull JInterfaceInvokeExpr expr) {
-        // TODO Auto-generated method stub
-        super.caseInterfaceInvokeExpr(expr);
+        handleInvokeExpr(expr.getMethodSignature(), expr.getArgs(), expr.getBase());
     }
 
     @Override
     public void caseSpecialInvokeExpr(@Nonnull JSpecialInvokeExpr expr) {
-        // TODO Auto-generated method stub
-        super.caseSpecialInvokeExpr(expr);
+        handleInvokeExpr(expr.getMethodSignature(), expr.getArgs(), expr.getBase());
     }
 
     @Override
     public void caseVirtualInvokeExpr(@Nonnull JVirtualInvokeExpr expr) {
-        // TODO Auto-generated method stub
-        super.caseVirtualInvokeExpr(expr);
+        handleInvokeExpr(expr.getMethodSignature(), expr.getArgs(), expr.getBase());
     }
 
     @Override
     public void caseDynamicInvokeExpr(@Nonnull JDynamicInvokeExpr expr) {
-        // TODO Auto-generated method stub
-        super.caseDynamicInvokeExpr(expr);
+        throw new UnsupportedOperationException("Dynamic invoke expressions are not supported");
     }
 }
