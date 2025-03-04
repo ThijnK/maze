@@ -2,12 +2,10 @@ package nl.uu.maze.execution.concrete;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
-import java.util.Map.Entry;
 import java.lang.reflect.Parameter;
 
 import org.slf4j.Logger;
@@ -15,7 +13,6 @@ import org.slf4j.LoggerFactory;
 
 import nl.uu.maze.analysis.JavaAnalyzer;
 import nl.uu.maze.execution.ArgMap;
-import nl.uu.maze.execution.ArgMap.*;
 import nl.uu.maze.execution.MethodType;
 import nl.uu.maze.util.ArrayUtils;
 
@@ -124,14 +121,14 @@ public class ObjectInstantiator {
      * @return An array of arguments corresponding to the given parameters
      */
     public static Object[] generateArgs(Parameter[] params, MethodType methodType, ArgMap argMap,
+            // TODO: can remove the analyzer here
             JavaAnalyzer analyzer) {
         Object[] arguments = new Object[params.length];
-        ArgMap convertedArgMap = argMap != null ? convertArgMap(argMap, analyzer) : null;
         for (int i = 0; i < params.length; i++) {
             // If the parameter is known, use the known value
             String name = ArgMap.getSymbolicName(methodType, i);
-            if (convertedArgMap != null && convertedArgMap.containsKey(name)) {
-                arguments[i] = convertedArgMap.get(name);
+            if (argMap != null && argMap.containsKey(name)) {
+                arguments[i] = argMap.toJava(name, argMap.get(name), params[i].getType());
                 continue;
             }
 
@@ -186,119 +183,5 @@ public class ObjectInstantiator {
                 // Objects are set to null
                 return null;
         }
-    }
-
-    /**
-     * Convert the arguments in the ArgMap to the correct Java types.
-     * 
-     * @return A new ArgMap containing the converted elements in the ArgMap
-     */
-    public static ArgMap convertArgMap(ArgMap argMap, JavaAnalyzer analyzer) {
-        ArgMap newArgMap = new ArgMap();
-        for (Entry<String, Object> entry : argMap.entrySet()) {
-            convertEntry(entry.getKey(), entry.getValue(), argMap, newArgMap, analyzer);
-        }
-        return newArgMap;
-    }
-
-    /**
-     * Convert an entry in the ArgMap to the correct Java type.
-     */
-    private static Object convertEntry(String name, Object value, ArgMap argMap, ArgMap newArgMap,
-            JavaAnalyzer analyzer) {
-        // If already defined from resolving a reference, skip
-        if (newArgMap.containsKey(name)) {
-            return newArgMap.get(name);
-        }
-
-        if (value == null) {
-            newArgMap.set(name, null);
-        } else if (value instanceof ObjectRef) {
-            String var = ((ObjectRef) value).getVar();
-            Object obj = convertEntry(var, argMap.get(var), argMap, newArgMap, analyzer);
-            newArgMap.set(name, obj);
-        } else if (value instanceof ObjectInstance) {
-            // Convert ObjectInstance to Object
-            ObjectInstance inst = (ObjectInstance) value;
-            Class<?> type = inst.getTypeClass(analyzer);
-            // Create a dummy instance that will be filled with the correct values
-            Object obj = createInstance(type);
-
-            for (Map.Entry<String, ObjectField> fieldEntry : inst.getFields().entrySet()) {
-                Object fieldValue = fieldEntry.getValue().getValue();
-                Object convertedValue = convertEntry(name + "_" + fieldEntry.getKey(), fieldValue, argMap, newArgMap,
-                        analyzer);
-                try {
-                    Field field = type.getDeclaredField(fieldEntry.getKey());
-                    field.setAccessible(true);
-                    field.set(obj, convertedValue);
-                } catch (Exception e) {
-                    logger.error("Failed to set field: " + fieldEntry.getKey() + " in class: " + type.getName());
-                }
-            }
-
-            newArgMap.set(name, obj);
-        } else if (value.getClass().isArray()) {
-            // TODO: need the expected class of the array, not its current one
-            // TODO: can get it from heap as SootUp type, then need to convert to Class<?>
-            // Convert array to correct type
-            newArgMap.set(name, convertArray(value, value.getClass()));
-        } else {
-            // Cast to expected type to make sure it is correct
-            // TODO: casting to its current class..! Need actual type
-            newArgMap.set(name, value.getClass().isPrimitive() ? wrap(value.getClass()).cast(value)
-                    : value.getClass().cast(value));
-        }
-
-        return newArgMap.get(name);
-    }
-
-    /**
-     * Convert an array of objects to an array of the given type.
-     * 
-     * @param value The array to convert
-     * @param type  The type of the array
-     * @return A typed array
-     */
-    private static Object convertArray(Object value, Class<?> type) {
-        int length = Array.getLength(value);
-        Object typedArray = Array.newInstance(type.getComponentType(), length);
-
-        for (int j = 0; j < length; j++) {
-            Object element = Array.get(value, j);
-            if (type.getComponentType().isArray()) {
-                // Recursively copy subarrays
-                Array.set(typedArray, j, convertArray(element, type.getComponentType()));
-            } else {
-                // Copy elements
-                Array.set(typedArray, j, element);
-            }
-        }
-        return typedArray;
-    }
-
-    /**
-     * Wrap a primitive type in its corresponding wrapper class.
-     */
-    private static Class<?> wrap(Class<?> clazz) {
-        if (!clazz.isPrimitive())
-            return clazz;
-        if (clazz == int.class)
-            return Integer.class;
-        if (clazz == long.class)
-            return Long.class;
-        if (clazz == boolean.class)
-            return Boolean.class;
-        if (clazz == double.class)
-            return Double.class;
-        if (clazz == float.class)
-            return Float.class;
-        if (clazz == char.class)
-            return Character.class;
-        if (clazz == byte.class)
-            return Byte.class;
-        if (clazz == short.class)
-            return Short.class;
-        throw new IllegalArgumentException("Unknown primitive type: " + clazz);
     }
 }

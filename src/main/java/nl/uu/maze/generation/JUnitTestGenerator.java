@@ -227,22 +227,19 @@ public class JUnitTestGenerator {
             return;
         }
         builtObjects.add(var);
-        Class<?> typeClass = inst.getTypeClass();
-        if (typeClass == null) {
-            Type type = inst.getType();
-            if (type != null) {
-                Optional<Class<?>> typeClassOpt = analyzer.tryGetJavaClass(inst.getType());
-                if (typeClassOpt.isPresent()) {
-                    typeClass = typeClassOpt.get();
-                }
+        Class<?> clazz = null;
+        Type type = inst.getType();
+        if (type != null) {
+            Optional<Class<?>> typeClassOpt = analyzer.tryGetJavaClass(type);
+            if (typeClassOpt.isPresent()) {
+                clazz = typeClassOpt.get();
             }
         }
-        if (typeClass != null) {
-            inst.setTypeClass(typeClass);
-            buildObjectInstance(methodBuilder, var, typeClass);
+        if (clazz != null) {
+            buildObjectInstance(methodBuilder, var, clazz);
         } else {
             // Default to assuming (hoping) that the class has a zero-argument constructor
-            methodBuilder.addStatement("$L $L = new $L()", inst.getType(), var, inst.getType());
+            methodBuilder.addStatement("$L $L = new $L()", type, var, type);
         }
 
         addFieldDefinitions(methodBuilder, argMap, builtObjects, var, inst);

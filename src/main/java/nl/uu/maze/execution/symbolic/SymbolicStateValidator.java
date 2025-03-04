@@ -157,25 +157,25 @@ public class SymbolicStateValidator {
                     String fieldName = var.substring(var.indexOf('_') + 1);
                     Type fieldType = heapObj.getFieldType(fieldName);
 
-                    ObjectInstance objFields = (ObjectInstance) argMap.getOrNew(varBase,
+                    ObjectInstance objInst = (ObjectInstance) argMap.getOrNew(varBase,
                             new ObjectInstance((ClassType) heapObj.getType()));
                     // If the field is a heap reference, handle it accordingly
                     Expr<?> conRef = state.heap.getSingleAlias(var);
                     if (conRef != null) {
                         // If heap reference is null, set field to null
                         if (isNull) {
-                            objFields.setField(fieldName, null, fieldType);
+                            objInst.setField(fieldName, null, fieldType);
                         }
                         // Otherwise, set field to reference the heap object
                         else {
                             ObjectRef ref = new ObjectRef(conRef.toString());
-                            objFields.setField(fieldName, ref, fieldType);
+                            objInst.setField(fieldName, ref, fieldType);
                         }
                     }
                     // Otherwise, it's a primitive type
                     else {
                         Object value = transformer.transformExpr(expr, fieldType);
-                        objFields.setField(fieldName, value, fieldType);
+                        objInst.setField(fieldName, value, fieldType);
                     }
                 }
                 continue;

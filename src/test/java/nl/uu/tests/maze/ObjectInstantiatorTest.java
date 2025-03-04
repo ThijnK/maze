@@ -2,10 +2,8 @@ package nl.uu.tests.maze;
 
 import nl.uu.maze.analysis.JavaAnalyzer;
 import nl.uu.maze.execution.ArgMap;
-import nl.uu.maze.execution.ArgMap.*;
 import nl.uu.maze.execution.MethodType;
 import nl.uu.maze.execution.concrete.ObjectInstantiator;
-import sootup.core.types.PrimitiveType;
 
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
@@ -91,40 +89,6 @@ class ObjectInstantiatorTest {
         assertTrue(args[6] instanceof Character);
         assertTrue(args[7] instanceof Boolean);
         assertTrue(args[8] == null);
-    }
-
-    @Test
-    public void testConvertArgMap() throws MalformedURLException, URISyntaxException {
-        ArgMap argMap = new ArgMap();
-
-        ObjectInstance obj1 = new ObjectInstance(TestClassWithArgs.class);
-        obj1.setField("a", 1, PrimitiveType.getInt());
-        obj1.setField("b", 2.0, PrimitiveType.getDouble());
-        obj1.setField("c", true, PrimitiveType.getBoolean());
-        argMap.set("obj1", obj1);
-
-        ObjectInstance obj2 = new ObjectInstance(TestClassManyArgs.class);
-        obj2.setField("a", 1, PrimitiveType.getInt());
-        obj2.setField("b", 2.0, PrimitiveType.getDouble());
-        obj2.setField("c", 3.0f, PrimitiveType.getFloat());
-        obj2.setField("d", 4L, PrimitiveType.getLong());
-        obj2.setField("e", (short) 5, PrimitiveType.getShort());
-        obj2.setField("f", (byte) 6, PrimitiveType.getByte());
-        obj2.setField("g", '7', PrimitiveType.getChar());
-        obj2.setField("h", true, PrimitiveType.getBoolean());
-        obj2.setField("i", new ObjectRef("obj1"), null);
-        argMap.set("obj2", obj2);
-
-        argMap.set("obj3", new int[] { 1, 2, 3 });
-
-        argMap.set("marg0", new ObjectRef("obj3"));
-        argMap.set("marg1", new ObjectRef("obj2"));
-
-        JavaAnalyzer analyzer = new JavaAnalyzer("target/classes", null);
-        ArgMap converted = ObjectInstantiator.convertArgMap(argMap, analyzer);
-
-        assertEquals(converted.get("marg0"), converted.get("obj3"));
-        assertEquals(converted.get("marg1"), converted.get("obj2"));
     }
 
     public static class TestClassNoArgs {
