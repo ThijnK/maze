@@ -299,8 +299,11 @@ public class DSEController {
             TraceManager.clearEntries();
             concrete.execute(ctor, javaMethod, argMap);
             SymbolicState finalState = replaySymbolic(cfg, method);
-
-            // TODO: what to do if the final state is infeasible?
+            if (finalState.isInfeasible()) {
+                // It should not be possible for a final state to be infeasible, because we're
+                // replaying a concrete execution
+                throw new RuntimeException("Infeasible state encountered during symbolic replay");
+            }
 
             boolean isNew = searchStrategy.add(finalState);
             // Only add a new test case if this path has not been explored before
