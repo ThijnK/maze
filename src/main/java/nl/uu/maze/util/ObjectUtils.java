@@ -46,7 +46,8 @@ public class ObjectUtils {
      * changed.
      */
     public static void comparePrimitives(Object obj1, Object obj2, FieldChangeCallback callback) {
-        if (obj1 == null || obj2 == null) {
+        // If obj2 is null, we simply return every field as changed
+        if (obj1 == null) {
             return;
         }
 
@@ -59,7 +60,7 @@ public class ObjectUtils {
 
                 field.setAccessible(true);
                 Object val1 = field.get(obj1);
-                Object val2 = field.get(obj2);
+                Object val2 = obj2 != null ? field.get(obj2) : null;
                 if (!val1.equals(val2)) {
                     callback.fieldChanged(field, val1, val2);
                 }

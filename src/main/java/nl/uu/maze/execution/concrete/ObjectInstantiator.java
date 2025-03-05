@@ -56,7 +56,7 @@ public class ObjectInstantiator {
      * Attempt to create an instance of the given class using the given
      * {@link ArgMap} to determine the arguments to pass to the constructor.
      * 
-     * @param clazz  The class to instantiate
+     * @param ctor   The constructor to use to create the instance
      * @param argMap {@link ArgMap} containing the arguments to pass to the
      *               constructor
      * @return An instance of the class or null if the instance could not be created

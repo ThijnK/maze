@@ -1,6 +1,8 @@
 package nl.uu.maze.transform;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.lang.reflect.Constructor;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.BiFunction;
@@ -17,15 +19,11 @@ import nl.uu.maze.analysis.JavaAnalyzer;
 import nl.uu.maze.execution.ArgMap;
 import nl.uu.maze.execution.ArgMap.*;
 import nl.uu.maze.execution.MethodType;
-import nl.uu.maze.execution.concrete.ConcreteExecutor;
-import nl.uu.maze.execution.symbolic.SymbolicState;
-import nl.uu.maze.execution.symbolic.SymbolicStateValidator;
-import nl.uu.maze.util.ObjectUtils;
-import nl.uu.maze.util.Pair;
-import nl.uu.maze.util.Z3Sorts;
+import nl.uu.maze.execution.concrete.*;
+import nl.uu.maze.execution.symbolic.*;
+import nl.uu.maze.util.*;
 import sootup.core.jimple.visitor.AbstractValueVisitor;
-import sootup.core.signatures.FieldSignature;
-import sootup.core.signatures.MethodSignature;
+import sootup.core.signatures.*;
 import sootup.core.jimple.basic.*;
 import sootup.core.jimple.common.constant.*;
 import sootup.core.jimple.common.expr.*;
@@ -554,19 +552,21 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
 
     // #region Invocations
     private void handleInvokeExpr(MethodSignature methodSig, List<Immediate> args, Local base) {
-        // Get the method from the method signature
-        Method method;
+        boolean isCtor = methodSig.getName().equals("<init>");
+        // Get the method or constructor from the method signature
+        Object executable;
         try {
-            method = analyzer.getJavaMethod(methodSig);
+            executable = isCtor ? analyzer.getJavaConstructor(methodSig) : analyzer.getJavaMethod(methodSig);
         } catch (ClassNotFoundException | NoSuchMethodException e) {
-            logger.error("Failed to find method: " + methodSig);
+            logger.error("Failed to find " + (isCtor ? "constructor" : "method") + ": " + methodSig);
             return;
         }
 
-        // Evaluate the state iff the method is not static or involves arguments
         ArgMap argMap = null;
         Object instance = null;
         Object copy = null;
+
+        // Evaluate state if the method is not static or involves arguments
         if (base != null || args.size() > 0) {
             Optional<ArgMap> argMapOpt = validator.evaluate(state, true);
             // If state is not satisfiable at this point, stop execution of this path
@@ -576,11 +576,32 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
             }
             argMap = argMapOpt.get();
 
+            // For non-constructor invocations with a base, retrieve the instance and
+            // create a shallow copy
+            if (!isCtor && base != null) {
+                Expr<?> symRef = state.getVariable(base.getName());
+                // Need the class type of the instance here, and method.getDeclaringClass()
+                // could be an interface, so take the type from heap object
+                try {
+                    Class<?> clazz = analyzer.getJavaClass(state.heap.getHeapObject(symRef).getType());
+                    // If the method is abstract, we need to find the concrete implementation
+                    if (Modifier.isAbstract(((Method) executable).getModifiers())) {
+                        executable = clazz.getDeclaredMethod(methodSig.getName(),
+                                ((Method) executable).getParameterTypes());
+                    }
+                    instance = argMap.toJava(symRef.toString(), clazz);
+                    // Create a shallow copy of the instance to compare its fields later
+                    copy = ObjectUtils.shallowCopy(instance, clazz);
+                } catch (ClassNotFoundException | NoSuchMethodException | SecurityException e) {
+                    logger.warn("Failed to find class for instance: " + symRef.toString());
+                }
+            }
+
             // Overwrite the method args (marg0 etc.) with the args for this method call
             for (int i = 0; i < args.size(); i++) {
                 Immediate arg = args.get(i);
                 Expr<?> argExpr = transform(arg);
-                String name = ArgMap.getSymbolicName(MethodType.METHOD, i);
+                String name = ArgMap.getSymbolicName(isCtor ? MethodType.CTOR : MethodType.METHOD, i);
                 if (argExpr.getSort().equals(sorts.getRefSort())) {
                     // If the argument is a reference, set it to refer to that ref in ArgMap
                     argMap.set(name, new ObjectRef(argExpr.toString()));
@@ -591,32 +612,26 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
                     argMap.set(name, argVal);
                 }
             }
-
-            // Get instance object from ArgMap if we need one
-            if (base != null) {
-                Expr<?> symRef = state.getVariable(base.getName());
-                String key = symRef.toString();
-                // Need the class type of the instance here, and method.getDeclaringClass()
-                // could be an interface, so take the type from heap object
-                try {
-                    Class<?> clazz = analyzer.getJavaClass(state.heap.getHeapObject(symRef).getType());
-                    // Also overwrite the method for the same reason as above
-                    method = clazz.getDeclaredMethod(methodSig.getName(), method.getParameterTypes());
-                    instance = argMap.toJava(key, clazz);
-                    // Create a shallow copy of the instance to compare its fields later
-                    copy = ObjectUtils.shallowCopy(instance, clazz);
-                } catch (ClassNotFoundException | NoSuchMethodException | SecurityException e) {
-                    logger.warn("Failed to find class for instance: " + key);
-                }
-            }
         }
 
-        Object retval = executor.execute(instance, method, argMap);
+        Object retval;
+        if (isCtor) {
+            retval = ObjectInstantiator.createInstance((Constructor<?>) executable, argMap);
+            // For constructor calls, the new instance is the return value
+            instance = retval;
+        } else {
+            retval = executor.execute(instance, (Method) executable, argMap);
+        }
+
         Type retType = methodSig.getType();
-        setResult(javaToZ3.transform(retval, state, retType));
+        if (!retType.equals(VoidType.getInstance())) {
+            setResult(javaToZ3.transform(retval, state, retType));
+        } else {
+            setResult(null);
+        }
 
         // Check if the method modifies any (primitive) fields of the instance object
-        if (base != null && copy != null) {
+        if (base != null && instance != null) {
             ObjectUtils.comparePrimitives(instance, copy, (field, val1, val2) -> {
                 // Field has been modified, set the field in the heap
                 String fieldName = field.getName();

@@ -180,10 +180,15 @@ public class JavaAnalyzer {
      * @throws NoSuchMethodException  If the method cannot be found
      */
     public Method getJavaMethod(MethodSignature methodSignature) throws ClassNotFoundException, NoSuchMethodException {
-        // JavaSootMethod method = view.getMethod(methodSignature).orElseThrow();
         Class<?> clazz = getJavaClass(methodSignature.getDeclClassType());
         return clazz.getDeclaredMethod(methodSignature.getName(),
                 getParameterClasses(methodSignature.getParameterTypes()));
+    }
+
+    public Constructor<?> getJavaConstructor(MethodSignature methodSignature)
+            throws ClassNotFoundException, NoSuchMethodException {
+        Class<?> clazz = getJavaClass(methodSignature.getDeclClassType());
+        return clazz.getConstructor(getParameterClasses(methodSignature.getParameterTypes()));
     }
 
     /**
