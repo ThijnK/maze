@@ -562,42 +562,45 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
             return;
         }
 
-        // Evaluate the state and fill object fields with their current values
-        Optional<ArgMap> argMapOpt = validator.evaluate(state, true);
-        // If state is not satisfiable at this point, stop execution (prune) of this
-        // path
-        if (!argMapOpt.isPresent()) {
-            state.setInfeasible();
-            return;
-        }
-        ArgMap argMap = argMapOpt.get();
-
-        // Overwrite the method args (marg0 etc.) with the args for this method call
-        for (int i = 0; i < args.size(); i++) {
-            Immediate arg = args.get(i);
-            Expr<?> argExpr = transform(arg);
-            String name = ArgMap.getSymbolicName(MethodType.METHOD, i);
-            if (argExpr.getSort().equals(sorts.getRefSort())) {
-                // If the argument is a reference, set it to refer to that ref in ArgMap
-                argMap.set(name, new ObjectRef(argExpr.toString()));
-            }
-            // Otherwise, convert the expr to a Java value and set it in the ArgMap
-            else {
-                Object argVal = validator.evaluate(argExpr, arg.getType());
-                argMap.set(name, argVal);
-            }
-        }
-
-        // Get instance object from ArgMap if we need one
+        // Evaluate the state iff the method is not static or involves arguments
+        ArgMap argMap = null;
         Object instance = null;
-        if (base != null) {
-            Expr<?> symRef = state.getVariable(base.getName());
-            // Let's assume that the base is always a reference to an object
-            if (!symRef.getSort().equals(sorts.getRefSort())) {
-                throw new UnsupportedOperationException("Base of invoke expression is not a reference");
+        if (base != null || args.size() > 0) {
+            Optional<ArgMap> argMapOpt = validator.evaluate(state, true);
+            // If state is not satisfiable at this point, stop execution (prune) of this
+            // path
+            if (!argMapOpt.isPresent()) {
+                state.setInfeasible();
+                return;
             }
-            String key = symRef.toString();
-            instance = argMap.toJava(key, method.getDeclaringClass());
+            argMap = argMapOpt.get();
+
+            // Overwrite the method args (marg0 etc.) with the args for this method call
+            for (int i = 0; i < args.size(); i++) {
+                Immediate arg = args.get(i);
+                Expr<?> argExpr = transform(arg);
+                String name = ArgMap.getSymbolicName(MethodType.METHOD, i);
+                if (argExpr.getSort().equals(sorts.getRefSort())) {
+                    // If the argument is a reference, set it to refer to that ref in ArgMap
+                    argMap.set(name, new ObjectRef(argExpr.toString()));
+                }
+                // Otherwise, convert the expr to a Java value and set it in the ArgMap
+                else {
+                    Object argVal = validator.evaluate(argExpr, arg.getType());
+                    argMap.set(name, argVal);
+                }
+            }
+
+            // Get instance object from ArgMap if we need one
+            if (base != null) {
+                Expr<?> symRef = state.getVariable(base.getName());
+                // Let's assume that the base is always a reference to an object
+                if (!symRef.getSort().equals(sorts.getRefSort())) {
+                    throw new UnsupportedOperationException("Base of invoke expression is not a reference");
+                }
+                String key = symRef.toString();
+                instance = argMap.toJava(key, method.getDeclaringClass());
+            }
         }
 
         Object retval = executor.execute(instance, method, argMap);
