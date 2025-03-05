@@ -364,7 +364,7 @@ public class SymbolicHeap {
      * Retrieves a heap object from the heap using the given symbolic reference.
      * If the reference has more than one alias, an exception is thrown.
      */
-    private HeapObject getHeapObject(Expr<?> symRef) {
+    public HeapObject getHeapObject(Expr<?> symRef) {
         Set<Expr<?>> aliases = aliasMap.get(symRef);
         if (aliases == null || aliases.isEmpty()) {
             return null;

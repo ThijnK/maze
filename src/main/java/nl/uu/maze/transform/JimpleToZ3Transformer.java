@@ -569,8 +569,7 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
         Object copy = null;
         if (base != null || args.size() > 0) {
             Optional<ArgMap> argMapOpt = validator.evaluate(state, true);
-            // If state is not satisfiable at this point, stop execution (prune) of this
-            // path
+            // If state is not satisfiable at this point, stop execution of this path
             if (!argMapOpt.isPresent()) {
                 state.setInfeasible();
                 return;
@@ -596,14 +595,19 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
             // Get instance object from ArgMap if we need one
             if (base != null) {
                 Expr<?> symRef = state.getVariable(base.getName());
-                // Let's assume that the base is always a reference to an object
-                if (!symRef.getSort().equals(sorts.getRefSort())) {
-                    throw new UnsupportedOperationException("Base of invoke expression is not a reference");
-                }
                 String key = symRef.toString();
-                instance = argMap.toJava(key, method.getDeclaringClass());
-                // Create a shallow copy of the instance to compare its fields later
-                copy = ObjectUtils.shallowCopy(instance, method.getDeclaringClass());
+                // Need the class type of the instance here, and method.getDeclaringClass()
+                // could be an interface, so take the type from heap object
+                try {
+                    Class<?> clazz = analyzer.getJavaClass(state.heap.getHeapObject(symRef).getType());
+                    // Also overwrite the method for the same reason as above
+                    method = clazz.getDeclaredMethod(methodSig.getName(), method.getParameterTypes());
+                    instance = argMap.toJava(key, clazz);
+                    // Create a shallow copy of the instance to compare its fields later
+                    copy = ObjectUtils.shallowCopy(instance, clazz);
+                } catch (ClassNotFoundException | NoSuchMethodException | SecurityException e) {
+                    logger.warn("Failed to find class for instance: " + key);
+                }
             }
         }
 
