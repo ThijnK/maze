@@ -443,19 +443,17 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
     // #region Arrays
     @Override
     public void caseNewArrayExpr(@Nonnull JNewArrayExpr expr) {
-        Sort elemSort = sorts.determineSort(expr.getBaseType());
         Expr<?> size = transform(expr.getSize());
-        setResult(state.heap.allocateArray((ArrayType) expr.getType(), size, elemSort));
+        setResult(state.heap.allocateArray((ArrayType) expr.getType(), size, expr.getBaseType()));
     }
 
     @Override
     public void caseNewMultiArrayExpr(@Nonnull JNewMultiArrayExpr expr) {
-        Sort elemSort = sorts.determineSort(expr.getBaseType().getBaseType());
         BitVecExpr[] sizes = new BitVecExpr[((ArrayType) expr.getType()).getDimension()];
         for (int i = 0; i < sizes.length; i++) {
             sizes[i] = ((BitVecExpr) transform(expr.getSizes().get(i)));
         }
-        setResult(state.heap.allocateMultiArray((ArrayType) expr.getType(), sizes, elemSort));
+        setResult(state.heap.allocateMultiArray((ArrayType) expr.getType(), sizes, expr.getBaseType().getBaseType()));
     }
 
     @Override
@@ -517,9 +515,9 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
             // Allocate new array on the heap
             ArrayType arrType = (ArrayType) sootType;
             if (arrType.getDimension() > 1) {
-                param = state.heap.allocateMultiArray(var, arrType, sorts.determineSort(arrType.getBaseType()));
+                param = state.heap.allocateMultiArray(var, arrType, arrType.getBaseType());
             } else {
-                param = state.heap.allocateArray(var, arrType, sorts.determineSort(arrType.getBaseType()));
+                param = state.heap.allocateArray(var, arrType, arrType.getBaseType());
             }
         } else if (sootType instanceof ClassType && !sootType.toString().equals("java.lang.String")) {
             // Allocate new object on the heap

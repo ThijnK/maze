@@ -1,5 +1,6 @@
 package nl.uu.maze.util;
 
+import com.microsoft.z3.BitVecExpr;
 import com.microsoft.z3.BitVecSort;
 import com.microsoft.z3.Context;
 import com.microsoft.z3.Expr;
@@ -12,7 +13,7 @@ import sootup.core.types.PrimitiveType.*;
 import sootup.java.core.types.JavaClassType;
 
 /**
- * Provides global Z3 sorts.
+ * Provides global Z3 sorts and other type utilities.
  */
 public class Z3Sorts {
     private static Z3Sorts instance;
@@ -208,5 +209,29 @@ public class Z3Sorts {
      */
     public int getLongBitSize() {
         return Type.getValueBitSize(PrimitiveType.getLong());
+    }
+
+    /**
+     * Get a default value as a Z3 expression for the given Soot type.
+     */
+    public Expr<?> getDefaultValue(Type sootType) {
+        if (Type.isIntLikeType(sootType)) {
+            return ctx.mkBV(0, getBitSize(sootType));
+        } else if (sootType instanceof FloatType) {
+            return ctx.mkFP(0.0f, getFloatSort());
+        } else if (sootType instanceof DoubleType) {
+            return ctx.mkFP(0.0, getDoubleSort());
+        } else if (sootType instanceof ArrayType || sootType instanceof ClassType || sootType instanceof NullType) {
+            return getNullConst();
+        } else {
+            throw new UnsupportedOperationException("Unsupported type: " + sootType);
+        }
+    }
+
+    /**
+     * Get a default integer value as a Z3 expression.
+     */
+    public BitVecExpr getDefaultInt() {
+        return ctx.mkBV(0, getIntBitSize());
     }
 }

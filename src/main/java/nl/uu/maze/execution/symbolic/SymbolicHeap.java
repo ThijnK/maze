@@ -104,6 +104,14 @@ public class SymbolicHeap {
         return ctx.mkConst(key, sorts.getRefSort());
     }
 
+    public Expr<?> newSymRef() {
+        return newRef(newRefKey());
+    }
+
+    public Expr<?> newConRef() {
+        return newRef(newObjKey());
+    }
+
     public SymbolicHeap clone(SymbolicState state) {
         return new SymbolicHeap(state, heapCounter, refCounter, heap, aliasMap, resolvedRefs, arrayIndices);
     }
@@ -254,115 +262,92 @@ public class SymbolicHeap {
     }
 
     /**
-     * Allocates a new array of the given size and element sort, and returns its
+     * Allocates a new array of the given size and element type, and returns its
      * reference.
-     * 
-     * @see #allocateArray(String, Type, Expr, Sort)
+     * This should be used for "concrete" arrays, for which we know the size, e.g.,
+     * for expressions like `new int[3]`.
      */
-    public <E extends Sort> Expr<?> allocateArray(ArrayType type, Expr<?> size, E elemSort) {
-        return allocateArray(newRefKey(), type, size, elemSort);
-    }
-
-    /**
-     * Allocates a new array of the given element sort, using a symbolic variable
-     * for the size, and returns its reference.
-     */
-    public <E extends Sort> Expr<?> allocateArray(String key, ArrayType type, E elemSort) {
-        return allocateArray(key, type, null, elemSort);
-    }
-
-    /**
-     * Allocates a new array of the given size and element sort, and returns its
-     * reference.
-     * 
-     * @param <E>      The Z3 sort of the elements in the array
-     * @param key      The name to use for the array object on the heap
-     * @param type     The type of the array
-     * @param size     The size of the array, usually a Z3 BitVecNum
-     * @param elemSort The Z3 sort of the elements in the array
-     * @return The reference to the newly allocated array object
-     */
-    public <E extends Sort> Expr<?> allocateArray(String key, ArrayType type, Expr<?> size, E elemSort) {
-        BitVecSort indexSort = sorts.getIntSort();
-        Expr<?> symRef = newRef(key);
-        String conKey = newObjKey();
-        Expr<?> conRef = newRef(conKey);
-
-        // If no size given, make it symbolic (e.g., for method arguments)
-        if (size == null) {
-            Expr<BitVecSort> len = ctx.mkConst(conKey + "_len", sorts.getIntSort());
-            // Make sure array size is non-negative and does not exceed the max length
-            state.addEngineConstraint(ctx.mkBVSGE(len, ctx.mkBV(0, sorts.getIntBitSize())));
-            state.addEngineConstraint(ctx.mkBVSLT(len, ctx.mkBV(MAX_ARRAY_LENGTH, sorts.getIntBitSize())));
-            size = len;
-        }
-
-        ArrayExpr<BitVecSort, E> arr = ctx.mkArrayConst(conKey + "_elems", indexSort, elemSort);
+    public Expr<?> allocateArray(ArrayType type, Expr<?> size, Type elemType) {
+        // Create an array constant with default value depending on the element sort
+        ArrayExpr<BitVecSort, ?> arr = ctx.mkConstArray(sorts.getIntSort(), sorts.getDefaultValue(elemType));
         ArrayObject arrObj = new ArrayObject(type, arr, size);
-        allocateHeapObject(symRef, conRef, arrObj);
+        Expr<?> symRef = newSymRef();
+        allocateHeapObject(symRef, newConRef(), arrObj);
         return symRef;
     }
 
     /**
-     * Allocates a multi-dimensional array with the given sizes and element sort.
-     * 
-     * @see #allocateMultiArray(String, Type, BitVecExpr[], Sort)
+     * Allocates a new symbolic array of the given element type, using a symbolic
+     * variable for its size and elements, and returns its reference.
+     * This should be used for symbolic arrays, for which we do not know the size or
+     * the elements, e.g., when passed as method arguments.
      */
-    public <E extends Sort> Expr<?> allocateMultiArray(ArrayType type, BitVecExpr[] sizes, E elemSort) {
-        return allocateMultiArray(newRefKey(), type, sizes, elemSort);
-    }
-
-    /**
-     * Allocates a multi-dimensional array with the given element sort, using
-     * symbolic variables for the sizes, and returns its reference.
-     * 
-     * @see #allocateMultiArray(String, Type, BitVecExpr[], Sort)
-     */
-    public <E extends Sort> Expr<?> allocateMultiArray(String key, ArrayType type, E elemSort) {
-        return allocateMultiArray(key, type, null, elemSort);
-    }
-
-    /**
-     * Allocates a multi-dimensional array with the given sizes and element sort.
-     * 
-     * @param <E>      The Z3 sort of the elements in the array
-     * @param key      The name to use for the array object on the heap
-     * @param type     The type of the array
-     * @param sizes    The size of each dimension of the array
-     * @param elemSort The Z3 sort of the elements in the array
-     * @return The reference to the newly allocated array object
-     */
-    public <E extends Sort> Expr<?> allocateMultiArray(String key, ArrayType type, BitVecExpr[] sizes, E elemSort) {
-        BitVecSort indexSort = sorts.getIntSort();
-        Expr<?> symRef = newRef(key);
+    public Expr<?> allocateArray(String key, ArrayType type, Type elemType) {
+        // Create symbolic variable for the size of the array
         String conKey = newObjKey();
-        Expr<?> conRef = newRef(conKey);
-        int dim = type.getDimension();
+        Expr<BitVecSort> size = ctx.mkConst(conKey + "_len", sorts.getIntSort());
+        // Make sure array size is non-negative and does not exceed the max length
+        state.addEngineConstraint(ctx.mkBVSGE(size, ctx.mkBV(0, sorts.getIntBitSize())));
+        state.addEngineConstraint(ctx.mkBVSLT(size, ctx.mkBV(MAX_ARRAY_LENGTH, sorts.getIntBitSize())));
 
-        if (sizes != null && sizes.length != dim) {
-            throw new IllegalArgumentException("Expected " + dim + " sizes, got " + sizes.length);
+        ArrayExpr<BitVecSort, ?> arr = ctx.mkArrayConst(conKey + "_elems", sorts.getIntSort(),
+                sorts.determineSort(elemType));
+        ArrayObject arrObj = new ArrayObject(type, arr, size);
+        Expr<?> symRef = newRef(key);
+        allocateHeapObject(symRef, newRef(conKey), arrObj);
+        return symRef;
+    }
+
+    /**
+     * Allocates a multi-dimensional array with the given sizes and element type,
+     * and returns its reference.
+     * This should be used for "concrete" multi-dimensional arrays, for which we
+     * know the sizes, e.g.,
+     * for expressions like `new int[3][4]`.
+     */
+    public Expr<?> allocateMultiArray(ArrayType type, BitVecExpr[] sizes, Type elemType) {
+        if (sizes == null || sizes.length != type.getDimension()) {
+            throw new IllegalArgumentException(
+                    "Expected " + type.getDimension() + " sizes, got " + (sizes != null ? sizes.length : null));
         }
 
-        // If no sizes given, make them symbolic (e.g., for method arguments)
-        if (sizes == null) {
-            sizes = new BitVecExpr[dim];
-            for (int i = 0; i < dim; i++) {
-                Expr<BitVecSort> size = ctx.mkConst(conKey + "_len" + i, sorts.getIntSort());
-                sizes[i] = ((BitVecExpr) size);
-                // Make sure array size is non-negative and does not exceed the max length
-                state.addEngineConstraint(ctx.mkBVSGE(size, ctx.mkBV(0, sorts.getIntBitSize())));
-                state.addEngineConstraint(ctx.mkBVSLT(size, ctx.mkBV(MAX_ARRAY_LENGTH, sorts.getIntBitSize())));
-            }
+        ArrayExpr<BitVecSort, ?> arr = ctx.mkConstArray(sorts.getIntSort(), sorts.getDefaultValue(elemType));
+        ArrayExpr<BitVecSort, BitVecSort> size = ctx.mkConstArray(sorts.getIntSort(), sorts.getDefaultInt());
+        for (int i = 0; i < type.getDimension(); i++) {
+            size = ctx.mkStore(size, ctx.mkBV(i, sorts.getIntBitSize()), sizes[i]);
+        }
+        MultiArrayObject arrObj = new MultiArrayObject(type, arr, size);
+        Expr<?> symRef = newSymRef();
+        allocateHeapObject(symRef, newConRef(), arrObj);
+        return symRef;
+    }
+
+    /**
+     * Allocates a multi-dimensional array of the given element type, using symbolic
+     * variables for its sizes and elements,
+     * and returns its reference.
+     * This should be used for symbolic multi-dimensional arrays, for which we do
+     * not know the sizes or the elements, e.g.,
+     * when passed as method arguments.
+     */
+    public Expr<?> allocateMultiArray(String key, ArrayType type, Type elemType) {
+        String conKey = newObjKey();
+        // Create symbolic lengths for each dimension of the array
+        ArrayExpr<BitVecSort, BitVecSort> size = ctx.mkConstArray(sorts.getIntSort(), sorts.getDefaultInt());
+        for (int i = 0; i < type.getDimension(); i++) {
+            Expr<BitVecSort> len = ctx.mkConst(conKey + "_len" + i, sorts.getIntSort());
+            // Make sure array size is non-negative and does not exceed the max length
+            state.addEngineConstraint(ctx.mkBVSGE(len, ctx.mkBV(0, sorts.getIntBitSize())));
+            state.addEngineConstraint(ctx.mkBVSLT(len, ctx.mkBV(MAX_ARRAY_LENGTH, sorts.getIntBitSize())));
+
+            size = ctx.mkStore(size, ctx.mkBV(i, sorts.getIntBitSize()), len);
         }
 
-        ArrayExpr<BitVecSort, E> arr = ctx.mkArrayConst(conKey + "_elems", indexSort, elemSort);
-        ArrayExpr<BitVecSort, BitVecSort> lengths = ctx.mkArrayConst(conKey + "_lens", indexSort, indexSort);
-        for (int i = 0; i < dim; i++) {
-            lengths = ctx.mkStore(lengths, ctx.mkBV(i, sorts.getIntBitSize()), sizes[i]);
-        }
-
-        MultiArrayObject arrObj = new MultiArrayObject(type, arr, lengths);
-        allocateHeapObject(symRef, conRef, arrObj);
+        ArrayExpr<BitVecSort, ?> arr = ctx.mkArrayConst(conKey + "_elems", sorts.getIntSort(),
+                sorts.determineSort(elemType));
+        MultiArrayObject arrObj = new MultiArrayObject(type, arr, size);
+        Expr<?> symRef = newRef(key);
+        allocateHeapObject(symRef, newRef(conKey), arrObj);
         return symRef;
     }
     // #endregion
@@ -459,7 +444,8 @@ public class SymbolicHeap {
             Expr<?> newValue;
             if (fieldType instanceof ArrayType) {
                 // Create a new array object
-                newValue = allocateArray(varName + "_" + fieldName, (ArrayType) fieldType, sorts.getIntSort());
+                newValue = allocateArray(varName + "_" + fieldName, (ArrayType) fieldType,
+                        ((ArrayType) fieldType).getBaseType());
             } else if (fieldType instanceof ClassType && !fieldType.toString().equals("java.lang.String")) {
                 // Create a new object
                 newValue = allocateObject(varName + "_" + fieldName, fieldType);

@@ -6,7 +6,6 @@ import java.lang.reflect.Field;
 import com.microsoft.z3.BitVecExpr;
 import com.microsoft.z3.Context;
 import com.microsoft.z3.Expr;
-import com.microsoft.z3.Sort;
 
 import nl.uu.maze.execution.symbolic.SymbolicState;
 import nl.uu.maze.util.Z3Sorts;
@@ -85,7 +84,7 @@ public class JavaToZ3Transformer {
             throw new UnsupportedOperationException("Expected type is not an array type: " + expectedType);
         }
         ArrayType arrType = (ArrayType) expectedType;
-        Sort elemSort = sorts.determineSort(arrType.getBaseType());
+        Type elemType = arrType.getBaseType();
         int dim = arrType.getDimension();
 
         // Multi-dimensional arrays
@@ -106,15 +105,15 @@ public class JavaToZ3Transformer {
                 sizes[i] = ctx.mkBV(0, sorts.getIntBitSize());
             }
             // Allocate a symbolic multi-dimensional array in the heap
-            Expr<?> ref = state.heap.allocateMultiArray(arrType, sizes, elemSort);
+            Expr<?> ref = state.heap.allocateMultiArray(arrType, sizes, elemType);
 
             // Set the elements of the array
-            setMultiArrayElements(ref, value, dim, new BitVecExpr[0], elemSort, arrType.getBaseType());
+            setMultiArrayElements(ref, value, dim, new BitVecExpr[0], arrType.getBaseType());
             return ref;
         } else {
             Expr<?> sizeExpr = ctx.mkBV(Array.getLength(value), sorts.getIntBitSize());
             // Allocate a symbolic array in the heap (adjust the method as needed)
-            Expr<?> ref = state.heap.allocateArray(arrType, sizeExpr, elemSort);
+            Expr<?> ref = state.heap.allocateArray(arrType, sizeExpr, elemType);
             // Set the elements of the array
             for (int i = 0; i < Array.getLength(value); i++) {
                 Expr<?> elem = transform(Array.get(value, i), arrType.getBaseType());
@@ -124,8 +123,7 @@ public class JavaToZ3Transformer {
         }
     }
 
-    private void setMultiArrayElements(Expr<?> ref, Object array, int dim, BitVecExpr[] indices, Sort elemSort,
-            Type elemType) {
+    private void setMultiArrayElements(Expr<?> ref, Object array, int dim, BitVecExpr[] indices, Type elemType) {
         BitVecExpr[] newIndices = new BitVecExpr[indices.length + 1];
         System.arraycopy(indices, 0, newIndices, 0, indices.length);
 
@@ -138,7 +136,7 @@ public class JavaToZ3Transformer {
         } else {
             for (int i = 0; i < Array.getLength(array); i++) {
                 newIndices[indices.length] = ctx.mkBV(i, sorts.getIntBitSize());
-                setMultiArrayElements(ref, Array.get(array, i), dim, newIndices, elemSort, elemType);
+                setMultiArrayElements(ref, Array.get(array, i), dim, newIndices, elemType);
             }
         }
     }
