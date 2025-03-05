@@ -20,6 +20,7 @@ import nl.uu.maze.execution.MethodType;
 import nl.uu.maze.execution.concrete.ConcreteExecutor;
 import nl.uu.maze.execution.symbolic.SymbolicState;
 import nl.uu.maze.execution.symbolic.SymbolicStateValidator;
+import nl.uu.maze.util.ObjectUtils;
 import nl.uu.maze.util.Pair;
 import nl.uu.maze.util.Z3Sorts;
 import sootup.core.jimple.visitor.AbstractValueVisitor;
@@ -565,6 +566,7 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
         // Evaluate the state iff the method is not static or involves arguments
         ArgMap argMap = null;
         Object instance = null;
+        Object copy = null;
         if (base != null || args.size() > 0) {
             Optional<ArgMap> argMapOpt = validator.evaluate(state, true);
             // If state is not satisfiable at this point, stop execution (prune) of this
@@ -600,12 +602,25 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
                 }
                 String key = symRef.toString();
                 instance = argMap.toJava(key, method.getDeclaringClass());
+                // Create a shallow copy of the instance to compare its fields later
+                copy = ObjectUtils.shallowCopy(instance, method.getDeclaringClass());
             }
         }
 
         Object retval = executor.execute(instance, method, argMap);
         Type retType = methodSig.getType();
         setResult(javaToZ3.transform(retval, state, retType));
+
+        // Check if the method modifies any (primitive) fields of the instance object
+        if (base != null && copy != null) {
+            ObjectUtils.comparePrimitives(instance, copy, (field, val1, val2) -> {
+                // Field has been modified, set the field in the heap
+                String fieldName = field.getName();
+                Type fieldType = sorts.determineType(field.getType());
+                Expr<?> fieldExpr = javaToZ3.transform(val1, state, fieldType);
+                state.heap.setField(base.getName(), fieldName, fieldExpr, fieldType);
+            });
+        }
     }
 
     @Override

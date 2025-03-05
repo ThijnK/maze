@@ -34,13 +34,15 @@ public class ObjectInstantiator {
     /**
      * Attempt to create an instance of the given class.
      * 
-     * @param clazz The class to instantiate
+     * @param clazz    The class to instantiate
+     * @param forceNew Whether to force the creation of a new instance instead of
+     *                 reusing previously created instances
      * @return An instance of the class or null if the instance could not be created
      */
-    public static Object createInstance(Class<?> clazz) {
+    public static Object createInstance(Class<?> clazz, boolean forceNew) {
         // Try to create an instance using one of the constructors
         for (Constructor<?> ctor : clazz.getConstructors()) {
-            Object instance = createInstance(ctor, generateArgs(ctor.getParameters(), MethodType.CTOR, null));
+            Object instance = createInstance(ctor, generateArgs(ctor.getParameters(), MethodType.CTOR, null), forceNew);
             if (instance != null) {
                 return instance;
             }
@@ -60,23 +62,25 @@ public class ObjectInstantiator {
      * @return An instance of the class or null if the instance could not be created
      */
     public static Object createInstance(Constructor<?> ctor, ArgMap argMap) {
-        return createInstance(ctor, generateArgs(ctor.getParameters(), MethodType.CTOR, argMap));
+        return createInstance(ctor, generateArgs(ctor.getParameters(), MethodType.CTOR, argMap), false);
     }
 
     /**
      * Attempt to create an instance of the given class using the given arguments.
      * 
-     * @param ctor The constructor to use to create the instance
-     * @param args The arguments to pass to the constructor
+     * @param ctor     The constructor to use to create the instance
+     * @param args     The arguments to pass to the constructor
+     * @param forceNew Whether to force the creation of a new instance instead of
+     *                 reusing previously created instances
      * @return An instance of the class or null if the instance could not be created
      */
-    public static Object createInstance(Constructor<?> ctor, Object[] args) {
+    public static Object createInstance(Constructor<?> ctor, Object[] args, boolean forceNew) {
         try {
             int hash = Arrays.hashCode(args);
             hash = 31 * hash + ctor.getDeclaringClass().getName().hashCode();
             // Check if an instance of the class has already
             // been created with the same arguments
-            if (cutInstances.containsKey(hash)) {
+            if (!forceNew && cutInstances.containsKey(hash)) {
                 return cutInstances.get(hash);
             } else {
                 logger.debug("Creating instance of class " + ctor.getDeclaringClass().getName() + " with args: "

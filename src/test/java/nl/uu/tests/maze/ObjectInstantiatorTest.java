@@ -14,21 +14,21 @@ import java.net.URISyntaxException;
 class ObjectInstantiatorTest {
     @Test
     public void testCreateInstance_NoArgs() {
-        Object instance = ObjectInstantiator.createInstance(TestClassNoArgs.class);
+        Object instance = ObjectInstantiator.createInstance(TestClassNoArgs.class, true);
         assertNotNull(instance);
         assertTrue(instance instanceof TestClassNoArgs);
     }
 
     @Test
     public void testCreateInstance_WithArgs() {
-        Object instance = ObjectInstantiator.createInstance(TestClassWithArgs.class);
+        Object instance = ObjectInstantiator.createInstance(TestClassWithArgs.class, true);
         assertNotNull(instance);
         assertTrue(instance instanceof TestClassWithArgs);
     }
 
     @Test
     public void testCreateInstance_NoConstructors() {
-        Object instance = ObjectInstantiator.createInstance(TestClassNoConstructors.class);
+        Object instance = ObjectInstantiator.createInstance(TestClassNoConstructors.class, true);
         assertNotNull(instance);
         assertTrue(instance instanceof TestClassNoConstructors);
     }

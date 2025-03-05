@@ -137,7 +137,7 @@ public class ArgMap {
             // Convert ObjectInstance to Object
             ObjectInstance instance = (ObjectInstance) value;
             // Create a dummy instance that will be filled with the correct values
-            Object obj = ObjectInstantiator.createInstance(type);
+            Object obj = ObjectInstantiator.createInstance(type, true);
 
             for (Map.Entry<String, ObjectField> entry : instance.getFields().entrySet()) {
                 try {
