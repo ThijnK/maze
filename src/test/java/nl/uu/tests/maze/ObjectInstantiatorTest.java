@@ -1,6 +1,5 @@
 package nl.uu.tests.maze;
 
-import nl.uu.maze.analysis.JavaAnalyzer;
 import nl.uu.maze.execution.ArgMap;
 import nl.uu.maze.execution.MethodType;
 import nl.uu.maze.execution.concrete.ObjectInstantiator;
@@ -55,8 +54,7 @@ class ObjectInstantiatorTest {
         Parameter[] params = TestClassManyArgs.class.getConstructors()[0].getParameters();
         ArgMap argMap = new ArgMap(new Object[] { 1, 2.0, 3.0f, 4L, (short) 5, (byte) 6, '7', true,
                 new TestClassWithArgs(1, 2.0, true) }, MethodType.METHOD);
-        JavaAnalyzer analyzer = new JavaAnalyzer("target/classes", null);
-        Object[] args = ObjectInstantiator.generateArgs(params, MethodType.METHOD, argMap, analyzer);
+        Object[] args = ObjectInstantiator.generateArgs(params, MethodType.METHOD, argMap);
         assertEquals(9, args.length);
         assertEquals(1, args[0]);
         assertEquals(2.0, args[1]);
@@ -78,7 +76,7 @@ class ObjectInstantiatorTest {
         argMap.set("marg3", 4L);
         argMap.set("marg4", (short) 5);
         argMap.set("marg5", (byte) 6);
-        Object[] args = ObjectInstantiator.generateArgs(params, MethodType.METHOD, argMap, null);
+        Object[] args = ObjectInstantiator.generateArgs(params, MethodType.METHOD, argMap);
         assertEquals(9, args.length);
         assertEquals(1, args[0]);
         assertTrue(args[1] instanceof Double);
