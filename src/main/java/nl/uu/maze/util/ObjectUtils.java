@@ -2,7 +2,6 @@ package nl.uu.maze.util;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 
 import nl.uu.maze.execution.concrete.ObjectInstantiator;
 
@@ -14,34 +13,17 @@ public class ObjectUtils {
      * Shallow copy an object, copying only primitive fields.
      */
     public static Object shallowCopy(Object obj, Class<?> clazz) {
-        if (obj == null) {
-            return null;
-        }
-
-        // Dummy instance which we'll copy primitive fields into
-        Object copy = ObjectInstantiator.createInstance(clazz, true);
-
-        for (Field field : clazz.getDeclaredFields()) {
-            try {
-                // Only copy non-static primitive fields
-                if (Modifier.isStatic(field.getModifiers()) || !field.getType().isPrimitive()) {
-                    continue;
-                }
-
-                field.setAccessible(true);
-                field.set(copy, field.get(obj));
-            } catch (Exception e) {
-                // Ignore
-            }
-        }
-
-        return copy;
+        return deepCopy(obj, clazz, false);
     }
 
     /**
-     * Deep copy an object, copying all fields.
+     * Deep copy an object, copying all fields, including nested objects.
      */
     public static Object deepCopy(Object obj, Class<?> clazz) {
+        return deepCopy(obj, clazz, true);
+    }
+
+    private static Object deepCopy(Object obj, Class<?> clazz, boolean recurse) {
         if (obj == null) {
             return null;
         }
@@ -65,7 +47,7 @@ public class ObjectUtils {
                 // If the field is a primitive (or String), simply copy it
                 if (field.getType().isPrimitive() || field.getType().equals(String.class)) {
                     field.set(copy, value);
-                } else {
+                } else if (recurse) {
                     // If the field is an object, recursively copy it
                     field.set(copy, deepCopy(value, field.getType()));
                 }
@@ -78,68 +60,45 @@ public class ObjectUtils {
     }
 
     public interface FieldChange {
-        void fieldChanged(Field[] path, Object val1, Object val2);
-    }
-
-    public interface PrimitiveFieldChange {
-        void fieldChanged(Field field, Object val1, Object val2);
+        void fieldChanged(Field[] path, Object oldValue, Object newValue);
     }
 
     /**
      * Compare two objects and call the callback for each primitive field that has
-     * changed.
+     * changed in the updated object compared to the original object.
      */
-    public static void shallowCompare(Object obj1, Object obj2, PrimitiveFieldChange callback) {
-        // If obj2 is null, we simply return every field as changed
-        if (obj1 == null) {
-            return;
-        }
-
-        for (Field field : obj1.getClass().getDeclaredFields()) {
-            try {
-                // Only compare non-static primitive fields
-                if (Modifier.isStatic(field.getModifiers()) || !field.getType().isPrimitive()) {
-                    continue;
-                }
-
-                field.setAccessible(true);
-                Object val1 = field.get(obj1);
-                Object val2 = obj2 != null ? field.get(obj2) : null;
-                if (!val1.equals(val2)) {
-                    callback.fieldChanged(field, val1, val2);
-                }
-            } catch (Exception e) {
-                // Ignore
-            }
-        }
+    public static void shallowCompare(Object original, Object updated, FieldChange callback) {
+        deepCompare(original, updated, callback, new Field[0], false);
     }
 
     /**
      * Compare two objects and call the callback for each field that has changed,
      * including nested objects.
      */
-    public static void deepCompare(Object obj1, Object obj2, FieldChange callback) {
-        // If obj2 is null, we simply return every field as changed
-        if (obj1 == null) {
+    public static void deepCompare(Object original, Object updated, FieldChange callback) {
+        deepCompare(original, updated, callback, new Field[0], true);
+    }
+
+    private static void deepCompare(Object original, Object updated, FieldChange callback, Field[] path,
+            boolean recurse) {
+        // If updates is null, abort
+        // If original is null, we simply return every field as changed
+        if (updated == null) {
             return;
         }
 
-        deepCompare(obj1, obj2, callback, new Field[0]);
-    }
-
-    private static void deepCompare(Object obj1, Object obj2, FieldChange callback, Field[] path) {
-        for (Field field : obj1.getClass().getDeclaredFields()) {
+        for (Field field : updated.getClass().getDeclaredFields()) {
             try {
                 Field[] fieldPath = ArrayUtils.append(path, field);
                 field.setAccessible(true);
-                Object val1 = field.get(obj1);
-                Object val2 = obj2 != null ? field.get(obj2) : null;
+                Object oldValue = original != null ? field.get(original) : null;
+                Object newValue = field.get(updated);
                 if (field.getType().isPrimitive() || field.getType().equals(String.class)) {
-                    if (!val1.equals(val2)) {
-                        callback.fieldChanged(fieldPath, val1, val2);
+                    if (!newValue.equals(oldValue)) {
+                        callback.fieldChanged(fieldPath, oldValue, newValue);
                     }
-                } else {
-                    deepCompare(val1, val2, callback, fieldPath);
+                } else if (recurse) {
+                    deepCompare(oldValue, newValue, callback, fieldPath, recurse);
                 }
             } catch (Exception e) {
                 // Ignore

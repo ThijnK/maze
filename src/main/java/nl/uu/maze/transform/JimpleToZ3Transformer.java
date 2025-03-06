@@ -582,7 +582,7 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
 
         ArgMap argMap = null;
         Object instance = null;
-        Object copy = null;
+        Object original = null;
 
         // Evaluate state if the method is not static or involves arguments
         if (base != null || args.size() > 0) {
@@ -613,7 +613,7 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
                         return;
                     }
                     // Create a shallow copy of the instance to compare its fields later
-                    copy = ObjectUtils.shallowCopy(instance, clazz);
+                    original = ObjectUtils.shallowCopy(instance, clazz);
                 } catch (ClassNotFoundException | NoSuchMethodException | SecurityException e) {
                     logger.warn("Failed to find class for instance: " + symRef.toString());
                 }
@@ -654,11 +654,12 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
 
         // Check if the method modifies any (primitive) fields of the instance object
         if (base != null && instance != null) {
-            ObjectUtils.shallowCompare(instance, copy, (field, val1, val2) -> {
+            ObjectUtils.shallowCompare(original, instance, (path, oldValue, newValue) -> {
                 // Field has been modified, set the field in the heap
-                String fieldName = field.getName();
-                Type fieldType = sorts.determineType(field.getType());
-                Expr<?> fieldExpr = javaToZ3.transform(val1, state, fieldType);
+                // Shallow compare, so we can assume path.length == 1
+                String fieldName = path[0].getName();
+                Type fieldType = sorts.determineType(path[0].getType());
+                Expr<?> fieldExpr = javaToZ3.transform(newValue, state, fieldType);
                 state.heap.setField(base.getName(), fieldName, fieldExpr, fieldType);
             });
         }
