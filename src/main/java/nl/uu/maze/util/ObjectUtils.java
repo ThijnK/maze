@@ -1,5 +1,6 @@
 package nl.uu.maze.util;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 
@@ -29,6 +30,45 @@ public class ObjectUtils {
 
                 field.setAccessible(true);
                 field.set(copy, field.get(obj));
+            } catch (Exception e) {
+                // Ignore
+            }
+        }
+
+        return copy;
+    }
+
+    /**
+     * Deep copy an object, copying all fields.
+     */
+    public static Object deepCopy(Object obj, Class<?> clazz) {
+        if (obj == null) {
+            return null;
+        }
+
+        if (clazz.isArray()) {
+            // If the object is an array, copy each element
+            Object arr = Array.newInstance(clazz.getComponentType(), Array.getLength(obj));
+            for (int i = 0; i < Array.getLength(obj); i++) {
+                Array.set(arr, i, deepCopy(Array.get(obj, i), clazz.getComponentType()));
+            }
+            return arr;
+        }
+
+        // Dummy instance which we'll copy fields into
+        Object copy = ObjectInstantiator.createInstance(clazz, true);
+
+        for (Field field : clazz.getDeclaredFields()) {
+            try {
+                field.setAccessible(true);
+                Object value = field.get(obj);
+                // If the field is a primitive (or String), simply copy it
+                if (field.getType().isPrimitive() || field.getType().equals(String.class)) {
+                    field.set(copy, value);
+                } else {
+                    // If the field is an object, recursively copy it
+                    field.set(copy, deepCopy(value, field.getType()));
+                }
             } catch (Exception e) {
                 // Ignore
             }
