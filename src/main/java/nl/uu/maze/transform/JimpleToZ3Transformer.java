@@ -420,7 +420,25 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
     public void caseStaticFieldRef(@Nonnull JStaticFieldRef ref) {
         // Note: ref.toString() will be e.g. "<org.a.s.e.SingleMethod: int x>"
         // (but not abbreviated)
-        setResult(state.getVariable(ref.toString()));
+        Expr<?> expr = state.getVariable(ref.toString());
+        if (expr == null) {
+            // If note already in the state, create a new symbolic value
+            Type type = ref.getType();
+            if (type instanceof ArrayType) {
+                ArrayType arrType = (ArrayType) type;
+                if (arrType.getDimension() > 1) {
+                    setResult(state.heap.allocateMultiArray(state.heap.newRefKey(), arrType, arrType.getBaseType()));
+                } else {
+                    setResult(state.heap.allocateArray(state.heap.newRefKey(), arrType, arrType.getBaseType()));
+                }
+            } else if (type instanceof ClassType && !type.toString().equals("java.lang.String")) {
+                setResult(state.heap.allocateObject(state.heap.newRefKey(), ref.getType()));
+            } else {
+                setResult(ctx.mkConst(ref.toString(), sorts.determineSort(type)));
+            }
+        } else {
+            setResult(expr);
+        }
     }
 
     @Override
@@ -590,6 +608,10 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
                                 ((Method) executable).getParameterTypes());
                     }
                     instance = argMap.toJava(symRef.toString(), clazz);
+                    if (instance == null) {
+                        logger.warn("Failed to find instance for base: " + symRef.toString());
+                        return;
+                    }
                     // Create a shallow copy of the instance to compare its fields later
                     copy = ObjectUtils.shallowCopy(instance, clazz);
                 } catch (ClassNotFoundException | NoSuchMethodException | SecurityException e) {

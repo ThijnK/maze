@@ -115,6 +115,6 @@ public class SymbolicRefExtractor extends AbstractValueVisitor<Expr<?>> {
 
     @Override
     public void caseDynamicInvokeExpr(@Nonnull JDynamicInvokeExpr expr) {
-        throw new UnsupportedOperationException("DynamicInvokeExpr not supported");
+        throw new UnsupportedOperationException("Dynamic invoke expressions are not supported");
     }
 }
