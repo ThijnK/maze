@@ -22,7 +22,7 @@ public class ObjectUtilsTest {
     }
 
     @Test
-    void testDeepCopy_NestedFields() {
+    public void testDeepCopy_NestedFields() {
         TestClass nested = new TestClass(24, "World", null, new TestClass[0]);
         TestClass original = new TestClass(42, "Hello", nested, new TestClass[] {
                 new TestClass(1, "One", null, new TestClass[0]),

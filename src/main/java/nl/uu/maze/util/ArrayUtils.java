@@ -1,5 +1,6 @@
 package nl.uu.maze.util;
 
+import java.lang.reflect.Array;
 import java.util.Random;
 
 /**
@@ -40,5 +41,25 @@ public class ArrayUtils {
         }
         sb.append(']');
         return sb.toString();
+    }
+
+    /**
+     * Copy the given array to a new array of the specified length.
+     */
+    public static <T> T[] copyOf(T[] original, int newLength) {
+        @SuppressWarnings("unchecked")
+        T[] copy = (T[]) Array.newInstance(original.getClass().getComponentType(), newLength);
+        System.arraycopy(original, 0, copy, 0, Math.min(original.length, newLength));
+        return copy;
+    }
+
+    /**
+     * Create a new array with the given element appended to the end of the original
+     * array, increasing the length by 1.
+     */
+    public static <E> E[] append(E[] arr, E el) {
+        E[] newArr = copyOf(arr, arr.length + 1);
+        newArr[arr.length] = el;
+        return newArr;
     }
 }

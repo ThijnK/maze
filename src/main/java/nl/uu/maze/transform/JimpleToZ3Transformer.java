@@ -654,7 +654,7 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
 
         // Check if the method modifies any (primitive) fields of the instance object
         if (base != null && instance != null) {
-            ObjectUtils.comparePrimitives(instance, copy, (field, val1, val2) -> {
+            ObjectUtils.shallowCompare(instance, copy, (field, val1, val2) -> {
                 // Field has been modified, set the field in the heap
                 String fieldName = field.getName();
                 Type fieldType = sorts.determineType(field.getType());
