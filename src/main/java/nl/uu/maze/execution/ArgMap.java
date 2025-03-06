@@ -165,7 +165,7 @@ public class ArgMap {
     }
 
     /**
-     * Convert an array of objects to an array of the given type.
+     * Convert an array of Object to an array of the given type.
      * 
      * @param value The array to convert
      * @param type  The type of the array

@@ -41,7 +41,7 @@ public class ObjectInstantiator {
      */
     public static Object createInstance(Class<?> clazz, boolean forceNew) {
         // Try to create an instance using one of the constructors
-        for (Constructor<?> ctor : clazz.getConstructors()) {
+        for (Constructor<?> ctor : clazz.getDeclaredConstructors()) {
             Object instance = createInstance(ctor, generateArgs(ctor.getParameters(), MethodType.CTOR, null), forceNew);
             if (instance != null) {
                 return instance;
@@ -85,6 +85,7 @@ public class ObjectInstantiator {
             } else {
                 logger.debug("Creating instance of class " + ctor.getDeclaringClass().getName() + " with args: "
                         + ArrayUtils.toString(args));
+                ctor.setAccessible(true);
                 Object instance = ctor.newInstance(args);
 
                 // Store the instance in the cutInstances map

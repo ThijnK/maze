@@ -259,7 +259,7 @@ public class JavaAnalyzer {
      */
     public Pair<Constructor<?>, Object[]> getJavaConstructor(Class<?> clazz) {
         // Find a constructor for which arguments can be generated
-        for (Constructor<?> ctor : clazz.getConstructors()) {
+        for (Constructor<?> ctor : clazz.getDeclaredConstructors()) {
             try {
                 Object[] args = ObjectInstantiator.generateArgs(ctor.getParameters(), MethodType.CTOR, null);
                 return Pair.of(ctor, args);
