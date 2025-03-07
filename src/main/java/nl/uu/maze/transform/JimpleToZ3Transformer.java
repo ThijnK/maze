@@ -569,7 +569,7 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
     // #endregion
 
     // #region Invocations
-    private void handleInvokeExpr(MethodSignature methodSig, List<Immediate> args, Local base) {
+    private void handleInvocation(MethodSignature methodSig, List<Immediate> args, Local base) {
         boolean isCtor = methodSig.getName().equals("<init>");
         // Get the method or constructor from the method signature
         Object executable;
@@ -667,22 +667,22 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
 
     @Override
     public void caseStaticInvokeExpr(@Nonnull JStaticInvokeExpr expr) {
-        handleInvokeExpr(expr.getMethodSignature(), expr.getArgs(), null);
+        handleInvocation(expr.getMethodSignature(), expr.getArgs(), null);
     }
 
     @Override
     public void caseInterfaceInvokeExpr(@Nonnull JInterfaceInvokeExpr expr) {
-        handleInvokeExpr(expr.getMethodSignature(), expr.getArgs(), expr.getBase());
+        handleInvocation(expr.getMethodSignature(), expr.getArgs(), expr.getBase());
     }
 
     @Override
     public void caseSpecialInvokeExpr(@Nonnull JSpecialInvokeExpr expr) {
-        handleInvokeExpr(expr.getMethodSignature(), expr.getArgs(), expr.getBase());
+        handleInvocation(expr.getMethodSignature(), expr.getArgs(), expr.getBase());
     }
 
     @Override
     public void caseVirtualInvokeExpr(@Nonnull JVirtualInvokeExpr expr) {
-        handleInvokeExpr(expr.getMethodSignature(), expr.getArgs(), expr.getBase());
+        handleInvocation(expr.getMethodSignature(), expr.getArgs(), expr.getBase());
     }
 
     @Override
