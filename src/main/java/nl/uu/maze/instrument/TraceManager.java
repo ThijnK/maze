@@ -12,10 +12,10 @@ import java.util.Objects;
 public class TraceManager {
     /**
      * Represents the type of a branch in a symbolic trace file.
-     * This can be either an if-statement or a switch-statement.
+     * This can be either an if-statement, a switch-statement, or an array access.
      */
     public static enum BranchType {
-        IF, SWITCH;
+        IF, SWITCH, ARRAY;
 
         @Override
         public String toString() {
@@ -101,6 +101,10 @@ public class TraceManager {
 
         public boolean isSwitch() {
             return branchType == BranchType.SWITCH;
+        }
+
+        public boolean isArrayAccess() {
+            return branchType == BranchType.ARRAY;
         }
 
         @Override

@@ -246,6 +246,132 @@ public class BytecodeInstrumenter {
             super.visitTableSwitchInsn(min, max, dflt, labels);
         }
 
+        private boolean isArrayLoad(int opcode) {
+            return opcode >= Opcodes.IALOAD && opcode <= Opcodes.SALOAD;
+        }
+
+        private boolean isArrayStore(int opcode) {
+            return opcode >= Opcodes.IASTORE && opcode <= Opcodes.SASTORE;
+        }
+
+        // Instrument array access instructions to record whether index is in bounds
+        @Override
+        public void visitInsn(int opcode) {
+            if (isArrayLoad(opcode)) {
+                // For array load, stack is [array, index]
+                instrumentArrayBoundsCheck();
+            } else if (isArrayStore(opcode)) {
+                // For array store, stack is [array, index, value]
+                int valueVar = storeValueForArrayStore(opcode);
+                // Now stack is [array, index]
+                instrumentArrayBoundsCheck();
+                // Restore the value for the original store instruction
+                restoreValueForArrayStore(opcode, valueVar);
+            }
+            super.visitInsn(opcode);
+        }
+
+        /**
+         * Instrument array bounds check for array load/store instructions.
+         */
+        private void instrumentArrayBoundsCheck() {
+            // Assumes the top of the stack is [array, index]
+            mv.visitInsn(Opcodes.DUP2);
+            int indexVar = newLocal(Type.INT_TYPE);
+            int arrayVar = newLocal(Type.getType(Object.class));
+            mv.visitVarInsn(Opcodes.ISTORE, indexVar); // Pop duplicate index
+            mv.visitVarInsn(Opcodes.ASTORE, arrayVar); // Pop duplicate array
+
+            Label inBounds = new Label();
+            Label outOfBounds = new Label();
+            Label continueLabel = new Label();
+
+            // if (index < 0) goto outOfBounds
+            mv.visitVarInsn(Opcodes.ILOAD, indexVar);
+            mv.visitJumpInsn(Opcodes.IFLT, outOfBounds);
+
+            // if (index < array.length) goto inBounds else goto outOfBounds
+            mv.visitVarInsn(Opcodes.ILOAD, indexVar);
+            mv.visitVarInsn(Opcodes.ALOAD, arrayVar);
+            mv.visitInsn(Opcodes.ARRAYLENGTH);
+            mv.visitJumpInsn(Opcodes.IF_ICMPLT, inBounds);
+            mv.visitJumpInsn(Opcodes.GOTO, outOfBounds);
+
+            mv.visitLabel(inBounds);
+            instrumentTraceLog(BranchType.ARRAY, 1); // 1 indicates in bounds
+            mv.visitJumpInsn(Opcodes.GOTO, continueLabel);
+
+            mv.visitLabel(outOfBounds);
+            instrumentTraceLog(BranchType.ARRAY, 0); // 0 indicates out-of-bounds
+            mv.visitLabel(continueLabel);
+        }
+
+        /**
+         * Store the value of an array store instruction in a local variable.
+         */
+        private int storeValueForArrayStore(int opcode) {
+            int valueVar;
+            switch (opcode) {
+                case Opcodes.IASTORE:
+                case Opcodes.BASTORE:
+                case Opcodes.CASTORE:
+                case Opcodes.SASTORE:
+                    valueVar = newLocal(Type.INT_TYPE);
+                    mv.visitVarInsn(Opcodes.ISTORE, valueVar);
+                    break;
+                case Opcodes.LASTORE:
+                    valueVar = newLocal(Type.LONG_TYPE);
+                    mv.visitVarInsn(Opcodes.LSTORE, valueVar);
+                    break;
+                case Opcodes.FASTORE:
+                    valueVar = newLocal(Type.FLOAT_TYPE);
+                    mv.visitVarInsn(Opcodes.FSTORE, valueVar);
+                    break;
+                case Opcodes.DASTORE:
+                    valueVar = newLocal(Type.DOUBLE_TYPE);
+                    mv.visitVarInsn(Opcodes.DSTORE, valueVar);
+                    break;
+                case Opcodes.AASTORE:
+                    valueVar = newLocal(Type.getType(Object.class));
+                    mv.visitVarInsn(Opcodes.ASTORE, valueVar);
+                    break;
+                default:
+                    valueVar = newLocal(Type.INT_TYPE);
+                    mv.visitVarInsn(Opcodes.ISTORE, valueVar);
+                    break;
+            }
+            return valueVar;
+        }
+
+        /**
+         * Restore the value of an array store instruction from a local variable.
+         */
+        private void restoreValueForArrayStore(int opcode, int valueVar) {
+            switch (opcode) {
+                case Opcodes.IASTORE:
+                case Opcodes.BASTORE:
+                case Opcodes.CASTORE:
+                case Opcodes.SASTORE:
+                    mv.visitVarInsn(Opcodes.ILOAD, valueVar);
+                    break;
+                case Opcodes.LASTORE:
+                    mv.visitVarInsn(Opcodes.LLOAD, valueVar);
+                    break;
+                case Opcodes.FASTORE:
+                    mv.visitVarInsn(Opcodes.FLOAD, valueVar);
+                    break;
+                case Opcodes.DASTORE:
+                    mv.visitVarInsn(Opcodes.DLOAD, valueVar);
+                    break;
+                case Opcodes.AASTORE:
+                    mv.visitVarInsn(Opcodes.ALOAD, valueVar);
+                    break;
+                default:
+                    mv.visitVarInsn(Opcodes.ILOAD, valueVar);
+                    break;
+            }
+        }
+
         /**
          * Instrument code to record a trace entry
          * 
