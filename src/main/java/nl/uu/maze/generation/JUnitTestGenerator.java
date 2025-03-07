@@ -48,6 +48,7 @@ public class JUnitTestGenerator {
 
     /** Map of method names to the number of test cases generated for each method */
     private Map<String, Integer> methodCount;
+    private Set<Integer> builtTestCases = new HashSet<>();
     private boolean setFieldAdded = false;
 
     public JUnitTestGenerator(Class<?> clazz, JavaAnalyzer analyzer, ConcreteExecutor executor)
@@ -98,12 +99,9 @@ public class JUnitTestGenerator {
         boolean isVoid = method.getReturnType().toString().equals("void");
         boolean isException = retval instanceof Exception;
 
-        methodCount.compute(method.getName(), (k, v) -> v == null ? 1 : v + 1);
-        String testMethodName = "test" + capitalizeFirstLetter(method.getName()) + methodCount.get(method.getName());
-        MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder(testMethodName)
+        MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder("TEMP")
                 .addModifiers(Modifier.PUBLIC)
                 .addAnnotation(Test.class)
-                .addException(Exception.class)
                 .returns(void.class);
 
         // For static methods, just call the method
@@ -126,8 +124,6 @@ public class JUnitTestGenerator {
             if (retval instanceof ConstructorException) {
                 methodBuilder.addStatement("$T.assertThrows($T.class, () -> new $T($L))", Assertions.class,
                         Exception.class, clazz, String.join(", ", ctorParams));
-                classBuilder.addMethod(methodBuilder.build());
-                return;
             } else {
                 methodBuilder.addStatement("$T cut = new $T($L)", clazz, clazz, String.join(", ", ctorParams));
                 methodBuilder.addCode("\n"); // White space between ctor and method call
@@ -148,6 +144,18 @@ public class JUnitTestGenerator {
             }
         }
 
+        MethodSpec methodSpec = methodBuilder.build();
+        // Check if this is a duplicate test case
+        // Note: check hashCode of code, because method name is always unique
+        int hash = methodSpec.code().hashCode();
+        if (builtTestCases.contains(hash)) {
+            return;
+        }
+        builtTestCases.add(hash);
+
+        methodCount.compute(method.getName(), (k, v) -> v == null ? 1 : v + 1);
+        String testMethodName = "test" + capitalizeFirstLetter(method.getName()) + methodCount.get(method.getName());
+        methodBuilder.setName(testMethodName);
         classBuilder.addMethod(methodBuilder.build());
     }
 
