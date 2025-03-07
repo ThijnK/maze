@@ -127,6 +127,10 @@ public class SymbolicState {
         return paramTypes.getOrDefault(var, null);
     }
 
+    public boolean isParam(String var) {
+        return paramTypes.containsKey(var) || paramTypes.containsKey(getVariable(var).toString());
+    }
+
     /**
      * Adds a new path constraint to the current path condition.
      * 

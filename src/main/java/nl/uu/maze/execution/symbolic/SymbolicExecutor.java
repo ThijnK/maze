@@ -226,6 +226,33 @@ public class SymbolicExecutor {
             }
         }
 
+        // For array access on symbolic arrays (i.e., parameters), we split the state
+        // into one where the index is outside the bounds of the array (throws
+        // exception) and one where it is not
+        // This is to ensure that the engine can create an array of the correct size
+        // when generating test cases
+        List<SymbolicState> newStates = new ArrayList<SymbolicState>();
+        if (stmt.getRightOp() instanceof JArrayRef) {
+            JArrayRef ref = (JArrayRef) stmt.getRightOp();
+            if (state.isParam(ref.getBase().getName())) {
+                BitVecExpr index = (BitVecExpr) transformer.transform(ref.getIndex(), state);
+                SymbolicState outOfBoundsState = state.clone();
+                BitVecExpr len = (BitVecExpr) state.heap.getArrayLength(ref.getBase().getName());
+                if (len == null) {
+                    // If length is null, means we have a null reference, and exception is thrown
+                    return List.of(state);
+                }
+
+                outOfBoundsState.addEngineConstraint(ctx.mkOr(ctx.mkBVSLT(index, ctx.mkBV(0, sorts.getIntBitSize())),
+                        ctx.mkBVSGE(index, len)));
+                outOfBoundsState.setExceptionThrown();
+                newStates.add(outOfBoundsState);
+
+                state.addEngineConstraint(ctx.mkAnd(ctx.mkBVSGE(index, ctx.mkBV(0, sorts.getIntBitSize())),
+                        ctx.mkBVSLT(index, len)));
+            }
+        }
+
         LValue leftOp = stmt.getLeftOp();
         Expr<?> value = transformer.transform(stmt.getRightOp(), state, leftOp.toString());
 
@@ -244,7 +271,9 @@ public class SymbolicExecutor {
         }
 
         // Definition statements follow the same control flow as other statements
-        return handleOtherStmts(cfg, stmt, state);
+        List<SymbolicState> succStates = handleOtherStmts(cfg, stmt, state);
+        newStates.addAll(succStates);
+        return newStates;
     }
 
     /**
@@ -256,7 +285,6 @@ public class SymbolicExecutor {
      * @return A list of new symbolic states after executing the invoke statement
      */
     private List<SymbolicState> handleInvokeStmt(StmtGraph<?> cfg, JInvokeStmt stmt, SymbolicState state) {
-        // TODO: may need special handling for contructors
         AbstractInvokeExpr invokeExpr = stmt.getInvokeExpr();
         // Resolve aliases
         Expr<?> symRef = refExtractor.extract(invokeExpr, state);
