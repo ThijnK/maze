@@ -68,7 +68,7 @@ public class SymbolicExecutor {
         else if (stmt instanceof JSwitchStmt)
             return handleSwitchStmt(cfg, (JSwitchStmt) stmt, state, iterator);
         else if (stmt instanceof AbstractDefinitionStmt)
-            return handleDefStmt(cfg, (AbstractDefinitionStmt) stmt, state);
+            return handleDefStmt(cfg, (AbstractDefinitionStmt) stmt, state, iterator);
         else if (stmt instanceof JInvokeStmt)
             return handleInvokeStmt(cfg, (JInvokeStmt) stmt, state);
         else if (stmt instanceof JThrowStmt) {
@@ -215,7 +215,8 @@ public class SymbolicExecutor {
      * @param state The current symbolic state
      * @return A list of new symbolic states after executing the statement
      */
-    private List<SymbolicState> handleDefStmt(StmtGraph<?> cfg, AbstractDefinitionStmt stmt, SymbolicState state) {
+    private List<SymbolicState> handleDefStmt(StmtGraph<?> cfg, AbstractDefinitionStmt stmt, SymbolicState state,
+            Iterator<TraceEntry> iterator) {
         // If either the lhs or the rhs contains a symbolic reference (e.g., an object
         // or array reference) with more than one potential alias, then we split the
         // state into one state for each alias, and set the symbolic reference to the
@@ -238,25 +239,49 @@ public class SymbolicExecutor {
         // exception) and one where it is not
         // This is to ensure that the engine can create an array of the correct size
         // when generating test cases
-        List<SymbolicState> newStates = new ArrayList<SymbolicState>();
+        SymbolicState outOfBoundsState = null;
         if (leftOp instanceof JArrayRef || rightOp instanceof JArrayRef) {
             JArrayRef ref = leftOp instanceof JArrayRef ? (JArrayRef) leftOp : (JArrayRef) rightOp;
             if (state.isParam(ref.getBase().getName())) {
                 BitVecExpr index = (BitVecExpr) transformer.transform(ref.getIndex(), state);
-                SymbolicState outOfBoundsState = state.clone();
                 BitVecExpr len = (BitVecExpr) state.heap.getArrayLength(ref.getBase().getName());
                 if (len == null) {
                     // If length is null, means we have a null reference, and exception is thrown
                     return handleOtherStmts(cfg, stmt, state);
                 }
 
-                outOfBoundsState.addPathConstraint(ctx.mkOr(ctx.mkBVSLT(index, ctx.mkBV(0, sorts.getIntBitSize())),
-                        ctx.mkBVSGE(index, len)));
-                outOfBoundsState.setExceptionThrown();
-                newStates.add(outOfBoundsState);
+                // If replaying a trace, we should have a trace entry for the array access
+                if (iterator != null) {
+                    TraceEntry entry;
+                    // If end of iterator is reached or not an array access, something is wrong
+                    if (!iterator.hasNext() || !(entry = iterator.next()).isArrayAccess()) {
+                        state.setExceptionThrown();
+                        return List.of(state);
+                    }
 
-                state.addPathConstraint(ctx.mkAnd(ctx.mkBVSGE(index, ctx.mkBV(0, sorts.getIntBitSize())),
-                        ctx.mkBVSLT(index, len)));
+                    // If the entry value is 1, inside bounds, otherwise out of bounds
+                    if (entry.getValue() == 0) {
+                        state.addPathConstraint(ctx.mkOr(ctx.mkBVSLT(index, ctx.mkBV(0, sorts.getIntBitSize())),
+                                ctx.mkBVSGE(index, len)));
+                        state.setExceptionThrown();
+                        return handleOtherStmts(cfg, stmt, state);
+                    } else {
+                        state.addPathConstraint(ctx.mkAnd(ctx.mkBVSGE(index, ctx.mkBV(0, sorts.getIntBitSize())),
+                                ctx.mkBVSLT(index, len)));
+                    }
+                } else {
+                    // If not replaying a trace, split the state into one where the index is out of
+                    // bounds and one where it is not
+                    if (state.isParam(ref.getBase().getName())) {
+                        outOfBoundsState = state.clone();
+                        outOfBoundsState
+                                .addPathConstraint(ctx.mkOr(ctx.mkBVSLT(index, ctx.mkBV(0, sorts.getIntBitSize())),
+                                        ctx.mkBVSGE(index, len)));
+                        outOfBoundsState.setExceptionThrown();
+                        state.addPathConstraint(ctx.mkAnd(ctx.mkBVSGE(index, ctx.mkBV(0, sorts.getIntBitSize())),
+                                ctx.mkBVSLT(index, len)));
+                    }
+                }
             }
         }
 
@@ -278,8 +303,11 @@ public class SymbolicExecutor {
 
         // Definition statements follow the same control flow as other statements
         List<SymbolicState> succStates = handleOtherStmts(cfg, stmt, state);
-        newStates.addAll(succStates);
-        return newStates;
+        // For optional out of bounds state, check successors for potential catch blocks
+        if (outOfBoundsState != null) {
+            succStates.addAll(handleOtherStmts(cfg, stmt, outOfBoundsState));
+        }
+        return succStates;
     }
 
     /**
@@ -321,12 +349,11 @@ public class SymbolicExecutor {
         // but it can happen for exception-throwing statements inside a try block
         for (int i = 0; i < succs.size(); i++) {
             Stmt succ = succs.get(i);
-            // Prune if an exception was encountered, but this is not a catch block
-            if ((state.isExceptionThrown() && !isCatchBlock(succ))) {
-                continue;
+            // If the state is exceptional, and this succ is catch block, reset the
+            // exception flag
+            if (state.isExceptionThrown() && isCatchBlock(succ)) {
+                state.setExceptionThrown(false);
             }
-            // If it is a catch block, reset exception thrown flag
-            state.setExceptionThrown(false);
 
             SymbolicState newState = i == succs.size() - 1 ? state : state.clone();
             newState.setCurrentStmt(succ);
