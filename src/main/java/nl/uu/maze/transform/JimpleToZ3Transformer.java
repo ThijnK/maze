@@ -642,8 +642,12 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
             // For constructor calls, the new instance is the return value
             instance = retval;
         } else {
-            // TODO: if this throws exception?
             retval = executor.execute(instance, (Method) executable, argMap);
+            // If the method call throws an exception
+            if (retval instanceof Exception) {
+                state.setExceptionThrown();
+                return;
+            }
         }
 
         Type retType = methodSig.getType();

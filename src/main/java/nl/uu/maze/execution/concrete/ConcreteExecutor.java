@@ -59,10 +59,21 @@ public class ConcreteExecutor {
             return result;
         } catch (Exception e) {
             logger.warn("Execution of method " + method.getName() + " threw an exception: " + e);
-            return e;
+            return new MethodException();
         }
     }
 
+    /**
+     * Exception returned to indicate that the constructor of the class containing
+     * the method threw an exception.
+     */
     public static class ConstructorException extends Exception {
+    }
+
+    /**
+     * Exception returned to indicate that the method threw an exception during
+     * execution.
+     */
+    public static class MethodException extends Exception {
     }
 }

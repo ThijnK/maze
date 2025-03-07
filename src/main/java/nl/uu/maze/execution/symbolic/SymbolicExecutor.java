@@ -70,7 +70,10 @@ public class SymbolicExecutor {
             return handleDefStmt(cfg, (AbstractDefinitionStmt) stmt, state);
         else if (stmt instanceof JInvokeStmt)
             return handleInvokeStmt(cfg, (JInvokeStmt) stmt, state);
-        else
+        else if (stmt instanceof JThrowStmt) {
+            state.setExceptionThrown();
+            return handleOtherStmts(cfg, stmt, state);
+        } else
             return handleOtherStmts(cfg, stmt, state);
     }
 
@@ -240,7 +243,7 @@ public class SymbolicExecutor {
                 BitVecExpr len = (BitVecExpr) state.heap.getArrayLength(ref.getBase().getName());
                 if (len == null) {
                     // If length is null, means we have a null reference, and exception is thrown
-                    return List.of(state);
+                    return handleOtherStmts(cfg, stmt, state);
                 }
 
                 outOfBoundsState.addEngineConstraint(ctx.mkOr(ctx.mkBVSLT(index, ctx.mkBV(0, sorts.getIntBitSize())),
@@ -314,12 +317,24 @@ public class SymbolicExecutor {
         // Note: generally non-branching statements will not have more than 1 successor,
         // but it can happen for exception-throwing statements inside a try block
         for (int i = 0; i < succs.size(); i++) {
+            Stmt succ = succs.get(i);
+            // Prune if an exception was encountered, but this is not a catch block
+            if ((state.isExceptionThrown() && !isCatchBlock(succ))) {
+                continue;
+            }
+            // If it is a catch block, reset exception thrown flag
+            state.setExceptionThrown(false);
+
             SymbolicState newState = i == succs.size() - 1 ? state : state.clone();
-            newState.setCurrentStmt(succs.get(i));
+            newState.setCurrentStmt(succ);
             newStates.add(newState);
         }
 
         return newStates;
+    }
+
+    private boolean isCatchBlock(Stmt stmt) {
+        return stmt instanceof JIdentityStmt && ((JIdentityStmt) stmt).getRightOp() instanceof JCaughtExceptionRef;
     }
 
     /**
