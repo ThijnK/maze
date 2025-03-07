@@ -8,7 +8,9 @@ import sootup.java.core.JavaSootMethod;
 import javax.lang.model.element.Modifier;
 
 import java.lang.reflect.Array;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -18,13 +20,16 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Assertions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import com.palantir.javapoet.*;
 
 import nl.uu.maze.analysis.JavaAnalyzer;
 import nl.uu.maze.execution.ArgMap;
 import nl.uu.maze.execution.ArgMap.*;
+import nl.uu.maze.execution.concrete.ConcreteExecutor;
 import nl.uu.maze.execution.MethodType;
 
 /**
@@ -34,6 +39,7 @@ import nl.uu.maze.execution.MethodType;
 public class JUnitTestGenerator {
     private static final Logger logger = LoggerFactory.getLogger(JUnitTestGenerator.class);
     private final JavaAnalyzer analyzer;
+    private final ConcreteExecutor executor;
 
     private String testClassName;
     private TypeSpec.Builder classBuilder;
@@ -43,13 +49,15 @@ public class JUnitTestGenerator {
     private Map<String, Integer> methodCount;
     private boolean setFieldAdded = false;
 
-    public JUnitTestGenerator(Class<?> clazz, JavaAnalyzer analyzer) throws ClassNotFoundException {
+    public JUnitTestGenerator(Class<?> clazz, JavaAnalyzer analyzer, ConcreteExecutor executor)
+            throws ClassNotFoundException {
         testClassName = clazz.getSimpleName() + "Test";
         classBuilder = TypeSpec.classBuilder(testClassName)
                 .addModifiers(Modifier.PUBLIC);
         this.clazz = clazz;
         this.methodCount = new java.util.HashMap<>();
         this.analyzer = analyzer;
+        this.executor = executor;
     }
 
     /**
@@ -84,13 +92,15 @@ public class JUnitTestGenerator {
                 .addAnnotation(Test.class)
                 .addException(Exception.class)
                 .returns(void.class);
+        Class<?> returnType = analyzer.tryGetJavaClass(method.getReturnType()).orElse(Object.class);
 
         // For static methods, just call the method
         if (method.isStatic()) {
             // Add variable definitions for parameters
             List<String> params = addParamDefinitions(methodBuilder, method.getParameterTypes(), argMap,
                     MethodType.METHOD);
-            methodBuilder.addStatement("$T.$L($L)", clazz, method.getName(), String.join(", ", params));
+            methodBuilder.addStatement("$T retval = $T.$L($L)", returnType, clazz, method.getName(),
+                    String.join(", ", params));
         }
         // For instance methods, create an instance of the class and call the method
         else {
@@ -105,8 +115,12 @@ public class JUnitTestGenerator {
             methodBuilder.addCode("\n"); // White space between ctor and method call
             List<String> params = addParamDefinitions(methodBuilder, method.getParameterTypes(), argMap,
                     MethodType.METHOD);
-            methodBuilder.addStatement("cut.$L($L)", method.getName(), String.join(", ", params));
+            methodBuilder.addStatement("$T retval = cut.$L($L)", returnType, method.getName(),
+                    String.join(", ", params));
         }
+
+        methodBuilder.addCode("\n"); // White space between method call and assert
+        addAssertStatement(methodBuilder, method, ctor, argMap);
 
         classBuilder.addMethod(methodBuilder.build());
     }
@@ -299,6 +313,31 @@ public class JUnitTestGenerator {
 
         setFieldAdded = true;
         classBuilder.addMethod(methodBuilder.build());
+    }
+
+    /**
+     * Adds an assert statement to the given method builder that asserts the return
+     * value of the method under test for this test case.
+     * This is to support mutation testing.
+     */
+    private void addAssertStatement(MethodSpec.Builder methodBuilder, JavaSootMethod sootMethod,
+            JavaSootMethod sootCtor, ArgMap argMap) {
+        // Run method under test with the generated arguments and assert return value
+        // TODO: if execution throws exception, use an assertThrows statement
+        try {
+            Constructor<?> ctor = sootCtor != null ? analyzer.getJavaConstructor(sootCtor, clazz) : null;
+            Method method = analyzer.getJavaMethod(sootMethod, clazz);
+            Object retval = executor.execute(ctor, method, argMap);
+            if (retval == null) {
+                methodBuilder.addStatement("$T.assertNull($L)", Assertions.class, "retval");
+            } else {
+                methodBuilder.addStatement("$T.assertEquals($L, $L)", Assertions.class, valueToString(retval),
+                        "retval");
+            }
+
+        } catch (Exception e) {
+            logger.warn("Failed to generate assert statement for method " + sootMethod.getName());
+        }
     }
 
     /**
