@@ -14,6 +14,7 @@ import nl.uu.maze.util.Z3Sorts;
 import nl.uu.maze.util.Z3Utils;
 import sootup.core.graph.*;
 import sootup.core.jimple.basic.LValue;
+import sootup.core.jimple.basic.Value;
 import sootup.core.jimple.common.constant.IntConstant;
 import sootup.core.jimple.common.expr.AbstractInvokeExpr;
 import sootup.core.jimple.common.ref.*;
@@ -229,14 +230,17 @@ public class SymbolicExecutor {
             }
         }
 
+        LValue leftOp = stmt.getLeftOp();
+        Value rightOp = stmt.getRightOp();
+
         // For array access on symbolic arrays (i.e., parameters), we split the state
         // into one where the index is outside the bounds of the array (throws
         // exception) and one where it is not
         // This is to ensure that the engine can create an array of the correct size
         // when generating test cases
         List<SymbolicState> newStates = new ArrayList<SymbolicState>();
-        if (stmt.getRightOp() instanceof JArrayRef) {
-            JArrayRef ref = (JArrayRef) stmt.getRightOp();
+        if (leftOp instanceof JArrayRef || rightOp instanceof JArrayRef) {
+            JArrayRef ref = leftOp instanceof JArrayRef ? (JArrayRef) leftOp : (JArrayRef) rightOp;
             if (state.isParam(ref.getBase().getName())) {
                 BitVecExpr index = (BitVecExpr) transformer.transform(ref.getIndex(), state);
                 SymbolicState outOfBoundsState = state.clone();
@@ -246,17 +250,16 @@ public class SymbolicExecutor {
                     return handleOtherStmts(cfg, stmt, state);
                 }
 
-                outOfBoundsState.addEngineConstraint(ctx.mkOr(ctx.mkBVSLT(index, ctx.mkBV(0, sorts.getIntBitSize())),
+                outOfBoundsState.addPathConstraint(ctx.mkOr(ctx.mkBVSLT(index, ctx.mkBV(0, sorts.getIntBitSize())),
                         ctx.mkBVSGE(index, len)));
                 outOfBoundsState.setExceptionThrown();
                 newStates.add(outOfBoundsState);
 
-                state.addEngineConstraint(ctx.mkAnd(ctx.mkBVSGE(index, ctx.mkBV(0, sorts.getIntBitSize())),
+                state.addPathConstraint(ctx.mkAnd(ctx.mkBVSGE(index, ctx.mkBV(0, sorts.getIntBitSize())),
                         ctx.mkBVSLT(index, len)));
             }
         }
 
-        LValue leftOp = stmt.getLeftOp();
         Expr<?> value = transformer.transform(stmt.getRightOp(), state, leftOp.toString());
 
         if (leftOp instanceof JArrayRef) {
