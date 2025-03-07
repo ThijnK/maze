@@ -66,7 +66,7 @@ public class SymbolicState {
 
     public SymbolicState(Context ctx, Stmt stmt, int depth, MethodType methodType,
             Map<String, Expr<?>> symbolicVariables, List<BoolExpr> pathConstraints, List<BoolExpr> engineConstraints,
-            Map<String, Type> paramTypes, SymbolicHeap heap) {
+            Map<String, Type> paramTypes, SymbolicHeap heap, boolean exceptionThrown, boolean isInfeasible) {
         this.ctx = ctx;
         this.currentStmt = stmt;
         this.currentDepth = depth;
@@ -77,6 +77,8 @@ public class SymbolicState {
         this.heap = heap.clone(this);
         // Share the same variable types map to avoid copying
         this.paramTypes = paramTypes;
+        this.exceptionThrown = exceptionThrown;
+        this.isInfeasible = isInfeasible;
     }
 
     public void setMethodType(MethodType methodType) {
@@ -151,6 +153,10 @@ public class SymbolicState {
         this.exceptionThrown = true;
     }
 
+    public void setExceptionThrown(boolean exceptionThrown) {
+        this.exceptionThrown = exceptionThrown;
+    }
+
     public boolean isExceptionThrown() {
         return exceptionThrown;
     }
@@ -202,7 +208,7 @@ public class SymbolicState {
 
     public SymbolicState clone(Stmt stmt) {
         return new SymbolicState(ctx, stmt, currentDepth, methodType, symbolicVariables, pathConstraints,
-                engineConstraints, paramTypes, heap);
+                engineConstraints, paramTypes, heap, exceptionThrown, isInfeasible);
     }
 
     public SymbolicState clone() {
