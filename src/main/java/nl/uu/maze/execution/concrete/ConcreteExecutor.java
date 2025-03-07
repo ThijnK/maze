@@ -23,15 +23,18 @@ public class ConcreteExecutor {
      * @param method The method to invoke
      * @param argMap {@link ArgMap} containing the arguments to pass to the
      *               constructor and method invocation
-     * @return The return value of the method
-     * @throws IllegalArgumentException
-     * @throws InstantiationException
+     * @return The return value of the method or the exception thrown during
+     *         execution
      */
     public Object execute(Constructor<?> ctor, Method method, ArgMap argMap) {
         // If not static, create an instance of the class
         Object instance = null;
         if (!Modifier.isStatic(method.getModifiers())) {
             instance = ObjectInstantiator.createInstance(ctor, argMap);
+            // If constructor throws an exception, return it
+            if (instance == null) {
+                return new ConstructorException();
+            }
         }
         return execute(instance, method, argMap);
     }
@@ -43,7 +46,8 @@ public class ConcreteExecutor {
      * @param instance The instance to invoke the method on
      * @param method   The method to invoke
      * @param args     The arguments to pass to the method invocation
-     * @return The return value of the method
+     * @return The return value of the method, or the exception thrown during
+     *         execution
      */
     public Object execute(Object instance, Method method, ArgMap argMap) {
         try {
@@ -55,7 +59,10 @@ public class ConcreteExecutor {
             return result;
         } catch (Exception e) {
             logger.warn("Execution of method " + method.getName() + " threw an exception: " + e);
-            return null;
+            return e;
         }
+    }
+
+    public static class ConstructorException extends Exception {
     }
 }

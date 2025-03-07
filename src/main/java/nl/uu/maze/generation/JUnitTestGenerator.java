@@ -30,6 +30,7 @@ import nl.uu.maze.analysis.JavaAnalyzer;
 import nl.uu.maze.execution.ArgMap;
 import nl.uu.maze.execution.ArgMap.*;
 import nl.uu.maze.execution.concrete.ConcreteExecutor;
+import nl.uu.maze.execution.concrete.ConcreteExecutor.ConstructorException;
 import nl.uu.maze.execution.MethodType;
 
 /**
@@ -85,6 +86,18 @@ public class JUnitTestGenerator {
      *               method invocation
      */
     public void addMethodTestCase(JavaSootMethod method, JavaSootMethod ctor, ArgMap argMap) {
+        Object retval;
+        try {
+            Constructor<?> _ctor = ctor != null ? analyzer.getJavaConstructor(ctor, clazz) : null;
+            Method _method = analyzer.getJavaMethod(method, clazz);
+            retval = executor.execute(_ctor, _method, argMap);
+        } catch (Exception e) {
+            logger.warn("Failed to generate execute test case for " + method.getName());
+            return;
+        }
+        boolean isVoid = method.getReturnType().toString().equals("void");
+        boolean isException = retval instanceof Exception;
+
         methodCount.compute(method.getName(), (k, v) -> v == null ? 1 : v + 1);
         String testMethodName = "test" + capitalizeFirstLetter(method.getName()) + methodCount.get(method.getName());
         MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder(testMethodName)
@@ -92,15 +105,13 @@ public class JUnitTestGenerator {
                 .addAnnotation(Test.class)
                 .addException(Exception.class)
                 .returns(void.class);
-        Class<?> returnType = analyzer.tryGetJavaClass(method.getReturnType()).orElse(Object.class);
 
         // For static methods, just call the method
         if (method.isStatic()) {
             // Add variable definitions for parameters
             List<String> params = addParamDefinitions(methodBuilder, method.getParameterTypes(), argMap,
                     MethodType.METHOD);
-            methodBuilder.addStatement("$T retval = $T.$L($L)", returnType, clazz, method.getName(),
-                    String.join(", ", params));
+            addMethodCall(methodBuilder, method, params, isException, isVoid);
         }
         // For instance methods, create an instance of the class and call the method
         else {
@@ -111,18 +122,47 @@ public class JUnitTestGenerator {
             // Add variable definitions for the ctor parameters
             List<String> ctorParams = addParamDefinitions(methodBuilder, ctor.getParameterTypes(), argMap,
                     MethodType.CTOR);
-            methodBuilder.addStatement("$T cut = new $T($L)", clazz, clazz, String.join(", ", ctorParams));
-            methodBuilder.addCode("\n"); // White space between ctor and method call
-            List<String> params = addParamDefinitions(methodBuilder, method.getParameterTypes(), argMap,
-                    MethodType.METHOD);
+            // Assert throws for constructor call if it threw an exception
+            if (retval instanceof ConstructorException) {
+                methodBuilder.addStatement("$T.assertThrows($T.class, () -> new $T($L))", Assertions.class,
+                        Exception.class, clazz, String.join(", ", ctorParams));
+                classBuilder.addMethod(methodBuilder.build());
+                return;
+            } else {
+                methodBuilder.addStatement("$T cut = new $T($L)", clazz, clazz, String.join(", ", ctorParams));
+                methodBuilder.addCode("\n"); // White space between ctor and method call
+                List<String> params = addParamDefinitions(methodBuilder, method.getParameterTypes(), argMap,
+                        MethodType.METHOD);
+                addMethodCall(methodBuilder, method, params, isException, isVoid);
+            }
+        }
+
+        // Add an assert statement for the return value if the method is not void
+        if (!isException && !isVoid) {
+            methodBuilder.addCode("\n"); // White space between method call and assert
+            if (retval == null) {
+                methodBuilder.addStatement("$T.assertNull($L)", Assertions.class, "retval");
+            } else {
+                methodBuilder.addStatement("$T.assertEquals($L, $L)", Assertions.class, valueToString(retval),
+                        "retval");
+            }
+        }
+
+        classBuilder.addMethod(methodBuilder.build());
+    }
+
+    private void addMethodCall(MethodSpec.Builder methodBuilder, JavaSootMethod method, List<String> params,
+            boolean isException, boolean isVoid) {
+        Class<?> returnType = analyzer.tryGetJavaClass(method.getReturnType()).orElse(Object.class);
+        if (isException) {
+            methodBuilder.addStatement("$T.assertThrows($T.class, () -> cut.$L($L))", Assertions.class, Exception.class,
+                    method.getName(), String.join(", ", params));
+        } else if (isVoid) {
+            methodBuilder.addStatement("cut.$L($L)", method.getName(), String.join(", ", params));
+        } else {
             methodBuilder.addStatement("$T retval = cut.$L($L)", returnType, method.getName(),
                     String.join(", ", params));
         }
-
-        methodBuilder.addCode("\n"); // White space between method call and assert
-        addAssertStatement(methodBuilder, method, ctor, argMap);
-
-        classBuilder.addMethod(methodBuilder.build());
     }
 
     private List<String> addParamDefinitions(MethodSpec.Builder methodBuilder, List<Type> paramTypes, ArgMap argMap,
@@ -313,31 +353,6 @@ public class JUnitTestGenerator {
 
         setFieldAdded = true;
         classBuilder.addMethod(methodBuilder.build());
-    }
-
-    /**
-     * Adds an assert statement to the given method builder that asserts the return
-     * value of the method under test for this test case.
-     * This is to support mutation testing.
-     */
-    private void addAssertStatement(MethodSpec.Builder methodBuilder, JavaSootMethod sootMethod,
-            JavaSootMethod sootCtor, ArgMap argMap) {
-        // Run method under test with the generated arguments and assert return value
-        // TODO: if execution throws exception, use an assertThrows statement
-        try {
-            Constructor<?> ctor = sootCtor != null ? analyzer.getJavaConstructor(sootCtor, clazz) : null;
-            Method method = analyzer.getJavaMethod(sootMethod, clazz);
-            Object retval = executor.execute(ctor, method, argMap);
-            if (retval == null) {
-                methodBuilder.addStatement("$T.assertNull($L)", Assertions.class, "retval");
-            } else {
-                methodBuilder.addStatement("$T.assertEquals($L, $L)", Assertions.class, valueToString(retval),
-                        "retval");
-            }
-
-        } catch (Exception e) {
-            logger.warn("Failed to generate assert statement for method " + sootMethod.getName());
-        }
     }
 
     /**
