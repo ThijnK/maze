@@ -184,9 +184,8 @@ public class Z3ToJavaTransformer {
 
         Object[] arr = new Object[length];
         for (int i = 0; i < length; i++) {
-            BitVecExpr index = ctx.mkBV(i, sorts.getIntBitSize());
             // Select element at the index
-            Expr<?> element = model.eval(arrObj.getElem(index), true);
+            Expr<?> element = model.eval(arrObj.getElem(i), true);
             arr[i] = transformExpr(element, elemType);
         }
         return arr;

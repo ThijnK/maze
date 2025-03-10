@@ -736,6 +736,10 @@ public class SymbolicHeap {
             return (ArrayExpr<BitVecSort, E>) getField("elems").getValue();
         }
 
+        public <E extends Sort> Expr<E> getElem(int index) {
+            return ctx.mkSelect(getElems(), ctx.mkBV(index, sorts.getIntBitSize()));
+        }
+
         public <E extends Sort> Expr<E> getElem(BitVecExpr index) {
             return ctx.mkSelect(getElems(), index);
         }
@@ -789,6 +793,18 @@ public class SymbolicHeap {
                 flatIndex = ctx.mkBVAdd(ctx.mkBVMul(indices[i], prod), flatIndex);
             }
             return flatIndex;
+        }
+
+        /**
+         * Returns the element at the given indices by calculating the offset in the
+         * flattened multi-dimensional array.
+         */
+        public <E extends Sort> Expr<E> getElem(int... indices) {
+            BitVecExpr[] idxExprs = new BitVecExpr[indices.length];
+            for (int i = 0; i < indices.length; i++) {
+                idxExprs[i] = ctx.mkBV(indices[i], sorts.getIntBitSize());
+            }
+            return super.getElem(calcIndex(idxExprs));
         }
 
         /**
