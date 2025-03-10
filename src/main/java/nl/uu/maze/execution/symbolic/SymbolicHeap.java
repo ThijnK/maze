@@ -453,8 +453,7 @@ public class SymbolicHeap {
                     // If this symbolic ref has not been resolved (constrained to a particular
                     // concrete reference), then find potential aliases for it
                     findAliases(newValue);
-                    // For now, disallow field of an object to point to itself
-                    // TODO: allow this
+                    // Disallow field of an object to point to itself
                     aliasMap.get(newValue).remove(objRef);
                 }
             } else {

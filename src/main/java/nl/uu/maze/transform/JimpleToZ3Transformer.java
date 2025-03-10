@@ -458,7 +458,6 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
      */
     @Override
     public void caseCaughtExceptionRef(@Nonnull JCaughtExceptionRef ref) {
-        // TODO: may have to instantiate the Throwable object here with symbolic values
         setResult(state.heap.allocateObject(ref.getType()));
     }
     // #endregion

@@ -102,6 +102,7 @@ public class JUnitTestGenerator {
         MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder("TEMP")
                 .addModifiers(Modifier.PUBLIC)
                 .addAnnotation(Test.class)
+                .addException(Exception.class)
                 .returns(void.class);
 
         // For static methods, just call the method
