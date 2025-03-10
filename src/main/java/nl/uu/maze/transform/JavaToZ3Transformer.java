@@ -30,6 +30,20 @@ public class JavaToZ3Transformer {
      * Transforms the given Java value into a Z3 expression.
      * 
      * @param value the Java value (e.g. Integer, Boolean, String, array, etc.)
+     * @param state the symbolic state
+     * @return the corresponding Z3 expression
+     */
+    public Expr<?> transform(Object value, SymbolicState state) {
+        return transform(value, state, sorts.determineType(value.getClass()));
+    }
+
+    /**
+     * Transforms the given Java value into a Z3 expression.
+     * 
+     * @param value        the Java value (e.g. Integer, Boolean, String, array,
+     *                     etc.)
+     * @param state        the symbolic state
+     * @param expectedType the expected type of the value
      * @return the corresponding Z3 expression
      */
     public Expr<?> transform(Object value, SymbolicState state, Type expectedType) {
