@@ -190,7 +190,7 @@ public class SymbolicStateValidator {
         }
 
         if (fillObjectFields) {
-            fillObjectFields(state, argMap);
+            fillObjectFields(state, argMap, model);
         }
         return argMap;
     }
@@ -256,7 +256,7 @@ public class SymbolicStateValidator {
      * Fills the fields of objects in the given symbolic state with their current
      * values on the heap, if not already set in the argument map.
      */
-    private void fillObjectFields(SymbolicState state, ArgMap argMap) {
+    private void fillObjectFields(SymbolicState state, ArgMap argMap, Model model) {
         // Go through the heap and set fields of objects that are not in the model
         for (Entry<Expr<?>, HeapObject> entry : state.heap.entrySet()) {
             String var = entry.getKey().toString();
@@ -275,7 +275,7 @@ public class SymbolicStateValidator {
                 HeapObjectField field = fieldEntry.getValue();
 
                 Type fieldType = field.getType();
-                Expr<?> fieldValue = field.getValue();
+                Expr<?> fieldValue = model.eval(field.getValue(), true);
                 // References to other objects stored as ObjectRef
                 if (field.getValue().getSort().equals(sorts.getRefSort())) {
                     objFields.setField(fieldName, new ObjectRef(fieldValue.toString()), fieldType);
