@@ -5,6 +5,7 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.Constructor;
 import java.util.List;
 import java.util.Optional;
+import java.util.Map.Entry;
 import java.util.function.BiFunction;
 
 import javax.annotation.Nonnull;
@@ -21,6 +22,9 @@ import nl.uu.maze.execution.ArgMap.*;
 import nl.uu.maze.execution.MethodType;
 import nl.uu.maze.execution.concrete.*;
 import nl.uu.maze.execution.symbolic.*;
+import nl.uu.maze.execution.symbolic.SymbolicHeap.ArrayObject;
+import nl.uu.maze.execution.symbolic.SymbolicHeap.HeapObject;
+import nl.uu.maze.execution.symbolic.SymbolicHeap.HeapObjectField;
 import nl.uu.maze.util.*;
 import sootup.core.jimple.visitor.AbstractValueVisitor;
 import sootup.core.signatures.*;
@@ -601,7 +605,8 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
                 // Need the class type of the instance here, and method.getDeclaringClass()
                 // could be an interface, so take the type from heap object
                 try {
-                    Class<?> clazz = analyzer.getJavaClass(state.heap.getHeapObject(symRef).getType());
+                    HeapObject heapObj = state.heap.getHeapObject(symRef);
+                    Class<?> clazz = analyzer.getJavaClass(heapObj.getType());
                     // If the method is abstract, we need to find the concrete implementation
                     if (Modifier.isAbstract(((Method) executable).getModifiers())) {
                         executable = clazz.getDeclaredMethod(methodSig.getName(),
@@ -614,6 +619,7 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
                     }
                     // Create a shallow copy of the instance to compare its fields later
                     original = ObjectUtils.shallowCopy(instance, clazz);
+                    addConcretizationConstraints(heapObj, instance);
                 } catch (ClassNotFoundException | NoSuchMethodException | SecurityException e) {
                     logger.warn("Failed to find class for instance: " + symRef.toString());
                 }
@@ -668,6 +674,37 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
                 state.heap.setField(base.getName(), fieldName, fieldExpr, fieldType);
             });
         }
+    }
+
+    /**
+     * Go through the fields of the heap object, and add constraints for symbolic
+     * field values to equal the concretized field values for the given object.
+     */
+    private void addConcretizationConstraints(HeapObject heapObj, Object object) {
+        for (Entry<String, HeapObjectField> field : heapObj.getFields()) {
+            String fieldName = field.getKey();
+            HeapObjectField heapField = field.getValue();
+            Expr<?> fieldValue = heapField.getValue();
+            if (fieldValue.getSort().equals(sorts.getRefSort())) {
+                HeapObject fieldObj = state.heap.getHeapObject(fieldValue);
+                // For arrays, we need to concretize the array elements
+                if (fieldObj instanceof ArrayObject) {
+                    // TODO: Concretize array elements
+                } else {
+                    addConcretizationConstraints(fieldObj, ObjectUtils.getField(object, fieldName));
+                }
+            } else {
+                // Get the field value from the object
+                Object objField = ObjectUtils.getField(object, fieldName);
+                if (objField != null) {
+                    // Convert the field value to a symbolic expression
+                    Expr<?> fieldExpr = javaToZ3.transform(objField, state, sorts.determineType(objField.getClass()));
+                    // Add a constraint that the field value must equal the symbolic value
+                    state.addPathConstraint(ctx.mkEq(fieldValue, fieldExpr));
+                }
+            }
+        }
+
     }
 
     @Override
