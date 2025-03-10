@@ -633,6 +633,17 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
                 if (argExpr.getSort().equals(sorts.getRefSort())) {
                     // If the argument is a reference, set it to refer to that ref in ArgMap
                     argMap.set(name, new ObjectRef(argExpr.toString()));
+                    // Add concretization constraints for this reference
+                    // Note: this call to argMap.toJava will be mimicked when generating args for
+                    // the concrete execution, but the value generated here will be stored and
+                    // reused later, avoiding duplicate work
+                    try {
+                        HeapObject argObj = state.heap.getHeapObject(argExpr);
+                        Class<?> argClazz = analyzer.getJavaClass(argObj.getType());
+                        addConcretizationConstraints(argObj, argMap.toJava(argExpr.toString(), argClazz));
+                    } catch (ClassNotFoundException e) {
+                        logger.warn("Failed to find class for reference: " + argExpr.toString());
+                    }
                 }
                 // Otherwise, convert the expr to a Java value and set it in the ArgMap
                 else {
