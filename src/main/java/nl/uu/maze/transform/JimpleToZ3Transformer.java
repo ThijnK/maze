@@ -700,7 +700,12 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
                 HeapObject fieldObj = state.heap.getHeapObject(fieldValue);
                 // For arrays, we need to concretize the array elements
                 if (fieldObj instanceof ArrayObject) {
-                    // TODO: Concretize array elements
+                    ArrayObject arrObj = (ArrayObject) fieldObj;
+                    Object arr = ObjectUtils.getField(object, fieldName);
+                    // Traverse the array, select corresponding element from arrObj's symbolic
+                    // array, and add constraint that they are equal
+                    // TODO
+                    // also have to deal with multi-dimensional arrays
                 } else {
                     addConcretizationConstraints(fieldObj, ObjectUtils.getField(object, fieldName));
                 }
