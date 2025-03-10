@@ -2,6 +2,7 @@ package nl.uu.maze.transform;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.util.List;
 import java.util.Optional;
@@ -25,6 +26,7 @@ import nl.uu.maze.execution.symbolic.*;
 import nl.uu.maze.execution.symbolic.SymbolicHeap.ArrayObject;
 import nl.uu.maze.execution.symbolic.SymbolicHeap.HeapObject;
 import nl.uu.maze.execution.symbolic.SymbolicHeap.HeapObjectField;
+import nl.uu.maze.execution.symbolic.SymbolicHeap.MultiArrayObject;
 import nl.uu.maze.util.*;
 import sootup.core.jimple.visitor.AbstractValueVisitor;
 import sootup.core.signatures.*;
@@ -632,7 +634,6 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
                 String name = ArgMap.getSymbolicName(isCtor ? MethodType.CTOR : MethodType.METHOD, i);
                 if (argExpr.getSort().equals(sorts.getRefSort())) {
                     // If the argument is a reference, set it to refer to that ref in ArgMap
-                    argMap.set(name, new ObjectRef(argExpr.toString()));
                     // Add concretization constraints for this reference
                     // Note: this call to argMap.toJava will be mimicked when generating args for
                     // the concrete execution, but the value generated here will be stored and
@@ -644,6 +645,7 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
                     } catch (ClassNotFoundException e) {
                         logger.warn("Failed to find class for reference: " + argExpr.toString());
                     }
+                    argMap.set(name, new ObjectRef(argExpr.toString()));
                 }
                 // Otherwise, convert the expr to a Java value and set it in the ArgMap
                 else {
@@ -692,31 +694,40 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
      * field values to equal the concretized field values for the given object.
      */
     private void addConcretizationConstraints(HeapObject heapObj, Object object) {
+        // For arrays, we need to concretize the array elements
+        if (heapObj instanceof ArrayObject) {
+            ArrayObject arrObj = (ArrayObject) heapObj;
+            // Traverse the array, select corresponding element from arrObj's symbolic
+            // array, and add constraint that they are equal
+            if (heapObj instanceof MultiArrayObject) {
+                // TODO: not supported
+            } else {
+                // Regular arrays
+                for (int i = 0; i < Array.getLength(object); i++) {
+                    Object arrElem = Array.get(object, i);
+                    Expr<?> arrElemExpr = javaToZ3.transform(arrElem, state);
+                    state.addEngineConstraint(ctx.mkEq(arrObj.getElem(i), arrElemExpr));
+                }
+            }
+
+            return;
+        }
+
         for (Entry<String, HeapObjectField> field : heapObj.getFields()) {
             String fieldName = field.getKey();
             HeapObjectField heapField = field.getValue();
             Expr<?> fieldValue = heapField.getValue();
             if (fieldValue.getSort().equals(sorts.getRefSort())) {
                 HeapObject fieldObj = state.heap.getHeapObject(fieldValue);
-                // For arrays, we need to concretize the array elements
-                if (fieldObj instanceof ArrayObject) {
-                    ArrayObject arrObj = (ArrayObject) fieldObj;
-                    Object arr = ObjectUtils.getField(object, fieldName);
-                    // Traverse the array, select corresponding element from arrObj's symbolic
-                    // array, and add constraint that they are equal
-                    // TODO
-                    // also have to deal with multi-dimensional arrays
-                } else {
-                    addConcretizationConstraints(fieldObj, ObjectUtils.getField(object, fieldName));
-                }
+                addConcretizationConstraints(fieldObj, ObjectUtils.getField(object, fieldName));
             } else {
                 // Get the field value from the object
                 Object objField = ObjectUtils.getField(object, fieldName);
                 if (objField != null) {
                     // Convert the field value to a symbolic expression
-                    Expr<?> fieldExpr = javaToZ3.transform(objField, state, sorts.determineType(objField.getClass()));
+                    Expr<?> fieldExpr = javaToZ3.transform(objField, state);
                     // Add a constraint that the field value must equal the symbolic value
-                    state.addPathConstraint(ctx.mkEq(fieldValue, fieldExpr));
+                    state.addEngineConstraint(ctx.mkEq(fieldValue, fieldExpr));
                 }
             }
         }
