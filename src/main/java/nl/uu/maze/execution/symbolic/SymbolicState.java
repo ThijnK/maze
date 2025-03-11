@@ -1,6 +1,8 @@
 package nl.uu.maze.execution.symbolic;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,15 +37,21 @@ public class SymbolicState {
     private MethodType methodType = MethodType.METHOD;
 
     /** Mapping from variable names to symbolic expressions. */
-    private Map<String, Expr<?>> store;
+    public final Map<String, Expr<?>> store;
+    /** Symbolic heap to store symbolic objects and arrays. */
+    public final SymbolicHeap heap;
+    /** Special variable to store the return value of a method. */
+    private Expr<?> retval;
     /** Path constraints imposed by the program, e.g., if statements. */
     private List<BoolExpr> pathConstraints;
     /** Constraints imposed by the engine, e.g., for array size bounds. */
     private List<BoolExpr> engineConstraints;
-    public final SymbolicHeap heap;
     /** Tracks SootUp types of parameters. */
     private Map<String, Type> paramTypes;
+    /** Call stack of symbolic states, used for (internal) method calls. */
+    private Deque<SymbolicState> callStack;
 
+    private boolean isFinalState = false;
     /** Indicates whether an exception was thrown during symbolic execution. */
     private boolean exceptionThrown = false;
     /** Indicates whether the state constraints were found to be unsatisfiable. */
@@ -53,29 +61,38 @@ public class SymbolicState {
         this.ctx = ctx;
         this.cfg = cfg;
         this.stmt = cfg.getStartingStmt();
+        this.store = new HashMap<>();
+        this.heap = new SymbolicHeap(this);
         this.pathConstraints = new ArrayList<>();
         this.engineConstraints = new ArrayList<>();
         this.paramTypes = new HashMap<>();
-        this.store = new HashMap<>();
-        this.heap = new SymbolicHeap(this);
+        this.callStack = new ArrayDeque<>();
     }
 
-    private SymbolicState(Context ctx, StmtGraph<?> cfg, Stmt stmt, int depth, MethodType methodType,
-            Map<String, Expr<?>> symbolicVariables, List<BoolExpr> pathConstraints, List<BoolExpr> engineConstraints,
-            Map<String, Type> paramTypes, SymbolicHeap heap, boolean exceptionThrown, boolean isInfeasible) {
-        this.ctx = ctx;
-        this.cfg = cfg;
-        this.stmt = stmt;
-        this.depth = depth;
-        this.methodType = methodType;
-        this.store = new HashMap<>(symbolicVariables);
-        this.pathConstraints = new ArrayList<>(pathConstraints);
-        this.engineConstraints = new ArrayList<>(engineConstraints);
-        this.heap = heap.clone(this);
-        // Share the same variable types map to avoid copying
-        this.paramTypes = paramTypes;
-        this.exceptionThrown = exceptionThrown;
-        this.isInfeasible = isInfeasible;
+    /*
+     * Create a new symbolic state by copying all relevant fields from the other
+     * state given.
+     */
+    private SymbolicState(SymbolicState state) {
+        this.ctx = state.ctx;
+        this.cfg = state.cfg;
+        this.stmt = state.stmt;
+        this.depth = state.depth;
+        this.methodType = state.methodType;
+
+        this.store = new HashMap<>(state.store);
+        this.heap = state.heap.clone(this);
+        this.retval = state.retval;
+        this.pathConstraints = new ArrayList<>(state.pathConstraints);
+        this.engineConstraints = new ArrayList<>(state.engineConstraints);
+        // Share param types map to avoid copying
+        this.paramTypes = state.paramTypes;
+        // Note: states in the call stack are lazily cloned when needed
+        this.callStack = new ArrayDeque<>(state.callStack);
+
+        this.isFinalState = state.isFinalState;
+        this.exceptionThrown = state.exceptionThrown;
+        this.isInfeasible = state.isInfeasible;
     }
 
     public void setMethodType(MethodType methodType) {
@@ -99,12 +116,13 @@ public class SymbolicState {
     }
 
     public void setStmt(Stmt stmt) {
+        isFinalState = false;
         this.stmt = stmt;
     }
 
     /** Get the successor statements for the current statement. */
     public List<Stmt> getSuccessors() {
-        return cfg.getAllSuccessors(stmt);
+        return stmt == null ? List.of() : cfg.getAllSuccessors(stmt);
     }
 
     public void assign(String var, Expr<?> expression) {
@@ -117,6 +135,15 @@ public class SymbolicState {
 
     public boolean exists(String var) {
         return store.containsKey(var);
+    }
+
+    public Expr<?> getReturnValue() {
+        // TODO: this can be reference to heap object as well!
+        return retval;
+    }
+
+    public void setReturnValue(Expr<?> retval) {
+        this.retval = retval;
     }
 
     public void setParamType(String var, Type type) {
@@ -142,6 +169,10 @@ public class SymbolicState {
 
     public void addEngineConstraint(BoolExpr constraint) {
         engineConstraints.add(constraint);
+    }
+
+    public void setFinalState() {
+        this.isFinalState = true;
     }
 
     /**
@@ -201,16 +232,11 @@ public class SymbolicState {
     }
 
     public boolean isFinalState() {
-        return exceptionThrown || isInfeasible || cfg.getAllSuccessors(stmt).isEmpty();
-    }
-
-    public SymbolicState clone(Stmt stmt) {
-        return new SymbolicState(ctx, cfg, stmt, depth, methodType, store, pathConstraints,
-                engineConstraints, paramTypes, heap, exceptionThrown, isInfeasible);
+        return isFinalState || exceptionThrown || isInfeasible;
     }
 
     public SymbolicState clone() {
-        return clone(stmt);
+        return new SymbolicState(this);
     }
 
     public Context getContext() {

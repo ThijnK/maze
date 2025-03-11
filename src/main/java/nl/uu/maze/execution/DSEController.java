@@ -26,14 +26,9 @@ import nl.uu.maze.execution.symbolic.SymbolicExecutor;
 import nl.uu.maze.execution.symbolic.SymbolicState;
 import nl.uu.maze.execution.symbolic.SymbolicStateValidator;
 import nl.uu.maze.generation.JUnitTestGenerator;
-import nl.uu.maze.instrument.BytecodeInstrumenter;
-import nl.uu.maze.instrument.TraceManager;
+import nl.uu.maze.instrument.*;
 import nl.uu.maze.instrument.TraceManager.TraceEntry;
-import nl.uu.maze.search.ConcreteSearchStrategy;
-import nl.uu.maze.search.SearchStrategy;
-import nl.uu.maze.search.SearchStrategyFactory;
-import nl.uu.maze.search.SymbolicSearchStrategy;
-import nl.uu.maze.transform.JimpleToZ3Transformer;
+import nl.uu.maze.search.*;
 import nl.uu.maze.util.Z3Sorts;
 import sootup.core.graph.StmtGraph;
 import sootup.java.core.JavaSootClass;
@@ -64,7 +59,6 @@ public class DSEController {
     private final SymbolicStateValidator validator;
     private final ConcreteExecutor concrete;
     private final JUnitTestGenerator generator;
-    private final JimpleToZ3Transformer transformer;
 
     private Constructor<?> ctor;
     private JavaSootMethod ctorSoot;
@@ -109,8 +103,7 @@ public class DSEController {
 
         this.concrete = new ConcreteExecutor();
         this.validator = new SymbolicStateValidator(ctx);
-        this.transformer = new JimpleToZ3Transformer(ctx, concrete, validator, analyzer);
-        this.symbolic = new SymbolicExecutor(ctx, transformer);
+        this.symbolic = new SymbolicExecutor(ctx, concrete, validator, analyzer);
         this.generator = new JUnitTestGenerator(clazz, analyzer, concrete);
     }
 
@@ -180,6 +173,7 @@ public class DSEController {
                 // Only if the state was the final constructor state, set the current statement
                 // to the starting statement of the target method
                 if (!state.getMethodType().isCtor()) {
+                    newState.setCFG(cfg);
                     newState.setStmt(cfg.getStartingStmt());
                 }
                 searchStrategy.add(newState);
@@ -217,11 +211,11 @@ public class DSEController {
                         }
 
                         state.setMethodType(MethodType.METHOD);
-                        state.setCFG(cfg);
                         // Clone the state to avoid modifying the original in subsequent execution (want
                         // to reuse this final ctor state for multiple methods)
                         initStates.put(state.hashCode(), state.clone());
                         logger.debug("Switching to target method: " + method.getName());
+                        state.setCFG(cfg);
                         state.setStmt(cfg.getStartingStmt());
                         searchStrategy.add(state);
                     } else {

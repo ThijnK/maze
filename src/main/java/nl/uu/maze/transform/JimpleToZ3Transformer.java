@@ -1,32 +1,14 @@
 package nl.uu.maze.transform;
 
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.lang.reflect.Array;
-import java.lang.reflect.Constructor;
-import java.util.List;
-import java.util.Optional;
-import java.util.Map.Entry;
 import java.util.function.BiFunction;
 
 import javax.annotation.Nonnull;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.microsoft.z3.*;
 import com.microsoft.z3.Expr;
 
-import nl.uu.maze.analysis.JavaAnalyzer;
 import nl.uu.maze.execution.ArgMap;
-import nl.uu.maze.execution.ArgMap.*;
-import nl.uu.maze.execution.MethodType;
-import nl.uu.maze.execution.concrete.*;
 import nl.uu.maze.execution.symbolic.*;
-import nl.uu.maze.execution.symbolic.SymbolicHeap.ArrayObject;
-import nl.uu.maze.execution.symbolic.SymbolicHeap.HeapObject;
-import nl.uu.maze.execution.symbolic.SymbolicHeap.HeapObjectField;
-import nl.uu.maze.execution.symbolic.SymbolicHeap.MultiArrayObject;
 import nl.uu.maze.util.*;
 import sootup.core.jimple.visitor.AbstractValueVisitor;
 import sootup.core.signatures.*;
@@ -35,31 +17,20 @@ import sootup.core.jimple.common.constant.*;
 import sootup.core.jimple.common.expr.*;
 import sootup.core.jimple.common.ref.*;
 import sootup.core.types.*;
-import sootup.java.core.JavaSootMethod;
 
 /**
  * Transforms a Jimple value ({@link Value}) to a Z3 expression ({@link Expr}).
  */
 public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
-    private static final Logger logger = LoggerFactory.getLogger(JimpleToZ3Transformer.class);
     private static final Z3Sorts sorts = Z3Sorts.getInstance();
 
     private final Context ctx;
-    private final ConcreteExecutor executor;
-    private final SymbolicStateValidator validator;
-    private final JavaAnalyzer analyzer;
-    private final JavaToZ3Transformer javaToZ3;
 
     private SymbolicState state;
     private String lhs;
 
-    public JimpleToZ3Transformer(Context ctx, ConcreteExecutor executor, SymbolicStateValidator validator,
-            JavaAnalyzer analyzer) {
+    public JimpleToZ3Transformer(Context ctx) {
         this.ctx = ctx;
-        this.executor = executor;
-        this.validator = validator;
-        this.analyzer = analyzer;
-        this.javaToZ3 = new JavaToZ3Transformer(ctx);
     }
 
     /**
@@ -574,180 +545,5 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
     }
     // #endregion
 
-    // #region Invocations
-    private void handleInvocation(MethodSignature methodSig, List<Immediate> args, Local base) {
-        Optional<JavaSootMethod> methodOpt = analyzer.tryGetSootMethod(methodSig);
-        if (methodOpt.isPresent()) {
-            // If available internally, we can symbolically execute it
-            // TODO: handle internal method
-        }
-
-        boolean isCtor = methodSig.getName().equals("<init>");
-        Object executable = getExecutable(methodSig, isCtor);
-        if (executable == null)
-            return;
-
-        ArgMap argMap = null;
-        Object instance = null;
-        Object original = null;
-
-        if (base != null || args.size() > 0) {
-            Expr<?> symRef = base != null ? state.lookup(base.getName()) : null;
-            HeapObject heapObj = state.heap.getHeapObject(symRef);
-            if (base != null && heapObj == null) {
-                state.setExceptionThrown();
-                return;
-            }
-
-            Optional<ArgMap> argMapOpt = validator.evaluate(state, true);
-            if (!argMapOpt.isPresent()) {
-                state.setInfeasible();
-                return;
-            }
-            argMap = argMapOpt.get();
-
-            if (!isCtor && base != null) {
-                try {
-                    Class<?> clazz = analyzer.getJavaClass(heapObj.getType());
-                    if (Modifier.isAbstract(((Method) executable).getModifiers())) {
-                        executable = clazz.getDeclaredMethod(methodSig.getName(),
-                                ((Method) executable).getParameterTypes());
-                    }
-                    instance = argMap.toJava(base.getName(), clazz);
-                    if (instance == null) {
-                        logger.warn("Failed to find instance for base: " + base.getName());
-                        return;
-                    }
-                    original = ObjectUtils.shallowCopy(instance, instance.getClass());
-                    addConcretizationConstraints(heapObj, instance);
-                } catch (ClassNotFoundException | NoSuchMethodException e) {
-                    logger.error("Failed to find class or method for base: " + base.getName());
-                    return;
-                }
-            }
-            setMethodArguments(args, isCtor, argMap);
-        }
-
-        Object retval = isCtor ? ObjectInstantiator.createInstance((Constructor<?>) executable, argMap)
-                : executor.execute(instance, (Method) executable, argMap);
-        if (retval instanceof Exception) {
-            state.setExceptionThrown();
-            return;
-        }
-
-        Type retType = methodSig.getType();
-        setResult(!retType.equals(VoidType.getInstance()) ? javaToZ3.transform(retval, state, retType) : null);
-        if (base != null && instance != null) {
-            updateModifiedFields(base, original, instance);
-        }
-    }
-
-    private Object getExecutable(MethodSignature methodSig, boolean isCtor) {
-        try {
-            return isCtor ? analyzer.getJavaConstructor(methodSig) : analyzer.getJavaMethod(methodSig);
-        } catch (ClassNotFoundException | NoSuchMethodException e) {
-            logger.error("Failed to find " + (isCtor ? "constructor" : "method") + ": " + methodSig);
-            return null;
-        }
-    }
-
-    private void setMethodArguments(List<Immediate> args, boolean isCtor, ArgMap argMap) {
-        for (int i = 0; i < args.size(); i++) {
-            Immediate arg = args.get(i);
-            Expr<?> argExpr = transform(arg);
-            String name = ArgMap.getSymbolicName(isCtor ? MethodType.CTOR : MethodType.METHOD, i);
-            if (argExpr.getSort().equals(sorts.getRefSort())) {
-                try {
-                    HeapObject argObj = state.heap.getHeapObject(argExpr);
-                    Class<?> argClazz = analyzer.getJavaClass(argObj.getType());
-                    addConcretizationConstraints(argObj, argMap.toJava(argExpr.toString(), argClazz));
-                } catch (ClassNotFoundException e) {
-                    logger.warn("Failed to find class for reference: " + argExpr.toString());
-                }
-                argMap.set(name, new ObjectRef(argExpr.toString()));
-            } else {
-                Object argVal = validator.evaluate(argExpr, arg.getType());
-                argMap.set(name, argVal);
-            }
-        }
-    }
-
-    private void updateModifiedFields(Local base, Object original, Object instance) {
-        ObjectUtils.shallowCompare(original, instance, (path, oldValue, newValue) -> {
-            String fieldName = path[0].getName();
-            Type fieldType = sorts.determineType(path[0].getType());
-            Expr<?> fieldExpr = javaToZ3.transform(newValue, state, fieldType);
-            state.heap.setField(base.getName(), fieldName, fieldExpr, fieldType);
-        });
-    }
-
-    /**
-     * Go through the fields of the heap object, and add constraints for symbolic
-     * field values to equal the concretized field values for the given object.
-     */
-    private void addConcretizationConstraints(HeapObject heapObj, Object object) {
-        // For arrays, we need to concretize the array elements
-        if (heapObj instanceof ArrayObject) {
-            ArrayObject arrObj = (ArrayObject) heapObj;
-            // Traverse the array, select corresponding element from arrObj's symbolic
-            // array, and add constraint that they are equal
-            if (heapObj instanceof MultiArrayObject) {
-                // TODO: not supported
-            } else {
-                // Regular arrays
-                for (int i = 0; i < Array.getLength(object); i++) {
-                    Object arrElem = Array.get(object, i);
-                    Expr<?> arrElemExpr = javaToZ3.transform(arrElem, state);
-                    state.addEngineConstraint(ctx.mkEq(arrObj.getElem(i), arrElemExpr));
-                }
-            }
-
-            return;
-        }
-
-        for (Entry<String, HeapObjectField> field : heapObj.getFields()) {
-            String fieldName = field.getKey();
-            HeapObjectField heapField = field.getValue();
-            Expr<?> fieldValue = heapField.getValue();
-            if (fieldValue.getSort().equals(sorts.getRefSort())) {
-                HeapObject fieldObj = state.heap.getHeapObject(fieldValue);
-                addConcretizationConstraints(fieldObj, ObjectUtils.getField(object, fieldName));
-            } else {
-                // Get the field value from the object
-                Object objField = ObjectUtils.getField(object, fieldName);
-                if (objField != null) {
-                    // Convert the field value to a symbolic expression
-                    Expr<?> fieldExpr = javaToZ3.transform(objField, state);
-                    // Add a constraint that the field value must equal the symbolic value
-                    state.addEngineConstraint(ctx.mkEq(fieldValue, fieldExpr));
-                }
-            }
-        }
-
-    }
-
-    @Override
-    public void caseStaticInvokeExpr(@Nonnull JStaticInvokeExpr expr) {
-        handleInvocation(expr.getMethodSignature(), expr.getArgs(), null);
-    }
-
-    @Override
-    public void caseInterfaceInvokeExpr(@Nonnull JInterfaceInvokeExpr expr) {
-        handleInvocation(expr.getMethodSignature(), expr.getArgs(), expr.getBase());
-    }
-
-    @Override
-    public void caseSpecialInvokeExpr(@Nonnull JSpecialInvokeExpr expr) {
-        handleInvocation(expr.getMethodSignature(), expr.getArgs(), expr.getBase());
-    }
-
-    @Override
-    public void caseVirtualInvokeExpr(@Nonnull JVirtualInvokeExpr expr) {
-        handleInvocation(expr.getMethodSignature(), expr.getArgs(), expr.getBase());
-    }
-
-    @Override
-    public void caseDynamicInvokeExpr(@Nonnull JDynamicInvokeExpr expr) {
-        throw new UnsupportedOperationException("Dynamic invoke expressions are not supported");
-    }
+    // Note: invocations are handled in {@link SymbolicExecutor} and not here
 }

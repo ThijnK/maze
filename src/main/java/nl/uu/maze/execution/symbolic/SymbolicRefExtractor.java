@@ -6,14 +6,7 @@ import com.microsoft.z3.Expr;
 
 import sootup.core.jimple.basic.Local;
 import sootup.core.jimple.basic.Value;
-import sootup.core.jimple.common.expr.JDynamicInvokeExpr;
-import sootup.core.jimple.common.expr.JEqExpr;
-import sootup.core.jimple.common.expr.JInstanceOfExpr;
-import sootup.core.jimple.common.expr.JInterfaceInvokeExpr;
-import sootup.core.jimple.common.expr.JLengthExpr;
-import sootup.core.jimple.common.expr.JNeExpr;
-import sootup.core.jimple.common.expr.JSpecialInvokeExpr;
-import sootup.core.jimple.common.expr.JVirtualInvokeExpr;
+import sootup.core.jimple.common.expr.*;
 import sootup.core.jimple.common.ref.JArrayRef;
 import sootup.core.jimple.common.ref.JInstanceFieldRef;
 import sootup.core.jimple.visitor.AbstractValueVisitor;
@@ -111,10 +104,5 @@ public class SymbolicRefExtractor extends AbstractValueVisitor<Expr<?>> {
     @Override
     public void caseVirtualInvokeExpr(@Nonnull JVirtualInvokeExpr expr) {
         setResult(extract(expr.getBase().getName()));
-    }
-
-    @Override
-    public void caseDynamicInvokeExpr(@Nonnull JDynamicInvokeExpr expr) {
-        throw new UnsupportedOperationException("Dynamic invoke expressions are not supported");
     }
 }
