@@ -138,7 +138,7 @@ public class DSEController {
             logger.info("Using constructor: " + ctorSoot.getSignature());
 
             if (!concreteDriven) {
-                SymbolicState initialState = new SymbolicState(ctx, ctorCfg.getStartingStmt());
+                SymbolicState initialState = new SymbolicState(ctx, ctorCfg);
                 initialState.setMethodType(MethodType.CTOR);
                 initStates.put(initialState.hashCode(), initialState);
             }
@@ -169,7 +169,7 @@ public class DSEController {
         // If static, start with target method, otherwise start with constructor
         if (method.isStatic()) {
             logger.debug("Executing target method: " + method.getName());
-            searchStrategy.add(new SymbolicState(ctx, cfg.getStartingStmt()));
+            searchStrategy.add(new SymbolicState(ctx, cfg));
         } else {
             logger.debug("Executing constructor: " + ctorSoot.getName());
             // Clone the ctor states to avoid modifying the original in subsequent execution
@@ -179,8 +179,8 @@ public class DSEController {
                 SymbolicState newState = state.clone();
                 // Only if the state was the final constructor state, set the current statement
                 // to the starting statement of the target method
-                if (!state.isCtor()) {
-                    newState.setCurrentStmt(cfg.getStartingStmt());
+                if (!state.getMethodType().isCtor()) {
+                    newState.setStmt(cfg.getStartingStmt());
                 }
                 searchStrategy.add(newState);
             }
@@ -189,8 +189,8 @@ public class DSEController {
         SymbolicState current;
         while ((current = searchStrategy.next()) != null) {
             logger.debug("Current state: " + current);
-            logger.debug("Next stmt: " + current.getCurrentStmt());
-            if (!current.isCtor() && current.isFinalState(cfg) || current.incrementDepth() >= MAX_DEPTH) {
+            logger.debug("Next stmt: " + current.getStmt());
+            if (!current.getMethodType().isCtor() && current.isFinalState() || current.incrementDepth() >= MAX_DEPTH) {
                 if (!current.isInfeasible())
                     finalStates.add(current);
                 searchStrategy.remove(current);
@@ -200,13 +200,13 @@ public class DSEController {
             // Symbolically execute the current statement of the selected symbolic state to
             // be processed
             int currHash = current.hashCode();
-            List<SymbolicState> newStates = symbolic.step(current.isCtor() ? ctorCfg : cfg, current);
-            if (current.isCtor()) {
+            List<SymbolicState> newStates = symbolic.step(current);
+            if (current.getMethodType().isCtor()) {
                 initStates.remove(currHash);
                 // If any of the new states are final states, set their current
                 // statement to the starting statement of the target method
                 for (SymbolicState state : newStates) {
-                    if (state.isFinalState(ctorCfg)) {
+                    if (state.isFinalState()) {
                         // If the state is an exception-throwing state, immediately add it to the
                         // final states, or if it is infeasible, skip it
                         if (state.isExceptionThrown() || state.isInfeasible()) {
@@ -217,18 +217,22 @@ public class DSEController {
                         }
 
                         state.setMethodType(MethodType.METHOD);
+                        state.setCFG(cfg);
                         // Clone the state to avoid modifying the original in subsequent execution (want
                         // to reuse this final ctor state for multiple methods)
                         initStates.put(state.hashCode(), state.clone());
                         logger.debug("Switching to target method: " + method.getName());
-                        state.setCurrentStmt(cfg.getStartingStmt());
+                        state.setStmt(cfg.getStartingStmt());
+                        searchStrategy.add(state);
                     } else {
                         initStates.put(state.hashCode(), state);
+                        searchStrategy.add(state);
                     }
                 }
+            } else {
+                searchStrategy.add(newStates);
             }
 
-            searchStrategy.add(newStates);
         }
 
         List<ArgMap> argMap = validator.evaluate(finalStates);
@@ -243,7 +247,7 @@ public class DSEController {
         int pathHash = 0;
         if (method.isStatic()) {
             // Start immediately with target method
-            current = new SymbolicState(ctx, cfg.getStartingStmt());
+            current = new SymbolicState(ctx, cfg);
             iterator = TraceManager.getEntries(method.getName()).iterator();
         } else {
             // Start with constructor
@@ -252,25 +256,25 @@ public class DSEController {
             // If the ctor has been explored along this path before, reuse final state
             if (initStates.containsKey(pathHash)) {
                 current = initStates.get(pathHash).clone();
-                current.setCurrentStmt(cfg.getStartingStmt());
+                current.setStmt(cfg.getStartingStmt());
                 current.setMethodType(MethodType.METHOD);
                 iterator = TraceManager.getEntries(method.getName()).iterator();
             } else {
-                current = new SymbolicState(ctx, ctorCfg.getStartingStmt());
+                current = new SymbolicState(ctx, ctorCfg);
                 current.setMethodType(MethodType.CTOR);
                 iterator = entries.iterator();
             }
         }
 
-        while (current.isCtor() || !current.isFinalState(cfg)) {
+        while (current.getMethodType().isCtor() || !current.isFinalState()) {
             logger.debug("Current state: " + current);
-            logger.debug("Next stmt: " + current.getCurrentStmt());
-            List<SymbolicState> newStates = symbolic.step(current.isCtor() ? ctorCfg : cfg, current, iterator);
+            logger.debug("Next stmt: " + current.getStmt());
+            List<SymbolicState> newStates = symbolic.step(current, iterator);
             // Note: newStates will always contain exactly one element, because we are
             // replaying a trace
             current = newStates.get(0);
             // At the end of the ctor, start with the target method
-            if (current.isCtor() && current.isFinalState(ctorCfg)) {
+            if (current.getMethodType().isCtor() && current.isFinalState()) {
                 // If the state is an exception-throwing state, we stop immediately
                 if (current.isExceptionThrown() || current.isInfeasible()) {
                     if (!current.isInfeasible())
@@ -279,10 +283,11 @@ public class DSEController {
                 }
 
                 current.setMethodType(MethodType.METHOD);
+                current.setCFG(cfg);
                 // Save the final ctor state for reuse in other methods
                 initStates.put(pathHash, current.clone());
                 logger.debug("Switching to target method: " + method.getName());
-                current.setCurrentStmt(cfg.getStartingStmt());
+                current.setStmt(cfg.getStartingStmt());
                 iterator = TraceManager.getEntries(method.getName()).iterator();
             }
         }

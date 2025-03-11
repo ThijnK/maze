@@ -408,11 +408,11 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
     // #region Objects
     @Override
     public void caseThisRef(@Nonnull JThisRef ref) {
-        if (state.containsVariable("this")) {
-            setResult(state.getVariable("this"));
+        if (state.exists("this")) {
+            setResult(state.lookup("this"));
         } else {
             Expr<?> thisRef = state.heap.allocateObject(ref.getType());
-            state.setVariable("this", thisRef);
+            state.assign("this", thisRef);
             setResult(thisRef);
         }
     }
@@ -427,7 +427,7 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
     public void caseStaticFieldRef(@Nonnull JStaticFieldRef ref) {
         // Note: ref.toString() will be e.g. "<org.a.s.e.SingleMethod: int x>"
         // (but not abbreviated)
-        Expr<?> expr = state.getVariable(ref.toString());
+        Expr<?> expr = state.lookup(ref.toString());
         if (expr == null) {
             // If note already in the state, create a new symbolic value
             Type type = ref.getType();
@@ -570,7 +570,7 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
             state.heap.copyArrayIndices(var, lhs);
         }
 
-        setResult(state.getVariable(var));
+        setResult(state.lookup(var));
     }
     // #endregion
 
@@ -592,7 +592,7 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
         Object original = null;
 
         if (base != null || args.size() > 0) {
-            Expr<?> symRef = base != null ? state.getVariable(base.getName()) : null;
+            Expr<?> symRef = base != null ? state.lookup(base.getName()) : null;
             HeapObject heapObj = state.heap.getHeapObject(symRef);
             if (base != null && heapObj == null) {
                 state.setExceptionThrown();

@@ -12,7 +12,6 @@ import nl.uu.maze.instrument.TraceManager.TraceEntry;
 import nl.uu.maze.transform.JimpleToZ3Transformer;
 import nl.uu.maze.util.Z3Sorts;
 import nl.uu.maze.util.Z3Utils;
-import sootup.core.graph.*;
 import sootup.core.jimple.basic.LValue;
 import sootup.core.jimple.basic.Value;
 import sootup.core.jimple.common.constant.IntConstant;
@@ -37,59 +36,52 @@ public class SymbolicExecutor {
     }
 
     /**
-     * Execute a single step of symbolic execution on the given control flow graph
-     * and symbolic state.
+     * Execute a single step of symbolic execution on the given symbolic state.
      * 
-     * @param cfg   The control flow graph
-     * @param state The current symbolic state
-     * @return A list of successor symbolic states after executing the current
-     *         statement
+     * @param state The symbolic state
+     * @return A list of successor symbolic states
      */
-    public List<SymbolicState> step(StmtGraph<?> cfg, SymbolicState state) {
-        return step(cfg, state, null);
+    public List<SymbolicState> step(SymbolicState state) {
+        return step(state, null);
     }
 
     /**
-     * Execute a single step of symbolic execution on the given control flow graph
-     * and symbolic state. If replaying a trace, follow the branch indicated by the
-     * trace.
+     * Execute a single step of symbolic execution on the symbolic state.
+     * If replaying a trace, follows the branch indicated by the trace.
      * 
-     * @param cfg      The control flow graph
      * @param state    The current symbolic state
-     * @param iterator The iterator over the trace entries or <b>null</b> if not
-     *                 replaying a trace
-     * @return A list of new symbolic states after executing the current statement
+     * @param iterator The iterator over the trace entries or <code>null</code> if
+     *                 not replaying a trace
+     * @return A list of successor symbolic states
      */
-    public List<SymbolicState> step(StmtGraph<?> cfg, SymbolicState state, Iterator<TraceEntry> iterator) {
-        Stmt stmt = state.getCurrentStmt();
+    public List<SymbolicState> step(SymbolicState state, Iterator<TraceEntry> iterator) {
+        Stmt stmt = state.getStmt();
 
         if (stmt instanceof JIfStmt)
-            return handleIfStmt(cfg, (JIfStmt) stmt, state, iterator);
+            return handleIfStmt((JIfStmt) stmt, state, iterator);
         else if (stmt instanceof JSwitchStmt)
-            return handleSwitchStmt(cfg, (JSwitchStmt) stmt, state, iterator);
+            return handleSwitchStmt((JSwitchStmt) stmt, state, iterator);
         else if (stmt instanceof AbstractDefinitionStmt)
-            return handleDefStmt(cfg, (AbstractDefinitionStmt) stmt, state, iterator);
+            return handleDefStmt((AbstractDefinitionStmt) stmt, state, iterator);
         else if (stmt instanceof JInvokeStmt)
-            return handleInvokeStmt(cfg, (JInvokeStmt) stmt, state);
+            return handleInvokeStmt((JInvokeStmt) stmt, state);
         else if (stmt instanceof JThrowStmt) {
             state.setExceptionThrown();
-            return handleOtherStmts(cfg, stmt, state);
+            return handleOtherStmts(state);
         } else
-            return handleOtherStmts(cfg, stmt, state);
+            return handleOtherStmts(state);
     }
 
     /**
-     * Handle if statements during symbolic execution.
+     * Symbolically execute an if statement.
      * 
-     * @param cfg      The control flow graph
      * @param stmt     The if statement as a Jimple statement ({@link JIfStmt})
      * @param state    The current symbolic state
-     * @param iterator The iterator over the trace entries or <b>null</b> if not
-     *                 replaying a trace
-     * @return A list of new symbolic states after executing the if statement
+     * @param iterator The iterator over the trace entries or <code>null</code> if
+     *                 not replaying a trace
+     * @return A list of successor symbolic states after executing the if statement
      */
-    private List<SymbolicState> handleIfStmt(StmtGraph<?> cfg, JIfStmt stmt, SymbolicState state,
-            Iterator<TraceEntry> iterator) {
+    private List<SymbolicState> handleIfStmt(JIfStmt stmt, SymbolicState state, Iterator<TraceEntry> iterator) {
         // Split the state if the condition contains a symbolic reference with multiple
         // aliases (i.e. reference comparisons)
         Expr<?> symRef = refExtractor.extract(stmt.getCondition(), state);
@@ -98,7 +90,7 @@ public class SymbolicExecutor {
             return splitStates.get();
         }
 
-        List<Stmt> succs = cfg.getAllSuccessors(stmt);
+        List<Stmt> succs = state.getSuccessors();
         BoolExpr cond = (BoolExpr) transformer.transform(stmt.getCondition(), state);
         List<SymbolicState> newStates = new ArrayList<SymbolicState>();
 
@@ -116,7 +108,7 @@ public class SymbolicExecutor {
             TraceEntry entry = iterator.next();
             int branchIndex = entry.getValue();
             state.addPathConstraint(branchIndex == 0 ? Z3Utils.negate(ctx, cond) : cond);
-            state.setCurrentStmt(succs.get(branchIndex));
+            state.setStmt(succs.get(branchIndex));
             newStates.add(state);
         }
         // Otherwise, follow both branches
@@ -128,7 +120,7 @@ public class SymbolicExecutor {
 
             // True branch
             state.addPathConstraint(cond);
-            state.setCurrentStmt(succs.get(1));
+            state.setStmt(succs.get(1));
             newStates.add(state);
         }
 
@@ -136,20 +128,18 @@ public class SymbolicExecutor {
     }
 
     /**
-     * Handle switch statements during symbolic execution.
+     * Symbolically execute a switch statement.
      * 
-     * @param cfg      The control flow graph
      * @param stmt     The switch statement as a Jimple statement
      *                 ({@link JSwitchStmt})
      * @param state    The current symbolic state
-     * @param iterator The iterator over the trace entries or <b>null</b> if not
-     *                 replaying a trace
-     * @return A list of new symbolic states after executing the switch statement
+     * @param iterator The iterator over the trace entries or <code>null</code> if
+     *                 not replaying a trace
+     * @return A list of successor symbolic states after executing the switch
      */
-    private List<SymbolicState> handleSwitchStmt(StmtGraph<?> cfg, JSwitchStmt stmt, SymbolicState state,
-            Iterator<TraceEntry> iterator) {
-        List<Stmt> succs = cfg.getAllSuccessors(stmt);
-        Expr<?> var = state.getVariable(stmt.getKey().toString());
+    private List<SymbolicState> handleSwitchStmt(JSwitchStmt stmt, SymbolicState state, Iterator<TraceEntry> iterator) {
+        List<Stmt> succs = state.getSuccessors();
+        Expr<?> var = state.lookup(stmt.getKey().toString());
         List<IntConstant> values = stmt.getValues();
         List<SymbolicState> newStates = new ArrayList<SymbolicState>();
 
@@ -173,7 +163,7 @@ public class SymbolicExecutor {
                 // Otherwise add constraint for the branch that was taken
                 state.addPathConstraint(mkSwitchConstraint(var, values.get(branchIndex)));
             }
-            state.setCurrentStmt(succs.get(branchIndex));
+            state.setStmt(succs.get(branchIndex));
             newStates.add(state);
         }
         // Otherwise, follow all branches
@@ -188,10 +178,10 @@ public class SymbolicExecutor {
                 BoolExpr constraint = mkSwitchConstraint(var, values.get(i));
                 newState.addPathConstraint(constraint);
                 defaultCaseState.addPathConstraint(ctx.mkNot(constraint));
-                newState.setCurrentStmt(succs.get(i));
+                newState.setStmt(succs.get(i));
                 newStates.add(newState);
             }
-            defaultCaseState.setCurrentStmt(succs.get(succs.size() - 1));
+            defaultCaseState.setStmt(succs.get(succs.size() - 1));
             newStates.add(defaultCaseState);
         }
 
@@ -207,15 +197,16 @@ public class SymbolicExecutor {
     }
 
     /**
-     * Handle definition statements (assignment, identity) during symbolic
-     * execution by updating the symbolic state.
+     * Symbolically execute a definition statement (assign or identity).
      * 
-     * @param cfg   The control flow graph
-     * @param stmt  The statement to handle
-     * @param state The current symbolic state
-     * @return A list of new symbolic states after executing the statement
+     * @param stmt     The definition statement
+     * @param state    The current symbolic state
+     * @param iterator The iterator over the trace entries or <code>null</code> if
+     *                 not replaying a trace
+     * @return A list of successor symbolic states after executing the definition
+     *         statement
      */
-    private List<SymbolicState> handleDefStmt(StmtGraph<?> cfg, AbstractDefinitionStmt stmt, SymbolicState state,
+    private List<SymbolicState> handleDefStmt(AbstractDefinitionStmt stmt, SymbolicState state,
             Iterator<TraceEntry> iterator) {
         // If either the lhs or the rhs contains a symbolic reference (e.g., an object
         // or array reference) with more than one potential alias, then we split the
@@ -247,7 +238,7 @@ public class SymbolicExecutor {
                 BitVecExpr len = (BitVecExpr) state.heap.getArrayLength(ref.getBase().getName());
                 if (len == null) {
                     // If length is null, means we have a null reference, and exception is thrown
-                    return handleOtherStmts(cfg, stmt, state);
+                    return handleOtherStmts(state);
                 }
 
                 // If replaying a trace, we should have a trace entry for the array access
@@ -264,7 +255,7 @@ public class SymbolicExecutor {
                         state.addPathConstraint(ctx.mkOr(ctx.mkBVSLT(index, ctx.mkBV(0, sorts.getIntBitSize())),
                                 ctx.mkBVSGE(index, len)));
                         state.setExceptionThrown();
-                        return handleOtherStmts(cfg, stmt, state);
+                        return handleOtherStmts(state);
                     } else {
                         state.addPathConstraint(ctx.mkAnd(ctx.mkBVSGE(index, ctx.mkBV(0, sorts.getIntBitSize())),
                                 ctx.mkBVSLT(index, len)));
@@ -298,14 +289,14 @@ public class SymbolicExecutor {
             state.heap.setField(ref.getBase().getName(), ref.getFieldSignature().getName(), value,
                     ref.getFieldSignature().getType());
         } else {
-            state.setVariable(leftOp.toString(), value);
+            state.assign(leftOp.toString(), value);
         }
 
         // Definition statements follow the same control flow as other statements
-        List<SymbolicState> succStates = handleOtherStmts(cfg, stmt, state);
+        List<SymbolicState> succStates = handleOtherStmts(state);
         // For optional out of bounds state, check successors for potential catch blocks
         if (outOfBoundsState != null) {
-            succStates.addAll(handleOtherStmts(cfg, stmt, outOfBoundsState));
+            succStates.addAll(handleOtherStmts(outOfBoundsState));
         }
         return succStates;
     }
@@ -313,12 +304,11 @@ public class SymbolicExecutor {
     /**
      * Handle invoke statements during symbolic execution.
      * 
-     * @param cfg   The control flow graph
      * @param stmt  The invoke statement as a Jimple statement ({@link JInvokeStmt})
      * @param state The current symbolic state
-     * @return A list of new symbolic states after executing the invoke statement
+     * @return A list of successor symbolic states after executing the invocation
      */
-    private List<SymbolicState> handleInvokeStmt(StmtGraph<?> cfg, JInvokeStmt stmt, SymbolicState state) {
+    private List<SymbolicState> handleInvokeStmt(JInvokeStmt stmt, SymbolicState state) {
         AbstractInvokeExpr invokeExpr = stmt.getInvokeExpr();
         // Resolve aliases
         Expr<?> symRef = refExtractor.extract(invokeExpr, state);
@@ -331,20 +321,18 @@ public class SymbolicExecutor {
         transformer.transform(invokeExpr, state);
 
         // Invoke statements follow the same control flow as other statements
-        return handleOtherStmts(cfg, stmt, state);
+        return handleOtherStmts(state);
     }
 
     /**
-     * Handle other types of statements during symbolic execution.
+     * Return a list of successor symbolic states for the current statement.
      * 
-     * @param cfg   The control flow graph
-     * @param stmt  The statement to handle
      * @param state The current symbolic state
-     * @return A list of new symbolic states after executing the statement
+     * @return A list of successor symbolic states
      */
-    private List<SymbolicState> handleOtherStmts(StmtGraph<?> cfg, Stmt stmt, SymbolicState state) {
+    private List<SymbolicState> handleOtherStmts(SymbolicState state) {
         List<SymbolicState> newStates = new ArrayList<SymbolicState>();
-        List<Stmt> succs = cfg.getAllSuccessors(stmt);
+        List<Stmt> succs = state.getSuccessors();
         // Note: generally non-branching statements will not have more than 1 successor,
         // but it can happen for exception-throwing statements inside a try block
         for (int i = 0; i < succs.size(); i++) {
@@ -356,13 +344,14 @@ public class SymbolicExecutor {
             }
 
             SymbolicState newState = i == succs.size() - 1 ? state : state.clone();
-            newState.setCurrentStmt(succ);
+            newState.setStmt(succ);
             newStates.add(newState);
         }
 
         return newStates;
     }
 
+    /** Check whether a statement represents that start of a catch block. */
     private boolean isCatchBlock(Stmt stmt) {
         return stmt instanceof JIdentityStmt && ((JIdentityStmt) stmt).getRightOp() instanceof JCaughtExceptionRef;
     }

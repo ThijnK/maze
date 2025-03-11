@@ -29,49 +29,46 @@ import sootup.core.types.Type;
  */
 public class SymbolicState {
     private final Context ctx;
-    private Stmt currentStmt;
-    private int currentDepth = 0;
+    private StmtGraph<?> cfg;
+    private Stmt stmt;
+    private int depth = 0;
     private MethodType methodType = MethodType.METHOD;
 
-    private Map<String, Expr<?>> symbolicVariables;
+    /** Mapping from variable names to symbolic expressions. */
+    private Map<String, Expr<?>> store;
+    /** Path constraints imposed by the program, e.g., if statements. */
     private List<BoolExpr> pathConstraints;
-    /**
-     * Constraints imposed by the engine, e.g., to put a max and min bound on array
-     * sizes.
-     */
+    /** Constraints imposed by the engine, e.g., for array size bounds. */
     private List<BoolExpr> engineConstraints;
     public final SymbolicHeap heap;
-    /**
-     * Tracks the SootUp types of symbolic variables representing method parameters.
-     */
+    /** Tracks SootUp types of parameters. */
     private Map<String, Type> paramTypes;
 
     /** Indicates whether an exception was thrown during symbolic execution. */
     private boolean exceptionThrown = false;
-    /**
-     * Indicates whether the state is infeasible, i.e., path constraints
-     * unsatisfiable.
-     */
+    /** Indicates whether the state constraints were found to be unsatisfiable. */
     private boolean isInfeasible = false;
 
-    public SymbolicState(Context ctx, Stmt stmt) {
+    public SymbolicState(Context ctx, StmtGraph<?> cfg) {
         this.ctx = ctx;
-        this.currentStmt = stmt;
-        this.symbolicVariables = new HashMap<>();
+        this.cfg = cfg;
+        this.stmt = cfg.getStartingStmt();
         this.pathConstraints = new ArrayList<>();
         this.engineConstraints = new ArrayList<>();
         this.paramTypes = new HashMap<>();
+        this.store = new HashMap<>();
         this.heap = new SymbolicHeap(this);
     }
 
-    public SymbolicState(Context ctx, Stmt stmt, int depth, MethodType methodType,
+    private SymbolicState(Context ctx, StmtGraph<?> cfg, Stmt stmt, int depth, MethodType methodType,
             Map<String, Expr<?>> symbolicVariables, List<BoolExpr> pathConstraints, List<BoolExpr> engineConstraints,
             Map<String, Type> paramTypes, SymbolicHeap heap, boolean exceptionThrown, boolean isInfeasible) {
         this.ctx = ctx;
-        this.currentStmt = stmt;
-        this.currentDepth = depth;
+        this.cfg = cfg;
+        this.stmt = stmt;
+        this.depth = depth;
         this.methodType = methodType;
-        this.symbolicVariables = new HashMap<>(symbolicVariables);
+        this.store = new HashMap<>(symbolicVariables);
         this.pathConstraints = new ArrayList<>(pathConstraints);
         this.engineConstraints = new ArrayList<>(engineConstraints);
         this.heap = heap.clone(this);
@@ -89,36 +86,37 @@ public class SymbolicState {
         return methodType;
     }
 
-    public boolean isCtor() {
-        return methodType.isCtor();
-    }
-
-    public boolean isInit() {
-        return methodType.isInit();
-    }
-
     public int incrementDepth() {
-        return ++currentDepth;
+        return ++depth;
     }
 
-    public Stmt getCurrentStmt() {
-        return currentStmt;
+    public void setCFG(StmtGraph<?> cfg) {
+        this.cfg = cfg;
     }
 
-    public void setCurrentStmt(Stmt stmt) {
-        this.currentStmt = stmt;
+    public Stmt getStmt() {
+        return stmt;
     }
 
-    public void setVariable(String var, Expr<?> expression) {
-        symbolicVariables.put(var, expression);
+    public void setStmt(Stmt stmt) {
+        this.stmt = stmt;
     }
 
-    public Expr<?> getVariable(String var) {
-        return symbolicVariables.getOrDefault(var, null);
+    /** Get the successor statements for the current statement. */
+    public List<Stmt> getSuccessors() {
+        return cfg.getAllSuccessors(stmt);
     }
 
-    public boolean containsVariable(String var) {
-        return symbolicVariables.containsKey(var);
+    public void assign(String var, Expr<?> expression) {
+        store.put(var, expression);
+    }
+
+    public Expr<?> lookup(String var) {
+        return store.getOrDefault(var, null);
+    }
+
+    public boolean exists(String var) {
+        return store.containsKey(var);
     }
 
     public void setParamType(String var, Type type) {
@@ -130,7 +128,7 @@ public class SymbolicState {
     }
 
     public boolean isParam(String var) {
-        return paramTypes.containsKey(var) || paramTypes.containsKey(getVariable(var).toString());
+        return paramTypes.containsKey(var) || paramTypes.containsKey(lookup(var).toString());
     }
 
     /**
@@ -202,17 +200,17 @@ public class SymbolicState {
         return allConstraints;
     }
 
-    public boolean isFinalState(StmtGraph<?> cfg) {
-        return exceptionThrown || isInfeasible || cfg.getAllSuccessors(currentStmt).isEmpty();
+    public boolean isFinalState() {
+        return exceptionThrown || isInfeasible || cfg.getAllSuccessors(stmt).isEmpty();
     }
 
     public SymbolicState clone(Stmt stmt) {
-        return new SymbolicState(ctx, stmt, currentDepth, methodType, symbolicVariables, pathConstraints,
+        return new SymbolicState(ctx, cfg, stmt, depth, methodType, store, pathConstraints,
                 engineConstraints, paramTypes, heap, exceptionThrown, isInfeasible);
     }
 
     public SymbolicState clone() {
-        return clone(currentStmt);
+        return clone(stmt);
     }
 
     public Context getContext() {
@@ -221,7 +219,7 @@ public class SymbolicState {
 
     @Override
     public String toString() {
-        return "Vars: " + symbolicVariables + ", Heap: " + heap + ", PC: " + pathConstraints + ", EC: "
+        return "Vars: " + store + ", Heap: " + heap + ", PC: " + pathConstraints + ", EC: "
                 + engineConstraints;
     }
 
@@ -233,13 +231,13 @@ public class SymbolicState {
             return false;
 
         SymbolicState state = (SymbolicState) obj;
-        return state.currentStmt.equals(currentStmt) && state.symbolicVariables.equals(symbolicVariables)
+        return state.stmt.equals(stmt) && state.store.equals(store)
                 && state.pathConstraints.equals(pathConstraints) && state.heap.equals(heap);
     }
 
     @Override
     public int hashCode() {
-        return currentStmt.hashCode() + symbolicVariables.hashCode() + pathConstraints.hashCode()
+        return stmt.hashCode() + store.hashCode() + pathConstraints.hashCode()
                 + engineConstraints.hashCode()
                 + heap.hashCode();
     }

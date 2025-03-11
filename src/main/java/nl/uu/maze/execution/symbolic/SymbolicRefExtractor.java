@@ -47,7 +47,7 @@ public class SymbolicRefExtractor extends AbstractValueVisitor<Expr<?>> {
     }
 
     private Expr<?> extract(String name) {
-        Expr<?> var = state.getVariable(name);
+        Expr<?> var = state.lookup(name);
         if (state.heap.isAliased(var)) {
             return var;
         }

@@ -357,7 +357,7 @@ public class SymbolicHeap {
      * Retrieves a heap object from the heap using the given variable name.
      */
     private HeapObject getHeapObject(String var) {
-        return getHeapObject(state.getVariable(var));
+        return getHeapObject(state.lookup(var));
     }
 
     /**
@@ -392,7 +392,7 @@ public class SymbolicHeap {
      * Determines whether the given variable references an array.
      */
     public boolean isArray(String var) {
-        return getArrayObject(state.getVariable(var)) != null;
+        return getArrayObject(state.lookup(var)) != null;
     }
 
     /**
@@ -409,7 +409,7 @@ public class SymbolicHeap {
      * Sets the value of an object's field based on the given variable name.
      */
     public void setField(String var, String fieldName, Expr<?> value, Type type) {
-        setField(state.getVariable(var), fieldName, value, type);
+        setField(state.lookup(var), fieldName, value, type);
     }
 
     /**
@@ -439,7 +439,7 @@ public class SymbolicHeap {
 
         HeapObjectField field = obj.getField(fieldName);
         if (field == null) {
-            Expr<?> objRef = getSingleAlias(state.getVariable(var));
+            Expr<?> objRef = getSingleAlias(state.lookup(var));
             String varName = objRef.toString();
             Expr<?> newValue;
             if (fieldType instanceof ArrayType) {
@@ -506,7 +506,7 @@ public class SymbolicHeap {
      *         exist
      */
     public Expr<?> getArrayElement(String lhs, String var, BitVecExpr index) {
-        return getArrayElement(lhs, var, state.getVariable(var), index);
+        return getArrayElement(lhs, var, state.lookup(var), index);
     }
 
     /**
@@ -537,7 +537,7 @@ public class SymbolicHeap {
                 if (lhs != null) {
                     arrayIndices.put(lhs, indices);
                 }
-                return state.getVariable(var);
+                return state.lookup(var);
             }
         }
 
@@ -548,7 +548,7 @@ public class SymbolicHeap {
      * Sets the value at the given index for the given array variable.
      */
     public <E extends Sort> void setArrayElement(String var, BitVecExpr index, Expr<E> value) {
-        setArrayElement(var, state.getVariable(var), index, value);
+        setArrayElement(var, state.lookup(var), index, value);
     }
 
     /**
@@ -611,7 +611,7 @@ public class SymbolicHeap {
      * @return The Z3 expr representing the length of the array
      */
     public Expr<?> getArrayLength(String var) {
-        return getArrayLength(var, state.getVariable(var));
+        return getArrayLength(var, state.lookup(var));
     }
 
     /**
