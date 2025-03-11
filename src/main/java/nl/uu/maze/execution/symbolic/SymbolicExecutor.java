@@ -100,14 +100,14 @@ public class SymbolicExecutor {
         else if (stmt instanceof AbstractDefinitionStmt)
             return handleDefStmt((AbstractDefinitionStmt) stmt, state, iterator);
         else if (stmt instanceof JInvokeStmt)
-            return handleInvokeStmt(stmt.getInvokeExpr(), state);
+            return handleInvokeStmt(stmt.getInvokeExpr(), state, iterator);
         else if (stmt instanceof JThrowStmt) {
             state.setExceptionThrown();
-            return handleOtherStmts(state);
+            return handleOtherStmts(state, iterator);
         } else if (stmt instanceof JReturnStmt)
-            return handleReturnStmt((JReturnStmt) stmt, state);
+            return handleReturnStmt((JReturnStmt) stmt, state, iterator);
         else
-            return handleOtherStmts(state);
+            return handleOtherStmts(state, iterator);
     }
 
     /**
@@ -275,7 +275,7 @@ public class SymbolicExecutor {
                 BitVecExpr len = (BitVecExpr) state.heap.getArrayLength(ref.getBase().getName());
                 if (len == null) {
                     // If length is null, means we have a null reference, and exception is thrown
-                    return handleOtherStmts(state);
+                    return handleOtherStmts(state, iterator);
                 }
 
                 // If replaying a trace, we should have a trace entry for the array access
@@ -292,7 +292,7 @@ public class SymbolicExecutor {
                         state.addPathConstraint(ctx.mkOr(ctx.mkBVSLT(index, ctx.mkBV(0, sorts.getIntBitSize())),
                                 ctx.mkBVSGE(index, len)));
                         state.setExceptionThrown();
-                        return handleOtherStmts(state);
+                        return handleOtherStmts(state, iterator);
                     } else {
                         state.addPathConstraint(ctx.mkAnd(ctx.mkBVSGE(index, ctx.mkBV(0, sorts.getIntBitSize())),
                                 ctx.mkBVSLT(index, len)));
@@ -351,10 +351,10 @@ public class SymbolicExecutor {
         }
 
         // Definition statements follow the same control flow as other statements
-        List<SymbolicState> succStates = handleOtherStmts(state);
+        List<SymbolicState> succStates = handleOtherStmts(state, iterator);
         // For optional out of bounds state, check successors for potential catch blocks
         if (outOfBoundsState != null) {
-            succStates.addAll(handleOtherStmts(outOfBoundsState));
+            succStates.addAll(handleOtherStmts(outOfBoundsState, iterator));
         }
         return succStates;
     }
@@ -362,11 +362,14 @@ public class SymbolicExecutor {
     /**
      * Symbolically or concretely execute an invoke statement.
      * 
-     * @param expr  The invoke expression ({@link AbstractInvokeExpr})
-     * @param state The current symbolic state
+     * @param expr     The invoke expression ({@link AbstractInvokeExpr})
+     * @param state    The current symbolic state
+     * @param iterator The iterator over the trace entries or <code>null</code> if
+     *                 not replaying a trace
      * @return A list of successor symbolic states after executing the invocation
      */
-    private List<SymbolicState> handleInvokeStmt(AbstractInvokeExpr expr, SymbolicState state) {
+    private List<SymbolicState> handleInvokeStmt(AbstractInvokeExpr expr, SymbolicState state,
+            Iterator<TraceEntry> iterator) {
         // Resolve aliases
         Expr<?> symRef = refExtractor.extract(expr, state);
         Optional<List<SymbolicState>> splitStates = splitOnAliases(state, symRef);
@@ -378,7 +381,7 @@ public class SymbolicExecutor {
         boolean executed = executeMethod(state, expr);
         // If executed concretely, immediately continue with the next statement
         if (executed) {
-            return handleOtherStmts(state);
+            return handleOtherStmts(state, iterator);
         }
         return List.of(state);
     }
@@ -386,35 +389,47 @@ public class SymbolicExecutor {
     /**
      * Handle non-void return statements by storing the return value.
      * 
-     * @param stmt  The return statement as a Jimple statement ({@link JReturnStmt})
-     * @param state The current symbolic state
+     * @param stmt     The return statement as a Jimple statement
+     *                 ({@link JReturnStmt})
+     * @param state    The current symbolic state
+     * @param iterator The iterator over the trace entries or <code>null</code> if
+     *                 not replaying a trace
      * @return A list of successor symbolic states after executing the return
      */
-    private List<SymbolicState> handleReturnStmt(JReturnStmt stmt, SymbolicState state) {
+    private List<SymbolicState> handleReturnStmt(JReturnStmt stmt, SymbolicState state, Iterator<TraceEntry> iterator) {
         Expr<?> value = jimpleToZ3.transform(stmt.getOp(), state);
         state.setReturnValue(value);
-        return handleOtherStmts(state);
+        return handleOtherStmts(state, iterator);
     }
 
     /**
      * Return a list of successor symbolic states for the current statement.
      * 
-     * @param state The current symbolic state
+     * @param state    The current symbolic state
+     * @param iterator The iterator over the trace entries or <code>null</code> if
+     *                 not replaying a trace
      * @return A list of successor symbolic states
      */
-    private List<SymbolicState> handleOtherStmts(SymbolicState state) {
+    private List<SymbolicState> handleOtherStmts(SymbolicState state, Iterator<TraceEntry> iterator) {
         List<SymbolicState> newStates = new ArrayList<SymbolicState>();
         List<Stmt> succs = state.getSuccessors();
 
         // Final state
         if (succs.isEmpty()) {
-            state.setFinalState();
-            // TODO: if callStack not empty, pop and continue from there
-            // If popping and current statement of popped state is a definition statement,
-            // assign return value of method call!
-            // And call handleOtherStatements on the state popped afterwards to continue
-            // with the statement after the method call!
-            return List.of(state);
+            // If call stack is also empty, we have reached the end of the MUT
+            if (state.isCallStackEmpty()) {
+                state.setFinalState();
+                return List.of(state);
+            }
+            // Otherwise, pop the call stack and continue from there
+            SymbolicState poppedState = state.popCallStack();
+            // If the popped state is a definition statement, we still need to complete the
+            // assignment using the return value of the method that just finished execution
+            if (poppedState.getStmt() instanceof AbstractDefinitionStmt) {
+                poppedState.setReturnValue(state.getReturnValue());
+                return handleDefStmt((AbstractDefinitionStmt) poppedState.getStmt(), poppedState, iterator);
+            }
+            return handleOtherStmts(poppedState, iterator);
         }
 
         // Note: generally non-branching statements will not have more than 1 successor,
