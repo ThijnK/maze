@@ -174,7 +174,6 @@ public class DSEController {
                 // to the starting statement of the target method
                 if (!state.getMethodType().isCtor()) {
                     newState.setCFG(cfg);
-                    newState.setStmt(cfg.getStartingStmt());
                 }
                 searchStrategy.add(newState);
             }
@@ -216,7 +215,6 @@ public class DSEController {
                         initStates.put(state.hashCode(), state.clone());
                         logger.debug("Switching to target method: " + method.getName());
                         state.setCFG(cfg);
-                        state.setStmt(cfg.getStartingStmt());
                         searchStrategy.add(state);
                     } else {
                         initStates.put(state.hashCode(), state);
@@ -277,11 +275,10 @@ public class DSEController {
                 }
 
                 current.setMethodType(MethodType.METHOD);
-                current.setCFG(cfg);
                 // Save the final ctor state for reuse in other methods
                 initStates.put(pathHash, current.clone());
                 logger.debug("Switching to target method: " + method.getName());
-                current.setStmt(cfg.getStartingStmt());
+                current.setCFG(cfg);
                 iterator = TraceManager.getEntries(method.getName()).iterator();
             }
         }

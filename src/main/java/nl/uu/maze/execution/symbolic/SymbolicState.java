@@ -40,7 +40,10 @@ public class SymbolicState {
     public final Map<String, Expr<?>> store;
     /** Symbolic heap to store symbolic objects and arrays. */
     public final SymbolicHeap heap;
-    /** Special variable to store the return value of a method. */
+    /**
+     * Special variable to store the return value of a method call or the method
+     * this state is part of.
+     */
     private Expr<?> retval;
     /** Path constraints imposed by the program, e.g., if statements. */
     private List<BoolExpr> pathConstraints;
@@ -107,8 +110,25 @@ public class SymbolicState {
         return ++depth;
     }
 
+    /**
+     * Set the CFG for this symbolic state.
+     * Note: also sets the current statement to the starting statement of the CFG.
+     */
     public void setCFG(StmtGraph<?> cfg) {
         this.cfg = cfg;
+        setStmt(cfg.getStartingStmt());
+    }
+
+    public void pushCallStack(SymbolicState state) {
+        callStack.push(state);
+    }
+
+    public SymbolicState popCallStack() {
+        return callStack.pop();
+    }
+
+    public boolean isCallStackEmpty() {
+        return callStack.isEmpty();
     }
 
     public Stmt getStmt() {
@@ -246,7 +266,7 @@ public class SymbolicState {
     @Override
     public String toString() {
         return "Vars: " + store + ", Heap: " + heap + ", PC: " + pathConstraints + ", EC: "
-                + engineConstraints;
+                + engineConstraints + ", CallStack: " + callStack.size();
     }
 
     @Override

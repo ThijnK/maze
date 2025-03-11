@@ -7,10 +7,11 @@ package nl.uu.maze.execution;
  * <li>CTOR: Constructor</li>
  * <li>CINIT: Class initializer</li>
  * <li>METHOD: Regular target method</li>
+ * <li>CALLEE: Method called by the target method</li>
  * </ul>
  */
 public enum MethodType {
-    CTOR, CINIT, METHOD;
+    CTOR, CINIT, METHOD, CALLEE;
 
     /**
      * Get the prefix for this method type, to be used in symbolic names.
@@ -23,6 +24,7 @@ public enum MethodType {
                 return "cl";
             case METHOD:
                 return "m";
+            case CALLEE:
             default:
                 return "";
         }
