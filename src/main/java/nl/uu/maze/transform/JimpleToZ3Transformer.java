@@ -583,122 +583,102 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
         }
 
         boolean isCtor = methodSig.getName().equals("<init>");
-        // Get the method or constructor from the method signature
-        Object executable;
-        try {
-            executable = isCtor ? analyzer.getJavaConstructor(methodSig) : analyzer.getJavaMethod(methodSig);
-        } catch (ClassNotFoundException | NoSuchMethodException e) {
-            logger.error("Failed to find " + (isCtor ? "constructor" : "method") + ": " + methodSig);
+        Object executable = getExecutable(methodSig, isCtor);
+        if (executable == null)
             return;
-        }
 
         ArgMap argMap = null;
         Object instance = null;
         Object original = null;
 
-        // Evaluate state if the method is not static or involves arguments
         if (base != null || args.size() > 0) {
             Expr<?> symRef = base != null ? state.getVariable(base.getName()) : null;
             HeapObject heapObj = state.heap.getHeapObject(symRef);
             if (base != null && heapObj == null) {
-                // Null dereference
                 state.setExceptionThrown();
                 return;
             }
 
             Optional<ArgMap> argMapOpt = validator.evaluate(state, true);
-            // If state is not satisfiable at this point, stop execution of this path
             if (!argMapOpt.isPresent()) {
                 state.setInfeasible();
                 return;
             }
             argMap = argMapOpt.get();
 
-            // For non-constructor invocations with a base, retrieve the instance and
-            // create a shallow copy
-            if (!isCtor && symRef != null) {
-                // Need the class type of the instance here, and method.getDeclaringClass()
-                // could be an interface, so take the type from heap object
+            if (!isCtor && base != null) {
                 try {
                     Class<?> clazz = analyzer.getJavaClass(heapObj.getType());
-                    // If the method is abstract, we need to find the concrete implementation
                     if (Modifier.isAbstract(((Method) executable).getModifiers())) {
                         executable = clazz.getDeclaredMethod(methodSig.getName(),
                                 ((Method) executable).getParameterTypes());
                     }
-                    instance = argMap.toJava(symRef.toString(), clazz);
+                    instance = argMap.toJava(base.getName(), clazz);
                     if (instance == null) {
-                        logger.warn("Failed to find instance for base: " + symRef.toString());
+                        logger.warn("Failed to find instance for base: " + base.getName());
                         return;
                     }
-                    // Create a shallow copy of the instance to compare its fields later
-                    original = ObjectUtils.shallowCopy(instance, clazz);
+                    original = ObjectUtils.shallowCopy(instance, instance.getClass());
                     addConcretizationConstraints(heapObj, instance);
-                } catch (ClassNotFoundException | NoSuchMethodException | SecurityException e) {
-                    logger.warn("Failed to find class for instance: " + symRef.toString());
+                } catch (ClassNotFoundException | NoSuchMethodException e) {
+                    logger.error("Failed to find class or method for base: " + base.getName());
+                    return;
                 }
             }
-
-            // Overwrite the method args (marg0 etc.) with the args for this method call
-            for (int i = 0; i < args.size(); i++) {
-                Immediate arg = args.get(i);
-                Expr<?> argExpr = transform(arg);
-                String name = ArgMap.getSymbolicName(isCtor ? MethodType.CTOR : MethodType.METHOD, i);
-                if (argExpr.getSort().equals(sorts.getRefSort())) {
-                    // If the argument is a reference, set it to refer to that ref in ArgMap
-                    // Add concretization constraints for this reference
-                    // Note: this call to argMap.toJava will be mimicked when generating args for
-                    // the concrete execution, but the value generated here will be stored and
-                    // reused later, avoiding duplicate work
-                    try {
-                        HeapObject argObj = state.heap.getHeapObject(argExpr);
-                        Class<?> argClazz = analyzer.getJavaClass(argObj.getType());
-                        addConcretizationConstraints(argObj, argMap.toJava(argExpr.toString(), argClazz));
-                    } catch (ClassNotFoundException e) {
-                        logger.warn("Failed to find class for reference: " + argExpr.toString());
-                    }
-                    argMap.set(name, new ObjectRef(argExpr.toString()));
-                }
-                // Otherwise, convert the expr to a Java value and set it in the ArgMap
-                else {
-                    Object argVal = validator.evaluate(argExpr, arg.getType());
-                    argMap.set(name, argVal);
-                }
-            }
+            setMethodArguments(args, isCtor, argMap);
         }
 
-        Object retval;
-        if (isCtor) {
-            retval = ObjectInstantiator.createInstance((Constructor<?>) executable, argMap);
-            // For constructor calls, the new instance is the return value
-            instance = retval;
-        } else {
-            retval = executor.execute(instance, (Method) executable, argMap);
-            // If the method call throws an exception
-            if (retval instanceof Exception) {
-                state.setExceptionThrown();
-                return;
-            }
+        Object retval = isCtor ? ObjectInstantiator.createInstance((Constructor<?>) executable, argMap)
+                : executor.execute(instance, (Method) executable, argMap);
+        if (retval instanceof Exception) {
+            state.setExceptionThrown();
+            return;
         }
 
         Type retType = methodSig.getType();
-        if (!retType.equals(VoidType.getInstance())) {
-            setResult(javaToZ3.transform(retval, state, retType));
-        } else {
-            setResult(null);
-        }
-
-        // Check if the method modifies any (primitive) fields of the instance object
+        setResult(!retType.equals(VoidType.getInstance()) ? javaToZ3.transform(retval, state, retType) : null);
         if (base != null && instance != null) {
-            ObjectUtils.shallowCompare(original, instance, (path, oldValue, newValue) -> {
-                // Field has been modified, set the field in the heap
-                // Shallow compare, so we can assume path.length == 1
-                String fieldName = path[0].getName();
-                Type fieldType = sorts.determineType(path[0].getType());
-                Expr<?> fieldExpr = javaToZ3.transform(newValue, state, fieldType);
-                state.heap.setField(base.getName(), fieldName, fieldExpr, fieldType);
-            });
+            updateModifiedFields(base, original, instance);
         }
+    }
+
+    private Object getExecutable(MethodSignature methodSig, boolean isCtor) {
+        try {
+            return isCtor ? analyzer.getJavaConstructor(methodSig) : analyzer.getJavaMethod(methodSig);
+        } catch (ClassNotFoundException | NoSuchMethodException e) {
+            logger.error("Failed to find " + (isCtor ? "constructor" : "method") + ": " + methodSig);
+            return null;
+        }
+    }
+
+    private void setMethodArguments(List<Immediate> args, boolean isCtor, ArgMap argMap) {
+        for (int i = 0; i < args.size(); i++) {
+            Immediate arg = args.get(i);
+            Expr<?> argExpr = transform(arg);
+            String name = ArgMap.getSymbolicName(isCtor ? MethodType.CTOR : MethodType.METHOD, i);
+            if (argExpr.getSort().equals(sorts.getRefSort())) {
+                try {
+                    HeapObject argObj = state.heap.getHeapObject(argExpr);
+                    Class<?> argClazz = analyzer.getJavaClass(argObj.getType());
+                    addConcretizationConstraints(argObj, argMap.toJava(argExpr.toString(), argClazz));
+                } catch (ClassNotFoundException e) {
+                    logger.warn("Failed to find class for reference: " + argExpr.toString());
+                }
+                argMap.set(name, new ObjectRef(argExpr.toString()));
+            } else {
+                Object argVal = validator.evaluate(argExpr, arg.getType());
+                argMap.set(name, argVal);
+            }
+        }
+    }
+
+    private void updateModifiedFields(Local base, Object original, Object instance) {
+        ObjectUtils.shallowCompare(original, instance, (path, oldValue, newValue) -> {
+            String fieldName = path[0].getName();
+            Type fieldType = sorts.determineType(path[0].getType());
+            Expr<?> fieldExpr = javaToZ3.transform(newValue, state, fieldType);
+            state.heap.setField(base.getName(), fieldName, fieldExpr, fieldType);
+        });
     }
 
     /**
