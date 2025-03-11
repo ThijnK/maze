@@ -285,5 +285,15 @@ public class SymbolicStateValidator {
                 }
             }
         }
+
+        // Also go through the variables store of the state and set object references
+        for (Entry<String, Expr<?>> entry : state.store.entrySet()) {
+            String var = entry.getKey();
+            Expr<?> value = entry.getValue();
+            if (value.getSort().equals(sorts.getRefSort())) {
+                ObjectRef ref = new ObjectRef(value.toString());
+                argMap.set(var, ref);
+            }
+        }
     }
 }
