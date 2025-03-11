@@ -591,6 +591,14 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
 
         // Evaluate state if the method is not static or involves arguments
         if (base != null || args.size() > 0) {
+            Expr<?> symRef = base != null ? state.getVariable(base.getName()) : null;
+            HeapObject heapObj = state.heap.getHeapObject(symRef);
+            if (base != null && heapObj == null) {
+                // Null dereference
+                state.setExceptionThrown();
+                return;
+            }
+
             Optional<ArgMap> argMapOpt = validator.evaluate(state, true);
             // If state is not satisfiable at this point, stop execution of this path
             if (!argMapOpt.isPresent()) {
@@ -601,12 +609,10 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
 
             // For non-constructor invocations with a base, retrieve the instance and
             // create a shallow copy
-            if (!isCtor && base != null) {
-                Expr<?> symRef = state.getVariable(base.getName());
+            if (!isCtor && symRef != null) {
                 // Need the class type of the instance here, and method.getDeclaringClass()
                 // could be an interface, so take the type from heap object
                 try {
-                    HeapObject heapObj = state.heap.getHeapObject(symRef);
                     Class<?> clazz = analyzer.getJavaClass(heapObj.getType());
                     // If the method is abstract, we need to find the concrete implementation
                     if (Modifier.isAbstract(((Method) executable).getModifiers())) {
