@@ -93,22 +93,25 @@ public class DSEController {
     public DSEController(String classPath, String className, boolean concreteDriven, String strategyName,
             String outPath)
             throws Exception {
-        this.concreteDriven = concreteDriven;
         this.outPath = Path.of(outPath);
+        this.concreteDriven = concreteDriven;
+        this.instrumented = concreteDriven ? BytecodeInstrumenter.instrument(classPath, className) : null;
         searchStrategy = SearchStrategyFactory.getStrategy(concreteDriven, strategyName);
         logger.info("Using search strategy: " + searchStrategy.getClass().getSimpleName());
+
         this.ctx = new Context();
         Z3Sorts.initialize(ctx);
-        this.instrumented = concreteDriven ? BytecodeInstrumenter.instrument(classPath, className) : null;
+
         this.analyzer = new JavaAnalyzer(classPath, instrumented != null ? instrumented.getClassLoader() : null);
         this.classType = analyzer.getClassType(className);
         this.sootClass = analyzer.getSootClass(classType);
         this.clazz = analyzer.getJavaClass(classType);
+
         this.concrete = new ConcreteExecutor();
-        this.generator = new JUnitTestGenerator(clazz, analyzer, concrete);
         this.validator = new SymbolicStateValidator(ctx);
         this.transformer = new JimpleToZ3Transformer(ctx, concrete, validator, analyzer);
         this.symbolic = new SymbolicExecutor(ctx, transformer);
+        this.generator = new JUnitTestGenerator(clazz, analyzer, concrete);
     }
 
     /**

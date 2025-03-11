@@ -46,6 +46,7 @@ public class JavaAnalyzer {
     private final AnalysisInputLocation inputLocation;
     private final ClassLoader classLoader;
     private final JavaView view;
+    private final JavaIdentifierFactory identifierFactory;
 
     public JavaAnalyzer(String classPath, ClassLoader classLoader) throws MalformedURLException, URISyntaxException {
         inputLocation = new JavaClassPathAnalysisInputLocation(classPath);
@@ -53,6 +54,7 @@ public class JavaAnalyzer {
         URL classUrl = Paths.get(classPath).toUri().toURL();
         this.classLoader = classLoader != null ? classLoader : new URLClassLoader(new URL[] { classUrl });
         view = new JavaView(inputLocation);
+        identifierFactory = view.getIdentifierFactory();
     }
 
     /**
@@ -63,7 +65,6 @@ public class JavaAnalyzer {
      * @return The {@link ClassType} of the class
      */
     public JavaClassType getClassType(String className) {
-        JavaIdentifierFactory identifierFactory = view.getIdentifierFactory();
         return identifierFactory.getClassType(className);
     }
 
@@ -280,6 +281,14 @@ public class JavaAnalyzer {
      */
     public JavaSootClass getSootClass(JavaClassType classType) throws NoSuchElementException {
         return view.getClass(classType).orElseThrow();
+    }
+
+    /**
+     * Attempt to find a method in a given class type.
+     * Will only work if the class is available in the class path.
+     */
+    public Optional<JavaSootMethod> tryGetSootMethod(MethodSignature methodSig) {
+        return view.getClass(methodSig.getDeclClassType()).flatMap(c -> c.getMethod(methodSig.getSubSignature()));
     }
 
     /**

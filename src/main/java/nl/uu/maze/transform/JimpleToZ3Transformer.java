@@ -35,6 +35,7 @@ import sootup.core.jimple.common.constant.*;
 import sootup.core.jimple.common.expr.*;
 import sootup.core.jimple.common.ref.*;
 import sootup.core.types.*;
+import sootup.java.core.JavaSootMethod;
 
 /**
  * Transforms a Jimple value ({@link Value}) to a Z3 expression ({@link Expr}).
@@ -575,6 +576,12 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
 
     // #region Invocations
     private void handleInvocation(MethodSignature methodSig, List<Immediate> args, Local base) {
+        Optional<JavaSootMethod> methodOpt = analyzer.tryGetSootMethod(methodSig);
+        if (methodOpt.isPresent()) {
+            // If available internally, we can symbolically execute it
+            // TODO: handle internal method
+        }
+
         boolean isCtor = methodSig.getName().equals("<init>");
         // Get the method or constructor from the method signature
         Object executable;
