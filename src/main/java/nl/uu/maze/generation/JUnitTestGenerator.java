@@ -138,10 +138,10 @@ public class JUnitTestGenerator {
         if (!isException && !isVoid) {
             methodBuilder.addCode("\n"); // White space between method call and assert
             if (retval == null) {
-                methodBuilder.addStatement("$T.assertNull($L)", Assertions.class, "retval");
+                methodBuilder.addStatement("$T.assertNull(retval)", Assertions.class);
             } else {
-                methodBuilder.addStatement("$T.assertEquals($L, $L)", Assertions.class, valueToString(retval),
-                        "retval");
+                methodBuilder.addStatement("$T expected = $L", retval.getClass(), valueToString(retval));
+                methodBuilder.addStatement("$T.assertEquals(expected, retval)", Assertions.class);
             }
         }
 
@@ -284,6 +284,9 @@ public class JUnitTestGenerator {
         methodBuilder.addStatement("$T $L = new $T($L)", clazz, var, clazz, String.join(", ", argNames));
     }
 
+    /**
+     * Builds an object instance for the given ObjectInstance.
+     */
     private void buildObjectInstance(MethodSpec.Builder methodBuilder, ArgMap argMap, Set<String> builtObjects,
             String var, ObjectInstance inst) {
         if (builtObjects.contains(var)) {
