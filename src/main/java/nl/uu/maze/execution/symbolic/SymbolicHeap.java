@@ -445,7 +445,7 @@ public class SymbolicHeap {
             for (Entry<String, HeapObjectField> entry : obj.getFields()) {
                 HeapObjectField field = entry.getValue();
                 Expr<?> value = field.getValue();
-                if (value.getSort().equals(sorts.getRefSort())) {
+                if (sorts.isRef(value)) {
                     linkHeapObject(value, otherHeap);
                 }
             }
@@ -634,7 +634,7 @@ public class SymbolicHeap {
         }
 
         if (arrObj instanceof MultiArrayObject) {
-            if (value.getSort().equals(sorts.getRefSort())) {
+            if (sorts.isRef(value)) {
                 // Reassigning part of a multi-dimensional array to another array not supported
                 throw new RuntimeException("Cannot assign reference to multi-dimensional array element");
             }

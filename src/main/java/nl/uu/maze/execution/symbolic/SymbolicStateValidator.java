@@ -117,7 +117,7 @@ public class SymbolicStateValidator {
 
             // For reference types (arrays + objects)
             boolean isNull = false;
-            if (expr.getSort().equals(sorts.getRefSort())) {
+            if (sorts.isRef(expr)) {
                 // If the variable is interpreted as null, set it to null
                 if (expr.equals(nullExpr)) {
                     argMap.set(var, null);
@@ -277,7 +277,7 @@ public class SymbolicStateValidator {
                 Type fieldType = field.getType();
                 Expr<?> fieldValue = model.eval(field.getValue(), true);
                 // References to other objects stored as ObjectRef
-                if (field.getValue().getSort().equals(sorts.getRefSort())) {
+                if (sorts.isRef(field.getValue())) {
                     objFields.setField(fieldName, new ObjectRef(fieldValue.toString()), fieldType);
                 } else {
                     Object value = transformer.transformExpr(fieldValue, fieldType);
@@ -290,7 +290,7 @@ public class SymbolicStateValidator {
         for (Entry<String, Expr<?>> entry : state.store.entrySet()) {
             String var = entry.getKey();
             Expr<?> value = entry.getValue();
-            if (value.getSort().equals(sorts.getRefSort())) {
+            if (sorts.isRef(value)) {
                 ObjectRef ref = new ObjectRef(value.toString());
                 argMap.set(var, ref);
             }

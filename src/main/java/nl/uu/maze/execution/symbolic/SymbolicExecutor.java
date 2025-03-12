@@ -435,7 +435,7 @@ public class SymbolicExecutor {
             }
             for (Immediate arg : expr.getArgs()) {
                 Expr<?> argExpr = jimpleToZ3.transform(arg, caller);
-                if (argExpr.getSort().equals(sorts.getRefSort())) {
+                if (sorts.isRef(argExpr)) {
                     caller.heap.linkHeapObject(argExpr, state.heap);
                 }
             }
@@ -446,7 +446,7 @@ public class SymbolicExecutor {
                 Expr<?> returnValue = state.getReturnValue();
                 caller.setReturnValue(returnValue);
                 // If return value is a reference, link the heap object
-                if (returnValue != null && returnValue.getSort().equals(sorts.getRefSort())) {
+                if (returnValue != null && sorts.isRef(returnValue)) {
                     caller.heap.linkHeapObject(returnValue, state.heap);
                 }
                 return handleDefStmt((AbstractDefinitionStmt) caller.getStmt(), caller, iterator);
@@ -562,7 +562,7 @@ public class SymbolicExecutor {
 
             // If the argument is a reference, link the heap object from caller state to
             // the callee state
-            if (argExpr.getSort().equals(sorts.getRefSort())) {
+            if (sorts.isRef(argExpr)) {
                 callee.heap.linkHeapObject(argExpr, state.heap);
             }
         }
@@ -651,7 +651,7 @@ public class SymbolicExecutor {
             Immediate arg = args.get(i);
             Expr<?> argExpr = jimpleToZ3.transform(arg, state);
             String name = ArgMap.getSymbolicName(isCtor ? MethodType.CTOR : MethodType.METHOD, i);
-            if (argExpr.getSort().equals(sorts.getRefSort())) {
+            if (sorts.isRef(argExpr)) {
                 try {
                     HeapObject argObj = state.heap.getHeapObject(argExpr);
                     Class<?> argClazz = analyzer.getJavaClass(argObj.getType());
@@ -704,7 +704,7 @@ public class SymbolicExecutor {
             String fieldName = field.getKey();
             HeapObjectField heapField = field.getValue();
             Expr<?> fieldValue = heapField.getValue();
-            if (fieldValue.getSort().equals(sorts.getRefSort())) {
+            if (sorts.isRef(fieldValue)) {
                 HeapObject fieldObj = state.heap.getHeapObject(fieldValue);
                 addConcretizationConstraints(state, fieldObj, ObjectUtils.getField(object, fieldName));
             } else {

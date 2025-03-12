@@ -90,6 +90,13 @@ public class Z3Sorts {
     }
 
     /**
+     * Check if the given Z3 expression is a reference.
+     */
+    public boolean isRef(Expr<?> expr) {
+        return expr.getSort().equals(refSort);
+    }
+
+    /**
      * Determine the Z3 sort for the given Soot type.
      * 
      * @param sootType The Soot type
