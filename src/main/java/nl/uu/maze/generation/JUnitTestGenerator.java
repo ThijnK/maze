@@ -143,7 +143,7 @@ public class JUnitTestGenerator {
             if (retval == null) {
                 methodBuilder.addStatement("$T.assertNull(retval)", Assertions.class);
             } else {
-                if (retval.getClass().isPrimitive() || retval.getClass().isArray() || retval instanceof String) {
+                if (isPrimitive(retval) || retval.getClass().isArray()) {
                     methodBuilder.addStatement("$T expected = $L", retval.getClass(), valueToString(retval));
                 } else {
                     buildObject(methodBuilder, "expected", retval);
@@ -295,7 +295,7 @@ public class JUnitTestGenerator {
                 if (value.getClass().isArray()) {
                     methodBuilder.addStatement("$T $L = $L", field.getType(), fieldVar, arrayToString(value));
                     methodBuilder.addStatement("setField($L, \"$L\", $L)", var, field.getName(), fieldVar);
-                } else if (isPrimitive(value.getClass())) {
+                } else if (isPrimitive(value)) {
                     methodBuilder.addStatement("setField($L, \"$L\", $L)", var, field.getName(), valueToString(value));
                 } else {
                     buildObject(methodBuilder, fieldVar, value);
@@ -533,7 +533,8 @@ public class JUnitTestGenerator {
         }
     }
 
-    private boolean isPrimitive(Class<?> clazz) {
+    private boolean isPrimitive(Object obj) {
+        Class<?> clazz = obj.getClass();
         return clazz.isPrimitive() || primitiveWrappers.contains(clazz) || clazz == String.class;
     }
 
