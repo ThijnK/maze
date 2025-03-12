@@ -426,13 +426,14 @@ public class SymbolicExecutor {
 
         // Final state
         if (succs.isEmpty()) {
-            // If call stack is also empty, we have reached the end of the MUT
-            if (state.isCallStackEmpty()) {
+            // If the state has a caller, it means it was part of a method call
+            // So we continue with the caller state
+            // Otherwise, this is the final state
+            if (!state.hasCaller()) {
                 state.setFinalState();
                 return List.of(state);
             }
-            // Otherwise, pop the call stack and continue from there
-            SymbolicState caller = state.popCallStack().clone();
+            SymbolicState caller = state.getCaller().clone();
 
             // Link relevant parts of the heap from the callee state to the caller state
             // This is necessary to ensure that newly created objects in the callee's state
@@ -549,7 +550,7 @@ public class SymbolicExecutor {
             Local base) {
         // Create a fresh state that will enter the method call
         SymbolicState callee = new SymbolicState(ctx, analyzer.getCFG(method));
-        callee.pushCallStack(state);
+        callee.setCaller(state);
         callee.setMethodType(MethodType.CALLEE);
         // Also set the constraints to be the same as the caller state
         // This will copy references, so original constraints will be modified if the

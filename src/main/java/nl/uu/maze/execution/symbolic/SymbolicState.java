@@ -1,8 +1,6 @@
 package nl.uu.maze.execution.symbolic;
 
-import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Deque;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,8 +49,13 @@ public class SymbolicState {
     private List<BoolExpr> engineConstraints;
     /** Tracks SootUp types of parameters. */
     private Map<String, Type> paramTypes;
-    /** Call stack of symbolic states, used for (internal) method calls. */
-    private Deque<SymbolicState> callStack;
+    /**
+     * Tracks the symbolic state that called this state for a method call.
+     * Used to return to the caller state after the callee state finishes the
+     * method.
+     * When this is null, it means this state is in the main method under test.
+     */
+    private SymbolicState caller = null;
 
     private boolean isFinalState = false;
     /** Indicates whether an exception was thrown during symbolic execution. */
@@ -69,7 +72,6 @@ public class SymbolicState {
         this.pathConstraints = new ArrayList<>();
         this.engineConstraints = new ArrayList<>();
         this.paramTypes = new HashMap<>();
-        this.callStack = new ArrayDeque<>();
     }
 
     /*
@@ -90,8 +92,8 @@ public class SymbolicState {
         this.engineConstraints = new ArrayList<>(state.engineConstraints);
         // Share param types map to avoid copying
         this.paramTypes = state.paramTypes;
-        // Note: states in the call stack are lazily cloned when needed
-        this.callStack = new ArrayDeque<>(state.callStack);
+        // Note: caller state is are lazily cloned when needed
+        this.caller = state.caller;
 
         this.isFinalState = state.isFinalState;
         this.exceptionThrown = state.exceptionThrown;
@@ -119,16 +121,16 @@ public class SymbolicState {
         setStmt(cfg.getStartingStmt());
     }
 
-    public void pushCallStack(SymbolicState state) {
-        callStack.push(state);
+    public void setCaller(SymbolicState caller) {
+        this.caller = caller;
     }
 
-    public SymbolicState popCallStack() {
-        return callStack.pop();
+    public SymbolicState getCaller() {
+        return caller;
     }
 
-    public boolean isCallStackEmpty() {
-        return callStack.isEmpty();
+    public boolean hasCaller() {
+        return caller != null;
     }
 
     public Stmt getStmt() {
@@ -272,7 +274,7 @@ public class SymbolicState {
     @Override
     public String toString() {
         return "Vars: " + store + ", Heap: " + heap + ", PC: " + pathConstraints + ", EC: "
-                + engineConstraints + ", CallStack: " + callStack.size();
+                + engineConstraints + ", Callee: " + (caller == null ? "no" : "yes");
     }
 
     @Override
