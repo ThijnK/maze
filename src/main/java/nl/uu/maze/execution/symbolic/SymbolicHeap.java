@@ -498,8 +498,14 @@ public class SymbolicHeap {
             Expr<?> newValue;
             if (fieldType instanceof ArrayType) {
                 // Create a new array object
-                newValue = allocateArray(varName + "_" + fieldName, (ArrayType) fieldType,
-                        ((ArrayType) fieldType).getBaseType());
+                int dim = ((ArrayType) fieldType).getDimension();
+                if (dim > 1) {
+                    newValue = allocateMultiArray(varName + "_" + fieldName, (ArrayType) fieldType,
+                            ((ArrayType) fieldType).getBaseType());
+                } else {
+                    newValue = allocateArray(varName + "_" + fieldName, (ArrayType) fieldType,
+                            ((ArrayType) fieldType).getBaseType());
+                }
             } else if (fieldType instanceof ClassType && !fieldType.toString().equals("java.lang.String")) {
                 // Create a new object
                 newValue = allocateObject(varName + "_" + fieldName, fieldType);
