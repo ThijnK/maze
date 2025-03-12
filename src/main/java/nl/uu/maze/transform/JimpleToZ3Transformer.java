@@ -501,6 +501,9 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
     @Override
     public void caseParameterRef(@Nonnull JParameterRef ref) {
         String var = ArgMap.getSymbolicName(state.getMethodType(), ref.getIndex());
+        Type sootType = ref.getType();
+        state.setParamType(var, sootType);
+
         // If a value for this parameter is already defined (e.g., in a method call),
         // use that value
         Expr<?> param = state.lookup(var);
@@ -508,10 +511,8 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
             setResult(param);
             return;
         }
-        // Otherwise, create new symbolic value for the parameter
-        Type sootType = ref.getType();
-        state.setParamType(var, sootType);
 
+        // Otherwise, create new symbolic value for the parameter
         if (sootType instanceof ArrayType) {
             // Allocate new array on the heap
             ArrayType arrType = (ArrayType) sootType;

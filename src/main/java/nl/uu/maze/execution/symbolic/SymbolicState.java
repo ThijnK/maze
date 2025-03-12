@@ -158,7 +158,6 @@ public class SymbolicState {
     }
 
     public Expr<?> getReturnValue() {
-        // TODO: this can be reference to heap object as well!
         return retval;
     }
 
@@ -191,6 +190,11 @@ public class SymbolicState {
         engineConstraints.add(constraint);
     }
 
+    public void setConstraints(List<BoolExpr> pathConstraints, List<BoolExpr> engineConstraints) {
+        this.pathConstraints = pathConstraints;
+        this.engineConstraints = engineConstraints;
+    }
+
     public void setFinalState() {
         this.isFinalState = true;
     }
@@ -218,17 +222,21 @@ public class SymbolicState {
         return isInfeasible;
     }
 
-    /**
-     * Returns the list of path constraints for this state.
-     */
+    /** Returns the list of path constraints for this state. */
     public List<BoolExpr> getPathConstraints() {
         return pathConstraints;
     }
 
-    /**
-     * Returns the list of engine constraints for this state.
-     */
+    /** Returns the list of engine constraints for this state. */
     public List<BoolExpr> getEngineConstraints() {
+        return engineConstraints;
+    }
+
+    /**
+     * Returns the list of engine constraints for this state, adding additional
+     * constraints for concrete heap references to be distinct.
+     */
+    public List<BoolExpr> getFullEngineConstraints() {
         // Add constraint that all concrete references are distinct
         // So not equal to any other concrete ref, and not equal to null
         List<BoolExpr> engineConstraints = new ArrayList<>(this.engineConstraints);
@@ -244,10 +252,12 @@ public class SymbolicState {
     /**
      * Returns the list of all constraints (path + engine constraints) for this
      * state.
+     * Engine constraints will include additional constraints for concrete heap
+     * references to be distinct.
      */
     public List<BoolExpr> getAllConstraints() {
         List<BoolExpr> allConstraints = new ArrayList<>(getPathConstraints());
-        allConstraints.addAll(getEngineConstraints());
+        allConstraints.addAll(getFullEngineConstraints());
         return allConstraints;
     }
 

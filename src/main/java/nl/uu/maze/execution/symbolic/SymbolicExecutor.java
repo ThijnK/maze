@@ -422,14 +422,37 @@ public class SymbolicExecutor {
                 return List.of(state);
             }
             // Otherwise, pop the call stack and continue from there
-            SymbolicState poppedState = state.popCallStack().clone();
-            // If the popped state is a definition statement, we still need to complete the
-            // assignment using the return value of the method that just finished execution
-            if (poppedState.getStmt() instanceof AbstractDefinitionStmt) {
-                poppedState.setReturnValue(state.getReturnValue());
-                return handleDefStmt((AbstractDefinitionStmt) poppedState.getStmt(), poppedState, iterator);
+            SymbolicState caller = state.popCallStack().clone();
+
+            // Link relevant parts of the heap from the callee state to the caller state
+            // This is necessary to ensure that newly created objects in the callee's state
+            // that are referenced by the caller's state are linked correctly
+            caller.heap.setCounters(state.heap.getHeapCounter(), state.heap.getRefCounter());
+            AbstractInvokeExpr expr = caller.getStmt().getInvokeExpr();
+            if (expr instanceof AbstractInstanceInvokeExpr) {
+                caller.heap.linkHeapObject(caller.lookup(((AbstractInstanceInvokeExpr) expr).getBase().getName()),
+                        state.heap);
             }
-            return handleOtherStmts(poppedState, iterator);
+            for (Immediate arg : expr.getArgs()) {
+                Expr<?> argExpr = jimpleToZ3.transform(arg, caller);
+                if (argExpr.getSort().equals(sorts.getRefSort())) {
+                    caller.heap.linkHeapObject(argExpr, state.heap);
+                }
+            }
+
+            // If the caller state is a definition statement, we still need to complete the
+            // assignment using the return value of the method that just finished execution
+            if (caller.getStmt() instanceof AbstractDefinitionStmt) {
+                Expr<?> returnValue = state.getReturnValue();
+                caller.setReturnValue(returnValue);
+                // If return value is a reference, link the heap object
+                if (returnValue != null && returnValue.getSort().equals(sorts.getRefSort())) {
+                    caller.heap.linkHeapObject(returnValue, state.heap);
+                }
+                return handleDefStmt((AbstractDefinitionStmt) caller.getStmt(), caller, iterator);
+            }
+            return handleOtherStmts(caller, iterator);
+
         }
 
         // Note: generally non-branching statements will not have more than 1 successor,
@@ -513,16 +536,21 @@ public class SymbolicExecutor {
         SymbolicState callee = new SymbolicState(ctx, analyzer.getCFG(method));
         callee.pushCallStack(state);
         callee.setMethodType(MethodType.CALLEE);
-        // Copy the heap counter to avoid interference with path constraints when
-        // restoring the caller state from the call stack
-        callee.heap.setHeapCounter(state.heap.getHeapCounter());
-
-        // TODO: make sure the objects are shared between the states
+        // Also set the constraints to be the same as the caller state
+        // This will copy references, so original constraints will be modified if the
+        // callee state adds new constraints (intentionally)
+        callee.setConstraints(state.getPathConstraints(), state.getEngineConstraints());
+        // Copy the heap counter to avoid interference of constraints added by callee
+        // with constraints added by caller after the method call
+        callee.heap.setCounters(state.heap.getHeapCounter(), state.heap.getRefCounter());
+        callee.heap.setResolvedRefs(state.heap.getResolvedRefs());
 
         // Copy object reference for "this" (if needed)
         if (base != null) {
             Expr<?> symRef = state.lookup(base.getName());
             callee.assign("this", symRef);
+            // Link the heap object from caller state to the callee state
+            callee.heap.linkHeapObject(symRef, state.heap);
         }
 
         // Copy arguments for the method call to the fresh state
@@ -531,6 +559,12 @@ public class SymbolicExecutor {
             Immediate arg = args.get(i);
             Expr<?> argExpr = jimpleToZ3.transform(arg, state);
             callee.assign(ArgMap.getSymbolicName(MethodType.CALLEE, i), argExpr);
+
+            // If the argument is a reference, link the heap object from caller state to
+            // the callee state
+            if (argExpr.getSort().equals(sorts.getRefSort())) {
+                callee.heap.linkHeapObject(argExpr, state.heap);
+            }
         }
 
         // Actual execution will be done by {@link DSEController}!

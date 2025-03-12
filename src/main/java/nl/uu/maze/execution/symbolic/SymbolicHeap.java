@@ -80,8 +80,21 @@ public class SymbolicHeap {
         return heapCounter;
     }
 
-    public void setHeapCounter(int heapCounter) {
+    public int getRefCounter() {
+        return refCounter;
+    }
+
+    public void setCounters(int heapCounter, int refCounter) {
         this.heapCounter = heapCounter;
+        this.refCounter = refCounter;
+    }
+
+    public Set<Expr<?>> getResolvedRefs() {
+        return resolvedRefs;
+    }
+
+    public void setResolvedRefs(Set<Expr<?>> resolvedRefs) {
+        this.resolvedRefs = resolvedRefs;
     }
 
     public HeapObject get(String var) {
@@ -409,6 +422,34 @@ public class SymbolicHeap {
     public boolean isMultiArray(String var) {
         HeapObject obj = getHeapObject(var);
         return obj != null && obj instanceof MultiArrayObject;
+    }
+
+    /**
+     * Link a heap object from another symbolic heap to this heap.
+     * This will perform a deep linking, meaning any objects referenced by the
+     * object's
+     * fields are also linked.
+     * The objects are NOT cloned, so any changes to the copied object will affect
+     * the original object (including alias map entries).
+     */
+    public void linkHeapObject(Expr<?> symRef, SymbolicHeap otherHeap) {
+        aliasMap.put(symRef, otherHeap.getAliases(symRef));
+        for (Expr<?> conRef : otherHeap.getAliases(symRef)) {
+            HeapObject obj = otherHeap.get(conRef);
+            if (obj == null) {
+                continue;
+            }
+            heap.put(conRef, obj);
+
+            // Copy reference fields recursively
+            for (Entry<String, HeapObjectField> entry : obj.getFields()) {
+                HeapObjectField field = entry.getValue();
+                Expr<?> value = field.getValue();
+                if (value.getSort().equals(sorts.getRefSort())) {
+                    linkHeapObject(value, otherHeap);
+                }
+            }
+        }
     }
     // #endregion
 
