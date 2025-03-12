@@ -51,6 +51,9 @@ public class JUnitTestGenerator {
     private Set<Integer> builtTestCases = new HashSet<>();
     private boolean setFieldAdded = false;
 
+    private final Set<Class<?>> primitiveWrappers = Set.of(Boolean.class, Byte.class, Short.class, Integer.class,
+            Long.class, Float.class, Double.class, Character.class);
+
     public JUnitTestGenerator(Class<?> clazz, JavaAnalyzer analyzer, ConcreteExecutor executor)
             throws ClassNotFoundException {
         testClassName = clazz.getSimpleName() + "Test";
@@ -140,7 +143,11 @@ public class JUnitTestGenerator {
             if (retval == null) {
                 methodBuilder.addStatement("$T.assertNull(retval)", Assertions.class);
             } else {
-                methodBuilder.addStatement("$T expected = $L", retval.getClass(), valueToString(retval));
+                if (retval.getClass().isPrimitive() || retval.getClass().isArray() || retval instanceof String) {
+                    methodBuilder.addStatement("$T expected = $L", retval.getClass(), valueToString(retval));
+                } else {
+                    buildObject(methodBuilder, "expected", retval);
+                }
                 methodBuilder.addStatement("$T.assertEquals(expected, retval)", Assertions.class);
             }
         }
@@ -198,7 +205,7 @@ public class JUnitTestGenerator {
             else if (value instanceof ObjectRef) {
                 buildFromReference(methodBuilder, argMap, builtObjects, (ObjectRef) value, type, var);
             }
-            // Other paramters (non-object) can be defined immediately
+            // Other parameters (non-object) can be defined immediately
             else {
                 // If the ArgMap contains no value, use a default value
                 String valueStr = !argMap.containsKey(var) ? getDefaultValue(paramTypes.get(i)) : valueToString(value);
@@ -265,6 +272,38 @@ public class JUnitTestGenerator {
             addStatementTriple(methodBuilder, type, var, (String) value);
         } else {
             addStatementTriple(methodBuilder, type, var, valueToString(value));
+        }
+    }
+
+    /**
+     * Builds an object instance for the given arbitrary Java object by setting the
+     * fields using reflection.
+     */
+    private void buildObject(MethodSpec.Builder methodBuilder, String var, Object obj) {
+        Class<?> clazz = obj.getClass();
+        Field[] fields = clazz.getDeclaredFields();
+        buildObjectInstance(methodBuilder, var, clazz);
+        for (Field field : fields) {
+            field.setAccessible(true);
+            try {
+                Object value = field.get(obj);
+                if (value == null) {
+                    continue;
+                }
+                addSetFieldMethod();
+                String fieldVar = var + "_" + field.getName();
+                if (value.getClass().isArray()) {
+                    methodBuilder.addStatement("$T $L = $L", field.getType(), fieldVar, arrayToString(value));
+                    methodBuilder.addStatement("setField($L, \"$L\", $L)", var, field.getName(), fieldVar);
+                } else if (isPrimitive(value.getClass())) {
+                    methodBuilder.addStatement("setField($L, \"$L\", $L)", var, field.getName(), valueToString(value));
+                } else {
+                    buildObject(methodBuilder, fieldVar, value);
+                    methodBuilder.addStatement("setField($L, \"$L\", $L)", var, field.getName(), fieldVar);
+                }
+            } catch (IllegalAccessException e) {
+                logger.warn("Failed to access field " + field.getName() + " in " + clazz.getName());
+            }
         }
     }
 
@@ -492,6 +531,10 @@ public class JUnitTestGenerator {
             default:
                 return "null";
         }
+    }
+
+    private boolean isPrimitive(Class<?> clazz) {
+        return clazz.isPrimitive() || primitiveWrappers.contains(clazz) || clazz == String.class;
     }
 
     private String capitalizeFirstLetter(String str) {
