@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import nl.uu.maze.execution.concrete.ObjectInstantiator;
 import nl.uu.maze.execution.symbolic.SymbolicStateValidator;
+import nl.uu.maze.util.Z3Sorts;
 import sootup.core.types.ClassType;
 import sootup.core.types.Type;
 
@@ -131,7 +132,12 @@ public class ArgMap {
             converted.put(key, null);
         } else if (value instanceof ObjectRef) {
             String var = ((ObjectRef) value).getVar();
-            Object obj = toJava(var, args.get(var), type);
+            // If an object does not exist in the map, but is referenced, it's simply an
+            // unconstrained object, so we don't much care about its fields
+            // So, create an empty ObjectInstance
+            Object refValue = args.containsKey(var) ? args.get(var)
+                    : new ObjectInstance((ClassType) Z3Sorts.getInstance().determineType(type));
+            Object obj = toJava(var, refValue, type);
             converted.put(key, obj);
         } else if (value instanceof ObjectInstance) {
             // Convert ObjectInstance to Object

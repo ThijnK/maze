@@ -138,8 +138,8 @@ public class DSEController {
         }
 
         for (JavaSootMethod method : methods) {
-            // Skip non-standard methods
-            if (pattern.matcher(method.getName()).matches()) {
+            // Skip non-public and non-standard methods (e.g., <init>, <clinit>)
+            if (!method.isPublic() || pattern.matcher(method.getName()).matches()) {
                 continue;
             }
 
