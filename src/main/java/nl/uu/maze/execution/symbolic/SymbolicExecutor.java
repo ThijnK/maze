@@ -318,6 +318,11 @@ public class SymbolicExecutor {
             if (state.getReturnValue() != null) {
                 value = state.getReturnValue();
                 state.setReturnValue(null);
+                // If array indices required for the return value, set them
+                if (state.heap.getArrayIndices("return") != null) {
+                    // TODO: does not support instance field ref
+                    state.heap.copyArrayIndices("return", leftOp.toString());
+                }
             }
             // If not already executed, first execute the method
             else {
@@ -395,7 +400,14 @@ public class SymbolicExecutor {
      * @return A list of successor symbolic states after executing the return
      */
     private List<SymbolicState> handleReturnStmt(JReturnStmt stmt, SymbolicState state, Iterator<TraceEntry> iterator) {
-        Expr<?> value = jimpleToZ3.transform(stmt.getOp(), state);
+        Immediate op = stmt.getOp();
+        // If the op is a local referring to (part of) a multidimensional array, we need
+        // to know the arrayIndices entry for the return value
+        if (op instanceof Local && state.heap.isMultiArray(op.toString())) {
+            // Note: "return" is a reserved keyword, so no conflict with program variables
+            state.heap.copyArrayIndices(op.toString(), "return");
+        }
+        Expr<?> value = jimpleToZ3.transform(op, state);
         state.setReturnValue(value);
         return handleOtherStmts(state, iterator);
     }
@@ -445,6 +457,9 @@ public class SymbolicExecutor {
             if (caller.getStmt() instanceof AbstractDefinitionStmt) {
                 Expr<?> returnValue = state.getReturnValue();
                 caller.setReturnValue(returnValue);
+                if (state.heap.getArrayIndices("return") != null) {
+                    caller.heap.setArrayIndices("return", state.heap.getArrayIndices("return"));
+                }
                 // If return value is a reference, link the heap object
                 if (returnValue != null && sorts.isRef(returnValue)) {
                     caller.heap.linkHeapObject(returnValue, state.heap);
@@ -558,7 +573,13 @@ public class SymbolicExecutor {
         for (int i = 0; i < args.size(); i++) {
             Immediate arg = args.get(i);
             Expr<?> argExpr = jimpleToZ3.transform(arg, state);
-            callee.assign(ArgMap.getSymbolicName(MethodType.CALLEE, i), argExpr);
+            String argName = ArgMap.getSymbolicName(MethodType.CALLEE, i);
+            callee.assign(argName, argExpr);
+            if (state.heap.isMultiArray(arg.toString())) {
+                // If the argument is a multi-dimensional array, copy the array indices
+                // to the callee state
+                callee.heap.setArrayIndices(argName, state.heap.getArrayIndices(arg.toString()));
+            }
 
             // If the argument is a reference, link the heap object from caller state to
             // the callee state

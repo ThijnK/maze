@@ -559,6 +559,16 @@ public class SymbolicHeap {
         return indices;
     }
 
+    /** Retrieve the array indices for a given variable. */
+    public BitVecExpr[] getArrayIndices(String var) {
+        return arrayIndices.get(var);
+    }
+
+    /** Set the array indices for a given variable. */
+    public void setArrayIndices(String var, BitVecExpr[] indices) {
+        arrayIndices.put(var, indices);
+    }
+
     /**
      * Retrieves the value stored at the given index for the given array variable.
      * 

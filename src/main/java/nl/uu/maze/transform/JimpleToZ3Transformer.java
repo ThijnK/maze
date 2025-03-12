@@ -509,6 +509,10 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
         Expr<?> param = state.lookup(var);
         if (param != null) {
             setResult(param);
+            // Copy array indices if present
+            if (state.heap.isMultiArray(var)) {
+                state.heap.copyArrayIndices(var, lhs);
+            }
             return;
         }
 
