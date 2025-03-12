@@ -427,7 +427,9 @@ public class SymbolicExecutor {
             // Link relevant parts of the heap from the callee state to the caller state
             // This is necessary to ensure that newly created objects in the callee's state
             // that are referenced by the caller's state are linked correctly
+            caller.setConstraints(state.getPathConstraints(), state.getEngineConstraints());
             caller.heap.setCounters(state.heap.getHeapCounter(), state.heap.getRefCounter());
+            caller.heap.setResolvedRefs(state.heap.getResolvedRefs());
             AbstractInvokeExpr expr = caller.getStmt().getInvokeExpr();
             if (expr instanceof AbstractInstanceInvokeExpr) {
                 caller.heap.linkHeapObject(caller.lookup(((AbstractInstanceInvokeExpr) expr).getBase().getName()),
