@@ -251,8 +251,8 @@ public class SymbolicExecutor {
         // corresponding alias in each state
         // But only for assignments, not for identity statements
         if (stmt instanceof JAssignStmt) {
-            Expr<?> symRef = refExtractor.extract(stmt.getRightOp(), state);
-            symRef = symRef == null ? refExtractor.extract(stmt.getLeftOp(), state) : symRef;
+            Expr<?> symRef = refExtractor.extract(stmt.getLeftOp(), state);
+            symRef = symRef == null ? refExtractor.extract(stmt.getRightOp(), state) : symRef;
             Optional<List<SymbolicState>> splitStates = splitOnAliases(state, symRef);
             if (splitStates.isPresent()) {
                 return splitStates.get();
@@ -270,7 +270,7 @@ public class SymbolicExecutor {
         SymbolicState outOfBoundsState = null;
         if (stmt.containsArrayRef()) {
             JArrayRef ref = leftOp instanceof JArrayRef ? (JArrayRef) leftOp : (JArrayRef) rightOp;
-            if (state.isParam(ref.getBase().getName())) {
+            if (state.heap.isSymbolicArray(ref.getBase().getName())) {
                 BitVecExpr index = (BitVecExpr) jimpleToZ3.transform(ref.getIndex(), state);
                 BitVecExpr len = (BitVecExpr) state.heap.getArrayLength(ref.getBase().getName());
                 if (len == null) {
@@ -300,15 +300,13 @@ public class SymbolicExecutor {
                 } else {
                     // If not replaying a trace, split the state into one where the index is out of
                     // bounds and one where it is not
-                    if (state.isParam(ref.getBase().getName())) {
-                        outOfBoundsState = state.clone();
-                        outOfBoundsState
-                                .addPathConstraint(ctx.mkOr(ctx.mkBVSLT(index, ctx.mkBV(0, sorts.getIntBitSize())),
-                                        ctx.mkBVSGE(index, len)));
-                        outOfBoundsState.setExceptionThrown();
-                        state.addPathConstraint(ctx.mkAnd(ctx.mkBVSGE(index, ctx.mkBV(0, sorts.getIntBitSize())),
-                                ctx.mkBVSLT(index, len)));
-                    }
+                    outOfBoundsState = state.clone();
+                    outOfBoundsState
+                            .addPathConstraint(ctx.mkOr(ctx.mkBVSLT(index, ctx.mkBV(0, sorts.getIntBitSize())),
+                                    ctx.mkBVSGE(index, len)));
+                    outOfBoundsState.setExceptionThrown();
+                    state.addPathConstraint(ctx.mkAnd(ctx.mkBVSGE(index, ctx.mkBV(0, sorts.getIntBitSize())),
+                            ctx.mkBVSLT(index, len)));
                 }
             }
         }

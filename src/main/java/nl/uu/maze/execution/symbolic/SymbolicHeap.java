@@ -424,6 +424,11 @@ public class SymbolicHeap {
         return obj != null && obj instanceof MultiArrayObject;
     }
 
+    public boolean isSymbolicArray(String var) {
+        ArrayObject arrObj = getArrayObject(state.lookup(var));
+        return arrObj != null && arrObj.isSymbolic;
+    }
+
     /**
      * Link a heap object from another symbolic heap to this heap.
      * This will perform a deep linking, meaning any objects referenced by the
@@ -768,10 +773,13 @@ public class SymbolicHeap {
     }
 
     public class ArrayObject extends HeapObject {
+        private boolean isSymbolic;
+
         public ArrayObject(ArrayType type, Expr<?> elems, Expr<?> length) {
             super(type);
             setField("elems", elems, type);
             setField("len", length, PrimitiveType.getInt());
+            isSymbolic = !elems.isConstantArray();
         }
 
         @Override
