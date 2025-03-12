@@ -323,11 +323,11 @@ public class SymbolicExecutor {
             }
             // If not already executed, first execute the method
             else {
-                boolean executed = executeMethod(state, stmt.getInvokeExpr());
-                // If executed here is false, the method will be executed symbolically by
+                Optional<SymbolicState> callee = executeMethod(state, stmt.getInvokeExpr());
+                // If callee is not empty, the method will be executed symbolically by
                 // {@link DSEController}, so relinquish control here
-                if (!executed) {
-                    return List.of(state);
+                if (callee.isPresent()) {
+                    return List.of(callee.get());
                 }
                 // If executed concretely, the return value is stored in the state
                 value = state.getReturnValue();
@@ -378,12 +378,12 @@ public class SymbolicExecutor {
         }
 
         // Handle method invocation
-        boolean executed = executeMethod(state, expr);
+        Optional<SymbolicState> callee = executeMethod(state, expr);
         // If executed concretely, immediately continue with the next statement
-        if (executed) {
+        if (callee.isEmpty()) {
             return handleOtherStmts(state, iterator);
         }
-        return List.of(state);
+        return List.of(callee.get());
     }
 
     /**
@@ -422,7 +422,7 @@ public class SymbolicExecutor {
                 return List.of(state);
             }
             // Otherwise, pop the call stack and continue from there
-            SymbolicState poppedState = state.popCallStack();
+            SymbolicState poppedState = state.popCallStack().clone();
             // If the popped state is a definition statement, we still need to complete the
             // assignment using the return value of the method that just finished execution
             if (poppedState.getStmt() instanceof AbstractDefinitionStmt) {
@@ -484,10 +484,11 @@ public class SymbolicExecutor {
     /**
      * Execute a method call, either symbolically or concretely.
      * 
-     * @return <code>true</code> if the method was executed concretely,
-     *         <code>false</code> if it was executed symbolically
+     * @return A new symbolic state if the method was executed symbolically, or
+     *         an empty optional if the method was executed concretely (meaning you
+     *         should continue with whatever state you called this method with)
      */
-    private boolean executeMethod(SymbolicState state, AbstractInvokeExpr expr) {
+    private Optional<SymbolicState> executeMethod(SymbolicState state, AbstractInvokeExpr expr) {
         if (expr instanceof JDynamicInvokeExpr) {
             throw new UnsupportedOperationException("Dynamic invocation is not supported");
         }
@@ -496,42 +497,44 @@ public class SymbolicExecutor {
         Optional<JavaSootMethod> methodOpt = analyzer.tryGetSootMethod(expr.getMethodSignature());
         // If available internally, we can symbolically execute it
         if (methodOpt.isPresent()) {
-            executeSymbolic(state, methodOpt.get(), expr, base);
-            return false;
+            return executeSymbolic(state, methodOpt.get(), expr, base);
         }
         // Otherwise, execute it concretely
         else {
             executeConcrete(state, expr, base);
-            return true;
+            return Optional.empty();
         }
     }
 
     /** Execute a method call symbolically. */
-    private void executeSymbolic(SymbolicState state, JavaSootMethod method, AbstractInvokeExpr expr, Local base) {
-        // Turn the current state into the state for the method call
-        // That is, we push a clone of the current state onto the call stack
-        SymbolicState clone = state.clone();
-        state.pushCallStack(clone);
-        state.setCFG(analyzer.getCFG(method));
-        state.setMethodType(MethodType.CALLEE);
+    private Optional<SymbolicState> executeSymbolic(SymbolicState state, JavaSootMethod method, AbstractInvokeExpr expr,
+            Local base) {
+        // Create a fresh state that will enter the method call
+        SymbolicState callee = new SymbolicState(ctx, analyzer.getCFG(method));
+        callee.pushCallStack(state);
+        callee.setMethodType(MethodType.CALLEE);
+        // Copy the heap counter to avoid interference with path constraints when
+        // restoring the caller state from the call stack
+        callee.heap.setHeapCounter(state.heap.getHeapCounter());
 
         // TODO: make sure the objects are shared between the states
 
-        // Set the instance reference to "this"
+        // Copy object reference for "this" (if needed)
         if (base != null) {
             Expr<?> symRef = state.lookup(base.getName());
-            state.assign("this", symRef);
+            callee.assign("this", symRef);
         }
 
-        // Set the arguments for the method call
+        // Copy arguments for the method call to the fresh state
         List<Immediate> args = expr.getArgs();
         for (int i = 0; i < args.size(); i++) {
             Immediate arg = args.get(i);
             Expr<?> argExpr = jimpleToZ3.transform(arg, state);
-            state.assign(ArgMap.getSymbolicName(MethodType.CALLEE, i), argExpr);
+            callee.assign(ArgMap.getSymbolicName(MethodType.CALLEE, i), argExpr);
         }
 
         // Actual execution will be done by {@link DSEController}!
+        return Optional.of(callee);
     }
 
     /** Execute a method call concretely. */

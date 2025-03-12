@@ -76,6 +76,14 @@ public class SymbolicHeap {
         this.arrayIndices = new HashMap<>(arrayIndices);
     }
 
+    public int getHeapCounter() {
+        return heapCounter;
+    }
+
+    public void setHeapCounter(int heapCounter) {
+        this.heapCounter = heapCounter;
+    }
+
     public HeapObject get(String var) {
         return get(newRef(var));
     }
