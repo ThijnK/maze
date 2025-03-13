@@ -20,4 +20,9 @@ public class BFS extends ConcreteSearchStrategy {
     public PathConditionCandidate next() {
         return candidates.isEmpty() ? null : candidates.remove();
     }
+
+    @Override
+    public void reset() {
+        candidates.clear();
+    }
 }

@@ -61,4 +61,10 @@ public class RandomPathSearch extends SymbolicSearchStrategy {
             }
         }
     }
+
+    @Override
+    public void reset() {
+        tree = null;
+        current = null;
+    }
 }

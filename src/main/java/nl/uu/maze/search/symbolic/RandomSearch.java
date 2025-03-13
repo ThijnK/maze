@@ -29,4 +29,9 @@ public class RandomSearch extends SymbolicSearchStrategy {
     public void add(Collection<SymbolicState> newStates) {
         states.addAll(newStates);
     }
+
+    @Override
+    public void reset() {
+        states.clear();
+    }
 }

@@ -149,6 +149,7 @@ public class DSEController {
             } else {
                 runSymbolicDriven(method, (SymbolicSearchStrategy) searchStrategy);
             }
+            searchStrategy.reset();
         }
 
         generator.writeToFile(outPath);

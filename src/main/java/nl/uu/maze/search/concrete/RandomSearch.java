@@ -23,4 +23,9 @@ public class RandomSearch extends ConcreteSearchStrategy {
     public PathConditionCandidate next() {
         return candidates.isEmpty() ? null : candidates.remove(random.nextInt(candidates.size()));
     }
+
+    @Override
+    public void reset() {
+        candidates.clear();
+    }
 }

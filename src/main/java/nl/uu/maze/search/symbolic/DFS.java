@@ -20,4 +20,9 @@ public class DFS extends SymbolicSearchStrategy {
     public SymbolicState next() {
         return states.isEmpty() ? null : states.pop();
     }
+
+    @Override
+    public void reset() {
+        states.clear();
+    }
 }
