@@ -72,16 +72,6 @@ public class SymbolicExecutor {
     }
 
     /**
-     * Execute a single step of symbolic execution on the given symbolic state.
-     * 
-     * @param state The symbolic state
-     * @return A list of successor symbolic states
-     */
-    public List<SymbolicState> step(SymbolicState state) {
-        return step(state, false);
-    }
-
-    /**
      * Execute a single step of symbolic execution on the symbolic state.
      * If replaying a trace, follows the branch indicated by the trace.
      * 

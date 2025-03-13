@@ -1,7 +1,5 @@
 package nl.uu.maze.execution;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.nio.file.Path;
@@ -44,6 +42,8 @@ public class DSEController {
     private final boolean concreteDriven;
     private final Path outPath;
     private final SearchStrategy searchStrategy;
+    /** Search strategy used for symbolic replay of a trace (DFS). */
+    private final SymbolicSearchStrategy replayStrategy;
     private final JavaAnalyzer analyzer;
     private final Context ctx;
     private final JavaClassType classType;
@@ -87,7 +87,7 @@ public class DSEController {
         this.concreteDriven = concreteDriven;
         this.instrumented = concreteDriven ? BytecodeInstrumenter.instrument(classPath, className) : null;
         searchStrategy = SearchStrategyFactory.getStrategy(concreteDriven, strategyName);
-        logger.info("Using search strategy: " + searchStrategy.getClass().getSimpleName());
+        replayStrategy = (SymbolicSearchStrategy) SearchStrategyFactory.getStrategy(false, "DFS");
 
         this.ctx = new Context();
         Z3Sorts.initialize(ctx);
@@ -125,13 +125,6 @@ public class DSEController {
             ctorCfg = analyzer.getCFG(ctorSoot);
             initStates = new HashMap<Integer, SymbolicState>();
             logger.info("Using constructor: " + ctorSoot.getSignature());
-
-            // TDOO: can move this to runSymbolicDriven
-            if (!concreteDriven) {
-                SymbolicState initialState = new SymbolicState(ctx, ctorSoot.getSignature(), ctorCfg);
-                initialState.setMethodType(MethodType.CTOR);
-                initStates.put(initialState.hashCode(), initialState);
-            }
         }
 
         for (JavaSootMethod method : methods) {
@@ -152,8 +145,21 @@ public class DSEController {
         generator.writeToFile(outPath);
     }
 
-    /** Run symbolic-driven DSE on the given method. */
+    /**
+     * Run symbolic-driven DSE on the given method, evaluating and generating test
+     * cases for the final states found.
+     */
     private void runSymbolicDriven(JavaSootMethod method, SymbolicSearchStrategy searchStrategy) throws Exception {
+        List<SymbolicState> finalStates = runSymbolic(method, searchStrategy);
+        List<ArgMap> argMap = validator.evaluate(finalStates);
+        generator.addMethodTestCases(method, ctorSoot, argMap);
+    }
+
+    /**
+     * Run symbolic-driven DSE on the given method, returning the final states
+     * found.
+     */
+    private List<SymbolicState> runSymbolic(JavaSootMethod method, SymbolicSearchStrategy searchStrategy) {
         StmtGraph<?> cfg = analyzer.getCFG(method);
         List<SymbolicState> finalStates = new ArrayList<>();
 
@@ -163,17 +169,44 @@ public class DSEController {
             searchStrategy.add(new SymbolicState(ctx, method.getSignature(), cfg));
         } else {
             logger.debug("Executing constructor: " + ctorSoot.getName());
-            // Clone the ctor states to avoid modifying the original in subsequent execution
-            // and set their current statement to the starting statement of the target
-            // method
-            for (SymbolicState state : initStates.values()) {
-                SymbolicState newState = state.clone();
-                // Only if the state was the final constructor state, set the current statement
-                // to the starting statement of the target method
-                if (!state.getMethodType().isCtor()) {
-                    newState.setMethod(method.getSignature(), cfg);
+            // For concrete-driven, we'll be replaying a trace, so if the ctor has been
+            // explored along this path before, we can reuse, otherwise we start from
+            // scratch
+            if (concreteDriven) {
+                int pathHash = TraceManager.hashCode(ctorSoot.getSignature());
+                // In this case, if the initStates has a state for this path hash, it means it
+                // was the final state in the ctor, so immediately switch to the target method
+                if (initStates.containsKey(pathHash)) {
+                    SymbolicState state = initStates.get(pathHash).clone();
+                    state.setMethod(method.getSignature(), cfg);
+                    searchStrategy.add(state);
+                } else {
+                    SymbolicState state = new SymbolicState(ctx, ctorSoot.getSignature(), ctorCfg);
+                    state.setMethodType(MethodType.CTOR);
+                    searchStrategy.add(state);
                 }
-                searchStrategy.add(newState);
+            }
+            // For symbolic-driven, we start with the entire front of states from the ctor,
+            // if available
+            // If not available, simply start at the beginning of the ctor
+            else {
+                if (initStates.isEmpty()) {
+                    SymbolicState state = new SymbolicState(ctx, ctorSoot.getSignature(), ctorCfg);
+                    state.setMethodType(MethodType.CTOR);
+                    searchStrategy.add(state);
+                } else {
+                    for (SymbolicState state : initStates.values()) {
+                        // Clone the state to avoid modifying the original, so that those can be reused
+                        // for other methods
+                        SymbolicState newState = state.clone();
+                        // Only if the state was the final constructor state, set the current statement
+                        // to the starting statement of the target method
+                        if (!state.getMethodType().isCtor()) {
+                            newState.setMethod(method.getSignature(), cfg);
+                        }
+                        searchStrategy.add(newState);
+                    }
+                }
             }
         }
 
@@ -190,16 +223,18 @@ public class DSEController {
 
             // Symbolically execute the current statement of the selected symbolic state to
             // be processed
-            int currHash = current.hashCode();
-            List<SymbolicState> newStates = symbolic.step(current);
+            int currHash = concreteDriven ? TraceManager.hashCode(current.getMethodSignature()) : current.hashCode();
+            List<SymbolicState> newStates = symbolic.step(current, concreteDriven);
             // Unless it's the ctor, we can simply add the new states and continue
             if (!current.getMethodType().isCtor()) {
                 searchStrategy.add(newStates);
             } else {
                 initStates.remove(currHash);
-                // If any of the new states are final states, set their current
+                // If any of the new ctor states are final states, set their current
                 // statement to the starting statement of the target method
                 for (SymbolicState state : newStates) {
+                    int hashCode = concreteDriven ? TraceManager.hashCode(state.getMethodSignature())
+                            : state.hashCode();
                     if (state.isFinalState()) {
                         // If the state is an exception-throwing state, immediately add it to the
                         // final states, or if it is infeasible, skip it
@@ -213,75 +248,23 @@ public class DSEController {
                         state.setMethodType(MethodType.METHOD);
                         // Clone the state to avoid modifying the original in subsequent execution (want
                         // to reuse this final ctor state for multiple methods)
-                        initStates.put(state.hashCode(), state.clone());
+                        initStates.put(hashCode, state.clone());
                         logger.debug("Switching to target method: " + method.getName());
                         state.setMethod(method.getSignature(), cfg);
                         searchStrategy.add(state);
                     } else {
-                        initStates.put(state.hashCode(), state);
+                        initStates.put(hashCode, state);
                         searchStrategy.add(state);
                     }
                 }
             }
-
         }
 
-        List<ArgMap> argMap = validator.evaluate(finalStates);
-        generator.addMethodTestCases(method, ctorSoot, argMap);
-    }
-
-    /** Replay a trace symbolically. */
-    private SymbolicState replaySymbolic(StmtGraph<?> cfg, JavaSootMethod method)
-            throws FileNotFoundException, IOException, Exception {
-        SymbolicState current;
-        int pathHash = 0;
-        if (method.isStatic()) {
-            // Start immediately with target method
-            current = new SymbolicState(ctx, method.getSignature(), cfg);
-        } else {
-            // Start with constructor
-            pathHash = TraceManager.hashCode(ctorSoot.getSignature());
-            // If the ctor has been explored along this path before, reuse final state
-            if (initStates.containsKey(pathHash)) {
-                current = initStates.get(pathHash).clone();
-                current.setMethod(method.getSignature(), cfg);
-            } else {
-                current = new SymbolicState(ctx, ctorSoot.getSignature(), ctorCfg);
-                current.setMethodType(MethodType.CTOR);
-            }
-        }
-
-        while (current.getMethodType().isCtor() || !current.isFinalState()) {
-            logger.debug("Current state: " + current);
-            logger.debug("Next stmt: " + current.getStmt());
-            List<SymbolicState> newStates = symbolic.step(current, true);
-            // Note: newStates will always contain exactly one element, because we are
-            // replaying a trace
-            current = newStates.get(0);
-            // At the end of the ctor, start with the target method
-            if (current.getMethodType().isCtor() && current.isFinalState()) {
-                // If the state is an exception-throwing state, we stop immediately
-                if (current.isExceptionThrown() || current.isInfeasible()) {
-                    if (!current.isInfeasible())
-                        initStates.put(pathHash, current);
-                    break;
-                }
-
-                current.setMethodType(MethodType.METHOD);
-                // Save the final ctor state for reuse in other methods
-                initStates.put(pathHash, current.clone());
-                logger.debug("Switching to target method: " + method.getName());
-                current.setMethod(method.getSignature(), cfg);
-            }
-        }
-
-        logger.debug("Replayed state: " + current);
-        return current;
+        return finalStates;
     }
 
     /** Run concrete-driven DSE on the given method. */
     private void runConcreteDriven(JavaSootMethod method, ConcreteSearchStrategy searchStrategy) throws Exception {
-        StmtGraph<?> cfg = analyzer.getCFG(method);
         Method javaMethod = analyzer.getJavaMethod(method, instrumented);
         ArgMap argMap = new ArgMap();
 
@@ -289,7 +272,8 @@ public class DSEController {
             // Concrete execution followed by symbolic replay
             TraceManager.clearEntries();
             concrete.execute(ctor, javaMethod, argMap);
-            SymbolicState finalState = replaySymbolic(cfg, method);
+            // Assume symbolic replay will produce a single final state
+            SymbolicState finalState = runSymbolic(method, replayStrategy).getFirst();
             if (finalState.isInfeasible()) {
                 // It should not be possible for a final state to be infeasible, because we're
                 // replaying a concrete execution
