@@ -37,20 +37,39 @@ public abstract class PathConstraint {
     }
 
     /**
-     * Represents a path constraint for a switch statement, which consists of an
-     * expression and a list of possible values for said expression.
+     * Represents a path constraint for where an expression is equal to one of a
+     * list of possible values.
+     * The expression, its possible values, and the index in the list of values are
+     * stored.
+     * If the index is -1, the expression is distinct from all values (relevant for
+     * default case of switch statements).
      */
-    public static class SwitchConstraint extends PathConstraint {
+    public static class CompositeConstraint extends PathConstraint {
         private static final Context ctx = Z3ContextProvider.getContext();
 
         private final Expr<?> expr;
         private final Expr<?>[] values;
         private int index;
+        private int minIndex;
+        private boolean allowDefault;
         private BoolExpr constraint;
 
-        public SwitchConstraint(Expr<?> expr, Expr<?>[] values, int index) {
+        /**
+         * Create a new composite constraint.
+         * 
+         * @param expr         The expression to constrain
+         * @param values       The possible values for the expression
+         * @param index        The index of the value that the expression should be
+         *                     equal to
+         * @param allowDefault Whether a default case where the expression is distinct
+         *                     from all values is allowed (<code>true</code> for switch
+         *                     statements)
+         */
+        public CompositeConstraint(Expr<?> expr, Expr<?>[] values, int index, boolean allowDefault) {
             this.expr = expr;
             this.values = values;
+            this.allowDefault = allowDefault;
+            this.minIndex = allowDefault ? -1 : 0;
             setIndex(index);
         }
 
@@ -79,8 +98,17 @@ public abstract class PathConstraint {
             return constraint;
         }
 
-        public int getNumValues() {
-            return values.length;
+        /**
+         * Get a list of possible indices for this constraint, excluding the current
+         * one.
+         */
+        public List<Integer> getPossibleIndices() {
+            List<Integer> possibleIndices = new ArrayList<>();
+            for (int i = minIndex; i < values.length; i++) {
+                if (i != index)
+                    possibleIndices.add(i);
+            }
+            return possibleIndices;
         }
 
         public int getIndex() {
@@ -88,14 +116,14 @@ public abstract class PathConstraint {
         }
 
         public void setIndex(int index) {
-            if (index < -1 || index >= values.length) {
+            if (index < minIndex || index >= values.length) {
                 throw new IllegalArgumentException("Invalid index for switch constraint");
             }
             this.index = index;
         }
 
-        public SwitchConstraint clone() {
-            return new SwitchConstraint(expr, values, index);
+        public CompositeConstraint clone() {
+            return new CompositeConstraint(expr, values, index, allowDefault);
         }
     }
 }

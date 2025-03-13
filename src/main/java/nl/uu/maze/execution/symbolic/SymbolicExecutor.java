@@ -22,7 +22,7 @@ import nl.uu.maze.execution.ArgMap.ObjectRef;
 import nl.uu.maze.execution.MethodType;
 import nl.uu.maze.execution.concrete.ConcreteExecutor;
 import nl.uu.maze.execution.concrete.ObjectInstantiator;
-import nl.uu.maze.execution.symbolic.PathConstraint.SwitchConstraint;
+import nl.uu.maze.execution.symbolic.PathConstraint.CompositeConstraint;
 import nl.uu.maze.execution.symbolic.SymbolicHeap.*;
 import nl.uu.maze.instrument.TraceManager;
 import nl.uu.maze.instrument.TraceManager.TraceEntry;
@@ -181,8 +181,8 @@ public class SymbolicExecutor {
 
             TraceEntry entry = TraceManager.consumeEntry(state.getMethodSignature());
             int branchIndex = entry.getValue();
-            SwitchConstraint constraint = new SwitchConstraint(var, values,
-                    branchIndex >= cases.size() ? -1 : branchIndex);
+            CompositeConstraint constraint = new CompositeConstraint(var, values,
+                    branchIndex >= cases.size() ? -1 : branchIndex, true);
             state.addPathConstraint(constraint);
             state.setStmt(succs.get(branchIndex));
             newStates.add(state);
@@ -194,7 +194,7 @@ public class SymbolicExecutor {
                 SymbolicState newState = i == succs.size() - 1 ? state : state.clone();
 
                 // Last successor is the default case
-                SwitchConstraint constraint = new SwitchConstraint(var, values, i >= cases.size() ? -1 : i);
+                CompositeConstraint constraint = new CompositeConstraint(var, values, i >= cases.size() ? -1 : i, true);
                 newState.addPathConstraint(constraint);
                 newState.setStmt(succs.get(i));
                 newStates.add(newState);

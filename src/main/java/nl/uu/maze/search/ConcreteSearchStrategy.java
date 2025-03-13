@@ -12,7 +12,7 @@ import nl.uu.maze.execution.symbolic.PathConstraint;
 import nl.uu.maze.execution.symbolic.SymbolicState;
 import nl.uu.maze.execution.symbolic.SymbolicStateValidator;
 import nl.uu.maze.execution.symbolic.PathConstraint.SingleConstraint;
-import nl.uu.maze.execution.symbolic.PathConstraint.SwitchConstraint;
+import nl.uu.maze.execution.symbolic.PathConstraint.CompositeConstraint;
 import nl.uu.maze.util.Z3Utils;
 
 /**
@@ -49,13 +49,9 @@ public abstract class ConcreteSearchStrategy implements SearchStrategy {
         for (int i = 0; i < length; i++) {
             PathConstraint constraint = pathConstraints.get(i);
             // For switch constraints, we want one candidate for every possible value
-            if (constraint instanceof SwitchConstraint) {
-                SwitchConstraint switchConstraint = (SwitchConstraint) constraint;
-                // Note that the loop starts at index -1, because that's for default case
-                for (int j = -1; j < switchConstraint.getNumValues(); j++) {
-                    if (j != switchConstraint.getIndex()) {
-                        add(new PathConditionCandidate(pathConstraints, i, j));
-                    }
+            if (constraint instanceof CompositeConstraint) {
+                for (Integer j : ((CompositeConstraint) constraint).getPossibleIndices()) {
+                    add(new PathConditionCandidate(pathConstraints, i, j));
                 }
             } else {
                 add(new PathConditionCandidate(pathConstraints, i));
@@ -155,8 +151,8 @@ public abstract class ConcreteSearchStrategy implements SearchStrategy {
             PathConstraint constraint = pathConstraints.get(index);
             // Make a copy of the path constraints to avoid modifying the original list
             pathConstraints = new ArrayList<>(pathConstraints);
-            if (constraint instanceof SwitchConstraint) {
-                SwitchConstraint negated = ((SwitchConstraint) constraint).clone();
+            if (constraint instanceof CompositeConstraint) {
+                CompositeConstraint negated = ((CompositeConstraint) constraint).clone();
                 negated.setIndex(subIndex);
                 pathConstraints.set(index, negated);
             } else {
