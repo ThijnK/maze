@@ -5,7 +5,6 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 
@@ -24,6 +23,7 @@ import nl.uu.maze.execution.MethodType;
 import nl.uu.maze.execution.concrete.ConcreteExecutor;
 import nl.uu.maze.execution.concrete.ObjectInstantiator;
 import nl.uu.maze.execution.symbolic.SymbolicHeap.*;
+import nl.uu.maze.instrument.TraceManager;
 import nl.uu.maze.instrument.TraceManager.TraceEntry;
 import nl.uu.maze.transform.JavaToZ3Transformer;
 import nl.uu.maze.transform.JimpleToZ3Transformer;
@@ -78,48 +78,46 @@ public class SymbolicExecutor {
      * @return A list of successor symbolic states
      */
     public List<SymbolicState> step(SymbolicState state) {
-        return step(state, null);
+        return step(state, false);
     }
 
     /**
      * Execute a single step of symbolic execution on the symbolic state.
      * If replaying a trace, follows the branch indicated by the trace.
      * 
-     * @param state    The current symbolic state
-     * @param iterator The iterator over the trace entries or <code>null</code> if
-     *                 not replaying a trace
+     * @param state  The current symbolic state
+     * @param replay Whether to replay a trace
      * @return A list of successor symbolic states
      */
-    public List<SymbolicState> step(SymbolicState state, Iterator<TraceEntry> iterator) {
+    public List<SymbolicState> step(SymbolicState state, boolean replay) {
         Stmt stmt = state.getStmt();
 
         if (stmt instanceof JIfStmt)
-            return handleIfStmt((JIfStmt) stmt, state, iterator);
+            return handleIfStmt((JIfStmt) stmt, state, replay);
         else if (stmt instanceof JSwitchStmt)
-            return handleSwitchStmt((JSwitchStmt) stmt, state, iterator);
+            return handleSwitchStmt((JSwitchStmt) stmt, state, replay);
         else if (stmt instanceof AbstractDefinitionStmt)
-            return handleDefStmt((AbstractDefinitionStmt) stmt, state, iterator);
+            return handleDefStmt((AbstractDefinitionStmt) stmt, state, replay);
         else if (stmt instanceof JInvokeStmt)
-            return handleInvokeStmt(stmt.getInvokeExpr(), state, iterator);
+            return handleInvokeStmt(stmt.getInvokeExpr(), state, replay);
         else if (stmt instanceof JThrowStmt) {
             state.setExceptionThrown();
-            return handleOtherStmts(state, iterator);
+            return handleOtherStmts(state, replay);
         } else if (stmt instanceof JReturnStmt)
-            return handleReturnStmt((JReturnStmt) stmt, state, iterator);
+            return handleReturnStmt((JReturnStmt) stmt, state, replay);
         else
-            return handleOtherStmts(state, iterator);
+            return handleOtherStmts(state, replay);
     }
 
     /**
      * Symbolically execute an if statement.
      * 
-     * @param stmt     The if statement as a Jimple statement ({@link JIfStmt})
-     * @param state    The current symbolic state
-     * @param iterator The iterator over the trace entries or <code>null</code> if
-     *                 not replaying a trace
+     * @param stmt   The if statement as a Jimple statement ({@link JIfStmt})
+     * @param state  The current symbolic state
+     * @param replay Whether to replay a trace
      * @return A list of successor symbolic states after executing the if statement
      */
-    private List<SymbolicState> handleIfStmt(JIfStmt stmt, SymbolicState state, Iterator<TraceEntry> iterator) {
+    private List<SymbolicState> handleIfStmt(JIfStmt stmt, SymbolicState state, boolean replay) {
         // Split the state if the condition contains a symbolic reference with multiple
         // aliases (i.e. reference comparisons)
         Expr<?> symRef = refExtractor.extract(stmt.getCondition(), state);
@@ -133,16 +131,16 @@ public class SymbolicExecutor {
         List<SymbolicState> newStates = new ArrayList<SymbolicState>();
 
         // If replaying a trace, follow the branch indicated by the trace
-        if (iterator != null) {
-            // If end of iterator is reached, it means exception was thrown
-            if (!iterator.hasNext()) {
+        if (replay) {
+            // If end of trace is reached, it means exception was thrown
+            if (!TraceManager.hasEntries(state.getMethodSignature())) {
                 // Set this state as an exceptional state and return it so it will be counted as
                 // a final state
                 state.setExceptionThrown();
                 return List.of(state);
             }
 
-            TraceEntry entry = iterator.next();
+            TraceEntry entry = TraceManager.consumeEntry(state.getMethodSignature());
             int branchIndex = entry.getValue();
             state.addPathConstraint(branchIndex == 0 ? Z3Utils.negate(ctx, cond) : cond);
             state.setStmt(succs.get(branchIndex));
@@ -168,28 +166,27 @@ public class SymbolicExecutor {
     /**
      * Symbolically execute a switch statement.
      * 
-     * @param stmt     The switch statement as a Jimple statement
-     *                 ({@link JSwitchStmt})
-     * @param state    The current symbolic state
-     * @param iterator The iterator over the trace entries or <code>null</code> if
-     *                 not replaying a trace
+     * @param stmt   The switch statement as a Jimple statement
+     *               ({@link JSwitchStmt})
+     * @param state  The current symbolic state
+     * @param replay Whether to replay a trace
      * @return A list of successor symbolic states after executing the switch
      */
-    private List<SymbolicState> handleSwitchStmt(JSwitchStmt stmt, SymbolicState state, Iterator<TraceEntry> iterator) {
+    private List<SymbolicState> handleSwitchStmt(JSwitchStmt stmt, SymbolicState state, boolean replay) {
         List<Stmt> succs = state.getSuccessors();
         Expr<?> var = state.lookup(stmt.getKey().toString());
         List<IntConstant> values = stmt.getValues();
         List<SymbolicState> newStates = new ArrayList<SymbolicState>();
 
         // If replaying a trace, follow the branch indicated by the trace
-        if (iterator != null) {
-            // If end of iterator is reached, it means exception was thrown
-            if (!iterator.hasNext()) {
+        if (replay) {
+            // If end of trace is reached, it means exception was thrown
+            if (!TraceManager.hasEntries(state.getMethodSignature())) {
                 state.setExceptionThrown();
                 return List.of(state);
             }
 
-            TraceEntry entry = iterator.next();
+            TraceEntry entry = TraceManager.consumeEntry(state.getMethodSignature());
             int branchIndex = entry.getValue();
             if (branchIndex >= values.size()) {
                 // Default case constraint is the negation of all other constraints
@@ -236,15 +233,13 @@ public class SymbolicExecutor {
     /**
      * Symbolically execute a definition statement (assign or identity).
      * 
-     * @param stmt     The definition statement
-     * @param state    The current symbolic state
-     * @param iterator The iterator over the trace entries or <code>null</code> if
-     *                 not replaying a trace
+     * @param stmt   The definition statement
+     * @param state  The current symbolic state
+     * @param replay Whether to replay a trace
      * @return A list of successor symbolic states after executing the definition
      *         statement
      */
-    private List<SymbolicState> handleDefStmt(AbstractDefinitionStmt stmt, SymbolicState state,
-            Iterator<TraceEntry> iterator) {
+    private List<SymbolicState> handleDefStmt(AbstractDefinitionStmt stmt, SymbolicState state, boolean replay) {
         // If either the lhs or the rhs contains a symbolic reference (e.g., an object
         // or array reference) with more than one potential alias, then we split the
         // state into one state for each alias, and set the symbolic reference to the
@@ -275,14 +270,15 @@ public class SymbolicExecutor {
                 BitVecExpr len = (BitVecExpr) state.heap.getArrayLength(ref.getBase().getName());
                 if (len == null) {
                     // If length is null, means we have a null reference, and exception is thrown
-                    return handleOtherStmts(state, iterator);
+                    return handleOtherStmts(state, replay);
                 }
 
                 // If replaying a trace, we should have a trace entry for the array access
-                if (iterator != null) {
+                if (replay) {
                     TraceEntry entry;
-                    // If end of iterator is reached or not an array access, something is wrong
-                    if (!iterator.hasNext() || !(entry = iterator.next()).isArrayAccess()) {
+                    // If end of trace is reached or not an array access, something is wrong
+                    if (!TraceManager.hasEntries(state.getMethodSignature())
+                            || !(entry = TraceManager.consumeEntry(state.getMethodSignature())).isArrayAccess()) {
                         state.setExceptionThrown();
                         return List.of(state);
                     }
@@ -292,7 +288,7 @@ public class SymbolicExecutor {
                         state.addPathConstraint(ctx.mkOr(ctx.mkBVSLT(index, ctx.mkBV(0, sorts.getIntBitSize())),
                                 ctx.mkBVSGE(index, len)));
                         state.setExceptionThrown();
-                        return handleOtherStmts(state, iterator);
+                        return handleOtherStmts(state, replay);
                     } else {
                         state.addPathConstraint(ctx.mkAnd(ctx.mkBVSGE(index, ctx.mkBV(0, sorts.getIntBitSize())),
                                 ctx.mkBVSLT(index, len)));
@@ -354,10 +350,10 @@ public class SymbolicExecutor {
         }
 
         // Definition statements follow the same control flow as other statements
-        List<SymbolicState> succStates = handleOtherStmts(state, iterator);
+        List<SymbolicState> succStates = handleOtherStmts(state, replay);
         // For optional out of bounds state, check successors for potential catch blocks
         if (outOfBoundsState != null) {
-            succStates.addAll(handleOtherStmts(outOfBoundsState, iterator));
+            succStates.addAll(handleOtherStmts(outOfBoundsState, replay));
         }
         return succStates;
     }
@@ -365,14 +361,12 @@ public class SymbolicExecutor {
     /**
      * Symbolically or concretely execute an invoke statement.
      * 
-     * @param expr     The invoke expression ({@link AbstractInvokeExpr})
-     * @param state    The current symbolic state
-     * @param iterator The iterator over the trace entries or <code>null</code> if
-     *                 not replaying a trace
+     * @param expr   The invoke expression ({@link AbstractInvokeExpr})
+     * @param state  The current symbolic state
+     * @param replay Whether to replay a trace
      * @return A list of successor symbolic states after executing the invocation
      */
-    private List<SymbolicState> handleInvokeStmt(AbstractInvokeExpr expr, SymbolicState state,
-            Iterator<TraceEntry> iterator) {
+    private List<SymbolicState> handleInvokeStmt(AbstractInvokeExpr expr, SymbolicState state, boolean replay) {
         // Resolve aliases
         Expr<?> symRef = refExtractor.extract(expr, state);
         Optional<List<SymbolicState>> splitStates = splitOnAliases(state, symRef);
@@ -384,7 +378,7 @@ public class SymbolicExecutor {
         Optional<SymbolicState> callee = executeMethod(state, expr);
         // If executed concretely, immediately continue with the next statement
         if (callee.isEmpty()) {
-            return handleOtherStmts(state, iterator);
+            return handleOtherStmts(state, replay);
         }
         return List.of(callee.get());
     }
@@ -392,14 +386,13 @@ public class SymbolicExecutor {
     /**
      * Handle non-void return statements by storing the return value.
      * 
-     * @param stmt     The return statement as a Jimple statement
-     *                 ({@link JReturnStmt})
-     * @param state    The current symbolic state
-     * @param iterator The iterator over the trace entries or <code>null</code> if
-     *                 not replaying a trace
+     * @param stmt   The return statement as a Jimple statement
+     *               ({@link JReturnStmt})
+     * @param state  The current symbolic state
+     * @param replay Whether to replay a trace
      * @return A list of successor symbolic states after executing the return
      */
-    private List<SymbolicState> handleReturnStmt(JReturnStmt stmt, SymbolicState state, Iterator<TraceEntry> iterator) {
+    private List<SymbolicState> handleReturnStmt(JReturnStmt stmt, SymbolicState state, boolean replay) {
         Immediate op = stmt.getOp();
         // If the op is a local referring to (part of) a multidimensional array, we need
         // to know the arrayIndices entry for the return value
@@ -409,18 +402,17 @@ public class SymbolicExecutor {
         }
         Expr<?> value = jimpleToZ3.transform(op, state);
         state.setReturnValue(value);
-        return handleOtherStmts(state, iterator);
+        return handleOtherStmts(state, replay);
     }
 
     /**
      * Return a list of successor symbolic states for the current statement.
      * 
-     * @param state    The current symbolic state
-     * @param iterator The iterator over the trace entries or <code>null</code> if
-     *                 not replaying a trace
+     * @param state  The current symbolic state
+     * @param replay Whether to replay a trace
      * @return A list of successor symbolic states
      */
-    private List<SymbolicState> handleOtherStmts(SymbolicState state, Iterator<TraceEntry> iterator) {
+    private List<SymbolicState> handleOtherStmts(SymbolicState state, boolean replay) {
         List<SymbolicState> newStates = new ArrayList<SymbolicState>();
         List<Stmt> succs = state.getSuccessors();
 
@@ -465,9 +457,9 @@ public class SymbolicExecutor {
                 if (returnValue != null && sorts.isRef(returnValue)) {
                     caller.heap.linkHeapObject(returnValue, state.heap);
                 }
-                return handleDefStmt((AbstractDefinitionStmt) caller.getStmt(), caller, iterator);
+                return handleDefStmt((AbstractDefinitionStmt) caller.getStmt(), caller, replay);
             }
-            return handleOtherStmts(caller, iterator);
+            return handleOtherStmts(caller, replay);
 
         }
 
@@ -549,7 +541,7 @@ public class SymbolicExecutor {
     private Optional<SymbolicState> executeSymbolic(SymbolicState state, JavaSootMethod method, AbstractInvokeExpr expr,
             Local base) {
         // Create a fresh state that will enter the method call
-        SymbolicState callee = new SymbolicState(ctx, analyzer.getCFG(method));
+        SymbolicState callee = new SymbolicState(ctx, method.getSignature(), analyzer.getCFG(method));
         callee.setCaller(state);
         callee.setMethodType(MethodType.CALLEE);
         // Also set the constraints to be the same as the caller state

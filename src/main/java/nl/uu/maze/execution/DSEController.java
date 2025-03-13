@@ -7,7 +7,6 @@ import java.lang.reflect.Method;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -22,12 +21,9 @@ import com.microsoft.z3.Model;
 
 import nl.uu.maze.analysis.JavaAnalyzer;
 import nl.uu.maze.execution.concrete.ConcreteExecutor;
-import nl.uu.maze.execution.symbolic.SymbolicExecutor;
-import nl.uu.maze.execution.symbolic.SymbolicState;
-import nl.uu.maze.execution.symbolic.SymbolicStateValidator;
+import nl.uu.maze.execution.symbolic.*;
 import nl.uu.maze.generation.JUnitTestGenerator;
 import nl.uu.maze.instrument.*;
-import nl.uu.maze.instrument.TraceManager.TraceEntry;
 import nl.uu.maze.search.*;
 import nl.uu.maze.util.Z3Sorts;
 import sootup.core.graph.StmtGraph;
@@ -130,8 +126,9 @@ public class DSEController {
             initStates = new HashMap<Integer, SymbolicState>();
             logger.info("Using constructor: " + ctorSoot.getSignature());
 
+            // TDOO: can move this to runSymbolicDriven
             if (!concreteDriven) {
-                SymbolicState initialState = new SymbolicState(ctx, ctorCfg);
+                SymbolicState initialState = new SymbolicState(ctx, ctorSoot.getSignature(), ctorCfg);
                 initialState.setMethodType(MethodType.CTOR);
                 initStates.put(initialState.hashCode(), initialState);
             }
@@ -163,7 +160,7 @@ public class DSEController {
         // If static, start with target method, otherwise start with constructor
         if (method.isStatic()) {
             logger.debug("Executing target method: " + method.getName());
-            searchStrategy.add(new SymbolicState(ctx, cfg));
+            searchStrategy.add(new SymbolicState(ctx, method.getSignature(), cfg));
         } else {
             logger.debug("Executing constructor: " + ctorSoot.getName());
             // Clone the ctor states to avoid modifying the original in subsequent execution
@@ -174,7 +171,7 @@ public class DSEController {
                 // Only if the state was the final constructor state, set the current statement
                 // to the starting statement of the target method
                 if (!state.getMethodType().isCtor()) {
-                    newState.setCFG(cfg);
+                    newState.setMethod(method.getSignature(), cfg);
                 }
                 searchStrategy.add(newState);
             }
@@ -195,7 +192,10 @@ public class DSEController {
             // be processed
             int currHash = current.hashCode();
             List<SymbolicState> newStates = symbolic.step(current);
-            if (current.getMethodType().isCtor()) {
+            // Unless it's the ctor, we can simply add the new states and continue
+            if (!current.getMethodType().isCtor()) {
+                searchStrategy.add(newStates);
+            } else {
                 initStates.remove(currHash);
                 // If any of the new states are final states, set their current
                 // statement to the starting statement of the target method
@@ -215,15 +215,13 @@ public class DSEController {
                         // to reuse this final ctor state for multiple methods)
                         initStates.put(state.hashCode(), state.clone());
                         logger.debug("Switching to target method: " + method.getName());
-                        state.setCFG(cfg);
+                        state.setMethod(method.getSignature(), cfg);
                         searchStrategy.add(state);
                     } else {
                         initStates.put(state.hashCode(), state);
                         searchStrategy.add(state);
                     }
                 }
-            } else {
-                searchStrategy.add(newStates);
             }
 
         }
@@ -235,34 +233,28 @@ public class DSEController {
     /** Replay a trace symbolically. */
     private SymbolicState replaySymbolic(StmtGraph<?> cfg, JavaSootMethod method)
             throws FileNotFoundException, IOException, Exception {
-        Iterator<TraceEntry> iterator;
         SymbolicState current;
         int pathHash = 0;
         if (method.isStatic()) {
             // Start immediately with target method
-            current = new SymbolicState(ctx, cfg);
-            iterator = TraceManager.getEntries(method.getName()).iterator();
+            current = new SymbolicState(ctx, method.getSignature(), cfg);
         } else {
             // Start with constructor
-            List<TraceEntry> entries = TraceManager.getEntries("<init>");
-            pathHash = entries.hashCode();
+            pathHash = TraceManager.hashCode(ctorSoot.getSignature());
             // If the ctor has been explored along this path before, reuse final state
             if (initStates.containsKey(pathHash)) {
                 current = initStates.get(pathHash).clone();
-                current.setStmt(cfg.getStartingStmt());
-                current.setMethodType(MethodType.METHOD);
-                iterator = TraceManager.getEntries(method.getName()).iterator();
+                current.setMethod(method.getSignature(), cfg);
             } else {
-                current = new SymbolicState(ctx, ctorCfg);
+                current = new SymbolicState(ctx, ctorSoot.getSignature(), ctorCfg);
                 current.setMethodType(MethodType.CTOR);
-                iterator = entries.iterator();
             }
         }
 
         while (current.getMethodType().isCtor() || !current.isFinalState()) {
             logger.debug("Current state: " + current);
             logger.debug("Next stmt: " + current.getStmt());
-            List<SymbolicState> newStates = symbolic.step(current, iterator);
+            List<SymbolicState> newStates = symbolic.step(current, true);
             // Note: newStates will always contain exactly one element, because we are
             // replaying a trace
             current = newStates.get(0);
@@ -279,8 +271,7 @@ public class DSEController {
                 // Save the final ctor state for reuse in other methods
                 initStates.put(pathHash, current.clone());
                 logger.debug("Switching to target method: " + method.getName());
-                current.setCFG(cfg);
-                iterator = TraceManager.getEntries(method.getName()).iterator();
+                current.setMethod(method.getSignature(), cfg);
             }
         }
 

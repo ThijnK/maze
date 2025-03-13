@@ -50,7 +50,8 @@ public class BytecodeInstrumenter {
 
             ClassReader classReader = new ClassReader(classBytes);
             ClassWriter classWriter = new ClassWriter(ClassWriter.COMPUTE_FRAMES | ClassWriter.COMPUTE_MAXS);
-            ClassVisitor classVisitor = new SymbolicTraceClassVisitor(classWriter);
+            String qualifiedClassName = classPrefix + '/' + name;
+            ClassVisitor classVisitor = new SymbolicTraceClassVisitor(classWriter, qualifiedClassName);
             classReader.accept(classVisitor, ClassReader.EXPAND_FRAMES);
 
             byte[] instrumentedBytes = classWriter.toByteArray();
@@ -115,26 +116,31 @@ public class BytecodeInstrumenter {
 
     /** Class visitor that instruments the class to record symbolic traces. */
     static class SymbolicTraceClassVisitor extends ClassVisitor {
-        public SymbolicTraceClassVisitor(ClassVisitor classVisitor) {
+        private final String className;
+
+        public SymbolicTraceClassVisitor(ClassVisitor classVisitor, String className) {
             super(Opcodes.ASM9, classVisitor);
+            this.className = className;
         }
 
         @Override
         public MethodVisitor visitMethod(int access, String name, String descriptor, String signature,
                 String[] exceptions) {
             MethodVisitor methodVisitor = super.visitMethod(access, name, descriptor, signature, exceptions);
-            return new SymbolicTraceMethodVisitor(Opcodes.ASM9, methodVisitor, access, name, descriptor);
+            String methodSignature = TraceManager.buildMethodSignature(className, name, descriptor);
+            return new SymbolicTraceMethodVisitor(Opcodes.ASM9, methodVisitor, access, name, descriptor,
+                    methodSignature);
         }
     }
 
     /** Method visitor that instruments the method to record symbolic traces */
     static class SymbolicTraceMethodVisitor extends AdviceAdapter {
-        String methodName;
+        String methodSignature;
 
         protected SymbolicTraceMethodVisitor(int api, MethodVisitor methodVisitor, int access, String name,
-                String descriptor) {
+                String descriptor, String methodSignature) {
             super(api, methodVisitor, access, name, descriptor);
-            this.methodName = name;
+            this.methodSignature = methodSignature;
         }
 
         // Instrument if statements to record the branch taken
@@ -381,7 +387,7 @@ public class BytecodeInstrumenter {
          */
         private void instrumentTraceLog(BranchType type, int value) {
             // Push arguments on the stack
-            mv.visitLdcInsn(methodName);
+            mv.visitLdcInsn(methodSignature);
             mv.visitFieldInsn(Opcodes.GETSTATIC, BRANCH_TYPE_PATH, type.name(),
                     String.format("L%s;", BRANCH_TYPE_PATH));
             mv.visitIntInsn(Opcodes.SIPUSH, value);

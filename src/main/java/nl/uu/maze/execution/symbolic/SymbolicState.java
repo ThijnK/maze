@@ -12,6 +12,7 @@ import nl.uu.maze.execution.MethodType;
 import nl.uu.maze.util.Z3Sorts;
 import sootup.core.graph.StmtGraph;
 import sootup.core.jimple.common.stmt.Stmt;
+import sootup.core.signatures.MethodSignature;
 import sootup.core.types.Type;
 
 /**
@@ -29,6 +30,7 @@ import sootup.core.types.Type;
  */
 public class SymbolicState {
     private final Context ctx;
+    private MethodSignature methodSig;
     private StmtGraph<?> cfg;
     private Stmt stmt;
     private int depth = 0;
@@ -63,8 +65,9 @@ public class SymbolicState {
     /** Indicates whether the state constraints were found to be unsatisfiable. */
     private boolean isInfeasible = false;
 
-    public SymbolicState(Context ctx, StmtGraph<?> cfg) {
+    public SymbolicState(Context ctx, MethodSignature methodSig, StmtGraph<?> cfg) {
         this.ctx = ctx;
+        this.methodSig = methodSig;
         this.cfg = cfg;
         this.stmt = cfg.getStartingStmt();
         this.store = new HashMap<>();
@@ -80,6 +83,7 @@ public class SymbolicState {
      */
     private SymbolicState(SymbolicState state) {
         this.ctx = state.ctx;
+        this.methodSig = state.methodSig;
         this.cfg = state.cfg;
         this.stmt = state.stmt;
         this.depth = state.depth;
@@ -113,12 +117,18 @@ public class SymbolicState {
     }
 
     /**
-     * Set the CFG for this symbolic state.
+     * Set the method this symbolic state represents, including the CFG and the
+     * method signature.
      * Note: also sets the current statement to the starting statement of the CFG.
      */
-    public void setCFG(StmtGraph<?> cfg) {
+    public void setMethod(MethodSignature methodSig, StmtGraph<?> cfg) {
+        this.methodSig = methodSig;
         this.cfg = cfg;
         setStmt(cfg.getStartingStmt());
+    }
+
+    public MethodSignature getMethodSignature() {
+        return methodSig;
     }
 
     public void setCaller(SymbolicState caller) {
@@ -137,6 +147,7 @@ public class SymbolicState {
         return stmt;
     }
 
+    // TODO: can remove this?
     public void setStmt(Stmt stmt) {
         isFinalState = false;
         this.stmt = stmt;
@@ -274,7 +285,7 @@ public class SymbolicState {
     @Override
     public String toString() {
         return "Vars: " + store + ", Heap: " + heap + ", PC: " + pathConstraints + ", EC: "
-                + engineConstraints + ", Callee: " + (caller == null ? "no" : "yes");
+                + engineConstraints + ", Caller: " + (caller == null ? "0" : "1");
     }
 
     @Override

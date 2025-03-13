@@ -5,6 +5,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Queue;
+
+import sootup.core.signatures.MethodSignature;
+import sootup.core.types.ArrayType;
+import sootup.core.types.ClassType;
+import sootup.core.types.Type;
 
 /**
  * Manages symbolic trace files and its entries.
@@ -24,38 +30,131 @@ public class TraceManager {
     }
 
     // Lists to store the trace entries per method
-    private static Map<String, LinkedList<TraceEntry>> traceEntries = new HashMap<>();
+    private static Map<String, Queue<TraceEntry>> traceEntries = new HashMap<>();
 
     /**
      * Record a trace entry for the specified method.
      * 
-     * @param methodName The name of the method
+     * @param methodSig  The signature of the method
      * @param branchType The type of branch
      * @param value      The value of the branch
      */
-    public static void recordTraceEntry(String methodName, BranchType branchType, int value) {
-        TraceEntry entry = new TraceEntry(methodName, branchType, value);
-        traceEntries.computeIfAbsent(methodName, k -> new LinkedList<>()).add(entry);
+    public static void recordTraceEntry(String methodSig, BranchType branchType, int value) {
+        TraceEntry entry = new TraceEntry(methodSig, branchType, value);
+        traceEntries.computeIfAbsent(methodSig, k -> new LinkedList<>()).add(entry);
     }
 
     /**
-     * Clear the trace entries for the specified method.
-     * 
-     * @param methodName The method name
+     * Clear the trace entries for all methods.
      */
     public static void clearEntries() {
         traceEntries.forEach((k, v) -> v.clear());
     }
 
     /**
-     * Get the trace entries for the specified method.
-     * 
-     * @param methodName The method name
-     * @return The trace entries for the method or an empty list if no entries are
-     *         found
+     * Consume the next trace entry for the specified method.
      */
-    public static List<TraceEntry> getEntries(String methodName) {
-        return traceEntries.getOrDefault(methodName, new LinkedList<>());
+    public static TraceEntry consumeEntry(MethodSignature methodSig) {
+        Queue<TraceEntry> entries = traceEntries.get(buildMethodSignature(methodSig));
+        return entries != null ? entries.poll() : null;
+    }
+
+    /**
+     * Check if there are any trace entries for the specified method.
+     */
+    public static boolean hasEntries(MethodSignature methodSig) {
+        Queue<TraceEntry> entries = traceEntries.get(buildMethodSignature(methodSig));
+        return entries != null && !entries.isEmpty();
+    }
+
+    /**
+     * Get the hash code of the trace for the specified method.
+     */
+    public static int hashCode(MethodSignature methodSig) {
+        Queue<TraceEntry> entries = traceEntries.get(buildMethodSignature(methodSig));
+        if (entries == null) {
+            return 0;
+        }
+        return entries.hashCode();
+    }
+
+    /**
+     * Build a signature for a method from its class name, method name, and
+     * descriptor.
+     * 
+     * @param className  The fully qualified name of the class
+     * @param methodName The name of the method
+     * @param descriptor The descriptor of the method
+     * @return The method signature
+     */
+    public static String buildMethodSignature(String className, String methodName, String descriptor) {
+        return "<" + className + ": " + methodName + descriptor + ">";
+    }
+
+    /**
+     * Build a signature for a method from its Jimple method signature
+     * ({@link MethodSignature}).
+     * 
+     * @param methodSig The Jimple method signature
+     * @return The method signature
+     */
+    public static String buildMethodSignature(MethodSignature methodSig) {
+        String className = methodSig.getDeclClassType().getFullyQualifiedName().replace(".", "/");
+        String descriptor = buildDescriptor(methodSig.getParameterTypes(), methodSig.getType());
+        return buildMethodSignature(className, methodSig.getName(), descriptor);
+    }
+
+    /**
+     * Build a descriptor for a method from its parameter types and return type.
+     * 
+     * @param paramTypes The parameter types of the method
+     * @param returnType The return type of the method
+     * @return The method descriptor
+     */
+    private static String buildDescriptor(List<Type> paramTypes, Type returnType) {
+        StringBuilder descriptor = new StringBuilder("(");
+        for (Type paramType : paramTypes) {
+            descriptor.append(typeToDescriptorComponent(paramType));
+        }
+        descriptor.append(")").append(typeToDescriptorComponent(returnType));
+        return descriptor.toString();
+    }
+
+    /**
+     * Convert a SootUp type ({@link Type}) to a descriptor component.
+     * 
+     * @param type The type to convert
+     * @return The descriptor component
+     */
+    private static String typeToDescriptorComponent(Type type) {
+        if (type instanceof ClassType) {
+            return "L" + ((ClassType) type).getFullyQualifiedName().replace(".", "/") + ";";
+        } else if (type instanceof ArrayType) {
+            return "[" + typeToDescriptorComponent(((ArrayType) type).getElementType());
+        } else {
+            switch (type.toString()) {
+                case "byte":
+                    return "B";
+                case "char":
+                    return "C";
+                case "double":
+                    return "D";
+                case "float":
+                    return "F";
+                case "int":
+                    return "I";
+                case "long":
+                    return "J";
+                case "short":
+                    return "S";
+                case "boolean":
+                    return "Z";
+                case "void":
+                    return "V";
+                default:
+                    throw new IllegalArgumentException("Unknown type: " + type);
+            }
+        }
     }
 
     /**
@@ -70,21 +169,21 @@ public class TraceManager {
      * </p>
      */
     public static class TraceEntry {
-        /** The name of the method from which this entry was logged */
-        private final String methodName;
+        /** The signature of the method from which this entry was logged */
+        private final String methodSig;
         /** The type of branch that was taken (e.g., if-else or switch) */
         private final BranchType branchType;
         /** The value of the branch that was taken (e.g., 0 or 1 for if-else) */
         private final int value;
 
-        public TraceEntry(String methodName, BranchType branchType, int value) {
-            this.methodName = methodName;
+        public TraceEntry(String methodSig, BranchType branchType, int value) {
+            this.methodSig = methodSig;
             this.branchType = branchType;
             this.value = value;
         }
 
-        public String getMethodName() {
-            return methodName;
+        public String getMethodSig() {
+            return methodSig;
         }
 
         public BranchType getBranchType() {
@@ -109,7 +208,7 @@ public class TraceManager {
 
         @Override
         public String toString() {
-            return formatString(methodName, branchType, value);
+            return formatString(methodSig, branchType, value);
         }
 
         /**
@@ -145,12 +244,12 @@ public class TraceManager {
                 return false;
             }
             TraceEntry other = (TraceEntry) obj;
-            return value == other.value && branchType == other.branchType && methodName.equals(other.methodName);
+            return value == other.value && branchType == other.branchType && methodSig.equals(other.methodSig);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(methodName, branchType, value);
+            return Objects.hash(methodSig, branchType, value);
         }
     }
 }
