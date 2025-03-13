@@ -191,7 +191,7 @@ public class SymbolicExecutor {
         else {
             // For all cases, except the default case
             for (int i = 0; i < succs.size(); i++) {
-                SymbolicState newState = i == succs.size() - 2 ? state : state.clone();
+                SymbolicState newState = i == succs.size() - 1 ? state : state.clone();
 
                 // Last successor is the default case
                 SwitchConstraint constraint = new SwitchConstraint(var, values, i >= cases.size() ? -1 : i);
