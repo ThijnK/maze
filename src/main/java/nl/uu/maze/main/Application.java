@@ -1,6 +1,7 @@
 package nl.uu.maze.main;
 
 import nl.uu.maze.execution.DSEController;
+import nl.uu.maze.util.Z3ContextProvider;
 
 /**
  * The main class of the application.
@@ -36,9 +37,10 @@ public class Application {
                     concreteDriven, strategyName,
                     outPath);
             controller.run();
-            controller.close();
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            Z3ContextProvider.close();
         }
     }
 }

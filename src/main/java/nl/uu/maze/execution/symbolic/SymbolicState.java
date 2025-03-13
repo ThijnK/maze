@@ -9,6 +9,7 @@ import java.util.stream.Stream;
 import com.microsoft.z3.*;
 
 import nl.uu.maze.execution.MethodType;
+import nl.uu.maze.util.Z3ContextProvider;
 import nl.uu.maze.util.Z3Sorts;
 import nl.uu.maze.execution.symbolic.PathConstraint.SingleConstraint;
 import sootup.core.graph.StmtGraph;
@@ -30,7 +31,8 @@ import sootup.core.types.Type;
  * </p>
  */
 public class SymbolicState {
-    private final Context ctx;
+    private static final Context ctx = Z3ContextProvider.getContext();
+
     private MethodSignature methodSig;
     private StmtGraph<?> cfg;
     private Stmt stmt;
@@ -66,8 +68,7 @@ public class SymbolicState {
     /** Indicates whether the state constraints were found to be unsatisfiable. */
     private boolean isInfeasible = false;
 
-    public SymbolicState(Context ctx, MethodSignature methodSig, StmtGraph<?> cfg) {
-        this.ctx = ctx;
+    public SymbolicState(MethodSignature methodSig, StmtGraph<?> cfg) {
         this.methodSig = methodSig;
         this.cfg = cfg;
         this.stmt = cfg.getStartingStmt();
@@ -83,7 +84,6 @@ public class SymbolicState {
      * state given.
      */
     private SymbolicState(SymbolicState state) {
-        this.ctx = state.ctx;
         this.methodSig = state.methodSig;
         this.cfg = state.cfg;
         this.stmt = state.stmt;
@@ -192,7 +192,7 @@ public class SymbolicState {
      * @param constraint The new path constraint to add
      */
     public void addPathConstraint(BoolExpr constraint) {
-        pathConstraints.add(new SingleConstraint(ctx, constraint));
+        pathConstraints.add(new SingleConstraint(constraint));
     }
 
     /**
@@ -205,7 +205,7 @@ public class SymbolicState {
     }
 
     public void addEngineConstraint(BoolExpr constraint) {
-        engineConstraints.add(new SingleConstraint(ctx, constraint));
+        engineConstraints.add(new SingleConstraint(constraint));
     }
 
     public void setConstraints(List<PathConstraint> pathConstraints, List<PathConstraint> engineConstraints) {
@@ -262,7 +262,7 @@ public class SymbolicState {
                 .concat(Stream.of(Z3Sorts.getInstance().getNullConst()), heap.getAllConcreteRefs().stream())
                 .toArray(Expr<?>[]::new);
         if (conRefs.length > 1) {
-            engineConstraints.add(new SingleConstraint(ctx, ctx.mkDistinct(conRefs)));
+            engineConstraints.add(new SingleConstraint(ctx.mkDistinct(conRefs)));
         }
         return engineConstraints;
     }
@@ -285,10 +285,6 @@ public class SymbolicState {
 
     public SymbolicState clone() {
         return new SymbolicState(this);
-    }
-
-    public Context getContext() {
-        return ctx;
     }
 
     @Override

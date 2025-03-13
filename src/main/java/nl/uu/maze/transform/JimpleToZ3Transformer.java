@@ -23,15 +23,10 @@ import sootup.core.types.*;
  */
 public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
     private static final Z3Sorts sorts = Z3Sorts.getInstance();
-
-    private final Context ctx;
+    private static final Context ctx = Z3ContextProvider.getContext();
 
     private SymbolicState state;
     private String lhs;
-
-    public JimpleToZ3Transformer(Context ctx) {
-        this.ctx = ctx;
-    }
 
     /**
      * Transform the given Jimple value to a Z3 expression.

@@ -10,6 +10,7 @@ import com.microsoft.z3.Model;
 
 import nl.uu.maze.execution.symbolic.SymbolicHeap.ArrayObject;
 import nl.uu.maze.execution.symbolic.SymbolicHeap.MultiArrayObject;
+import nl.uu.maze.util.Z3ContextProvider;
 import nl.uu.maze.util.Z3Sorts;
 import sootup.core.types.PrimitiveType;
 import sootup.core.types.Type;
@@ -20,12 +21,7 @@ import sootup.core.types.PrimitiveType.*;
  */
 public class Z3ToJavaTransformer {
     private static final Z3Sorts sorts = Z3Sorts.getInstance();
-
-    private Context ctx;
-
-    public Z3ToJavaTransformer(Context ctx) {
-        this.ctx = ctx;
-    }
+    private static final Context ctx = Z3ContextProvider.getContext();
 
     /** Transform a Z3 expression to a Java object. */
     public Object transformExpr(Expr<?> expr, Type type) {

@@ -28,9 +28,7 @@ import nl.uu.maze.instrument.TraceManager;
 import nl.uu.maze.instrument.TraceManager.TraceEntry;
 import nl.uu.maze.transform.JavaToZ3Transformer;
 import nl.uu.maze.transform.JimpleToZ3Transformer;
-import nl.uu.maze.util.ObjectUtils;
-import nl.uu.maze.util.Z3Sorts;
-import nl.uu.maze.util.Z3Utils;
+import nl.uu.maze.util.*;
 import sootup.core.jimple.basic.Immediate;
 import sootup.core.jimple.basic.LValue;
 import sootup.core.jimple.basic.Local;
@@ -53,8 +51,8 @@ import sootup.java.core.JavaSootMethod;
 public class SymbolicExecutor {
     private static final Logger logger = LoggerFactory.getLogger(SymbolicExecutor.class);
     private static final Z3Sorts sorts = Z3Sorts.getInstance();
+    private static final Context ctx = Z3ContextProvider.getContext();
 
-    private final Context ctx;
     private final ConcreteExecutor executor;
     private final SymbolicStateValidator validator;
     private final JavaAnalyzer analyzer;
@@ -62,14 +60,13 @@ public class SymbolicExecutor {
     private final JavaToZ3Transformer javaToZ3;
     private final SymbolicRefExtractor refExtractor = new SymbolicRefExtractor();
 
-    public SymbolicExecutor(Context ctx, ConcreteExecutor executor, SymbolicStateValidator validator,
+    public SymbolicExecutor(ConcreteExecutor executor, SymbolicStateValidator validator,
             JavaAnalyzer analyzer) {
-        this.ctx = ctx;
         this.executor = executor;
         this.validator = validator;
         this.analyzer = analyzer;
-        this.jimpleToZ3 = new JimpleToZ3Transformer(ctx);
-        this.javaToZ3 = new JavaToZ3Transformer(ctx);
+        this.jimpleToZ3 = new JimpleToZ3Transformer();
+        this.javaToZ3 = new JavaToZ3Transformer();
     }
 
     /**
@@ -133,7 +130,7 @@ public class SymbolicExecutor {
 
             TraceEntry entry = TraceManager.consumeEntry(state.getMethodSignature());
             int branchIndex = entry.getValue();
-            state.addPathConstraint(branchIndex == 0 ? Z3Utils.negate(ctx, cond) : cond);
+            state.addPathConstraint(branchIndex == 0 ? Z3Utils.negate(cond) : cond);
             state.setStmt(succs.get(branchIndex));
             newStates.add(state);
         }
@@ -142,7 +139,7 @@ public class SymbolicExecutor {
             // False branch
             SymbolicState newState = state.clone();
             newState.setStmt(succs.get(0));
-            newState.addPathConstraint(Z3Utils.negate(ctx, cond));
+            newState.addPathConstraint(Z3Utils.negate(cond));
             newStates.add(newState);
 
             // True branch
@@ -184,7 +181,7 @@ public class SymbolicExecutor {
 
             TraceEntry entry = TraceManager.consumeEntry(state.getMethodSignature());
             int branchIndex = entry.getValue();
-            SwitchConstraint constraint = new SwitchConstraint(ctx, var, values,
+            SwitchConstraint constraint = new SwitchConstraint(var, values,
                     branchIndex >= cases.size() ? -1 : branchIndex);
             state.addPathConstraint(constraint);
             state.setStmt(succs.get(branchIndex));
@@ -197,7 +194,7 @@ public class SymbolicExecutor {
                 SymbolicState newState = i == succs.size() - 2 ? state : state.clone();
 
                 // Last successor is the default case
-                SwitchConstraint constraint = new SwitchConstraint(ctx, var, values, i >= cases.size() ? -1 : i);
+                SwitchConstraint constraint = new SwitchConstraint(var, values, i >= cases.size() ? -1 : i);
                 newState.addPathConstraint(constraint);
                 newState.setStmt(succs.get(i));
                 newStates.add(newState);
@@ -518,7 +515,7 @@ public class SymbolicExecutor {
     private Optional<SymbolicState> executeSymbolic(SymbolicState state, JavaSootMethod method, AbstractInvokeExpr expr,
             Local base) {
         // Create a fresh state that will enter the method call
-        SymbolicState callee = new SymbolicState(ctx, method.getSignature(), analyzer.getCFG(method));
+        SymbolicState callee = new SymbolicState(method.getSignature(), analyzer.getCFG(method));
         callee.setCaller(state);
         callee.setMethodType(MethodType.CALLEE);
         // Also set the constraints to be the same as the caller state

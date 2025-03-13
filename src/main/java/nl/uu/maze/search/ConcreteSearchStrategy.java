@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import com.microsoft.z3.Context;
 import com.microsoft.z3.Model;
 
 import nl.uu.maze.execution.symbolic.PathConstraint;
@@ -55,11 +54,11 @@ public abstract class ConcreteSearchStrategy implements SearchStrategy {
                 // Note that the loop starts at index -1, because that's for default case
                 for (int j = -1; j < switchConstraint.getNumValues(); j++) {
                     if (j != switchConstraint.getIndex()) {
-                        add(new PathConditionCandidate(state.getContext(), pathConstraints, i, j));
+                        add(new PathConditionCandidate(pathConstraints, i, j));
                     }
                 }
             } else {
-                add(new PathConditionCandidate(state.getContext(), pathConstraints, i));
+                add(new PathConditionCandidate(pathConstraints, i));
             }
         }
         return true;
@@ -122,7 +121,6 @@ public abstract class ConcreteSearchStrategy implements SearchStrategy {
      *           (i.e., only when the candidate is selected for exploration).
      */
     public class PathConditionCandidate {
-        private final Context ctx;
         private List<PathConstraint> pathConstraints;
         /** The index of the constraint to negate. */
         private int index;
@@ -132,12 +130,11 @@ public abstract class ConcreteSearchStrategy implements SearchStrategy {
          */
         private int subIndex;
 
-        public PathConditionCandidate(Context ctx, List<PathConstraint> pathConstraints, int index) {
-            this(ctx, pathConstraints, index, -1);
+        public PathConditionCandidate(List<PathConstraint> pathConstraints, int index) {
+            this(pathConstraints, index, -1);
         }
 
-        public PathConditionCandidate(Context ctx, List<PathConstraint> pathConstraints, int index, int subIndex) {
-            this.ctx = ctx;
+        public PathConditionCandidate(List<PathConstraint> pathConstraints, int index, int subIndex) {
             this.pathConstraints = pathConstraints;
             this.index = index;
             this.subIndex = subIndex;
@@ -163,7 +160,7 @@ public abstract class ConcreteSearchStrategy implements SearchStrategy {
                 negated.setIndex(subIndex);
                 pathConstraints.set(index, negated);
             } else {
-                pathConstraints.set(index, new SingleConstraint(ctx, Z3Utils.negate(ctx, constraint.getConstraint())));
+                pathConstraints.set(index, new SingleConstraint(Z3Utils.negate(constraint.getConstraint())));
             }
         }
 

@@ -7,16 +7,12 @@ import com.microsoft.z3.BoolExpr;
 import com.microsoft.z3.Context;
 import com.microsoft.z3.Expr;
 
+import nl.uu.maze.util.Z3ContextProvider;
+
 /**
  * Represents a path constraint in symbolic execution.
  */
 public abstract class PathConstraint {
-    protected final Context ctx;
-
-    public PathConstraint(Context ctx) {
-        this.ctx = ctx;
-    }
-
     public abstract BoolExpr getConstraint();
 
     @Override
@@ -31,8 +27,7 @@ public abstract class PathConstraint {
     public static class SingleConstraint extends PathConstraint {
         private final BoolExpr constraint;
 
-        public SingleConstraint(Context ctx, BoolExpr constraint) {
-            super(ctx);
+        public SingleConstraint(BoolExpr constraint) {
             this.constraint = constraint;
         }
 
@@ -46,13 +41,14 @@ public abstract class PathConstraint {
      * expression and a list of possible values for said expression.
      */
     public static class SwitchConstraint extends PathConstraint {
+        private static final Context ctx = Z3ContextProvider.getContext();
+
         private final Expr<?> expr;
         private final Expr<?>[] values;
         private int index;
         private BoolExpr constraint;
 
-        public SwitchConstraint(Context ctx, Expr<?> expr, Expr<?>[] values, int index) {
-            super(ctx);
+        public SwitchConstraint(Expr<?> expr, Expr<?>[] values, int index) {
             this.expr = expr;
             this.values = values;
             setIndex(index);
@@ -99,7 +95,7 @@ public abstract class PathConstraint {
         }
 
         public SwitchConstraint clone() {
-            return new SwitchConstraint(ctx, expr, values, index);
+            return new SwitchConstraint(expr, values, index);
         }
     }
 }

@@ -14,6 +14,7 @@ import com.microsoft.z3.Context;
 import com.microsoft.z3.Expr;
 import com.microsoft.z3.Sort;
 
+import nl.uu.maze.util.Z3ContextProvider;
 import nl.uu.maze.util.Z3Sorts;
 import sootup.core.types.ArrayType;
 import sootup.core.types.ClassType;
@@ -30,8 +31,8 @@ public class SymbolicHeap {
      */
     private static final int MAX_ARRAY_LENGTH = 100;
     public static final Z3Sorts sorts = Z3Sorts.getInstance();
+    private static final Context ctx = Z3ContextProvider.getContext();
 
-    private final Context ctx;
     private final SymbolicState state;
 
     private int heapCounter = 0;
@@ -54,7 +55,6 @@ public class SymbolicHeap {
 
     public SymbolicHeap(SymbolicState state) {
         this.state = state;
-        this.ctx = state.getContext();
         this.resolvedRefs = new HashSet<>();
     }
 
@@ -166,20 +166,21 @@ public class SymbolicHeap {
         }
 
         // Add null reference as a potential alias
-        aliases.add(sorts.getNullConst());
-        for (Map.Entry<Expr<?>, Set<Expr<?>>> entry : aliasMap.entrySet()) {
-            Set<Expr<?>> otherAliases = entry.getValue();
-            if (entry.getKey().equals(symRef)) {
-                continue;
-            }
+        // aliases.add(sorts.getNullConst());
+        // for (Map.Entry<Expr<?>, Set<Expr<?>>> entry : aliasMap.entrySet()) {
+        // Set<Expr<?>> otherAliases = entry.getValue();
+        // if (entry.getKey().equals(symRef)) {
+        // continue;
+        // }
 
-            // Take one object from the heap for this other ref to see if it refers to the
-            // same type
-            HeapObject other = heap.get(getSingleAlias(otherAliases));
-            if (other != null && obj.type.equals(other.type)) {
-                aliases.addAll(otherAliases);
-            }
-        }
+        // // Take one object from the heap for this other ref to see if it refers to
+        // the
+        // // same type
+        // HeapObject other = heap.get(getSingleAlias(otherAliases));
+        // if (other != null && obj.type.equals(other.type)) {
+        // aliases.addAll(otherAliases);
+        // }
+        // }
     }
 
     /**

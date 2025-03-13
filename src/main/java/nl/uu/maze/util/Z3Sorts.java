@@ -17,8 +17,7 @@ import sootup.java.core.types.JavaClassType;
  */
 public class Z3Sorts {
     private static Z3Sorts instance;
-
-    private Context ctx;
+    private static final Context ctx = Z3ContextProvider.getContext();
 
     private Sort refSort;
     /** Null constant, used for null comparisons etc. */
@@ -31,8 +30,7 @@ public class Z3Sorts {
     private FPSort floatSort;
     private FPSort doubleSort;
 
-    private Z3Sorts(Context ctx) {
-        this.ctx = ctx;
+    private Z3Sorts() {
         refSort = ctx.mkUninterpretedSort("Ref");
         nullConst = ctx.mkConst("null", refSort);
         voidSort = ctx.mkUninterpretedSort("Void");
@@ -44,15 +42,9 @@ public class Z3Sorts {
         doubleSort = ctx.mkFPSort64();
     }
 
-    public static synchronized void initialize(Context ctx) {
-        if (instance == null) {
-            instance = new Z3Sorts(ctx);
-        }
-    }
-
     public static Z3Sorts getInstance() {
         if (instance == null) {
-            throw new IllegalStateException("Z3Sorts not initialized. Call initialize() first.");
+            instance = new Z3Sorts();
         }
         return instance;
     }

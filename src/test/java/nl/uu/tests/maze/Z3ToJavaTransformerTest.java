@@ -2,6 +2,7 @@ package nl.uu.tests.maze;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -14,19 +15,22 @@ import com.microsoft.z3.FPNum;
 import com.microsoft.z3.IntExpr;
 
 import nl.uu.maze.transform.Z3ToJavaTransformer;
-import nl.uu.maze.util.Z3Sorts;
+import nl.uu.maze.util.Z3ContextProvider;
 import sootup.core.types.PrimitiveType;
 import sootup.core.types.Type;
 
 public class Z3ToJavaTransformerTest {
+    private static final Context ctx = Z3ContextProvider.getContext();
     private static Z3ToJavaTransformer transformer;
-    private static Context ctx;
 
     @BeforeAll
     public static void setUp() {
-        ctx = new Context();
-        Z3Sorts.initialize(ctx);
-        transformer = new Z3ToJavaTransformer(ctx);
+        transformer = new Z3ToJavaTransformer();
+    }
+
+    @AfterAll
+    public static void tearDown() {
+        Z3ContextProvider.close();
     }
 
     @Test

@@ -14,7 +14,6 @@ import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.microsoft.z3.Context;
 import com.microsoft.z3.Model;
 
 import nl.uu.maze.analysis.JavaAnalyzer;
@@ -23,7 +22,6 @@ import nl.uu.maze.execution.symbolic.*;
 import nl.uu.maze.generation.JUnitTestGenerator;
 import nl.uu.maze.instrument.*;
 import nl.uu.maze.search.*;
-import nl.uu.maze.util.Z3Sorts;
 import sootup.core.graph.StmtGraph;
 import sootup.java.core.JavaSootClass;
 import sootup.java.core.JavaSootMethod;
@@ -45,7 +43,6 @@ public class DSEController {
     /** Search strategy used for symbolic replay of a trace (DFS). */
     private final SymbolicSearchStrategy replayStrategy;
     private final JavaAnalyzer analyzer;
-    private final Context ctx;
     private final JavaClassType classType;
     private final JavaSootClass sootClass;
     private final Class<?> clazz;
@@ -89,17 +86,14 @@ public class DSEController {
         searchStrategy = SearchStrategyFactory.getStrategy(concreteDriven, strategyName);
         replayStrategy = (SymbolicSearchStrategy) SearchStrategyFactory.getStrategy(false, "DFS");
 
-        this.ctx = new Context();
-        Z3Sorts.initialize(ctx);
-
         this.analyzer = new JavaAnalyzer(classPath, instrumented != null ? instrumented.getClassLoader() : null);
         this.classType = analyzer.getClassType(className);
         this.sootClass = analyzer.getSootClass(classType);
         this.clazz = analyzer.getJavaClass(classType);
 
         this.concrete = new ConcreteExecutor();
-        this.validator = new SymbolicStateValidator(ctx);
-        this.symbolic = new SymbolicExecutor(ctx, concrete, validator, analyzer);
+        this.validator = new SymbolicStateValidator();
+        this.symbolic = new SymbolicExecutor(concrete, validator, analyzer);
         this.generator = new JUnitTestGenerator(clazz, analyzer, concrete);
     }
 
@@ -166,7 +160,7 @@ public class DSEController {
         // If static, start with target method, otherwise start with constructor
         if (method.isStatic()) {
             logger.debug("Executing target method: " + method.getName());
-            searchStrategy.add(new SymbolicState(ctx, method.getSignature(), cfg));
+            searchStrategy.add(new SymbolicState(method.getSignature(), cfg));
         } else {
             logger.debug("Executing constructor: " + ctorSoot.getName());
             // For concrete-driven, we'll be replaying a trace, so if the ctor has been
@@ -181,7 +175,7 @@ public class DSEController {
                     state.setMethod(method.getSignature(), cfg);
                     searchStrategy.add(state);
                 } else {
-                    SymbolicState state = new SymbolicState(ctx, ctorSoot.getSignature(), ctorCfg);
+                    SymbolicState state = new SymbolicState(ctorSoot.getSignature(), ctorCfg);
                     state.setMethodType(MethodType.CTOR);
                     searchStrategy.add(state);
                 }
@@ -191,7 +185,7 @@ public class DSEController {
             // If not available, simply start at the beginning of the ctor
             else {
                 if (initStates.isEmpty()) {
-                    SymbolicState state = new SymbolicState(ctx, ctorSoot.getSignature(), ctorCfg);
+                    SymbolicState state = new SymbolicState(ctorSoot.getSignature(), ctorCfg);
                     state.setMethodType(MethodType.CTOR);
                     searchStrategy.add(state);
                 } else {
@@ -297,8 +291,4 @@ public class DSEController {
         }
     }
 
-    /** Close the Z3 context. */
-    public void close() {
-        ctx.close();
-    }
 }

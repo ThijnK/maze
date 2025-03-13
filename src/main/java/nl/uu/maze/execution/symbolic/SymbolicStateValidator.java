@@ -16,6 +16,7 @@ import nl.uu.maze.execution.ArgMap;
 import nl.uu.maze.execution.ArgMap.*;
 import nl.uu.maze.execution.symbolic.SymbolicHeap.*;
 import nl.uu.maze.transform.Z3ToJavaTransformer;
+import nl.uu.maze.util.Z3ContextProvider;
 import nl.uu.maze.util.Z3Sorts;
 import sootup.core.types.ClassType;
 import sootup.core.types.Type;
@@ -27,15 +28,16 @@ import sootup.core.types.Type;
 public class SymbolicStateValidator {
     private static final Logger logger = LoggerFactory.getLogger(SymbolicStateValidator.class);
     private static final Z3Sorts sorts = Z3Sorts.getInstance();
+    private static final Context ctx = Z3ContextProvider.getContext();
 
     private Solver solver;
     private Z3ToJavaTransformer transformer;
     /** Last created Z3 model */
     private Model model;
 
-    public SymbolicStateValidator(Context ctx) {
+    public SymbolicStateValidator() {
         this.solver = ctx.mkSolver();
-        this.transformer = new Z3ToJavaTransformer(ctx);
+        this.transformer = new Z3ToJavaTransformer();
     }
 
     /**

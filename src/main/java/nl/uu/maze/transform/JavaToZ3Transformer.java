@@ -8,6 +8,7 @@ import com.microsoft.z3.Context;
 import com.microsoft.z3.Expr;
 
 import nl.uu.maze.execution.symbolic.SymbolicState;
+import nl.uu.maze.util.Z3ContextProvider;
 import nl.uu.maze.util.Z3Sorts;
 import sootup.core.types.ArrayType;
 import sootup.core.types.ClassType;
@@ -18,13 +19,9 @@ import sootup.core.types.Type;
  */
 public class JavaToZ3Transformer {
     private static final Z3Sorts sorts = Z3Sorts.getInstance();
+    private static final Context ctx = Z3ContextProvider.getContext();
 
-    private final Context ctx;
     private SymbolicState state;
-
-    public JavaToZ3Transformer(Context ctx) {
-        this.ctx = ctx;
-    }
 
     /**
      * Transforms the given Java value into a Z3 expression.

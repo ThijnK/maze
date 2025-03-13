@@ -4,6 +4,8 @@ import com.microsoft.z3.BoolExpr;
 import com.microsoft.z3.Context;
 
 public class Z3Utils {
+    private static final Context ctx = Z3ContextProvider.getContext();
+
     /**
      * Negates the given boolean expression, avoiding double negation by wrapping it
      * in a NOT only if not already negated.
@@ -12,7 +14,7 @@ public class Z3Utils {
      * @param expr The expression to negate
      * @return The negated expression
      */
-    public static BoolExpr negate(Context ctx, BoolExpr expr) {
+    public static BoolExpr negate(BoolExpr expr) {
         return expr.isNot() ? (BoolExpr) expr.getArgs()[0] : ctx.mkNot(expr);
     }
 }
