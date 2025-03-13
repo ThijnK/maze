@@ -22,6 +22,7 @@ import nl.uu.maze.execution.ArgMap.ObjectRef;
 import nl.uu.maze.execution.MethodType;
 import nl.uu.maze.execution.concrete.ConcreteExecutor;
 import nl.uu.maze.execution.concrete.ObjectInstantiator;
+import nl.uu.maze.execution.symbolic.PathConstraint.SwitchConstraint;
 import nl.uu.maze.execution.symbolic.SymbolicHeap.*;
 import nl.uu.maze.instrument.TraceManager;
 import nl.uu.maze.instrument.TraceManager.TraceEntry;
@@ -165,8 +166,13 @@ public class SymbolicExecutor {
     private List<SymbolicState> handleSwitchStmt(JSwitchStmt stmt, SymbolicState state, boolean replay) {
         List<Stmt> succs = state.getSuccessors();
         Expr<?> var = state.lookup(stmt.getKey().toString());
-        List<IntConstant> values = stmt.getValues();
+        List<IntConstant> cases = stmt.getValues();
         List<SymbolicState> newStates = new ArrayList<SymbolicState>();
+
+        Expr<?>[] values = new Expr<?>[cases.size()];
+        for (int i = 0; i < cases.size(); i++) {
+            values[i] = ctx.mkBV(cases.get(i).getValue(), sorts.getIntBitSize());
+        }
 
         // If replaying a trace, follow the branch indicated by the trace
         if (replay) {
@@ -178,46 +184,27 @@ public class SymbolicExecutor {
 
             TraceEntry entry = TraceManager.consumeEntry(state.getMethodSignature());
             int branchIndex = entry.getValue();
-            if (branchIndex >= values.size()) {
-                // Default case constraint is the negation of all other constraints
-                for (int i = 0; i < values.size(); i++) {
-                    state.addPathConstraint(ctx.mkNot(mkSwitchConstraint(var, values.get(i))));
-                }
-            } else {
-                // Otherwise add constraint for the branch that was taken
-                state.addPathConstraint(mkSwitchConstraint(var, values.get(branchIndex)));
-            }
+            SwitchConstraint constraint = new SwitchConstraint(ctx, var, values,
+                    branchIndex >= cases.size() ? -1 : branchIndex);
+            state.addPathConstraint(constraint);
             state.setStmt(succs.get(branchIndex));
             newStates.add(state);
         }
         // Otherwise, follow all branches
         else {
-            // The last successor is the default case, whose constraint is the negation of
-            // all other constraints
-            SymbolicState defaultCaseState = state.clone();
             // For all cases, except the default case
-            for (int i = 0; i < succs.size() - 1; i++) {
+            for (int i = 0; i < succs.size(); i++) {
                 SymbolicState newState = i == succs.size() - 2 ? state : state.clone();
 
-                BoolExpr constraint = mkSwitchConstraint(var, values.get(i));
+                // Last successor is the default case
+                SwitchConstraint constraint = new SwitchConstraint(ctx, var, values, i >= cases.size() ? -1 : i);
                 newState.addPathConstraint(constraint);
-                defaultCaseState.addPathConstraint(ctx.mkNot(constraint));
                 newState.setStmt(succs.get(i));
                 newStates.add(newState);
             }
-            defaultCaseState.setStmt(succs.get(succs.size() - 1));
-            newStates.add(defaultCaseState);
         }
 
         return newStates;
-    }
-
-    /**
-     * Create a constraint for a switch case (i.e., the variable being switched over
-     * equals the case value)
-     */
-    private BoolExpr mkSwitchConstraint(Expr<?> var, IntConstant value) {
-        return ctx.mkEq(var, ctx.mkBV(value.getValue(), sorts.getIntBitSize()));
     }
 
     /**

@@ -6,12 +6,14 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import com.microsoft.z3.BoolExpr;
 import com.microsoft.z3.Context;
 import com.microsoft.z3.Model;
 
+import nl.uu.maze.execution.symbolic.PathConstraint;
 import nl.uu.maze.execution.symbolic.SymbolicState;
 import nl.uu.maze.execution.symbolic.SymbolicStateValidator;
+import nl.uu.maze.execution.symbolic.PathConstraint.SingleConstraint;
+import nl.uu.maze.execution.symbolic.PathConstraint.SwitchConstraint;
 import nl.uu.maze.util.Z3Utils;
 
 /**
@@ -40,13 +42,25 @@ public abstract class ConcreteSearchStrategy implements SearchStrategy {
         }
 
         // Add a candidate for every constraint in the path condition
-        List<BoolExpr> pathConstraints = state.getPathConstraints();
+        List<PathConstraint> pathConstraints = state.getPathConstraints();
         int length = pathConstraints.size();
         // Add engine constraints, but don't include them as candidates for negation
         // Note: this does not make a copy of the list, so the original list is modified
         pathConstraints.addAll(state.getFullEngineConstraints());
         for (int i = 0; i < length; i++) {
-            add(new PathConditionCandidate(pathConstraints, i, state.getContext()));
+            PathConstraint constraint = pathConstraints.get(i);
+            // For switch constraints, we want one candidate for every possible value
+            if (constraint instanceof SwitchConstraint) {
+                SwitchConstraint switchConstraint = (SwitchConstraint) constraint;
+                // Note that the loop starts at index -1, because that's for default case
+                for (int j = -1; j < switchConstraint.getNumValues(); j++) {
+                    if (j != switchConstraint.getIndex()) {
+                        add(new PathConditionCandidate(state.getContext(), pathConstraints, i, j));
+                    }
+                }
+            } else {
+                add(new PathConditionCandidate(state.getContext(), pathConstraints, i));
+            }
         }
         return true;
     }
@@ -107,19 +121,29 @@ public abstract class ConcreteSearchStrategy implements SearchStrategy {
      * @implNote The index is stored seperately to apply the negation "lazily"
      *           (i.e., only when the candidate is selected for exploration).
      */
-    protected class PathConditionCandidate {
-        private List<BoolExpr> pathConstraints;
+    public class PathConditionCandidate {
+        private final Context ctx;
+        private List<PathConstraint> pathConstraints;
+        /** The index of the constraint to negate. */
         private int index;
-        private Context ctx;
-        private boolean hasAppliedNegation = false;
+        /**
+         * The index of the new value to set an expr to when negating switch
+         * constraints.
+         */
+        private int subIndex;
 
-        public PathConditionCandidate(List<BoolExpr> pathConstraints, int index, Context ctx) {
-            this.pathConstraints = pathConstraints;
-            this.index = index;
-            this.ctx = ctx;
+        public PathConditionCandidate(Context ctx, List<PathConstraint> pathConstraints, int index) {
+            this(ctx, pathConstraints, index, -1);
         }
 
-        public List<BoolExpr> getPathConstraints() {
+        public PathConditionCandidate(Context ctx, List<PathConstraint> pathConstraints, int index, int subIndex) {
+            this.ctx = ctx;
+            this.pathConstraints = pathConstraints;
+            this.index = index;
+            this.subIndex = subIndex;
+        }
+
+        public List<PathConstraint> getPathConstraints() {
             return pathConstraints;
         }
 
@@ -128,17 +152,19 @@ public abstract class ConcreteSearchStrategy implements SearchStrategy {
         }
 
         /**
-         * Apply the negation to the constraint at the index if not already applied.
+         * Apply the negation to the constraint at the index.
          */
         public void applyNegation() {
-            if (hasAppliedNegation) {
-                return;
-            }
-
-            BoolExpr constraint = pathConstraints.get(index);
+            PathConstraint constraint = pathConstraints.get(index);
             // Make a copy of the path constraints to avoid modifying the original list
             pathConstraints = new ArrayList<>(pathConstraints);
-            pathConstraints.set(index, Z3Utils.negate(ctx, constraint));
+            if (constraint instanceof SwitchConstraint) {
+                SwitchConstraint negated = ((SwitchConstraint) constraint).clone();
+                negated.setIndex(subIndex);
+                pathConstraints.set(index, negated);
+            } else {
+                pathConstraints.set(index, new SingleConstraint(ctx, Z3Utils.negate(ctx, constraint.getConstraint())));
+            }
         }
 
         /**
@@ -148,9 +174,9 @@ public abstract class ConcreteSearchStrategy implements SearchStrategy {
          * @param pathConstraints The list of constraints to hash
          * @return The hash of the list of constraints
          */
-        public static int hash(List<BoolExpr> pathConstraints) {
+        public static int hash(List<PathConstraint> pathConstraints) {
             StringBuilder sb = new StringBuilder();
-            for (BoolExpr constraint : pathConstraints) {
+            for (PathConstraint constraint : pathConstraints) {
                 sb.append(constraint.toString());
             }
             return sb.toString().hashCode();

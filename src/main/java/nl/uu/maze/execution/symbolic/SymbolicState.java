@@ -10,6 +10,7 @@ import com.microsoft.z3.*;
 
 import nl.uu.maze.execution.MethodType;
 import nl.uu.maze.util.Z3Sorts;
+import nl.uu.maze.execution.symbolic.PathConstraint.SingleConstraint;
 import sootup.core.graph.StmtGraph;
 import sootup.core.jimple.common.stmt.Stmt;
 import sootup.core.signatures.MethodSignature;
@@ -46,9 +47,9 @@ public class SymbolicState {
      */
     private Expr<?> retval;
     /** Path constraints imposed by the program, e.g., if statements. */
-    private List<BoolExpr> pathConstraints;
+    private List<PathConstraint> pathConstraints;
     /** Constraints imposed by the engine, e.g., for array size bounds. */
-    private List<BoolExpr> engineConstraints;
+    private List<PathConstraint> engineConstraints;
     /** Tracks SootUp types of parameters. */
     private Map<String, Type> paramTypes;
     /**
@@ -147,7 +148,6 @@ public class SymbolicState {
         return stmt;
     }
 
-    // TODO: can remove this?
     public void setStmt(Stmt stmt) {
         isFinalState = false;
         this.stmt = stmt;
@@ -192,14 +192,23 @@ public class SymbolicState {
      * @param constraint The new path constraint to add
      */
     public void addPathConstraint(BoolExpr constraint) {
+        pathConstraints.add(new SingleConstraint(ctx, constraint));
+    }
+
+    /**
+     * Adds a new path constraint to the current path condition.
+     * 
+     * @param constraint The new path constraint to add
+     */
+    public void addPathConstraint(PathConstraint constraint) {
         pathConstraints.add(constraint);
     }
 
     public void addEngineConstraint(BoolExpr constraint) {
-        engineConstraints.add(constraint);
+        engineConstraints.add(new SingleConstraint(ctx, constraint));
     }
 
-    public void setConstraints(List<BoolExpr> pathConstraints, List<BoolExpr> engineConstraints) {
+    public void setConstraints(List<PathConstraint> pathConstraints, List<PathConstraint> engineConstraints) {
         this.pathConstraints = pathConstraints;
         this.engineConstraints = engineConstraints;
     }
@@ -232,12 +241,12 @@ public class SymbolicState {
     }
 
     /** Returns the list of path constraints for this state. */
-    public List<BoolExpr> getPathConstraints() {
+    public List<PathConstraint> getPathConstraints() {
         return pathConstraints;
     }
 
     /** Returns the list of engine constraints for this state. */
-    public List<BoolExpr> getEngineConstraints() {
+    public List<PathConstraint> getEngineConstraints() {
         return engineConstraints;
     }
 
@@ -245,15 +254,15 @@ public class SymbolicState {
      * Returns the list of engine constraints for this state, adding additional
      * constraints for concrete heap references to be distinct.
      */
-    public List<BoolExpr> getFullEngineConstraints() {
+    public List<PathConstraint> getFullEngineConstraints() {
         // Add constraint that all concrete references are distinct
         // So not equal to any other concrete ref, and not equal to null
-        List<BoolExpr> engineConstraints = new ArrayList<>(this.engineConstraints);
+        List<PathConstraint> engineConstraints = new ArrayList<>(this.engineConstraints);
         Expr<?>[] conRefs = Stream
                 .concat(Stream.of(Z3Sorts.getInstance().getNullConst()), heap.getAllConcreteRefs().stream())
                 .toArray(Expr<?>[]::new);
         if (conRefs.length > 1) {
-            engineConstraints.add(ctx.mkDistinct(conRefs));
+            engineConstraints.add(new SingleConstraint(ctx, ctx.mkDistinct(conRefs)));
         }
         return engineConstraints;
     }
@@ -264,8 +273,8 @@ public class SymbolicState {
      * Engine constraints will include additional constraints for concrete heap
      * references to be distinct.
      */
-    public List<BoolExpr> getAllConstraints() {
-        List<BoolExpr> allConstraints = new ArrayList<>(getPathConstraints());
+    public List<PathConstraint> getAllConstraints() {
+        List<PathConstraint> allConstraints = new ArrayList<>(getPathConstraints());
         allConstraints.addAll(getFullEngineConstraints());
         return allConstraints;
     }
