@@ -166,21 +166,19 @@ public class SymbolicHeap {
         }
 
         // Add null reference as a potential alias
-        // aliases.add(sorts.getNullConst());
-        // for (Map.Entry<Expr<?>, Set<Expr<?>>> entry : aliasMap.entrySet()) {
-        // Set<Expr<?>> otherAliases = entry.getValue();
-        // if (entry.getKey().equals(symRef)) {
-        // continue;
-        // }
+        aliases.add(sorts.getNullConst());
+        for (Map.Entry<Expr<?>, Set<Expr<?>>> entry : aliasMap.entrySet()) {
+            Set<Expr<?>> otherAliases = entry.getValue();
+            if (entry.getKey().equals(symRef)) {
+                continue;
+            }
 
-        // // Take one object from the heap for this other ref to see if it refers to
-        // the
-        // // same type
-        // HeapObject other = heap.get(getSingleAlias(otherAliases));
-        // if (other != null && obj.type.equals(other.type)) {
-        // aliases.addAll(otherAliases);
-        // }
-        // }
+            // Check if this other ref has the same type
+            HeapObject other = heap.get(getSingleAlias(otherAliases));
+            if (other != null && obj.type.equals(other.type)) {
+                aliases.addAll(otherAliases);
+            }
+        }
     }
 
     /**
