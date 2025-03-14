@@ -530,9 +530,8 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
 
         setResult(param);
 
-        // For object/array parameters, need to track potential aliases
-        if ((sootType instanceof ArrayType || sootType instanceof ClassType)
-                && !sootType.toString().equals("java.lang.String")) {
+        // For reference parameters, need to track potential aliases
+        if (sorts.isRef(param)) {
             state.heap.findAliases(param);
         }
     }

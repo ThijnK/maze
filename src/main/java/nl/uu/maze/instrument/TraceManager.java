@@ -207,6 +207,10 @@ public class TraceManager {
             return branchType == BranchType.ARRAY;
         }
 
+        public boolean isAliasResolution() {
+            return branchType == BranchType.ALIAS;
+        }
+
         @Override
         public String toString() {
             return formatString(methodSig, branchType, value);

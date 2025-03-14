@@ -323,6 +323,11 @@ public class SymbolicExecutor {
             state.assign(leftOp.toString(), value);
         }
 
+        // Special handling of parameters for reference types when replaying a trace
+        if (replay && rightOp instanceof JParameterRef && sorts.isRef(value)) {
+            resolveAliasForParameter(state, value);
+        }
+
         // Definition statements follow the same control flow as other statements
         List<SymbolicState> succStates = handleOtherStmts(state, replay);
         // For optional out of bounds state, check successors for potential catch blocks
@@ -330,6 +335,43 @@ public class SymbolicExecutor {
             succStates.addAll(handleOtherStmts(outOfBoundsState, replay));
         }
         return succStates;
+    }
+
+    /**
+     * Resolve alias for reference parameters when replaying a trace.
+     * The correct alias is recorded in the trace.
+     */
+    private void resolveAliasForParameter(SymbolicState state, Expr<?> symRef) {
+        TraceEntry entry = TraceManager.consumeEntry(state.getMethodSignature());
+        if (entry == null || !entry.isAliasResolution()) {
+            state.setExceptionThrown();
+            return;
+        }
+
+        Set<Expr<?>> aliases = state.heap.getAliases(symRef);
+        if (aliases == null) {
+            return;
+        }
+        Expr<?>[] aliasArr = aliases.toArray(Expr<?>[]::new);
+
+        // Find the right concrete reference for the parameter
+        // If null, this is simply the null constant
+        // Otherwise, it's the concrete reference of the aliased parameter
+        // Note: value in trace is the index of the aliased parameter or -1 for null
+        int aliasIndex = entry.getValue();
+        Expr<?> alias = aliasIndex == -1 ? sorts.getNullConst()
+                : state.heap.getSingleAlias(ArgMap.getSymbolicName(state.getMethodType(), aliasIndex));
+        // Find the index of this alias in the aliasArr
+        int i = 0;
+        for (; i < aliasArr.length; i++) {
+            if (aliasArr[i].equals(alias)) {
+                break;
+            }
+        }
+        // Constrain the parameter to the right alias
+        state.heap.setSingleAlias(symRef, alias);
+        CompositeConstraint constraint = new CompositeConstraint(symRef, aliasArr, i, false);
+        state.addPathConstraint(constraint);
     }
 
     /**
