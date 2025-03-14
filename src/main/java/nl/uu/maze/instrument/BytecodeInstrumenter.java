@@ -143,6 +143,102 @@ public class BytecodeInstrumenter {
             this.methodSignature = methodSignature;
         }
 
+        private boolean isStatic() {
+            return (methodAccess & Opcodes.ACC_STATIC) != 0;
+        }
+
+        // Instrument method enter to record argument aliasing
+        @Override
+        protected void onMethodEnter() {
+            Type[] argTypes = Type.getArgumentTypes(methodDesc);
+            int refParamCount = 0;
+            for (Type type : argTypes) {
+                if (type.getSort() == Type.OBJECT || type.getSort() == Type.ARRAY) {
+                    refParamCount++;
+                }
+            }
+
+            if (refParamCount > 1) {
+                // Create an array for the parameters
+                mv.visitLdcInsn(argTypes.length);
+                mv.visitTypeInsn(Opcodes.ANEWARRAY, "java/lang/Object");
+
+                // Store the arguments in the array
+                int localVarIndex = isStatic() ? 0 : 1; // Start at 0 for static methods, 1 for instance methods
+                for (int i = 0; i < argTypes.length; i++) {
+                    if (isReferenceType(argTypes[i])) {
+                        mv.visitInsn(Opcodes.DUP);
+                        mv.visitLdcInsn(i); // Index in the array
+                        mv.visitVarInsn(Opcodes.ALOAD, localVarIndex);
+                        mv.visitInsn(Opcodes.AASTORE);
+                    }
+                    localVarIndex += argTypes[i].getSize();
+                }
+
+                // Now check for parameter aliasing and null references
+                instrumentParameterAliasing(argTypes);
+            }
+        }
+
+        private boolean isReferenceType(Type type) {
+            return type.getSort() == Type.OBJECT || type.getSort() == Type.ARRAY;
+        }
+
+        /**
+         * Instrument the method to check for parameter aliasing and null references.
+         * 
+         * @param argTypes The types of the method arguments
+         */
+        private void instrumentParameterAliasing(Type[] argTypes) {
+            int argsVar = newLocal(Type.getType(Object[].class));
+            mv.visitVarInsn(Opcodes.ASTORE, argsVar);
+
+            // Check for aliasing and null references
+            for (int i = 0; i < argTypes.length; i++) {
+                if (!isReferenceType(argTypes[i])) {
+                    continue;
+                }
+
+                // Check for null references
+                mv.visitVarInsn(Opcodes.ALOAD, argsVar);
+                mv.visitLdcInsn(i); // Index in the array
+                mv.visitInsn(Opcodes.AALOAD);
+                Label notNull = new Label();
+                Label continueLabel = new Label();
+                mv.visitJumpInsn(Opcodes.IFNONNULL, notNull);
+                instrumentTraceLog(BranchType.ALIAS, -1); // -1 for null reference
+                mv.visitJumpInsn(Opcodes.GOTO, continueLabel);
+
+                mv.visitLabel(notNull);
+                // Check for aliasing of previous parameters
+                for (int j = 0; j < i; j++) {
+                    // Only compare to other reference parameters
+                    if (!isReferenceType(argTypes[j])) {
+                        continue;
+                    }
+
+                    // Load both parameters
+                    mv.visitVarInsn(Opcodes.ALOAD, argsVar);
+                    mv.visitLdcInsn(i);
+                    mv.visitInsn(Opcodes.AALOAD);
+                    mv.visitVarInsn(Opcodes.ALOAD, argsVar);
+                    mv.visitLdcInsn(j);
+                    mv.visitInsn(Opcodes.AALOAD);
+
+                    // Compare the two parameters
+                    Label notEqual = new Label();
+                    mv.visitJumpInsn(Opcodes.IF_ACMPNE, notEqual);
+                    instrumentTraceLog(BranchType.ALIAS, j); // Param i is an alias of param j
+                    mv.visitJumpInsn(Opcodes.GOTO, continueLabel);
+                    mv.visitLabel(notEqual);
+                }
+
+                // No aliasing found
+                instrumentTraceLog(BranchType.ALIAS, i); // Param i is not an alias of any previous param
+                mv.visitLabel(continueLabel);
+            }
+        }
+
         // Instrument if statements to record the branch taken
         @Override
         public void visitJumpInsn(int opcode, Label label) {

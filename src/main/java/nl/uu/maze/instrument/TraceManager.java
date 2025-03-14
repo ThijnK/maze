@@ -18,10 +18,11 @@ import sootup.core.types.Type;
 public class TraceManager {
     /**
      * Represents the type of a branch in a symbolic trace file.
-     * This can be either an if-statement, a switch-statement, or an array access.
+     * This can be either an if-statement, a switch-statement, an array access, or
+     * an alias resolution.
      */
     public static enum BranchType {
-        IF, SWITCH, ARRAY;
+        IF, SWITCH, ARRAY, ALIAS;
 
         @Override
         public String toString() {
