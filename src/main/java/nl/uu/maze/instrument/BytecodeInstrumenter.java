@@ -181,6 +181,11 @@ public class BytecodeInstrumenter {
         }
 
         private boolean isReferenceType(Type type) {
+            // Treat String as a primitive type
+            if (type.getClassName().equals("java.lang.String")) {
+                return false;
+            }
+
             return type.getSort() == Type.OBJECT || type.getSort() == Type.ARRAY;
         }
 
