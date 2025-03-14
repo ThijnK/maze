@@ -477,7 +477,15 @@ public class SymbolicExecutor {
                 SymbolicState newState = i == aliasArr.length - 1 ? state : state.clone();
                 newState.heap.setSingleAlias(symRef, aliasArr[i]);
                 CompositeConstraint constraint = new CompositeConstraint(symRef, aliasArr, i, false);
-                newState.addPathConstraint(constraint);
+                // For parameters, we add alias constraints to the path constraints, so they can
+                // be used in the search space for concrete-driven DSE
+                // For non-parameters, we add them to the engine constraints, so they are not
+                // considered in the search space
+                if (state.getParamType(symRef.toString()) != null) {
+                    newState.addPathConstraint(constraint);
+                } else {
+                    newState.addEngineConstraint(constraint);
+                }
                 newStates.add(newState);
             }
             if (newStates.size() > 1) {

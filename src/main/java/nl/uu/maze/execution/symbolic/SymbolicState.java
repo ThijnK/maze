@@ -198,6 +198,10 @@ public class SymbolicState {
         engineConstraints.add(new SingleConstraint(constraint));
     }
 
+    public void addEngineConstraint(PathConstraint constraint) {
+        engineConstraints.add(constraint);
+    }
+
     public void setConstraints(List<PathConstraint> pathConstraints, List<PathConstraint> engineConstraints) {
         this.pathConstraints = pathConstraints;
         this.engineConstraints = engineConstraints;
