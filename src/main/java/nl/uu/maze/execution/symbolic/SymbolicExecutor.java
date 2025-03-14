@@ -109,7 +109,7 @@ public class SymbolicExecutor {
         // Split the state if the condition contains a symbolic reference with multiple
         // aliases (i.e. reference comparisons)
         Expr<?> symRef = refExtractor.extract(stmt.getCondition(), state);
-        Optional<List<SymbolicState>> splitStates = splitOnAliases(state, symRef);
+        Optional<List<SymbolicState>> splitStates = splitOnAliases(state, symRef, replay);
         if (splitStates.isPresent()) {
             return splitStates.get();
         }
@@ -222,7 +222,7 @@ public class SymbolicExecutor {
         if (stmt instanceof JAssignStmt) {
             Expr<?> symRef = refExtractor.extract(stmt.getLeftOp(), state);
             symRef = symRef == null ? refExtractor.extract(stmt.getRightOp(), state) : symRef;
-            Optional<List<SymbolicState>> splitStates = splitOnAliases(state, symRef);
+            Optional<List<SymbolicState>> splitStates = splitOnAliases(state, symRef, replay);
             if (splitStates.isPresent()) {
                 return splitStates.get();
             }
@@ -385,7 +385,7 @@ public class SymbolicExecutor {
     private List<SymbolicState> handleInvokeStmt(AbstractInvokeExpr expr, SymbolicState state, boolean replay) {
         // Resolve aliases
         Expr<?> symRef = refExtractor.extract(expr, state);
-        Optional<List<SymbolicState>> splitStates = splitOnAliases(state, symRef);
+        Optional<List<SymbolicState>> splitStates = splitOnAliases(state, symRef, replay);
         if (splitStates.isPresent()) {
             return splitStates.get();
         }
@@ -506,7 +506,7 @@ public class SymbolicExecutor {
      * Split the current symbolic state into multiple states based if the given
      * symbolic reference has multiple aliases.
      */
-    private Optional<List<SymbolicState>> splitOnAliases(SymbolicState state, Expr<?> symRef) {
+    private Optional<List<SymbolicState>> splitOnAliases(SymbolicState state, Expr<?> symRef, boolean replay) {
         if (symRef == null || state.heap.isResolved(symRef)) {
             return Optional.empty();
         }
@@ -514,6 +514,25 @@ public class SymbolicExecutor {
         if (aliases != null) {
             Expr<?>[] aliasArr = aliases.toArray(Expr<?>[]::new);
             List<SymbolicState> newStates = new ArrayList<SymbolicState>(aliasArr.length);
+
+            // When replaying a trace, we pick any non-null alias arbitrarily and ignore the
+            // others, so we only follow one path
+            // Note: for method arguments, aliasing is detected through instrumentation, so
+            // those are guaranteed to be correclty resolved
+            // Here, we use a heuristic and hope for the best
+            if (replay) {
+                // Find first non-null alias
+                int i = 0;
+                for (; i < aliasArr.length; i++) {
+                    if (!sorts.isNull(aliasArr[i])) {
+                        break;
+                    }
+                }
+                Expr<?> alias = aliasArr[i];
+                state.heap.setSingleAlias(symRef, alias);
+                state.addEngineConstraint(ctx.mkEq(symRef, alias));
+                return Optional.empty();
+            }
 
             for (int i = 0; i < aliasArr.length; i++) {
                 SymbolicState newState = i == aliasArr.length - 1 ? state : state.clone();
