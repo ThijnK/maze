@@ -133,6 +133,10 @@ public class SymbolicHeap {
         return newRef(newObjKey());
     }
 
+    public boolean isConRef(String var) {
+        return heap.containsKey(newRef(var));
+    }
+
     public SymbolicHeap clone(SymbolicState state) {
         return new SymbolicHeap(state, heapCounter, refCounter, heap, aliasMap, resolvedRefs, arrayIndices);
     }

@@ -125,11 +125,19 @@ public class SymbolicStateValidator {
                     argMap.set(var, null);
                     isNull = true;
                 }
-                // If interpreted equal to another argument's reference, set it to the same
+                // If interpreted equal to another reference, set it to the same
                 // value
                 if (refValues.containsKey(expr)) {
                     ObjectRef ref = refValues.get(expr);
-                    argMap.set(var, ref);
+                    // If this var is a concrete ref, then the ObjectRef here is a symbolic ref, so
+                    // we need to switch them
+                    if (state.heap.isConRef(var)) {
+                        ObjectRef newRef = new ObjectRef(var);
+                        argMap.set(ref.getVar(), newRef);
+                        refValues.put(expr, newRef);
+                    } else {
+                        argMap.set(var, ref);
+                    }
                 }
                 // Store the reference value for equality checks to other argument references
                 refValues.put(expr, new ObjectRef(var));
@@ -183,7 +191,7 @@ public class SymbolicStateValidator {
                 continue;
             }
             // Primitive types
-            if (argMap.containsKey(var)) {
+            if (argMap.containsKey(var) || expr.isArray()) {
                 // Skip if already set (e.g., to null)
                 continue;
             }
