@@ -505,6 +505,9 @@ public class SymbolicHeap {
                     newValue = allocateArray(varName + "_" + fieldName, (ArrayType) fieldType,
                             ((ArrayType) fieldType).getBaseType());
                 }
+                if (!resolvedRefs.contains(newValue)) {
+                    findAliases(newValue);
+                }
             } else if (fieldType instanceof ClassType && !fieldType.toString().equals("java.lang.String")) {
                 // Create a new object
                 newValue = allocateObject(varName + "_" + fieldName, fieldType);
