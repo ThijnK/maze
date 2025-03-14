@@ -186,20 +186,10 @@ public class SymbolicState {
         return paramTypes.getOrDefault(var, null);
     }
 
-    /**
-     * Adds a new path constraint to the current path condition.
-     * 
-     * @param constraint The new path constraint to add
-     */
     public void addPathConstraint(BoolExpr constraint) {
         pathConstraints.add(new SingleConstraint(constraint));
     }
 
-    /**
-     * Adds a new path constraint to the current path condition.
-     * 
-     * @param constraint The new path constraint to add
-     */
     public void addPathConstraint(PathConstraint constraint) {
         pathConstraints.add(constraint);
     }

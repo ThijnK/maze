@@ -470,14 +470,15 @@ public class SymbolicExecutor {
         }
         Set<Expr<?>> aliases = state.heap.getAliases(symRef);
         if (aliases != null) {
-            List<SymbolicState> newStates = new ArrayList<SymbolicState>(aliases.size());
-            int i = 0;
-            for (Expr<?> alias : aliases) {
-                SymbolicState newState = i == aliases.size() - 1 ? state : state.clone();
-                newState.heap.setSingleAlias(symRef, alias);
-                newState.addEngineConstraint(ctx.mkEq(symRef, alias));
+            Expr<?>[] aliasArr = aliases.toArray(Expr<?>[]::new);
+            List<SymbolicState> newStates = new ArrayList<SymbolicState>(aliasArr.length);
+
+            for (int i = 0; i < aliasArr.length; i++) {
+                SymbolicState newState = i == aliasArr.length - 1 ? state : state.clone();
+                newState.heap.setSingleAlias(symRef, aliasArr[i]);
+                CompositeConstraint constraint = new CompositeConstraint(symRef, aliasArr, i, false);
+                newState.addPathConstraint(constraint);
                 newStates.add(newState);
-                i++;
             }
             if (newStates.size() > 1) {
                 return Optional.of(newStates);
