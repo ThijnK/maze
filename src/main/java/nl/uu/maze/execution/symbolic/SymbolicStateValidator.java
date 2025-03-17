@@ -14,7 +14,7 @@ import com.microsoft.z3.*;
 
 import nl.uu.maze.execution.ArgMap;
 import nl.uu.maze.execution.ArgMap.*;
-import nl.uu.maze.execution.symbolic.SymbolicHeap.*;
+import nl.uu.maze.execution.symbolic.HeapObjects.*;
 import nl.uu.maze.transform.Z3ToJavaTransformer;
 import nl.uu.maze.util.Z3ContextProvider;
 import nl.uu.maze.util.Z3Sorts;

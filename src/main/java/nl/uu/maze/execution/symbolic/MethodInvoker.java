@@ -18,7 +18,7 @@ import nl.uu.maze.execution.ArgMap.ObjectRef;
 import nl.uu.maze.execution.MethodType;
 import nl.uu.maze.execution.concrete.ConcreteExecutor;
 import nl.uu.maze.execution.concrete.ObjectInstantiator;
-import nl.uu.maze.execution.symbolic.SymbolicHeap.*;
+import nl.uu.maze.execution.symbolic.HeapObjects.*;
 import nl.uu.maze.transform.JavaToZ3Transformer;
 import nl.uu.maze.transform.JimpleToZ3Transformer;
 import nl.uu.maze.util.ObjectUtils;
