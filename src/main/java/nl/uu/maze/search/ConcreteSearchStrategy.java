@@ -13,7 +13,6 @@ import nl.uu.maze.execution.symbolic.SymbolicState;
 import nl.uu.maze.execution.symbolic.SymbolicStateValidator;
 import nl.uu.maze.execution.symbolic.PathConstraint.SingleConstraint;
 import nl.uu.maze.execution.symbolic.PathConstraint.CompositeConstraint;
-import nl.uu.maze.util.Z3Utils;
 
 /**
  * Abstract class for search strategies that operate on concrete-driven DSE.
@@ -152,11 +151,9 @@ public abstract class ConcreteSearchStrategy implements SearchStrategy {
             // Make a copy of the path constraints to avoid modifying the original list
             pathConstraints = new ArrayList<>(pathConstraints);
             if (constraint instanceof CompositeConstraint) {
-                CompositeConstraint negated = ((CompositeConstraint) constraint).clone();
-                negated.setIndex(subIndex);
-                pathConstraints.set(index, negated);
+                pathConstraints.set(index, ((CompositeConstraint) constraint).negate(subIndex));
             } else {
-                pathConstraints.set(index, new SingleConstraint(Z3Utils.negate(constraint.getConstraint())));
+                pathConstraints.set(index, ((SingleConstraint) constraint).negate());
             }
         }
 

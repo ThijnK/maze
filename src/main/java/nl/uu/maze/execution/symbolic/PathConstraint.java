@@ -8,6 +8,7 @@ import com.microsoft.z3.Context;
 import com.microsoft.z3.Expr;
 
 import nl.uu.maze.util.Z3ContextProvider;
+import nl.uu.maze.util.Z3Utils;
 
 /**
  * Represents a path constraint in symbolic execution.
@@ -33,6 +34,10 @@ public abstract class PathConstraint {
 
         public BoolExpr getConstraint() {
             return constraint;
+        }
+
+        public SingleConstraint negate() {
+            return new SingleConstraint(Z3Utils.negate(constraint));
         }
     }
 
@@ -70,7 +75,10 @@ public abstract class PathConstraint {
             this.values = values;
             this.allowDefault = allowDefault;
             this.minIndex = allowDefault ? -1 : 0;
-            setIndex(index);
+            if (index < minIndex || index >= values.length) {
+                throw new IllegalArgumentException("Invalid index for composite constraint");
+            }
+            this.index = index;
         }
 
         private BoolExpr createConstraint() {
@@ -111,19 +119,16 @@ public abstract class PathConstraint {
             return possibleIndices;
         }
 
-        public int getIndex() {
-            return index;
-        }
-
-        public void setIndex(int index) {
-            if (index < minIndex || index >= values.length) {
-                throw new IllegalArgumentException("Invalid index for switch constraint");
+        /**
+         * Negate a composite constraint by creating a new one with the same expression
+         * and values, but a different index indicating that the expression is equal to
+         * a different value.
+         */
+        public CompositeConstraint negate(int newIndex) {
+            if (newIndex < minIndex || newIndex >= values.length) {
+                throw new IllegalArgumentException("Invalid index for composite constraint");
             }
-            this.index = index;
-        }
-
-        public CompositeConstraint clone() {
-            return new CompositeConstraint(expr, values, index, allowDefault);
+            return new CompositeConstraint(expr, values, newIndex, allowDefault);
         }
     }
 }
