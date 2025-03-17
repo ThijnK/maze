@@ -150,26 +150,30 @@ public abstract class ConcreteSearchStrategy implements SearchStrategy {
         public void applyNegation() {
             PathConstraint constraint = pathConstraints.get(index);
             // Make a copy of the path constraints to avoid modifying the original list
-            pathConstraints = new ArrayList<>(pathConstraints);
+            List<PathConstraint> newConstraints = new ArrayList<>(pathConstraints.size());
             // Note: the negation creates a new PathConstraint instance, so original is
             // not modified
-            if (constraint instanceof CompositeConstraint) {
-                pathConstraints.set(index, ((CompositeConstraint) constraint).negate(subIndex));
-                // For alias constraints, it may occur that this alias constraint conflicts with
-                // another path constraint (e.g., from an explicit null comparison in the
-                // program), so we need to negate the other constraint as well
-                if (constraint instanceof AliasConstraint) {
-                    for (int i = 0; i < pathConstraints.size(); i++) {
-                        PathConstraint other = pathConstraints.get(i);
-                        // Note: constraint here refers to original constraint, not the negated one
-                        if (i != index && other instanceof SingleConstraint && constraint.isEqual(other)) {
-                            pathConstraints.set(i, ((SingleConstraint) other).negate());
-                        }
-                    }
+            PathConstraint negated = negateConstraint(constraint);
+            // For alias constraints, it may occur that this alias constraint conflicts with
+            // another path constraint (e.g., from an explicit null comparison in the
+            // program), so we filter out such conflicts
+            for (int i = 0; i < pathConstraints.size(); i++) {
+                if (i == index) {
+                    newConstraints.add(negated);
                 }
-            } else {
-                pathConstraints.set(index, ((SingleConstraint) constraint).negate());
+
+                PathConstraint other = pathConstraints.get(i);
+                // Skip conflicting constraint when negating alias constraints
+                if (!(constraint instanceof AliasConstraint) || !constraint.isEqual(other)) {
+                    newConstraints.add(other);
+                }
             }
+            pathConstraints = newConstraints;
+        }
+
+        public PathConstraint negateConstraint(PathConstraint constraint) {
+            return constraint instanceof CompositeConstraint ? ((CompositeConstraint) constraint).negate(subIndex)
+                    : ((SingleConstraint) constraint).negate();
         }
 
         /**

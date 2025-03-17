@@ -268,6 +268,7 @@ public class DSEController {
             concrete.execute(ctor, javaMethod, argMap);
             // Assume symbolic replay will produce a single final state
             SymbolicState finalState = runSymbolic(method, replayStrategy).getFirst();
+            logger.debug("Replayed state: " + finalState);
 
             boolean isNew = searchStrategy.add(finalState);
             // Only add a new test case if this path has not been explored before
