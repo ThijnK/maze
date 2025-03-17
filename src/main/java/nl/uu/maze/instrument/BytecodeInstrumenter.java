@@ -158,7 +158,7 @@ public class BytecodeInstrumenter {
                 }
             }
 
-            if (refParamCount > 1) {
+            if (refParamCount > 0) {
                 // Create an array for the parameters
                 mv.visitLdcInsn(argTypes.length);
                 mv.visitTypeInsn(Opcodes.ANEWARRAY, "java/lang/Object");

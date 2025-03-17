@@ -519,7 +519,7 @@ public class SymbolicExecutor {
             // others, so we only follow one path
             // Note: for method arguments, aliasing is detected through instrumentation, so
             // those are guaranteed to be correclty resolved
-            // Here, we use a heuristic and hope for the best
+            // Here, for non-argument aliasing, we use a heuristic and hope for the best
             if (replay) {
                 // Find first non-null alias
                 int i = 0;
