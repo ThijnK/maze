@@ -4,7 +4,7 @@ import java.lang.reflect.Array;
 import java.util.Random;
 
 /**
- * Utility class for array operations.
+ * Provides utility methods for working with arrays.
  */
 public class ArrayUtils {
     private static final Random rand = new Random();

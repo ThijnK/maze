@@ -22,14 +22,14 @@ import nl.uu.maze.util.ArrayUtils;
 public class ObjectInstantiator {
     private static final Logger logger = LoggerFactory.getLogger(ObjectInstantiator.class);
 
-    private static Random rand = new Random();
+    private static final Random rand = new Random();
 
     /**
      * Map of cut instances, indexed by their hash code.
      * Used to keep track of instances of the CUT that have been previously created,
      * to be able to reuse them when possible.
      */
-    private static Map<Integer, Object> cutInstances = new HashMap<>();
+    private static final Map<Integer, Object> cutInstances = new HashMap<>();
 
     /**
      * Attempt to create an instance of the given class.
@@ -53,7 +53,7 @@ public class ObjectInstantiator {
     }
 
     /**
-     * Attempt to create an instance of the given class using the given
+     * Attempt to create an instance of a class using the given
      * {@link ArgMap} to determine the arguments to pass to the constructor.
      * 
      * @param ctor   The constructor to use to create the instance
@@ -83,7 +83,7 @@ public class ObjectInstantiator {
             if (!forceNew && cutInstances.containsKey(hash)) {
                 return cutInstances.get(hash);
             } else {
-                logger.debug("Creating instance of class " + ctor.getDeclaringClass().getName() + " with args: "
+                logger.debug("Creating instance of class " + ctor.getDeclaringClass().getSimpleName() + " with args: "
                         + ArrayUtils.toString(args));
                 ctor.setAccessible(true);
                 Object instance = ctor.newInstance(args);
@@ -117,10 +117,9 @@ public class ObjectInstantiator {
      * type is not a primitive type, up to a certain depth.
      * 
      * @param params     The parameters of the method
-     * @param argMap     {@link ArgMap} containing the arguments to pass to the
-     *                   method
-     *                   invocation
      * @param methodType The type of the method
+     * @param argMap     {@link ArgMap} containing the arguments to pass to the
+     *                   method invocation
      * @return An array of arguments corresponding to the given parameters
      */
     public static Object[] generateArgs(Parameter[] params, MethodType methodType, ArgMap argMap) {
@@ -148,14 +147,14 @@ public class ObjectInstantiator {
     /**
      * Generate a random value for the given type.
      * 
-     * @param type  The type of the value to generate
-     * @param depth The current depth of the recursive instantiation
+     * @param type The java class of the value to generate
      * @return A random value or default of the given type
      */
     private static Object generateRandom(Class<?> type) {
         // Create empty array
         if (type.isArray()) {
-            // The newInstance method automatically deals with multi-dimensional arrays
+            // Note: the newInstance method automatically deals with multi-dimensional
+            // arrays
             return Array.newInstance(type.getComponentType(), 0);
         }
 

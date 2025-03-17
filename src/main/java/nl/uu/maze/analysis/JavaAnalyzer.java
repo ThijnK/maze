@@ -37,7 +37,7 @@ import sootup.java.core.views.JavaView;
  * 
  * <p>
  * The constructor of this class takes an optional class path parameter. If no
- * class path is provided, the default class path is set to "target/classes".
+ * class path is provided, a default class path "target/classes" is used.
  * </p>
  */
 public class JavaAnalyzer {
@@ -61,7 +61,7 @@ public class JavaAnalyzer {
      * Returns the {@link ClassType} of a class given its fully qualified name.
      * 
      * @param className The fully qualified name of the class (e.g.,
-     *                  "nl.uu.maze.examples.SimpleExample")
+     *                  "nl.uu.maze.example.SimpleExample")
      * @return The {@link ClassType} of the class
      */
     public JavaClassType getClassType(String className) {
@@ -87,7 +87,6 @@ public class JavaAnalyzer {
      * 
      * @param type The type for which to return the Java class
      * @return The Java class
-     * @throws ClassNotFoundException If a class cannot be found
      */
     public Class<?> getJavaClass(Type type) throws ClassNotFoundException {
         if (type instanceof PrimitiveType) {
@@ -142,10 +141,9 @@ public class JavaAnalyzer {
     }
 
     /**
-     * Returns an array of the Java classes of the parameters of a given SootUp
-     * method.
+     * Returns an array of the Java classes of the given SootUp parameter types.
      * 
-     * @param method The method for which to return the parameter classes
+     * @param parameterTypes The parameter types of the method
      * @return An array of the Java classes of the parameters
      */
     private Class<?>[] getParameterClasses(List<Type> parameterTypes) throws ClassNotFoundException {
@@ -163,8 +161,6 @@ public class JavaAnalyzer {
      * @param method The method for which to return the Java method
      * @param clazz  The Java class in which the method is defined
      * @return The Java method
-     * @throws ClassNotFoundException If a class cannot be found
-     * @throws NoSuchMethodException  If the method cannot be found
      */
     public Method getJavaMethod(JavaSootMethod method, Class<?> clazz)
             throws ClassNotFoundException, NoSuchMethodException {
@@ -177,8 +173,6 @@ public class JavaAnalyzer {
      * @param methodSignature The method signature for which to return the Java
      *                        method
      * @return The Java method
-     * @throws ClassNotFoundException If a class cannot be found
-     * @throws NoSuchMethodException  If the method cannot be found
      */
     public Method getJavaMethod(MethodSignature methodSignature) throws ClassNotFoundException, NoSuchMethodException {
         Class<?> clazz = getJavaClass(methodSignature.getDeclClassType());
@@ -186,10 +180,33 @@ public class JavaAnalyzer {
                 getParameterClasses(methodSignature.getParameterTypes()));
     }
 
+    /**
+     * Returns the Java method of a given SootUp method.
+     * If you already have the Java class of the method, use the other
+     * {@link #getJavaMethod(JavaSootMethod, Class)} method instead.
+     * 
+     * @param method The method for which to return the Java method
+     * @return The Java method
+     */
+    public Method getJavaMethod(JavaSootMethod method) throws ClassNotFoundException, NoSuchMethodException {
+        ClassType classType = method.getDeclaringClassType();
+        Class<?> clazz = getJavaClass(classType);
+        return getJavaMethod(method, clazz);
+    }
+
+    /**
+     * Returns the Java constructor of a given SootUp method signature.
+     * 
+     * @param methodSignature The method signature for which to return the Java
+     *                        constructor
+     * @return The Java constructor
+     * @throws ClassNotFoundException If a class cannot be found
+     * @throws NoSuchMethodException  If the constructor cannot be found
+     */
     public Constructor<?> getJavaConstructor(MethodSignature methodSignature)
             throws ClassNotFoundException, NoSuchMethodException {
         Class<?> clazz = getJavaClass(methodSignature.getDeclClassType());
-        return clazz.getConstructor(getParameterClasses(methodSignature.getParameterTypes()));
+        return clazz.getDeclaredConstructor(getParameterClasses(methodSignature.getParameterTypes()));
     }
 
     /**
@@ -203,23 +220,32 @@ public class JavaAnalyzer {
      */
     public Constructor<?> getJavaConstructor(JavaSootMethod method, Class<?> clazz)
             throws ClassNotFoundException, NoSuchMethodException {
-        return clazz.getConstructor(getParameterClasses(method.getParameterTypes()));
+        return clazz.getDeclaredConstructor(getParameterClasses(method.getParameterTypes()));
     }
 
     /**
-     * Returns the Java method of a given SootUp method.
-     * If you already have the Java class of the method, use the other
-     * {@link #getJavaMethod(JavaSootMethod, Class)} method instead.
+     * Find a constructor for the given class for which arguments can be generated.
+     * This ensures that the constructor does not require complex arguments, such as
+     * instances of inner classes.
      * 
-     * @param method The method for which to return the Java method
-     * @return The Java method
-     * @throws ClassNotFoundException If the class cannot be found
-     * @throws NoSuchMethodException  If the method cannot be found
+     * @param clazz The class to instantiate
+     * @return A constructor for the class
+     * @implNote This will fail if the class has a single constructor which requires
+     *           an instance of an inner class as an argument.
      */
-    public Method getJavaMethod(JavaSootMethod method) throws ClassNotFoundException, NoSuchMethodException {
-        ClassType classType = method.getDeclaringClassType();
-        Class<?> clazz = getJavaClass(classType);
-        return getJavaMethod(method, clazz);
+    public Pair<Constructor<?>, Object[]> getJavaConstructor(Class<?> clazz) {
+        // Find a constructor for which arguments can be generated
+        for (Constructor<?> ctor : clazz.getDeclaredConstructors()) {
+            try {
+                Object[] args = ObjectInstantiator.generateArgs(ctor.getParameters(), MethodType.CTOR, null);
+                return Pair.of(ctor, args);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        logger.warn("Failed to find suitable constructor for class " + clazz.getName());
+        return null;
     }
 
     /**
@@ -245,31 +271,6 @@ public class JavaAnalyzer {
                 }
             }
         }
-        return null;
-    }
-
-    /**
-     * Find a constructor for the given class for which arguments can be generated.
-     * This ensures that the constructor does not require complex arguments, such as
-     * instances of inner classes.
-     * 
-     * @param clazz The class to instantiate
-     * @return A constructor for the class
-     * @implNote This will fail if the class has a single constructor which requires
-     *           an instance of an inner class as an argument.
-     */
-    public Pair<Constructor<?>, Object[]> getJavaConstructor(Class<?> clazz) {
-        // Find a constructor for which arguments can be generated
-        for (Constructor<?> ctor : clazz.getDeclaredConstructors()) {
-            try {
-                Object[] args = ObjectInstantiator.generateArgs(ctor.getParameters(), MethodType.CTOR, null);
-                return Pair.of(ctor, args);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-
-        logger.warn("Failed to find suitable constructor for class " + clazz.getName());
         return null;
     }
 

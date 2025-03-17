@@ -3,7 +3,7 @@ package nl.uu.maze.util;
 import java.util.Objects;
 
 /**
- * Represents an immutable pair of two values.
+ * Represents a pair of two values.
  *
  * @param <First>  the type of the first value in the pair
  * @param <Second> the type of the second value in the pair

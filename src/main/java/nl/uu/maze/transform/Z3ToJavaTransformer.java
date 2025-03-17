@@ -17,7 +17,7 @@ import sootup.core.types.Type;
 import sootup.core.types.PrimitiveType.*;
 
 /**
- * Transform Z3 expressions to Java objects.
+ * Transform Z3 expressions ({@link Expr}) to Java objects.
  */
 public class Z3ToJavaTransformer {
     private static final Z3Sorts sorts = Z3Sorts.getInstance();

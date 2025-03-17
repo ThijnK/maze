@@ -45,7 +45,7 @@ public class ConcreteExecutor {
      * 
      * @param instance The instance to invoke the method on
      * @param method   The method to invoke
-     * @param args     The arguments to pass to the method invocation
+     * @param argMap   {@link ArgMap} containing the arguments to pass to the method
      * @return The return value of the method, or the exception thrown during
      *         execution
      */

@@ -25,8 +25,12 @@ import sootup.core.types.Type;
  * <ul>
  * <li>The current statement being executed</li>
  * <li>The current depth of the symbolic execution</li>
- * <li>A mapping from variable names to symbolic values</li>
- * <li>The path condition of the execution path leading to this state</li>
+ * <li>A store which maps variable names to their (symbolic) values</li>
+ * <li>A heap to store (symbolic) objects and arrays</li>
+ * <li>The return value of the method this state is part of, if present</li>
+ * <li>The path constraints of the execution path leading to this state</li>
+ * <li>The engine constraints imposed by the symbolic execution engine (e.g.,
+ * for array bounds)</li>
  * </ul>
  * </p>
  */
@@ -65,7 +69,7 @@ public class SymbolicState {
     private boolean isFinalState = false;
     /** Indicates whether an exception was thrown during symbolic execution. */
     private boolean exceptionThrown = false;
-    /** Indicates whether the state constraints were found to be unsatisfiable. */
+    /** Indicates whether the state's constraints were found to be unsatisfiable. */
     private boolean isInfeasible = false;
 
     public SymbolicState(MethodSignature methodSig, StmtGraph<?> cfg) {
@@ -97,7 +101,8 @@ public class SymbolicState {
         this.engineConstraints = new ArrayList<>(state.engineConstraints);
         // Share param types map to avoid copying
         this.paramTypes = state.paramTypes;
-        // Note: caller state is are lazily cloned when needed
+        // Note: caller state is lazily cloned when needed, so store a reference to the
+        // original here
         this.caller = state.caller;
 
         this.isFinalState = state.isFinalState;
@@ -118,7 +123,7 @@ public class SymbolicState {
     }
 
     /**
-     * Set the method this symbolic state represents, including the CFG and the
+     * Set the method this symbolic state represents, in terms of its CFG and
      * method signature.
      * Note: also sets the current statement to the starting statement of the CFG.
      */
@@ -212,7 +217,7 @@ public class SymbolicState {
     }
 
     /**
-     * Sets the exceptionThrown flag to true.
+     * Mark this state as an exception-throwing state.
      */
     public void setExceptionThrown() {
         this.exceptionThrown = true;

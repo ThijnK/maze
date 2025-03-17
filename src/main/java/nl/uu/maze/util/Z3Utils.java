@@ -3,6 +3,9 @@ package nl.uu.maze.util;
 import com.microsoft.z3.BoolExpr;
 import com.microsoft.z3.Context;
 
+/**
+ * Provides utility methods for working with Z3.
+ */
 public class Z3Utils {
     private static final Context ctx = Z3ContextProvider.getContext();
 

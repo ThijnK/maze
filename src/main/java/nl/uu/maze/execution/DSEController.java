@@ -28,8 +28,8 @@ import sootup.java.core.JavaSootMethod;
 import sootup.java.core.types.JavaClassType;
 
 /**
- * Controls the dynamic symbolic execution using various search strategies
- * that may mix symbolic and concrete execution.
+ * Controls the dynamic symbolic execution using various search strategies, both
+ * concrete or symbolic-driven.
  */
 public class DSEController {
     private static final Logger logger = LoggerFactory.getLogger(DSEController.class);
@@ -291,5 +291,4 @@ public class DSEController {
             argMap = validator.evaluate(model.get(), finalState, false);
         }
     }
-
 }

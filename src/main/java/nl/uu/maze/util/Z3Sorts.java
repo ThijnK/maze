@@ -13,7 +13,7 @@ import sootup.core.types.PrimitiveType.*;
 import sootup.java.core.types.JavaClassType;
 
 /**
- * Provides global Z3 sorts and other type utilities.
+ * Provides global Z3 sorts and related utility methods.
  */
 public class Z3Sorts {
     private static Z3Sorts instance;

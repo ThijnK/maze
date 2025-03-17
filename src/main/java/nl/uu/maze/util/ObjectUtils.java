@@ -6,7 +6,7 @@ import java.lang.reflect.Field;
 import nl.uu.maze.execution.concrete.ObjectInstantiator;
 
 /**
- * Utility class for copying objects.
+ * Provides utility methods for working with objects.
  */
 public class ObjectUtils {
     /**

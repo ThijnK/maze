@@ -12,6 +12,9 @@ import nl.uu.maze.util.Z3Utils;
 
 /**
  * Represents a path constraint in symbolic execution.
+ * A path constraint is a boolean expression that must be satisfied for a path
+ * to
+ * be taken in the program.
  */
 public abstract class PathConstraint {
     public abstract BoolExpr getConstraint();
@@ -42,10 +45,10 @@ public abstract class PathConstraint {
     }
 
     /**
-     * Represents a path constraint for where an expression is equal to one of a
+     * Represents a path constraint where an expression is equal to one of a
      * list of possible values.
-     * The expression, its possible values, and the index in the list of values are
-     * stored.
+     * The expression is stored separately, and an index is used to indicate which
+     * value the expression should be equal to.
      * If the index is -1, the expression is distinct from all values (relevant for
      * default case of switch statements), but this is only possible if the
      * <code>allowDefault</code> parameter is set to <code>true</code>.
@@ -54,6 +57,7 @@ public abstract class PathConstraint {
      * Two subclasses are provided, one for switch statements
      * ({@link SwitchConstraint}) and one for aliasing
      * ({@link AliasConstraint}). The latter does not allow a default case.
+     * Generally, you should use one of these subclasses instead of this class.
      * </p>
      */
     public static class CompositeConstraint extends PathConstraint {
@@ -88,7 +92,11 @@ public abstract class PathConstraint {
             this.index = index;
         }
 
-        protected BoolExpr createConstraint() {
+        /**
+         * Create the actual boolean expression for this composite constraint, i.e., set
+         * the expression equal to the value at the index.
+         */
+        private BoolExpr createConstraint() {
             // For default case, return a constraint that the expr is distinct from any of
             // the case values
             if (index == -1) {
@@ -162,7 +170,8 @@ public abstract class PathConstraint {
         /**
          * Check if this alias constraint is conflicting with another path constraint.
          * That is, if the other constraint is an equality constraint and one of the
-         * expressions is equal to the expression of this alias constraint.
+         * expressions is equal to the expression of this alias constraint, then it
+         * conflicts.
          */
         public boolean isConflicting(PathConstraint other) {
             BoolExpr otherConstraint = other.getConstraint();

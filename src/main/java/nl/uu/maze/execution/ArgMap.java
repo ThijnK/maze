@@ -4,8 +4,6 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
-import java.util.Map.Entry;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +18,15 @@ import sootup.core.types.Type;
  * Represents a map of arguments to be passed to a method.
  * Created either by the {@link ObjectInstantiator} randomly or from a Z3 model
  * by the {@link SymbolicStateValidator}.
+ * 
+ * <p>
+ * Arguments are identified based on their names, e.g., "carg0" is the first
+ * argument of a constructor, and "marg0" is the first argument of a regular
+ * method.
+ * These names should be created using the {@link #getSymbolicName
+ * getSymbolicName}
+ * method.
+ * </p>
  */
 public class ArgMap {
     private static final Logger logger = LoggerFactory.getLogger(ArgMap.class);
@@ -40,27 +47,8 @@ public class ArgMap {
      */
     private Map<String, Object> converted = new HashMap<>();
 
-    public ArgMap(Map<String, Object> args) {
-        this.args = args;
-    }
-
-    public ArgMap(Object[] args, MethodType type) {
-        this.args = new java.util.HashMap<>();
-        addAll(args, type);
-    }
-
     public ArgMap() {
         this.args = new java.util.HashMap<>();
-    }
-
-    public void addAll(Object[] args, MethodType type) {
-        for (int i = 0; i < args.length; i++) {
-            this.args.put(getSymbolicName(type, i), args[i]);
-        }
-    }
-
-    public Map<String, Object> getArgs() {
-        return args;
     }
 
     public void set(String key, Object value) {
@@ -85,10 +73,6 @@ public class ArgMap {
 
     public boolean containsKey(String key) {
         return args.containsKey(key);
-    }
-
-    public Set<Entry<String, Object>> entrySet() {
-        return args.entrySet();
     }
 
     /**

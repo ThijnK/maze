@@ -12,20 +12,18 @@ import sootup.core.jimple.common.ref.JInstanceFieldRef;
 import sootup.core.jimple.visitor.AbstractValueVisitor;
 
 /**
- * Extracts symbolic references which may reference at least one alias from a
- * Jimple value ({@link Value}).
+ * Extracts symbolic references from a Jimple value ({@link Value}).
  */
 public class SymbolicRefExtractor extends AbstractValueVisitor<Expr<?>> {
     private SymbolicState state;
 
     /**
-     * Extracts symbolic references which reference at least one alias from a
-     * Jimple value.
+     * Extracts symbolic references from a Jimple value.
      * 
      * @param value the Jimple value to extract symbolic references from
      * @param state the symbolic state to use
-     * @return the symbolic references extracted from the Jimple value or null if no
-     *         symbolic references were found
+     * @return the first symbolic reference encountered or null if no
+     *         symbolic references occur in the value
      */
     public Expr<?> extract(Value value, SymbolicState state) {
         this.state = state;

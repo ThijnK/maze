@@ -13,13 +13,25 @@ import sootup.core.types.ClassType;
 import sootup.core.types.Type;
 
 /**
- * Manages symbolic trace files and its entries.
+ * Manages symbolic traces and their entries.
  */
 public class TraceManager {
     /**
      * Represents the type of a branch in a symbolic trace file.
      * This can be either an if-statement, a switch-statement, an array access, or
      * an alias resolution.
+     * 
+     * <p>
+     * Array indexing and alias resolution are not "explicit" branches in the
+     * program, but would cause forking in the symbolic execution.
+     * For array indexing, it would be to determine whether the index is within
+     * bounds or not.
+     * For alias resolution, it would be to determine whether some reference
+     * references another refernce, is a null rereferece, or is a reference to a new
+     * object.
+     * Alias resolution currently only supports detecting aliasing between the
+     * arguments of a method.
+     * </p>
      */
     public static enum BranchType {
         IF, SWITCH, ARRAY, ALIAS;
@@ -30,7 +42,9 @@ public class TraceManager {
         }
     }
 
-    // Lists to store the trace entries per method
+    /**
+     * Stores the trace entries for each method in memory.
+     */
     private static Map<String, Queue<TraceEntry>> traceEntries = new HashMap<>();
 
     /**
@@ -80,8 +94,9 @@ public class TraceManager {
     }
 
     /**
-     * Build a signature for a method from its class name, method name, and
+     * Build a custom signature for a method from its class name, method name, and
      * descriptor.
+     * This is used to identify methods in the {@link #traceEntries} map.
      * 
      * @param className  The fully qualified name of the class
      * @param methodName The name of the method
@@ -163,10 +178,14 @@ public class TraceManager {
      * 
      * <p>
      * The entry consists of the method name, the branch type and the value of the
-     * branch. The value represents which branch was taken. In case of an
-     * if-statement, the value is 0 for the false branch and 1 for the true branch.
-     * In case of a switch-statement, the value is the index of the branch that was
-     * taken.
+     * branch. The value represents which branch was taken.
+     * Depending on the branch type, the value can mean different things:
+     * <ul>
+     * <li>If-else: 0 for the false branch, 1 for the true branch</li>
+     * <li>Switch: the index of the branch that was taken</li>
+     * <li>Array access: 0 for out-of-bounds, 1 for in-bounds</li>
+     * <li>Alias resolution: -1 for null reference, index of the parameter it refers
+     * to otherwise (which can be itself or a previous paramter)</li>
      * </p>
      */
     public static class TraceEntry {

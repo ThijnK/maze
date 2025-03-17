@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Represents a generic execution tree where each node can hold value of any
+ * Represents a generic tree where each node can hold a value of any
  * type.
  *
  * @param <T> The type of value held in each node.
@@ -13,7 +13,7 @@ import java.util.Optional;
 public class Tree<T> {
 
     /**
-     * Represents a node in the execution tree.
+     * Represents a node in the tree.
      *
      * @param <T> The type of value held in each node.
      */

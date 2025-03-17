@@ -16,6 +16,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Instruments Java bytecode files to record symbolic traces during (concrete)
+ * execution.
+ * Uses the ASM library.
+ */
 public class BytecodeInstrumenter {
     private static final String TRACE_MANAGER_PATH = TraceManager.class.getName().replace('.', '/');
     private static final String BRANCH_TYPE_PATH = BranchType.class.getName().replace('.', '/');
