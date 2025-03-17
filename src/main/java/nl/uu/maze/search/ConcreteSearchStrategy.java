@@ -149,6 +149,7 @@ public abstract class ConcreteSearchStrategy implements SearchStrategy {
          */
         public void applyNegation() {
             PathConstraint constraint = pathConstraints.get(index);
+            AliasConstraint alias = constraint instanceof AliasConstraint ? (AliasConstraint) constraint : null;
             // Make a copy of the path constraints to avoid modifying the original list
             List<PathConstraint> newConstraints = new ArrayList<>(pathConstraints.size());
             // Note: the negation creates a new PathConstraint instance, so original is
@@ -160,11 +161,12 @@ public abstract class ConcreteSearchStrategy implements SearchStrategy {
             for (int i = 0; i < pathConstraints.size(); i++) {
                 if (i == index) {
                     newConstraints.add(negated);
+                    continue;
                 }
 
                 PathConstraint other = pathConstraints.get(i);
                 // Skip conflicting constraint when negating alias constraints
-                if (!(constraint instanceof AliasConstraint) || !constraint.isEqual(other)) {
+                if (alias == null || !alias.isConflicting(other)) {
                     newConstraints.add(other);
                 }
             }

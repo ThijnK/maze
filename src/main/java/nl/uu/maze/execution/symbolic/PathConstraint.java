@@ -16,14 +16,6 @@ import nl.uu.maze.util.Z3Utils;
 public abstract class PathConstraint {
     public abstract BoolExpr getConstraint();
 
-    /**
-     * Check if this path constraint represents the same boolean expression as
-     * another path constraint.
-     */
-    public boolean isEqual(PathConstraint other) {
-        return getConstraint().equals(other.getConstraint());
-    }
-
     @Override
     public String toString() {
         return getConstraint().toString();
@@ -34,7 +26,7 @@ public abstract class PathConstraint {
      * expression.
      */
     public static class SingleConstraint extends PathConstraint {
-        private final BoolExpr constraint;
+        protected final BoolExpr constraint;
 
         public SingleConstraint(BoolExpr constraint) {
             this.constraint = constraint;
@@ -65,14 +57,14 @@ public abstract class PathConstraint {
      * </p>
      */
     public static class CompositeConstraint extends PathConstraint {
-        private static final Context ctx = Z3ContextProvider.getContext();
+        protected static final Context ctx = Z3ContextProvider.getContext();
 
-        private final Expr<?> expr;
-        private final Expr<?>[] values;
-        private final int index;
-        private final int minIndex;
-        private final boolean allowDefault;
-        private BoolExpr constraint;
+        protected final Expr<?> expr;
+        protected final Expr<?>[] values;
+        protected final int index;
+        protected final int minIndex;
+        protected final boolean allowDefault;
+        protected BoolExpr constraint;
 
         /**
          * Create a new composite constraint.
@@ -96,7 +88,7 @@ public abstract class PathConstraint {
             this.index = index;
         }
 
-        private BoolExpr createConstraint() {
+        protected BoolExpr createConstraint() {
             // For default case, return a constraint that the expr is distinct from any of
             // the case values
             if (index == -1) {
@@ -165,6 +157,28 @@ public abstract class PathConstraint {
     public static class AliasConstraint extends CompositeConstraint {
         public AliasConstraint(Expr<?> expr, Expr<?>[] values, int index) {
             super(expr, values, index, false);
+        }
+
+        /**
+         * Check if this alias constraint is conflicting with another path constraint.
+         * That is, if the other constraint is an equality constraint and one of the
+         * expressions is equal to the expression of this alias constraint.
+         */
+        public boolean isConflicting(PathConstraint other) {
+            BoolExpr otherConstraint = other.getConstraint();
+            if (otherConstraint.isNot()) {
+                otherConstraint = (BoolExpr) otherConstraint.getArgs()[0];
+            }
+            if (!otherConstraint.isEq()) {
+                return false;
+            }
+
+            for (Expr<?> arg : otherConstraint.getArgs()) {
+                if (arg.equals(expr)) {
+                    return true;
+                }
+            }
+            return false;
         }
     }
 }
