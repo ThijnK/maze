@@ -16,6 +16,14 @@ import nl.uu.maze.util.Z3Utils;
 public abstract class PathConstraint {
     public abstract BoolExpr getConstraint();
 
+    /**
+     * Check if this path constraint represents the same boolean expression as
+     * another path constraint.
+     */
+    public boolean isEqual(PathConstraint other) {
+        return getConstraint().equals(other.getConstraint());
+    }
+
     @Override
     public String toString() {
         return getConstraint().toString();
@@ -47,16 +55,23 @@ public abstract class PathConstraint {
      * The expression, its possible values, and the index in the list of values are
      * stored.
      * If the index is -1, the expression is distinct from all values (relevant for
-     * default case of switch statements).
+     * default case of switch statements), but this is only possible if the
+     * <code>allowDefault</code> parameter is set to <code>true</code>.
+     * 
+     * <p>
+     * Two subclasses are provided, one for switch statements
+     * ({@link SwitchConstraint}) and one for aliasing
+     * ({@link AliasConstraint}). The latter does not allow a default case.
+     * </p>
      */
     public static class CompositeConstraint extends PathConstraint {
         private static final Context ctx = Z3ContextProvider.getContext();
 
         private final Expr<?> expr;
         private final Expr<?>[] values;
-        private int index;
-        private int minIndex;
-        private boolean allowDefault;
+        private final int index;
+        private final int minIndex;
+        private final boolean allowDefault;
         private BoolExpr constraint;
 
         /**
@@ -129,6 +144,27 @@ public abstract class PathConstraint {
                 throw new IllegalArgumentException("Invalid index for composite constraint");
             }
             return new CompositeConstraint(expr, values, newIndex, allowDefault);
+        }
+    }
+
+    /**
+     * Represents a constraint for a switch statement.
+     * The expression is constrained to be equal to one of the possible values.
+     */
+    public static class SwitchConstraint extends CompositeConstraint {
+        public SwitchConstraint(Expr<?> expr, Expr<?>[] values, int index) {
+            super(expr, values, index, true);
+        }
+    }
+
+    /**
+     * Represents a constraint for aliasing.
+     * A symbolic reference is constrainted to be equal to one of the possible
+     * concrete heap references.
+     */
+    public static class AliasConstraint extends CompositeConstraint {
+        public AliasConstraint(Expr<?> expr, Expr<?>[] values, int index) {
+            super(expr, values, index, false);
         }
     }
 }

@@ -12,6 +12,7 @@ import nl.uu.maze.execution.symbolic.PathConstraint;
 import nl.uu.maze.execution.symbolic.SymbolicState;
 import nl.uu.maze.execution.symbolic.SymbolicStateValidator;
 import nl.uu.maze.execution.symbolic.PathConstraint.SingleConstraint;
+import nl.uu.maze.execution.symbolic.PathConstraint.AliasConstraint;
 import nl.uu.maze.execution.symbolic.PathConstraint.CompositeConstraint;
 
 /**
@@ -150,8 +151,22 @@ public abstract class ConcreteSearchStrategy implements SearchStrategy {
             PathConstraint constraint = pathConstraints.get(index);
             // Make a copy of the path constraints to avoid modifying the original list
             pathConstraints = new ArrayList<>(pathConstraints);
+            // Note: the negation creates a new PathConstraint instance, so original is
+            // not modified
             if (constraint instanceof CompositeConstraint) {
                 pathConstraints.set(index, ((CompositeConstraint) constraint).negate(subIndex));
+                // For alias constraints, it may occur that this alias constraint conflicts with
+                // another path constraint (e.g., from an explicit null comparison in the
+                // program), so we need to negate the other constraint as well
+                if (constraint instanceof AliasConstraint) {
+                    for (int i = 0; i < pathConstraints.size(); i++) {
+                        PathConstraint other = pathConstraints.get(i);
+                        // Note: constraint here refers to original constraint, not the negated one
+                        if (i != index && other instanceof SingleConstraint && constraint.isEqual(other)) {
+                            pathConstraints.set(i, ((SingleConstraint) other).negate());
+                        }
+                    }
+                }
             } else {
                 pathConstraints.set(index, ((SingleConstraint) constraint).negate());
             }

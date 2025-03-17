@@ -22,7 +22,7 @@ import nl.uu.maze.execution.ArgMap.ObjectRef;
 import nl.uu.maze.execution.MethodType;
 import nl.uu.maze.execution.concrete.ConcreteExecutor;
 import nl.uu.maze.execution.concrete.ObjectInstantiator;
-import nl.uu.maze.execution.symbolic.PathConstraint.CompositeConstraint;
+import nl.uu.maze.execution.symbolic.PathConstraint.*;
 import nl.uu.maze.execution.symbolic.SymbolicHeap.*;
 import nl.uu.maze.instrument.TraceManager;
 import nl.uu.maze.instrument.TraceManager.TraceEntry;
@@ -181,8 +181,8 @@ public class SymbolicExecutor {
 
             TraceEntry entry = TraceManager.consumeEntry(state.getMethodSignature());
             int branchIndex = entry.getValue();
-            CompositeConstraint constraint = new CompositeConstraint(var, values,
-                    branchIndex >= cases.size() ? -1 : branchIndex, true);
+            SwitchConstraint constraint = new SwitchConstraint(var, values,
+                    branchIndex >= cases.size() ? -1 : branchIndex);
             state.addPathConstraint(constraint);
             state.setStmt(succs.get(branchIndex));
             newStates.add(state);
@@ -194,7 +194,7 @@ public class SymbolicExecutor {
                 SymbolicState newState = i == succs.size() - 1 ? state : state.clone();
 
                 // Last successor is the default case
-                CompositeConstraint constraint = new CompositeConstraint(var, values, i >= cases.size() ? -1 : i, true);
+                SwitchConstraint constraint = new SwitchConstraint(var, values, i >= cases.size() ? -1 : i);
                 newState.addPathConstraint(constraint);
                 newState.setStmt(succs.get(i));
                 newStates.add(newState);
@@ -370,7 +370,7 @@ public class SymbolicExecutor {
         }
         // Constrain the parameter to the right alias
         state.heap.setSingleAlias(symRef, alias);
-        CompositeConstraint constraint = new CompositeConstraint(symRef, aliasArr, i, false);
+        AliasConstraint constraint = new AliasConstraint(symRef, aliasArr, i);
         state.addPathConstraint(constraint);
     }
 
@@ -537,7 +537,7 @@ public class SymbolicExecutor {
             for (int i = 0; i < aliasArr.length; i++) {
                 SymbolicState newState = i == aliasArr.length - 1 ? state : state.clone();
                 newState.heap.setSingleAlias(symRef, aliasArr[i]);
-                CompositeConstraint constraint = new CompositeConstraint(symRef, aliasArr, i, false);
+                AliasConstraint constraint = new AliasConstraint(symRef, aliasArr, i);
                 // For parameters, we add alias constraints to the path constraints, so they can
                 // be used in the search space for concrete-driven DSE
                 // For non-parameters, we add them to the engine constraints, so they are not
