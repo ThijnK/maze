@@ -12,7 +12,7 @@ import sootup.core.jimple.common.ref.JInstanceFieldRef;
 import sootup.core.jimple.visitor.AbstractValueVisitor;
 
 /**
- * Extracts symbolic references from a Jimple value ({@link Value}).
+ * Extracts unresolved symbolic references from a Jimple value ({@link Value}).
  */
 public class SymbolicRefExtractor extends AbstractValueVisitor<Expr<?>> {
     private SymbolicState state;
@@ -22,7 +22,8 @@ public class SymbolicRefExtractor extends AbstractValueVisitor<Expr<?>> {
      * 
      * @param value the Jimple value to extract symbolic references from
      * @param state the symbolic state to use
-     * @return the first symbolic reference encountered or null if no
+     * @return the first symbolic reference encountered which has multiple potential
+     *         aliases and has not been resolved yet or null if no
      *         symbolic references occur in the value
      */
     public Expr<?> extract(Value value, SymbolicState state) {
@@ -39,7 +40,7 @@ public class SymbolicRefExtractor extends AbstractValueVisitor<Expr<?>> {
 
     private Expr<?> extract(String name) {
         Expr<?> var = state.lookup(name);
-        if (state.heap.isAliased(var)) {
+        if (!state.heap.isResolved(var) && state.heap.isAliased(var)) {
             return var;
         }
         return null;
