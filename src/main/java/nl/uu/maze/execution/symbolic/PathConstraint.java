@@ -100,10 +100,7 @@ public abstract class PathConstraint {
             // For default case, return a constraint that the expr is distinct from any of
             // the case values
             if (index == -1) {
-                List<Expr<?>> exprs = new ArrayList<>();
-                for (int i = 0; i < values.length; i++) {
-                    exprs.add(values[i]);
-                }
+                List<Expr<?>> exprs = new ArrayList<>(List.of(values));
                 exprs.add(expr);
                 constraint = ctx.mkDistinct(exprs.toArray(Expr<?>[]::new));
             } else {
@@ -159,7 +156,7 @@ public abstract class PathConstraint {
 
     /**
      * Represents a constraint for aliasing.
-     * A symbolic reference is constrainted to be equal to one of the possible
+     * A symbolic reference is constrained to be equal to one of the possible
      * concrete heap references.
      */
     public static class AliasConstraint extends CompositeConstraint {

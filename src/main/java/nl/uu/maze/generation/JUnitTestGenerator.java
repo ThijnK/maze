@@ -42,20 +42,19 @@ public class JUnitTestGenerator {
     private final JavaAnalyzer analyzer;
     private final ConcreteExecutor executor;
 
-    private String testClassName;
-    private TypeSpec.Builder classBuilder;
-    private Class<?> clazz;
+    private final String testClassName;
+    private final TypeSpec.Builder classBuilder;
+    private final Class<?> clazz;
 
     /** Map of method names to the number of test cases generated for each method */
-    private Map<String, Integer> methodCount;
-    private Set<Integer> builtTestCases = new HashSet<>();
+    private final Map<String, Integer> methodCount;
+    private final Set<Integer> builtTestCases = new HashSet<>();
     private boolean setFieldAdded = false;
 
     private final Set<Class<?>> primitiveWrappers = Set.of(Boolean.class, Byte.class, Short.class, Integer.class,
             Long.class, Float.class, Double.class, Character.class);
 
-    public JUnitTestGenerator(Class<?> clazz, JavaAnalyzer analyzer, ConcreteExecutor executor)
-            throws ClassNotFoundException {
+    public JUnitTestGenerator(Class<?> clazz, JavaAnalyzer analyzer, ConcreteExecutor executor) {
         testClassName = clazz.getSimpleName() + "Test";
         classBuilder = TypeSpec.classBuilder(testClassName)
                 .addModifiers(Modifier.PUBLIC);
@@ -76,8 +75,8 @@ public class JUnitTestGenerator {
      */
     public void addMethodTestCases(JavaSootMethod method, JavaSootMethod ctor, List<ArgMap> argMaps) {
         logger.info("Generating JUnit test cases...");
-        for (int i = 0; i < argMaps.size(); i++) {
-            addMethodTestCase(method, ctor, argMaps.get(i));
+        for (ArgMap argMap : argMaps) {
+            addMethodTestCase(method, ctor, argMap);
         }
     }
 
@@ -96,7 +95,7 @@ public class JUnitTestGenerator {
             Method _method = analyzer.getJavaMethod(method, clazz);
             retval = executor.execute(_ctor, _method, argMap);
         } catch (Exception e) {
-            logger.warn("Failed to generate execute test case for " + method.getName());
+            logger.warn("Failed to generate execute test case for {}", method.getName());
             return;
         }
         boolean isVoid = method.getReturnType().toString().equals("void");
@@ -194,7 +193,7 @@ public class JUnitTestGenerator {
             Object value = argMap.get(var);
             Type type = paramTypes.get(i);
 
-            // For object paramters create an instance of the object
+            // For object parameters create an instance of the object
             // If the argMap does not contain a value for the param, create arbitrary object
             if (type instanceof ClassType && (!argMap.containsKey(var) || value instanceof ObjectInstance)) {
                 buildObjectInstance(methodBuilder, argMap, builtObjects, var,
@@ -262,8 +261,7 @@ public class JUnitTestGenerator {
             if (var != null) {
                 addStatementTriple(methodBuilder, type, var, ref.getVar());
             }
-        } else if (value instanceof ObjectRef) {
-            ObjectRef refValue = (ObjectRef) value;
+        } else if (value instanceof ObjectRef refValue) {
             buildFromReference(methodBuilder, argMap, builtObjects, refValue, type, ref.getVar());
             if (var != null) {
                 addStatementTriple(methodBuilder, type, var, ref.getVar());
@@ -320,7 +318,7 @@ public class JUnitTestGenerator {
                     methodBuilder.addStatement("setField($L, \"$L\", $L)", var, field.getName(), fieldVar);
                 }
             } catch (IllegalAccessException e) {
-                logger.warn("Failed to access field " + field.getName() + " in " + clazz.getName());
+                logger.warn("Failed to access field {} in {}", field.getName(), clazz.getName());
             }
         }
     }
@@ -330,7 +328,7 @@ public class JUnitTestGenerator {
      * constructor arguments.
      */
     private void buildObjectInstance(MethodSpec.Builder methodBuilder, String var, Class<?> clazz) {
-        Object[] arguments = analyzer.getJavaConstructor(clazz).getSecond();
+        Object[] arguments = analyzer.getJavaConstructor(clazz).second();
         String[] argNames = new String[arguments.length];
         for (int i = 0; i < arguments.length; i++) {
             Object arg = arguments[i];
@@ -370,7 +368,7 @@ public class JUnitTestGenerator {
 
     /**
      * Builds an object instance for the given ClassType with randomly generated
-     * constructor arguments, but overwrites any fields defiend in the given
+     * constructor arguments, but overwrites any fields defined in the given
      * ObjectFields argument with the given values.
      */
     private void addFieldDefinitions(MethodSpec.Builder methodBuilder, ArgMap argMap, Set<String> builtObjects,
@@ -382,11 +380,10 @@ public class JUnitTestGenerator {
             addSetFieldMethod();
 
             ObjectField field = entry.getValue();
-            if (field.getValue() instanceof ObjectRef) {
-                ObjectRef ref = (ObjectRef) field.getValue();
+            if (field.getValue() instanceof ObjectRef ref) {
                 // If the reference is to another object, build that object first
                 // Note: Arrays etc. will always be references, i.e., not directly defined
-                // inside of the ObjectInstance
+                // inside the ObjectInstance
                 if (!builtObjects.contains(ref.getVar())) {
                     buildFromReference(methodBuilder, argMap, builtObjects, ref, field.getType());
                 }
@@ -438,9 +435,9 @@ public class JUnitTestGenerator {
                     .addFileComment("Auto-generated by Maze")
                     .build();
             javaFile.writeToPath(path);
-            logger.info("JUnit test cases written to src/test/java/" + packageName + "/" + testClassName + ".java");
+            logger.info("JUnit test cases written to src/test/java/{}/{}.java", packageName, testClassName);
         } catch (Exception e) {
-            logger.error("Failed to generate JUnit test cases: " + e.getMessage());
+            logger.error("Failed to generate JUnit test cases: {}", e.getMessage());
         }
     }
 
@@ -456,7 +453,7 @@ public class JUnitTestGenerator {
             return "\"" + value + "\"";
         }
         if (value instanceof Character) {
-            return "\'" + Character.toString((char) value) + "\'";
+            return "'" + value + "'";
         }
         if (value.getClass().isArray()) {
             return arrayToString(value);
@@ -527,28 +524,18 @@ public class JUnitTestGenerator {
             return "{}";
         }
 
-        switch (type.toString()) {
-            case "int":
-                return "0";
-            case "boolean":
-                return "false";
-            case "char":
-                return "'\\u0000'";
-            case "byte":
-                return "(byte) 0";
-            case "short":
-                return "(short) 0";
-            case "long":
-                return "0L";
-            case "float":
-                return "0.0f";
-            case "double":
-                return "0.0";
-            case "java.lang.String":
-                return "\"\"";
-            default:
-                return "null";
-        }
+        return switch (type.toString()) {
+            case "int" -> "0";
+            case "boolean" -> "false";
+            case "char" -> "'\\u0000'";
+            case "byte" -> "(byte) 0";
+            case "short" -> "(short) 0";
+            case "long" -> "0L";
+            case "float" -> "0.0f";
+            case "double" -> "0.0";
+            case "java.lang.String" -> "\"\"";
+            default -> "null";
+        };
     }
 
     private boolean isPrimitive(Object obj) {

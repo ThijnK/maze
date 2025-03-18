@@ -24,7 +24,7 @@ import sootup.core.types.Type;
 /**
  * Represents a heap that maps references in the form of Z3 expressions to heap
  * objects.
- * Note that it is not a purely symbolic heap, rather the underyling
+ * Note that it is not a purely symbolic heap, rather the underlying
  * implementation relies on concrete values to be used as keys in a hash map.
  */
 public class SymbolicHeap {
@@ -40,19 +40,19 @@ public class SymbolicHeap {
 
     private int heapCounter = 0;
     private int refCounter = 0;
-    private Map<Expr<?>, HeapObject> heap = new HashMap<>();
-    private Map<Expr<?>, Set<Expr<?>>> aliasMap = new HashMap<>();
+    private final Map<Expr<?>, HeapObject> heap = new HashMap<>();
+    private final Map<Expr<?>, Set<Expr<?>>> aliasMap = new HashMap<>();
     /** Refs for which the state has been split to resolve aliasing. */
     private Set<Expr<?>> resolvedRefs;
     /**
-     * Tracks indices of multi-dimensional array accesses.
-     * In JVM bytecode, accessing a multi-dimensional array is done by accessing the
+     * Tracks indices of multidimensional array accesses.
+     * In JVM bytecode, accessing a multidimensional array is done by accessing the
      * array at each dimension separately, i.e., <code>arr[0][1]</code> becomes
      * <code>$stack0 = arr[0]; $stack1 = $stack0[1];</code>
      * This map stores the indices of each dimension accessed so far for a given
      * array variable. In the example, the map would store
      * <code>$stack0 -> [0]</code>.
-     * Only used for multi-dimensional arrays.
+     * Only used for multidimensional arrays.
      */
     private Map<String, BitVecExpr[]> arrayIndices = new HashMap<>();
 
@@ -112,10 +112,6 @@ public class SymbolicHeap {
         return heap.entrySet();
     }
 
-    public boolean containsRef(Expr<?> ref) {
-        return heap.containsKey(ref);
-    }
-
     public String newObjKey() {
         return "obj" + heapCounter++;
     }
@@ -146,7 +142,7 @@ public class SymbolicHeap {
 
     @Override
     public String toString() {
-        return heap.toString() + ", AliasMap: " + aliasMap.toString();
+        return heap + ", AliasMap: " + aliasMap;
     }
 
     @Override
@@ -195,10 +191,7 @@ public class SymbolicHeap {
     public boolean isAliased(Expr<?> symRef) {
         // Check if the current expression is a sym reference with at least one alias
         Set<Expr<?>> aliases = aliasMap.get(symRef);
-        if (aliases != null && aliases.size() > 0) {
-            return true;
-        }
-        return false;
+        return aliases != null && !aliases.isEmpty();
     }
 
     /**
@@ -259,7 +252,7 @@ public class SymbolicHeap {
         heap.put(conRef, obj);
 
         // Set aliases for the symbolic reference
-        Set<Expr<?>> aliases = new HashSet<Expr<?>>();
+        Set<Expr<?>> aliases = new HashSet<>();
         aliases.add(conRef);
         aliasMap.put(symRef, aliases);
     }
@@ -326,9 +319,9 @@ public class SymbolicHeap {
     }
 
     /**
-     * Allocates a multi-dimensional array with the given sizes and element type,
+     * Allocates a multidimensional array with the given sizes and element type,
      * and returns its reference.
-     * This should be used for "concrete" multi-dimensional arrays, for which we
+     * This should be used for "concrete" multidimensional arrays, for which we
      * know the sizes, e.g.,
      * for expressions like `new int[3][4]`.
      */
@@ -350,10 +343,10 @@ public class SymbolicHeap {
     }
 
     /**
-     * Allocates a multi-dimensional array of the given element type, using symbolic
+     * Allocates a multidimensional array of the given element type, using symbolic
      * variables for its sizes and elements,
      * and returns its reference.
-     * This should be used for symbolic multi-dimensional arrays, for which we do
+     * This should be used for symbolic multidimensional arrays, for which we do
      * not know the sizes or the elements, e.g.,
      * when passed as method arguments.
      */
@@ -409,25 +402,18 @@ public class SymbolicHeap {
      */
     private ArrayObject getArrayObject(Expr<?> symRef) {
         HeapObject obj = getHeapObject(symRef);
-        if (obj != null && obj instanceof ArrayObject) {
+        if (obj instanceof ArrayObject) {
             return (ArrayObject) obj;
         }
         return null;
     }
 
     /**
-     * Determines whether the given variable references an array.
-     */
-    public boolean isArray(String var) {
-        return getArrayObject(state.lookup(var)) != null;
-    }
-
-    /**
-     * Determines whether the given variable references a multi-dimensional array.
+     * Determines whether the given variable references a multidimensional array.
      */
     public boolean isMultiArray(String var) {
         HeapObject obj = getHeapObject(var);
-        return obj != null && obj instanceof MultiArrayObject;
+        return obj instanceof MultiArrayObject;
     }
 
     public boolean isSymbolicArray(String var) {
@@ -603,8 +589,7 @@ public class SymbolicHeap {
             return null;
         }
 
-        if (arrObj instanceof MultiArrayObject) {
-            MultiArrayObject multiArrObj = (MultiArrayObject) arrObj;
+        if (arrObj instanceof MultiArrayObject multiArrObj) {
             int dim = multiArrObj.getDim();
             BitVecExpr[] indices = getArrayIndices(var, dim, index);
 
@@ -638,7 +623,7 @@ public class SymbolicHeap {
     }
 
     /**
-     * Sets the value at the given indices for the given symbolic multi-dimensional
+     * Sets the value at the given indices for the given symbolic multidimensional
      * array reference.
      */
     public <E extends Sort> void setArrayElement(Expr<?> symRef, BitVecExpr[] indices, Expr<E> value) {
@@ -663,13 +648,12 @@ public class SymbolicHeap {
             return;
         }
 
-        if (arrObj instanceof MultiArrayObject) {
+        if (arrObj instanceof MultiArrayObject multiArrObj) {
             if (sorts.isRef(value)) {
-                // Reassigning part of a multi-dimensional array to another array not supported
+                // Reassigning part of a multidimensional array to another array not supported
                 throw new RuntimeException("Cannot assign reference to multi-dimensional array element");
             }
 
-            MultiArrayObject multiArrObj = (MultiArrayObject) arrObj;
             int dim = multiArrObj.getDim();
             BitVecExpr[] indices = getArrayIndices(var, dim, index);
 
@@ -712,7 +696,7 @@ public class SymbolicHeap {
             return ((MultiArrayObject) arrObj).getLength(dim);
         }
 
-        return ((ArrayObject) arrObj).getLength();
+        return arrObj.getLength();
     }
     // #endregion
 }

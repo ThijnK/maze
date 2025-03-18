@@ -30,7 +30,7 @@ public class ConcreteExecutor {
         // If not static, create an instance of the class
         Object instance = null;
         if (!Modifier.isStatic(method.getModifiers())) {
-            instance = ObjectInstantiator.createInstance(ctor, argMap);
+            instance = ObjectInstantiation.createInstance(ctor, argMap);
             // If constructor throws an exception, return it
             if (instance == null) {
                 return new ConstructorException();
@@ -51,14 +51,14 @@ public class ConcreteExecutor {
      */
     public Object execute(Object instance, Method method, ArgMap argMap) {
         try {
-            Object[] args = ObjectInstantiator.generateArgs(method.getParameters(), MethodType.METHOD, argMap);
-            logger.debug("Executing method " + method.getName() + " with args: " + ArrayUtils.toString(args));
+            Object[] args = ObjectInstantiation.generateArgs(method.getParameters(), MethodType.METHOD, argMap);
+            logger.debug("Executing method {} with args: {}", method.getName(), ArrayUtils.toString(args));
             Object result = method.invoke(instance, args);
-            logger.debug("Retval: " + (result == null ? "null" : result.toString()));
+            logger.debug("Retval: {}", result == null ? "null" : result.toString());
 
             return result;
         } catch (Exception e) {
-            logger.warn("Execution of method " + method.getName() + " threw an exception: " + e);
+            logger.warn("Execution of method {} threw an exception: {}", method.getName(), e.getMessage());
             return new MethodException();
         }
     }

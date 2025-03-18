@@ -17,7 +17,7 @@ import sootup.core.types.Type;
  */
 public class TraceManager {
     /**
-     * Represents the type of a branch in a symbolic trace file.
+     * Represents the type of branch in a symbolic trace file.
      * This can be either an if-statement, a switch-statement, an array access, or
      * an alias resolution.
      * 
@@ -27,13 +27,13 @@ public class TraceManager {
      * For array indexing, it would be to determine whether the index is within
      * bounds or not.
      * For alias resolution, it would be to determine whether some reference
-     * references another refernce, is a null rereferece, or is a reference to a new
+     * references another reference, is a null reference, or is a reference to a new
      * object.
      * Alias resolution currently only supports detecting aliasing between the
      * arguments of a method.
      * </p>
      */
-    public static enum BranchType {
+    public enum BranchType {
         IF, SWITCH, ARRAY, ALIAS;
 
         @Override
@@ -45,7 +45,7 @@ public class TraceManager {
     /**
      * Stores the trace entries for each method in memory.
      */
-    private static Map<String, Queue<TraceEntry>> traceEntries = new HashMap<>();
+    private static final Map<String, Queue<TraceEntry>> traceEntries = new HashMap<>();
 
     /**
      * Record a trace entry for the specified method.
@@ -185,7 +185,7 @@ public class TraceManager {
      * <li>Switch: the index of the branch that was taken</li>
      * <li>Array access: 0 for out-of-bounds, 1 for in-bounds</li>
      * <li>Alias resolution: -1 for null reference, index of the parameter it refers
-     * to otherwise (which can be itself or a previous paramter)</li>
+     * to otherwise (which can be itself or a previous parameter)</li>
      * </p>
      */
     public static class TraceEntry {
@@ -200,14 +200,6 @@ public class TraceManager {
             this.methodSig = methodSig;
             this.branchType = branchType;
             this.value = value;
-        }
-
-        public String getMethodSig() {
-            return methodSig;
-        }
-
-        public BranchType getBranchType() {
-            return branchType;
         }
 
         public int getValue() {

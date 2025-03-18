@@ -18,17 +18,12 @@ public enum MethodType {
      * arguments for different methods inside of an {@link ArgMap}.
      */
     public String getPrefix() {
-        switch (this) {
-            case CTOR:
-                return "c";
-            case CINIT:
-                return "cl";
-            case METHOD:
-                return "m";
-            case CALLEE:
-            default:
-                return "";
-        }
+        return switch (this) {
+            case CTOR -> "c";
+            case CINIT -> "cl";
+            case METHOD -> "m";
+            default -> "";
+        };
     }
 
     public boolean isInit() {

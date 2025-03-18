@@ -12,8 +12,7 @@ public class Z3Utils {
     /**
      * Negates the given boolean expression, avoiding double negation by wrapping it
      * in a NOT only if not already negated.
-     * 
-     * @param ctx  The Z3 context
+     *
      * @param expr The expression to negate
      * @return The negated expression
      */

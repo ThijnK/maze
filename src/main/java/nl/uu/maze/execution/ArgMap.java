@@ -9,7 +9,7 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import nl.uu.maze.execution.concrete.ObjectInstantiator;
+import nl.uu.maze.execution.concrete.ObjectInstantiation;
 import nl.uu.maze.execution.symbolic.SymbolicStateValidator;
 import nl.uu.maze.util.Z3Sorts;
 import sootup.core.types.ClassType;
@@ -17,7 +17,7 @@ import sootup.core.types.Type;
 
 /**
  * Represents a map of arguments to be passed to a method.
- * Created either by the {@link ObjectInstantiator} randomly or from a Z3 model
+ * Created either by the {@link ObjectInstantiation} randomly or from a Z3 model
  * by the {@link SymbolicStateValidator}.
  * 
  * <p>
@@ -42,11 +42,11 @@ public class ArgMap {
      * array is of a more specific type, in which case the array can be converted to
      * the correct type using the {@link #toJava toJava} method.
      */
-    private Map<String, Object> args;
+    private final Map<String, Object> args;
     /**
      * Map of objects converted to the correct Java type.
      */
-    private Map<String, Object> converted = new HashMap<>();
+    private final Map<String, Object> converted = new HashMap<>();
     /**
      * Track of how many times a variable is referenced by an ObjectRef.
      * Lazily instantiated to avoid unnecessary overhead.
@@ -109,8 +109,7 @@ public class ArgMap {
      */
     public Optional<Object> followRef(String var, boolean singleUseOnly) {
         Object value = args.get(var);
-        if (value instanceof ObjectRef) {
-            ObjectRef ref = (ObjectRef) value;
+        if (value instanceof ObjectRef ref) {
             // If set to singleUseOnly and the ref is used multiple times, or it's a
             // parameter, don't follow the chain
             if (singleUseOnly && (ref.getVar().contains("arg") || getRefCount(ref.getVar()) > 1)) {
@@ -173,11 +172,10 @@ public class ArgMap {
                     : new ObjectInstance((ClassType) Z3Sorts.getInstance().determineType(type));
             Object obj = toJava(var, refValue, type);
             converted.put(key, obj);
-        } else if (value instanceof ObjectInstance) {
+        } else if (value instanceof ObjectInstance instance) {
             // Convert ObjectInstance to Object
-            ObjectInstance instance = (ObjectInstance) value;
             // Create a dummy instance that will be filled with the correct values
-            Object obj = ObjectInstantiator.createInstance(type, true);
+            Object obj = ObjectInstantiation.createInstance(type, true);
 
             for (Map.Entry<String, ObjectField> entry : instance.getFields().entrySet()) {
                 try {
@@ -188,7 +186,7 @@ public class ArgMap {
                     Object convertedValue = toJava(key + "_" + entry.getKey(), fieldValue, field.getType());
                     field.set(obj, convertedValue);
                 } catch (Exception e) {
-                    logger.error("Failed to set field: " + entry.getKey() + " in class: " + type.getName());
+                    logger.error("Failed to set field: {} in class: {}", entry.getKey(), type.getName());
                 }
             }
 
@@ -218,7 +216,7 @@ public class ArgMap {
         for (int j = 0; j < length; j++) {
             Object element = Array.get(value, j);
             if (type.getComponentType().isArray()) {
-                // Recursively copy subarrays
+                // Recursively copy sub arrays
                 Array.set(typedArray, j, castArray(element, type.getComponentType()));
             } else {
                 // Copy elements
@@ -267,11 +265,6 @@ public class ArgMap {
             return var;
         }
 
-        public int getIndex() {
-            // Everything after "arg" is the index, but there can be other prefixes before
-            return Integer.parseInt(var.substring(var.indexOf("arg") + 3));
-        }
-
         @Override
         public String toString() {
             return var;
@@ -300,7 +293,7 @@ public class ArgMap {
     }
 
     /**
-     * Represents a object and its fields.
+     * Represents an object and its fields.
      */
     public static class ObjectInstance {
         private final ClassType type;

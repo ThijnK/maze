@@ -14,7 +14,7 @@ import nl.uu.maze.util.Tree.TreeNode;
  * selects the next
  * state to explore by walking the tree from the root to one of the leaves,
  * randomly selecting the branch to follow at each node.
- * 
+ * <p>
  * Whereas the {@link RandomSearch} selects the next state to explore
  * uniformly at random from the set of all states, this search strategy gives
  * preference to states that are closer to the root of the execution tree, and
@@ -24,7 +24,7 @@ import nl.uu.maze.util.Tree.TreeNode;
 public class RandomPathSearch extends SymbolicSearchStrategy {
     private Tree<SymbolicState> tree;
     private TreeNode<SymbolicState> current;
-    private Random random = new Random();
+    private final Random random = new Random();
 
     @Override
     public void add(SymbolicState state) {
@@ -56,9 +56,7 @@ public class RandomPathSearch extends SymbolicSearchStrategy {
             tree.removePath(current);
         } else {
             Optional<TreeNode<SymbolicState>> node = tree.findNode(state);
-            if (node.isPresent()) {
-                tree.removePath(node.get());
-            }
+            node.ifPresent(symbolicStateTreeNode -> tree.removePath(symbolicStateTreeNode));
         }
     }
 

@@ -54,21 +54,30 @@ public class SymbolicExecutor {
     public List<SymbolicState> step(SymbolicState state, boolean replay) {
         Stmt stmt = state.getStmt();
 
-        if (stmt instanceof JIfStmt)
-            return handleIfStmt((JIfStmt) stmt, state, replay);
-        else if (stmt instanceof JSwitchStmt)
-            return handleSwitchStmt((JSwitchStmt) stmt, state, replay);
-        else if (stmt instanceof AbstractDefinitionStmt)
-            return handleDefStmt((AbstractDefinitionStmt) stmt, state, replay);
-        else if (stmt instanceof JInvokeStmt)
-            return handleInvokeStmt(stmt.getInvokeExpr(), state, replay);
-        else if (stmt instanceof JThrowStmt) {
-            state.setExceptionThrown();
-            return handleOtherStmts(state, replay);
-        } else if (stmt instanceof JReturnStmt)
-            return handleReturnStmt((JReturnStmt) stmt, state, replay);
-        else
-            return handleOtherStmts(state, replay);
+        switch (stmt) {
+            case JIfStmt jIfStmt -> {
+                return handleIfStmt(jIfStmt, state, replay);
+            }
+            case JSwitchStmt jSwitchStmt -> {
+                return handleSwitchStmt(jSwitchStmt, state, replay);
+            }
+            case AbstractDefinitionStmt abstractDefinitionStmt -> {
+                return handleDefStmt(abstractDefinitionStmt, state, replay);
+            }
+            case JInvokeStmt ignored -> {
+                return handleInvokeStmt(stmt.getInvokeExpr(), state, replay);
+            }
+            case JThrowStmt ignored -> {
+                state.setExceptionThrown();
+                return handleOtherStmts(state, replay);
+            }
+            case JReturnStmt jReturnStmt -> {
+                return handleReturnStmt(jReturnStmt, state, replay);
+            }
+            default -> {
+                return handleOtherStmts(state, replay);
+            }
+        }
     }
 
     /**
@@ -90,7 +99,7 @@ public class SymbolicExecutor {
 
         List<Stmt> succs = state.getSuccessors();
         BoolExpr cond = (BoolExpr) jimpleToZ3.transform(stmt.getCondition(), state);
-        List<SymbolicState> newStates = new ArrayList<SymbolicState>();
+        List<SymbolicState> newStates = new ArrayList<>();
 
         // If replaying a trace, follow the branch indicated by the trace
         if (replay) {
@@ -103,6 +112,7 @@ public class SymbolicExecutor {
             }
 
             TraceEntry entry = TraceManager.consumeEntry(state.getMethodSignature());
+            assert entry != null;
             int branchIndex = entry.getValue();
             state.addPathConstraint(branchIndex == 0 ? Z3Utils.negate(cond) : cond);
             state.setStmt(succs.get(branchIndex));
@@ -112,7 +122,7 @@ public class SymbolicExecutor {
         else {
             // False branch
             SymbolicState newState = state.clone();
-            newState.setStmt(succs.get(0));
+            newState.setStmt(succs.getFirst());
             newState.addPathConstraint(Z3Utils.negate(cond));
             newStates.add(newState);
 
@@ -138,7 +148,7 @@ public class SymbolicExecutor {
         List<Stmt> succs = state.getSuccessors();
         Expr<?> var = state.lookup(stmt.getKey().toString());
         List<IntConstant> cases = stmt.getValues();
-        List<SymbolicState> newStates = new ArrayList<SymbolicState>();
+        List<SymbolicState> newStates = new ArrayList<>();
 
         Expr<?>[] values = new Expr<?>[cases.size()];
         for (int i = 0; i < cases.size(); i++) {
@@ -154,6 +164,7 @@ public class SymbolicExecutor {
             }
 
             TraceEntry entry = TraceManager.consumeEntry(state.getMethodSignature());
+            assert entry != null;
             int branchIndex = entry.getValue();
             SwitchConstraint constraint = new SwitchConstraint(var, values,
                     branchIndex >= cases.size() ? -1 : branchIndex);
@@ -236,7 +247,7 @@ public class SymbolicExecutor {
                         state.addPathConstraint(ctx.mkOr(ctx.mkBVSLT(index, ctx.mkBV(0, sorts.getIntBitSize())),
                                 ctx.mkBVSGE(index, len)));
                         state.setExceptionThrown();
-                        return handleOtherStmts(state, replay);
+                        return handleOtherStmts(state, true);
                     } else {
                         state.addPathConstraint(ctx.mkAnd(ctx.mkBVSGE(index, ctx.mkBV(0, sorts.getIntBitSize())),
                                 ctx.mkBVSLT(index, len)));
@@ -283,18 +294,18 @@ public class SymbolicExecutor {
             value = jimpleToZ3.transform(rightOp, state, leftOp.toString());
         }
 
-        if (leftOp instanceof JArrayRef) {
-            JArrayRef ref = (JArrayRef) leftOp;
-            BitVecExpr index = (BitVecExpr) jimpleToZ3.transform(ref.getIndex(), state);
-            state.heap.setArrayElement(ref.getBase().getName(), index, value);
-        } else if (leftOp instanceof JStaticFieldRef) {
-            // Static field assignments are considered out of scope
-        } else if (leftOp instanceof JInstanceFieldRef) {
-            JInstanceFieldRef ref = (JInstanceFieldRef) leftOp;
-            state.heap.setField(ref.getBase().getName(), ref.getFieldSignature().getName(), value,
-                    ref.getFieldSignature().getType());
-        } else {
-            state.assign(leftOp.toString(), value);
+        switch (leftOp) {
+            case JArrayRef ref -> {
+                BitVecExpr index = (BitVecExpr) jimpleToZ3.transform(ref.getIndex(), state);
+                state.heap.setArrayElement(ref.getBase().getName(), index, value);
+            }
+            case JStaticFieldRef ignored -> {
+                // Static field assignments are considered out of scope
+            }
+            case JInstanceFieldRef ref ->
+                    state.heap.setField(ref.getBase().getName(), ref.getFieldSignature().getName(), value,
+                            ref.getFieldSignature().getType());
+            default -> state.assign(leftOp.toString(), value);
         }
 
         // Special handling of parameters for reference types when replaying a trace
@@ -304,9 +315,9 @@ public class SymbolicExecutor {
 
         // Definition statements follow the same control flow as other statements
         List<SymbolicState> succStates = handleOtherStmts(state, replay);
-        // For optional out of bounds state, check successors for potential catch blocks
+        // For optional out-of-bounds state, check successors for potential catch blocks
         if (outOfBoundsState != null) {
-            succStates.addAll(handleOtherStmts(outOfBoundsState, replay));
+            succStates.addAll(handleOtherStmts(outOfBoundsState, false));
         }
         return succStates;
     }
@@ -367,10 +378,7 @@ public class SymbolicExecutor {
         // Handle method invocation
         Optional<SymbolicState> callee = methodInvoker.executeMethod(state, expr);
         // If executed concretely, immediately continue with the next statement
-        if (callee.isEmpty()) {
-            return handleOtherStmts(state, replay);
-        }
-        return List.of(callee.get());
+        return callee.map(List::of).orElseGet(() -> handleOtherStmts(state, replay));
     }
 
     /**
@@ -403,7 +411,7 @@ public class SymbolicExecutor {
      * @return A list of successor symbolic states
      */
     private List<SymbolicState> handleOtherStmts(SymbolicState state, boolean replay) {
-        List<SymbolicState> newStates = new ArrayList<SymbolicState>();
+        List<SymbolicState> newStates = new ArrayList<>();
         List<Stmt> succs = state.getSuccessors();
 
         // Final state
@@ -487,12 +495,12 @@ public class SymbolicExecutor {
         Set<Expr<?>> aliases = state.heap.getAliases(symRef);
         if (aliases != null) {
             Expr<?>[] aliasArr = aliases.toArray(Expr<?>[]::new);
-            List<SymbolicState> newStates = new ArrayList<SymbolicState>(aliasArr.length);
+            List<SymbolicState> newStates = new ArrayList<>(aliasArr.length);
 
             // When replaying a trace, we pick any non-null alias arbitrarily and ignore the
             // others, so we only follow one path
             // Note: for method arguments, aliasing is detected through instrumentation, so
-            // those are guaranteed to be correclty resolved
+            // those are guaranteed to be correctly resolved
             // Here, for non-argument aliasing, we use a heuristic and hope for the best
             if (replay) {
                 // Find first non-null alias

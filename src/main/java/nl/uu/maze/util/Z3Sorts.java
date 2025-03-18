@@ -19,16 +19,16 @@ public class Z3Sorts {
     private static Z3Sorts instance;
     private static final Context ctx = Z3ContextProvider.getContext();
 
-    private Sort refSort;
+    private final Sort refSort;
     /** Null constant, used for null comparisons etc. */
-    private Expr<?> nullConst;
-    private Sort voidSort;
-    private Sort stringSort;
+    private final Expr<?> nullConst;
+    private final Sort voidSort;
+    private final Sort stringSort;
 
-    private BitVecSort intSort;
-    private BitVecSort longSort;
-    private FPSort floatSort;
-    private FPSort doubleSort;
+    private final BitVecSort intSort;
+    private final BitVecSort longSort;
+    private final FPSort floatSort;
+    private final FPSort doubleSort;
 
     private Z3Sorts() {
         refSort = ctx.mkUninterpretedSort("Ref");

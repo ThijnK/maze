@@ -56,17 +56,13 @@ public class Z3ToJavaTransformer {
 
     /** Cast a long value to a Java int-like type */
     private Object castIntLike(Type type, long value) {
-        if (type instanceof ByteType) {
-            return (byte) value;
-        } else if (type instanceof ShortType) {
-            return (short) value;
-        } else if (type instanceof CharType) {
-            return (char) value;
-        } else if (type instanceof BooleanType) {
-            return value != 0;
-        } else {
-            return (int) value;
-        }
+        return switch (type) {
+            case ByteType ignored -> (byte) value;
+            case ShortType ignored -> (short) value;
+            case CharType ignored -> (char) value;
+            case BooleanType ignored -> value != 0;
+            case null, default -> (int) value;
+        };
     }
 
     /** Transform a Z3 floating-point number to a Java float or double */
@@ -131,22 +127,21 @@ public class Z3ToJavaTransformer {
             }
         }
 
-        // Recursively build the multi-dimensional array
+        // Recursively build the multidimensional array
         return buildMultiArray(arrObj, model, elemType, lengths, 0, new int[dim]);
     }
 
     /**
-     * Recursively builds a Java multi-dimensional array.
+     * Recursively builds a Java multidimensional array.
      *
-     * @param arrObj     The multi-dimensional array object (contains dimension
+     * @param arrObj     The multidimensional array object (contains dimension
      *                   info).
-     * @param arrExpr    The flattened Z3 array expression.
      * @param model      The current Z3 model.
-     * @param state      The symbolic state.
+     * @param elemType   The type of the elements of the array
      * @param lengths    Array containing the length for each dimension.
      * @param currentDim The current dimension being filled.
      * @param indices    The multi-index built so far.
-     * @return A Java Object representing the multi-dimensional array.
+     * @return A Java Object representing the multidimensional array.
      */
     private Object buildMultiArray(MultiArrayObject arrObj, Model model, Type elemType, int[] lengths, int currentDim,
             int[] indices) {

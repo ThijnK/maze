@@ -11,8 +11,8 @@ import nl.uu.maze.search.ConcreteSearchStrategy;
  * uniform randomly.
  */
 public class RandomSearch extends ConcreteSearchStrategy {
-    private List<PathConditionCandidate> candidates = new ArrayList<>();
-    private Random random = new Random();
+    private final List<PathConditionCandidate> candidates = new ArrayList<>();
+    private final Random random = new Random();
 
     @Override
     public void add(PathConditionCandidate candidate) {

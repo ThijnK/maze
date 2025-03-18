@@ -57,7 +57,7 @@ public class SymbolicState {
     /** Constraints imposed by the engine, e.g., for array size bounds. */
     private List<PathConstraint> engineConstraints;
     /** Tracks SootUp types of parameters. */
-    private Map<String, Type> paramTypes;
+    private final Map<String, Type> paramTypes;
     /**
      * Tracks the symbolic state that called this state for a method call.
      * Used to return to the caller state after the callee state finishes the
@@ -315,10 +315,9 @@ public class SymbolicState {
     public boolean equals(Object obj) {
         if (obj == this)
             return true;
-        if (!(obj instanceof SymbolicState))
+        if (!(obj instanceof SymbolicState state))
             return false;
 
-        SymbolicState state = (SymbolicState) obj;
         return state.stmt.equals(stmt) && state.store.equals(store)
                 && state.pathConstraints.equals(pathConstraints) && state.heap.equals(heap);
     }

@@ -4,7 +4,6 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Paths;
@@ -18,7 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import nl.uu.maze.execution.MethodType;
-import nl.uu.maze.execution.concrete.ObjectInstantiator;
+import nl.uu.maze.execution.concrete.ObjectInstantiation;
 import nl.uu.maze.util.Pair;
 import sootup.core.graph.StmtGraph;
 import sootup.core.inputlocation.AnalysisInputLocation;
@@ -43,13 +42,12 @@ import sootup.java.core.views.JavaView;
 public class JavaAnalyzer {
     private static final Logger logger = LoggerFactory.getLogger(JavaAnalyzer.class);
 
-    private final AnalysisInputLocation inputLocation;
     private final ClassLoader classLoader;
     private final JavaView view;
     private final JavaIdentifierFactory identifierFactory;
 
-    public JavaAnalyzer(String classPath, ClassLoader classLoader) throws MalformedURLException, URISyntaxException {
-        inputLocation = new JavaClassPathAnalysisInputLocation(classPath);
+    public JavaAnalyzer(String classPath, ClassLoader classLoader) throws MalformedURLException {
+        AnalysisInputLocation inputLocation = new JavaClassPathAnalysisInputLocation(classPath);
         // Set up a custom URL loader for the class path
         URL classUrl = Paths.get(classPath).toUri().toURL();
         this.classLoader = classLoader != null ? classLoader : new URLClassLoader(new URL[] { classUrl });
@@ -112,26 +110,17 @@ public class JavaAnalyzer {
 
     /** Returns the Java class of a SootUp primitive type. */
     private Class<?> getJavaClass(PrimitiveType type) {
-        switch (type.getName()) {
-            case "int":
-                return int.class;
-            case "double":
-                return double.class;
-            case "float":
-                return float.class;
-            case "long":
-                return long.class;
-            case "short":
-                return short.class;
-            case "byte":
-                return byte.class;
-            case "char":
-                return char.class;
-            case "boolean":
-                return boolean.class;
-            default:
-                throw new IllegalArgumentException("Unsupported primitive type: " + type.getName());
-        }
+        return switch (type.getName()) {
+            case "int" -> int.class;
+            case "double" -> double.class;
+            case "float" -> float.class;
+            case "long" -> long.class;
+            case "short" -> short.class;
+            case "byte" -> byte.class;
+            case "char" -> char.class;
+            case "boolean" -> boolean.class;
+            default -> throw new IllegalArgumentException("Unsupported primitive type: " + type.getName());
+        };
     }
 
     /** Returns the Java class of a SootUp array type. */
@@ -215,8 +204,6 @@ public class JavaAnalyzer {
      * @param method The method for which to return the Java constructor
      * @param clazz  The Java class in which the constructor is defined
      * @return The Java constructor
-     * @throws ClassNotFoundException
-     * @throws NoSuchMethodException
      */
     public Constructor<?> getJavaConstructor(JavaSootMethod method, Class<?> clazz)
             throws ClassNotFoundException, NoSuchMethodException {
@@ -237,14 +224,14 @@ public class JavaAnalyzer {
         // Find a constructor for which arguments can be generated
         for (Constructor<?> ctor : clazz.getDeclaredConstructors()) {
             try {
-                Object[] args = ObjectInstantiator.generateArgs(ctor.getParameters(), MethodType.CTOR, null);
+                Object[] args = ObjectInstantiation.generateArgs(ctor.getParameters(), MethodType.CTOR, null);
                 return Pair.of(ctor, args);
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.warn(e.getMessage());
             }
         }
 
-        logger.warn("Failed to find suitable constructor for class " + clazz.getName());
+        logger.warn("Failed to find suitable constructor for class {}", clazz.getName());
         return null;
     }
 
@@ -267,7 +254,7 @@ public class JavaAnalyzer {
                         return method;
                     }
                 } catch (ClassNotFoundException e) {
-                    logger.error("Failed to get parameter classes for method: " + method.getName());
+                    logger.error("Failed to get parameter classes for method: {}", method.getName());
                 }
             }
         }
@@ -301,8 +288,8 @@ public class JavaAnalyzer {
      */
     public StmtGraph<?> getCFG(JavaSootMethod method) {
         StmtGraph<?> cfg = method.getBody().getStmtGraph();
-        String urlToWebeditor = DotExporter.createUrlToWebeditor(cfg);
-        logger.info("CFG: " + urlToWebeditor);
+        String urlToWebEditor = DotExporter.createUrlToWebeditor(cfg);
+        logger.info("CFG: {}", urlToWebEditor);
         return cfg;
     }
 }

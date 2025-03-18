@@ -19,12 +19,10 @@ import nl.uu.maze.execution.symbolic.PathConstraint.CompositeConstraint;
  * Abstract class for search strategies that operate on concrete-driven DSE.
  */
 public abstract class ConcreteSearchStrategy implements SearchStrategy {
-    private Set<Integer> exploredPaths = new HashSet<>();
+    private final Set<Integer> exploredPaths = new HashSet<>();
 
     /**
      * Add a candidate to the search strategy.
-     * 
-     * @param candidate The candidate to add
      */
     protected abstract void add(PathConditionCandidate candidate);
 
@@ -113,18 +111,18 @@ public abstract class ConcreteSearchStrategy implements SearchStrategy {
      * A candidate consist of the path condition (a list of constraints) and the
      * index of the constraint to negate.
      * 
-     * @implNote The index is stored seperately to apply the negation "lazily"
+     * @implNote The index is stored separately to apply the negation "lazily"
      *           (i.e., only when the candidate is selected for exploration).
      */
     public class PathConditionCandidate {
         private List<PathConstraint> pathConstraints;
         /** The index of the constraint to negate. */
-        private int index;
+        private final int index;
         /**
          * The index of the new value to set an expr to when negating switch
          * constraints.
          */
-        private int subIndex;
+        private final int subIndex;
 
         public PathConditionCandidate(List<PathConstraint> pathConstraints, int index) {
             this(pathConstraints, index, -1);
@@ -138,10 +136,6 @@ public abstract class ConcreteSearchStrategy implements SearchStrategy {
 
         public List<PathConstraint> getPathConstraints() {
             return pathConstraints;
-        }
-
-        public int getIndex() {
-            return index;
         }
 
         /**
@@ -197,7 +191,7 @@ public abstract class ConcreteSearchStrategy implements SearchStrategy {
          * Check whether the path condition has been explored before.
          * This not only checks if the path condition as a whole has been explored, but
          * also checks if any prefix of the path condition that contains the negated
-         * constraint has already been explored. Such a prefix can be a termating path
+         * constraint has already been explored. Such a prefix can be a terminating path
          * that already occurs in the explored paths, so not checking the prefix could
          * lead to exploring the same path multiple (or even infinite) times.
          * 

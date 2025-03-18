@@ -19,8 +19,8 @@ import nl.uu.maze.util.ArrayUtils;
  * Instantiates objects using Java reflection and randomly generated
  * arguments.
  */
-public class ObjectInstantiator {
-    private static final Logger logger = LoggerFactory.getLogger(ObjectInstantiator.class);
+public class ObjectInstantiation {
+    private static final Logger logger = LoggerFactory.getLogger(ObjectInstantiation.class);
 
     private static final Random rand = new Random();
 
@@ -48,7 +48,7 @@ public class ObjectInstantiator {
             }
         }
 
-        logger.warn("Failed to create instance of class: " + clazz.getName());
+        logger.warn("Failed to create instance of class: {}", clazz.getName());
         return null;
     }
 
@@ -83,8 +83,7 @@ public class ObjectInstantiator {
             if (!forceNew && cutInstances.containsKey(hash)) {
                 return cutInstances.get(hash);
             } else {
-                logger.debug("Creating instance of class " + ctor.getDeclaringClass().getSimpleName() + " with args: "
-                        + ArrayUtils.toString(args));
+                logger.debug("Creating instance of class {} with args: {}", ctor.getDeclaringClass().getSimpleName(), ArrayUtils.toString(args));
                 ctor.setAccessible(true);
                 Object instance = ctor.newInstance(args);
 
@@ -93,21 +92,9 @@ public class ObjectInstantiator {
                 return instance;
             }
         } catch (Exception e) {
-            logger.warn("Constructor of " + ctor.getDeclaringClass().getSimpleName() + " threw an exception: " + e);
+            logger.warn("Constructor of {} threw an exception: {}", ctor.getDeclaringClass().getSimpleName(), e.getMessage());
             return null;
         }
-    }
-
-    /**
-     * Generate random values for the given parameters.
-     * This will attempt to recursively create instances of objects if the parameter
-     * type is not a primitive type, up to a certain depth.
-     * 
-     * @param params The parameters of the method
-     * @return An array of arguments corresponding to the given parameters
-     */
-    public static Object[] generateArgs(Parameter[] params) {
-        return generateArgs(params, MethodType.METHOD, null);
     }
 
     /**
@@ -147,34 +134,25 @@ public class ObjectInstantiator {
     private static Object getDefault(Class<?> type) {
         // Create empty array
         if (type.isArray()) {
-            // Note: the newInstance method automatically deals with multi-dimensional
+            // Note: the newInstance method automatically deals with multidimensional
             // arrays
             return Array.newInstance(type.getComponentType(), 0);
         }
 
-        switch (type.getName()) {
-            case "int":
-                return 0;
-            case "double":
-                return 0.0;
-            case "float":
-                return 0.0f;
-            case "long":
-                return 0L;
-            case "short":
-                return (short) 0;
-            case "byte":
-                return (byte) 0;
-            case "char":
-                return (char) 0;
-            case "boolean":
-                return false;
-            case "java.lang.String":
-                return "";
-            default:
+        return switch (type.getName()) {
+            case "int" -> 0;
+            case "double" -> 0.0;
+            case "float" -> 0.0f;
+            case "long" -> 0L;
+            case "short" -> (short) 0;
+            case "byte" -> (byte) 0;
+            case "char" -> (char) 0;
+            case "boolean" -> false;
+            case "java.lang.String" -> "";
+            default ->
                 // Objects are set to null
-                return null;
-        }
+                    null;
+        };
     }
 
     /**
@@ -185,28 +163,23 @@ public class ObjectInstantiator {
      */
     @SuppressWarnings("unused")
     private static Object generateRandom(Class<?> type) {
-        switch (type.getName()) {
-            case "int":
-                return rand.nextInt(Integer.MIN_VALUE, Integer.MAX_VALUE);
-            case "double":
+        return switch (type.getName()) {
+            case "int" -> rand.nextInt(Integer.MIN_VALUE, Integer.MAX_VALUE);
+            case "double" -> {
                 long randomBits64 = rand.nextLong();
-                return Double.longBitsToDouble(randomBits64);
-            case "float":
+                yield Double.longBitsToDouble(randomBits64);
+            }
+            case "float" -> {
                 int randomBits32 = rand.nextInt();
-                return Float.intBitsToFloat(randomBits32);
-            case "long":
-                return rand.nextLong(Long.MIN_VALUE, Long.MAX_VALUE);
-            case "short":
-                return (short) rand.nextInt(Short.MIN_VALUE, Short.MAX_VALUE);
-            case "byte":
-                return (byte) rand.nextInt(Byte.MIN_VALUE, Byte.MAX_VALUE);
-            case "char":
-                return (char) rand.nextInt(Character.MIN_VALUE, Character.MAX_VALUE);
-            case "boolean":
-                return rand.nextBoolean();
-            default:
-                // For other types, return default value
-                return getDefault(type);
-        }
+                yield Float.intBitsToFloat(randomBits32);
+            }
+            case "long" -> rand.nextLong(Long.MIN_VALUE, Long.MAX_VALUE);
+            case "short" -> (short) rand.nextInt(Short.MIN_VALUE, Short.MAX_VALUE);
+            case "byte" -> (byte) rand.nextInt(Byte.MIN_VALUE, Byte.MAX_VALUE);
+            case "char" -> (char) rand.nextInt(Character.MIN_VALUE, Character.MAX_VALUE);
+            case "boolean" -> rand.nextBoolean();
+            // For other types, return default value
+            default -> getDefault(type);
+        };
     }
 }

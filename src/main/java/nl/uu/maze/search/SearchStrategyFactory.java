@@ -18,30 +18,18 @@ public class SearchStrategyFactory {
      * @return A search strategy
      */
     public static SearchStrategy getStrategy(boolean concreteDriven, String name) {
-        switch ((concreteDriven ? "CD-" : "SD-") + name) {
-            case "CD-DFS":
-                return new nl.uu.maze.search.concrete.DFS();
-            case "SD-DFS":
-                return new nl.uu.maze.search.symbolic.DFS();
-            case "CD-BFS":
-                return new nl.uu.maze.search.concrete.BFS();
-            case "SD-BFS":
-                return new nl.uu.maze.search.symbolic.BFS();
-            case "CD-RandomSearch":
-            case "CD-Random":
-            case "CD-RS":
-                return new nl.uu.maze.search.concrete.RandomSearch();
-            case "SD-RandomSearch":
-            case "SD-Random":
-            case "SD-RS":
-                return new nl.uu.maze.search.symbolic.RandomSearch();
-            case "SD-RandomPathSearch":
-            case "SD-RandomPath":
-            case "SD-RPS":
-                return new nl.uu.maze.search.symbolic.RandomPathSearch();
-            default:
-                logger.warn("Unknown search strategy: " + name + ", defaulting to DFS");
-                return concreteDriven ? new nl.uu.maze.search.concrete.DFS() : new nl.uu.maze.search.symbolic.DFS();
-        }
+        return switch ((concreteDriven ? "CD-" : "SD-") + name) {
+            case "CD-DFS" -> new nl.uu.maze.search.concrete.DFS();
+            case "SD-DFS" -> new nl.uu.maze.search.symbolic.DFS();
+            case "CD-BFS" -> new nl.uu.maze.search.concrete.BFS();
+            case "SD-BFS" -> new nl.uu.maze.search.symbolic.BFS();
+            case "CD-RandomSearch", "CD-Random", "CD-RS" -> new nl.uu.maze.search.concrete.RandomSearch();
+            case "SD-RandomSearch", "SD-Random", "SD-RS" -> new nl.uu.maze.search.symbolic.RandomSearch();
+            case "SD-RandomPathSearch", "SD-RandomPath", "SD-RPS" -> new nl.uu.maze.search.symbolic.RandomPathSearch();
+            default -> {
+                logger.warn("Unknown search strategy: {}, defaulting to DFS", name);
+                yield concreteDriven ? new nl.uu.maze.search.concrete.DFS() : new nl.uu.maze.search.symbolic.DFS();
+            }
+        };
     }
 }

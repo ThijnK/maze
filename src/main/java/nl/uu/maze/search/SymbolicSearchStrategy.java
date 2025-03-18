@@ -10,8 +10,6 @@ import nl.uu.maze.execution.symbolic.SymbolicState;
 public abstract class SymbolicSearchStrategy implements SearchStrategy {
     /**
      * Add a symbolic state to the search strategy.
-     * 
-     * @param states
      */
     public abstract void add(SymbolicState state);
 

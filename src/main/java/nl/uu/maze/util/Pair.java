@@ -1,26 +1,19 @@
 package nl.uu.maze.util;
 
-import java.util.Objects;
-
 /**
  * Represents a pair of two values.
  *
  * @param <First>  the type of the first value in the pair
  * @param <Second> the type of the second value in the pair
  */
-public class Pair<First, Second> {
-    private final First first;
-    private final Second second;
-
+public record Pair<First, Second>(First first, Second second) {
     /**
      * Constructs a new Pair with the given values.
      *
      * @param first  the first value
      * @param second the second value
      */
-    public Pair(First first, Second second) {
-        this.first = first;
-        this.second = second;
+    public Pair {
     }
 
     /**
@@ -28,7 +21,8 @@ public class Pair<First, Second> {
      *
      * @return the first value
      */
-    public First getFirst() {
+    @Override
+    public First first() {
         return first;
     }
 
@@ -37,7 +31,8 @@ public class Pair<First, Second> {
      *
      * @return the second value
      */
-    public Second getSecond() {
+    @Override
+    public Second second() {
         return second;
     }
 
@@ -52,33 +47,6 @@ public class Pair<First, Second> {
      */
     public static <First, Second> Pair<First, Second> of(First first, Second second) {
         return new Pair<>(first, second);
-    }
-
-    /**
-     * Checks if this Pair is equal to another object.
-     *
-     * @param obj the object to compare with
-     * @return true if the other object is a Pair with equal values
-     */
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null || getClass() != obj.getClass())
-            return false;
-        Pair<?, ?> pair = (Pair<?, ?>) obj;
-        return Objects.equals(first, pair.first) &&
-                Objects.equals(second, pair.second);
-    }
-
-    /**
-     * Computes a hash code for this Pair.
-     *
-     * @return the hash code
-     */
-    @Override
-    public int hashCode() {
-        return Objects.hash(first, second);
     }
 
     /**

@@ -9,7 +9,7 @@ import nl.uu.maze.search.SymbolicSearchStrategy;
  * Symbolic-driven search strategy for Depth-First Search (DFS).
  */
 public class DFS extends SymbolicSearchStrategy {
-    private Stack<SymbolicState> states = new Stack<>();
+    private final Stack<SymbolicState> states = new Stack<>();
 
     @Override
     public void add(SymbolicState state) {

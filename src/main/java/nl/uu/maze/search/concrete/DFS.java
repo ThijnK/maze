@@ -8,7 +8,7 @@ import nl.uu.maze.search.ConcreteSearchStrategy;
  * Concrete-driven search strategy for Depth-First Search (DFS).
  */
 public class DFS extends ConcreteSearchStrategy {
-    Stack<PathConditionCandidate> candidates = new Stack<>();
+    private final Stack<PathConditionCandidate> candidates = new Stack<>();
 
     @Override
     public void add(PathConditionCandidate candidate) {

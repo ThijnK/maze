@@ -8,10 +8,10 @@ import static org.junit.jupiter.api.Assertions.*;
 public class ObjectUtilsTest {
 
     static class TestClass {
-        int intField;
-        String strField;
-        TestClass nestedField;
-        TestClass[] arrayField;
+        final int intField;
+        final String strField;
+        final TestClass nestedField;
+        final TestClass[] arrayField;
 
         TestClass(int intField, String strField, TestClass nestedField, TestClass[] arrayField) {
             this.intField = intField;

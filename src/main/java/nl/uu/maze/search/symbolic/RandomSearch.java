@@ -12,8 +12,8 @@ import nl.uu.maze.search.SymbolicSearchStrategy;
  * Symbolic-driven search strategy that selects the next state uniform randomly.
  */
 public class RandomSearch extends SymbolicSearchStrategy {
-    private List<SymbolicState> states = new ArrayList<>();
-    private Random random = new Random();
+    private final List<SymbolicState> states = new ArrayList<>();
+    private final Random random = new Random();
 
     @Override
     public void add(SymbolicState initialState) {

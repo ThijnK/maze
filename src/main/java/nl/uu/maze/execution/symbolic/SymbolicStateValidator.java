@@ -30,8 +30,8 @@ public class SymbolicStateValidator {
     private static final Z3Sorts sorts = Z3Sorts.getInstance();
     private static final Context ctx = Z3ContextProvider.getContext();
 
-    private Solver solver;
-    private Z3ToJavaTransformer transformer;
+    private final Solver solver;
+    private final Z3ToJavaTransformer transformer;
     /** Last created Z3 model */
     private Model model;
 
@@ -48,9 +48,9 @@ public class SymbolicStateValidator {
      * @return An optional model if the path condition is satisfiable
      */
     public Optional<Model> validate(List<PathConstraint> pathConstraints) {
-        solver.add(pathConstraints.stream().map((c) -> c.getConstraint()).toArray(BoolExpr[]::new));
+        solver.add(pathConstraints.stream().map(PathConstraint::getConstraint).toArray(BoolExpr[]::new));
         Status status = solver.check();
-        logger.debug("Path condition " + status.toString() + ": " + pathConstraints);
+        logger.debug("Path condition {}: {}", status.toString(), pathConstraints);
         Optional<Model> model = Optional.empty();
         if (status == Status.SATISFIABLE) {
             model = Optional.ofNullable(solver.getModel());
@@ -68,24 +68,6 @@ public class SymbolicStateValidator {
      */
     public Optional<Model> validate(SymbolicState state) {
         return validate(state.getAllConstraints());
-    }
-
-    /**
-     * Validates the given list of symbolic states. If the path condition is
-     * satisfiable, the corresponding model is returned.
-     * 
-     * @param states The symbolic states to validate
-     * @return A list of models for the satisfiable path conditions
-     */
-    public List<Model> validateAll(List<SymbolicState> states) {
-        List<Model> result = new ArrayList<>();
-        for (SymbolicState state : states) {
-            Optional<Model> model = validate(state);
-            if (model.isPresent()) {
-                result.add(model.get());
-            }
-        }
-        return result;
     }
 
     /**
@@ -150,12 +132,11 @@ public class SymbolicStateValidator {
             HeapObject heapObj = state.heap.get(varBase);
             if (heapObj != null) {
                 // Arrays
-                if (heapObj instanceof ArrayObject) {
+                if (heapObj instanceof ArrayObject arrObj) {
                     // There can be multiple declarations for the same array (elems and len)
                     if (argMap.containsKey(varBase)) {
                         continue;
                     }
-                    ArrayObject arrObj = (ArrayObject) heapObj;
                     Type elemType = arrObj.getType().getBaseType();
                     Object arr = transformer.transformArray(arrObj, model, elemType);
                     argMap.set(varBase, arr);
@@ -212,7 +193,7 @@ public class SymbolicStateValidator {
      * @param state            The symbolic state to validate and evaluate
      * @param fillObjectFields Whether to fill object fields with their current
      *                         values on the heap
-     * @@return A map of values extracted from the model if the path condition is
+     * @return A map of values extracted from the model if the path condition is
      *          satisfiable
      */
     public Optional<ArgMap> evaluate(SymbolicState state, boolean fillObjectFields) {

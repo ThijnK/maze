@@ -2,33 +2,33 @@ package nl.uu.tests.maze;
 
 import nl.uu.maze.execution.ArgMap;
 import nl.uu.maze.execution.MethodType;
-import nl.uu.maze.execution.concrete.ObjectInstantiator;
+import nl.uu.maze.execution.concrete.ObjectInstantiation;
 
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.lang.reflect.Parameter;
 
-class ObjectInstantiatorTest {
+class ObjectInstantiationTest {
     @Test
     public void testCreateInstance_NoArgs() {
-        Object instance = ObjectInstantiator.createInstance(TestClassNoArgs.class, true);
+        Object instance = ObjectInstantiation.createInstance(TestClassNoArgs.class, true);
         assertNotNull(instance);
-        assertTrue(instance instanceof TestClassNoArgs);
+        assertInstanceOf(TestClassNoArgs.class, instance);
     }
 
     @Test
     public void testCreateInstance_WithArgs() {
-        Object instance = ObjectInstantiator.createInstance(TestClassWithArgs.class, true);
+        Object instance = ObjectInstantiation.createInstance(TestClassWithArgs.class, true);
         assertNotNull(instance);
-        assertTrue(instance instanceof TestClassWithArgs);
+        assertInstanceOf(TestClassWithArgs.class, instance);
     }
 
     @Test
     public void testCreateInstance_NoConstructors() {
-        Object instance = ObjectInstantiator.createInstance(TestClassNoConstructors.class, true);
+        Object instance = ObjectInstantiation.createInstance(TestClassNoConstructors.class, true);
         assertNotNull(instance);
-        assertTrue(instance instanceof TestClassNoConstructors);
+        assertInstanceOf(TestClassNoConstructors.class, instance);
     }
 
     @Test
@@ -41,17 +41,17 @@ class ObjectInstantiatorTest {
         argMap.set("marg3", 4L);
         argMap.set("marg4", (short) 5);
         argMap.set("marg5", (byte) 6);
-        Object[] args = ObjectInstantiator.generateArgs(params, MethodType.METHOD, argMap);
+        Object[] args = ObjectInstantiation.generateArgs(params, MethodType.METHOD, argMap);
         assertEquals(9, args.length);
         assertEquals(1, args[0]);
-        assertTrue(args[1] instanceof Double);
-        assertTrue(args[2] instanceof Float);
+        assertInstanceOf(Double.class, args[1]);
+        assertInstanceOf(Float.class, args[2]);
         assertEquals(4L, args[3]);
         assertEquals((short) 5, args[4]);
         assertEquals((byte) 6, args[5]);
-        assertTrue(args[6] instanceof Character);
-        assertTrue(args[7] instanceof Boolean);
-        assertTrue(args[8] == null);
+        assertInstanceOf(Character.class, args[6]);
+        assertInstanceOf(Boolean.class, args[7]);
+        assertNull(args[8]);
     }
 
     public static class TestClassNoArgs {

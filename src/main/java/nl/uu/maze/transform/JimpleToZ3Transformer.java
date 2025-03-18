@@ -89,7 +89,7 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
         // Handle arithmetic operations
         if (l instanceof BitVecExpr && r instanceof BitVecExpr) {
             Pair<BitVecExpr, BitVecExpr> coerced = coerceToSameSort((BitVecExpr) l, (BitVecExpr) r);
-            return bvOperation.apply(coerced.getFirst(), coerced.getSecond());
+            return bvOperation.apply(coerced.first(), coerced.second());
         } else if (l instanceof FPExpr && r instanceof FPExpr && fpOperation != null) {
             return fpOperation.apply((FPExpr) l, (FPExpr) r);
         }
@@ -97,10 +97,10 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
         // FP and the other is a bit vector
         else if (l instanceof FPExpr && r instanceof BitVecExpr && fpOperation != null) {
             Pair<FPExpr, FPExpr> coerced = coerceToSameSort((BitVecExpr) r, (FPExpr) l);
-            return fpOperation.apply(coerced.getSecond(), coerced.getFirst());
+            return fpOperation.apply(coerced.second(), coerced.first());
         } else if (l instanceof BitVecExpr && r instanceof FPExpr && fpOperation != null) {
             Pair<FPExpr, FPExpr> coerced = coerceToSameSort((BitVecExpr) l, (FPExpr) r);
-            return fpOperation.apply(coerced.getFirst(), coerced.getSecond());
+            return fpOperation.apply(coerced.first(), coerced.second());
         } else {
             throw new UnsupportedOperationException(
                     "Unsupported operand types: " + l.getSort() + " and " + r.getSort());
@@ -166,13 +166,13 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
      * Coerce a bit vector to the given size by either sign extending or extracting
      * bits.
      */
-    private BitVecExpr coerceToSize(BitVecExpr epxr, int size) {
-        if (size > epxr.getSortSize()) {
-            return ctx.mkSignExt(size - epxr.getSortSize(), epxr);
-        } else if (size < epxr.getSortSize()) {
-            return ctx.mkExtract(size - 1, 0, epxr);
+    private BitVecExpr coerceToSize(BitVecExpr expr, int size) {
+        if (size > expr.getSortSize()) {
+            return ctx.mkSignExt(size - expr.getSortSize(), expr);
+        } else if (size < expr.getSortSize()) {
+            return ctx.mkExtract(size - 1, 0, expr);
         }
-        return epxr;
+        return expr;
     }
 
     /** Coerce a floating point number to the given sort by rounding. */
@@ -292,7 +292,7 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
 
     @Override
     public void caseShrExpr(@Nonnull JShrExpr expr) {
-        // Signed (arithemtic) shift right
+        // Signed (arithmetic) shift right
         setResult(transformArithExpr(expr, ctx::mkBVASHR, null));
     }
 
@@ -397,8 +397,7 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
         if (expr == null) {
             // If note already in the state, create a new symbolic value
             Type type = ref.getType();
-            if (type instanceof ArrayType) {
-                ArrayType arrType = (ArrayType) type;
+            if (type instanceof ArrayType arrType) {
                 if (arrType.getDimension() > 1) {
                     setResult(state.heap.allocateMultiArray(state.heap.newRefKey(), arrType, arrType.getBaseType()));
                 } else {
@@ -512,9 +511,8 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
         }
 
         // Otherwise, create new symbolic value for the parameter
-        if (sootType instanceof ArrayType) {
+        if (sootType instanceof ArrayType arrType) {
             // Allocate new array on the heap
-            ArrayType arrType = (ArrayType) sootType;
             if (arrType.getDimension() > 1) {
                 param = state.heap.allocateMultiArray(var, arrType, arrType.getBaseType());
             } else {
@@ -541,7 +539,7 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
         String var = local.getName();
         // If this local is a reference to an array, need to also set the collected
         // array indices for the lhs (if any) to a copy of the local's array indices
-        // (this is only applicable to multi-dimensional arrays)
+        // (this is only applicable to multidimensional arrays)
         if (lhs != null && state.heap.isMultiArray(var)) {
             state.heap.copyArrayIndices(var, lhs);
         }

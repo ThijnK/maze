@@ -27,7 +27,7 @@ public class HeapObjects {
      */
     public static class HeapObjectField {
         private Expr<?> value;
-        private Type type;
+        private final Type type;
 
         public HeapObjectField(Expr<?> value, Type type) {
             this.value = value;
@@ -57,8 +57,8 @@ public class HeapObjects {
      */
     public static class HeapObject {
         // A mapping from field names to symbolic expressions.
-        private Map<String, HeapObjectField> fields;
-        protected Type type;
+        private final Map<String, HeapObjectField> fields;
+        protected final Type type;
 
         public HeapObject(Type type) {
             this.fields = new HashMap<>(4);
@@ -145,11 +145,11 @@ public class HeapObjects {
     }
 
     public static class MultiArrayObject extends ArrayObject {
-        private int dim;
+        private final int dim;
 
         public MultiArrayObject(ArrayType type, Expr<?> elems, ArrayExpr<BitVecSort, BitVecSort> lengths) {
             super(type, elems, lengths);
-            this.dim = ((ArrayType) type).getDimension();
+            this.dim = type.getDimension();
         }
 
         public int getDim() {
@@ -183,19 +183,7 @@ public class HeapObjects {
 
         /**
          * Returns the element at the given indices by calculating the offset in the
-         * flattened multi-dimensional array.
-         */
-        public <E extends Sort> Expr<E> getElem(int... indices) {
-            BitVecExpr[] idxExprs = new BitVecExpr[indices.length];
-            for (int i = 0; i < indices.length; i++) {
-                idxExprs[i] = ctx.mkBV(indices[i], sorts.getIntBitSize());
-            }
-            return super.getElem(calcIndex(idxExprs));
-        }
-
-        /**
-         * Returns the element at the given indices by calculating the offset in the
-         * flattened multi-dimensional array.
+         * flattened multidimensional array.
          */
         public <E extends Sort> Expr<E> getElem(BitVecExpr... indices) {
             return super.getElem(calcIndex(indices));
@@ -203,7 +191,7 @@ public class HeapObjects {
 
         /**
          * Sets the element at the given indices by calculating the offset in the
-         * flattened multi-dimensional array.
+         * flattened multidimensional array.
          */
         public <E extends Sort> void setElem(Expr<E> value, BitVecExpr... indices) {
             super.setElem(calcIndex(indices), value);

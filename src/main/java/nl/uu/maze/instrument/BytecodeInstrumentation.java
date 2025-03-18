@@ -21,7 +21,7 @@ import java.util.Map;
  * execution.
  * Uses the ASM library.
  */
-public class BytecodeInstrumenter {
+public class BytecodeInstrumentation {
     private static final String TRACE_MANAGER_PATH = TraceManager.class.getName().replace('.', '/');
     private static final String BRANCH_TYPE_PATH = BranchType.class.getName().replace('.', '/');
 
@@ -140,7 +140,7 @@ public class BytecodeInstrumenter {
 
     /** Method visitor that instruments the method to record symbolic traces */
     static class SymbolicTraceMethodVisitor extends AdviceAdapter {
-        String methodSignature;
+        final String methodSignature;
 
         protected SymbolicTraceMethodVisitor(int api, MethodVisitor methodVisitor, int access, String name,
                 String descriptor, String methodSignature) {
@@ -424,13 +424,6 @@ public class BytecodeInstrumenter {
         private int storeValueForArrayStore(int opcode) {
             int valueVar;
             switch (opcode) {
-                case Opcodes.IASTORE:
-                case Opcodes.BASTORE:
-                case Opcodes.CASTORE:
-                case Opcodes.SASTORE:
-                    valueVar = newLocal(Type.INT_TYPE);
-                    mv.visitVarInsn(Opcodes.ISTORE, valueVar);
-                    break;
                 case Opcodes.LASTORE:
                     valueVar = newLocal(Type.LONG_TYPE);
                     mv.visitVarInsn(Opcodes.LSTORE, valueVar);
@@ -460,12 +453,6 @@ public class BytecodeInstrumenter {
          */
         private void restoreValueForArrayStore(int opcode, int valueVar) {
             switch (opcode) {
-                case Opcodes.IASTORE:
-                case Opcodes.BASTORE:
-                case Opcodes.CASTORE:
-                case Opcodes.SASTORE:
-                    mv.visitVarInsn(Opcodes.ILOAD, valueVar);
-                    break;
                 case Opcodes.LASTORE:
                     mv.visitVarInsn(Opcodes.LLOAD, valueVar);
                     break;

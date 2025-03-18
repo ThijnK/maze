@@ -17,7 +17,7 @@ import nl.uu.maze.execution.ArgMap;
 import nl.uu.maze.execution.ArgMap.ObjectRef;
 import nl.uu.maze.execution.MethodType;
 import nl.uu.maze.execution.concrete.ConcreteExecutor;
-import nl.uu.maze.execution.concrete.ObjectInstantiator;
+import nl.uu.maze.execution.concrete.ObjectInstantiation;
 import nl.uu.maze.execution.symbolic.HeapObjects.*;
 import nl.uu.maze.transform.JavaToZ3Transformer;
 import nl.uu.maze.transform.JimpleToZ3Transformer;
@@ -112,7 +112,7 @@ public class MethodInvoker {
             String argName = ArgMap.getSymbolicName(MethodType.CALLEE, i);
             callee.assign(argName, argExpr);
             if (state.heap.isMultiArray(arg.toString())) {
-                // If the argument is a multi-dimensional array, copy the array indices
+                // If the argument is a multidimensional array, copy the array indices
                 // to the callee state
                 callee.heap.setArrayIndices(argName, state.heap.getArrayIndices(arg.toString()));
             }
@@ -140,8 +140,8 @@ public class MethodInvoker {
         Object instance = null;
         Object original = null;
 
-        // Only need to evalute the state if there are variables involved
-        if (base != null || expr.getArgs().size() > 0) {
+        // Only need to evaluate the state if there are variables involved
+        if (base != null || !expr.getArgs().isEmpty()) {
             Expr<?> symRef = base != null ? state.lookup(base.getName()) : null;
             HeapObject heapObj = state.heap.getHeapObject(symRef);
             if (base != null && heapObj == null) {
@@ -150,7 +150,7 @@ public class MethodInvoker {
             }
 
             Optional<ArgMap> argMapOpt = validator.evaluate(state, true);
-            if (!argMapOpt.isPresent()) {
+            if (argMapOpt.isEmpty()) {
                 state.setInfeasible();
                 return;
             }
@@ -165,20 +165,20 @@ public class MethodInvoker {
                     }
                     instance = argMap.toJava(base.getName(), clazz);
                     if (instance == null) {
-                        logger.warn("Failed to find instance for base: " + base.getName());
+                        logger.warn("Failed to find instance for base: {}", base.getName());
                         return;
                     }
                     original = ObjectUtils.shallowCopy(instance, instance.getClass());
                     addConcretizationConstraints(state, heapObj, instance);
                 } catch (ClassNotFoundException | NoSuchMethodException e) {
-                    logger.error("Failed to find class or method for base: " + base.getName());
+                    logger.error("Failed to find class or method for base: {}", base.getName());
                     return;
                 }
             }
             setMethodArguments(state, expr.getArgs(), isCtor, argMap);
         }
 
-        Object retval = isCtor ? ObjectInstantiator.createInstance((Constructor<?>) executable, argMap)
+        Object retval = isCtor ? ObjectInstantiation.createInstance((Constructor<?>) executable, argMap)
                 : executor.execute(instance, (Method) executable, argMap);
         if (retval instanceof Exception) {
             state.setExceptionThrown();
@@ -198,7 +198,7 @@ public class MethodInvoker {
         try {
             return isCtor ? analyzer.getJavaConstructor(methodSig) : analyzer.getJavaMethod(methodSig);
         } catch (ClassNotFoundException | NoSuchMethodException e) {
-            logger.error("Failed to find " + (isCtor ? "constructor" : "method") + ": " + methodSig);
+            logger.error("Failed to find {}: {}", isCtor ? "constructor" : "method", methodSig);
             return null;
         }
     }
@@ -214,7 +214,7 @@ public class MethodInvoker {
                     Class<?> argClazz = analyzer.getJavaClass(argObj.getType());
                     addConcretizationConstraints(state, argObj, argMap.toJava(argExpr.toString(), argClazz));
                 } catch (ClassNotFoundException e) {
-                    logger.warn("Failed to find class for reference: " + argExpr.toString());
+                    logger.warn("Failed to find class for reference: {}", argExpr);
                 }
                 argMap.set(name, new ObjectRef(argExpr.toString()));
             } else {
@@ -239,8 +239,7 @@ public class MethodInvoker {
      */
     private void addConcretizationConstraints(SymbolicState state, HeapObject heapObj, Object object) {
         // For arrays, we need to concretize the array elements
-        if (heapObj instanceof ArrayObject) {
-            ArrayObject arrObj = (ArrayObject) heapObj;
+        if (heapObj instanceof ArrayObject arrObj) {
             // Traverse the array, select corresponding element from arrObj's symbolic
             // array, and add constraint that they are equal
             if (heapObj instanceof MultiArrayObject) {

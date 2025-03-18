@@ -3,7 +3,7 @@ package nl.uu.maze.util;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 
-import nl.uu.maze.execution.concrete.ObjectInstantiator;
+import nl.uu.maze.execution.concrete.ObjectInstantiation;
 
 /**
  * Provides utility methods for working with objects.
@@ -38,7 +38,7 @@ public class ObjectUtils {
         }
 
         // Dummy instance which we'll copy fields into
-        Object copy = ObjectInstantiator.createInstance(clazz, true);
+        Object copy = ObjectInstantiation.createInstance(clazz, true);
 
         for (Field field : clazz.getDeclaredFields()) {
             try {

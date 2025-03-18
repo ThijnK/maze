@@ -46,38 +46,45 @@ public class JavaToZ3Transformer {
     public Expr<?> transform(Object value, SymbolicState state, Type expectedType) {
         this.state = state;
 
-        if (value == null) {
-            return sorts.getNullConst();
-        }
-        // All int-like types are considered integers (including boolean)
-        if (value instanceof Integer) {
-            return ctx.mkBV((int) value, sorts.getIntBitSize());
-        }
-        if (value instanceof Byte) {
-            return ctx.mkBV((byte) value, sorts.getIntBitSize());
-        }
-        if (value instanceof Short) {
-            return ctx.mkBV((short) value, sorts.getIntBitSize());
-        }
-        if (value instanceof Character) {
-            return ctx.mkBV((char) value, sorts.getIntBitSize());
-        }
-        if (value instanceof Boolean) {
-            return ctx.mkBV((boolean) value ? 1 : 0, sorts.getIntBitSize());
-        }
-        if (value instanceof Long) {
-            return ctx.mkBV((long) value, sorts.getLongBitSize());
-        }
-        if (value instanceof String) {
-            return ctx.mkString((String) value);
-        }
-        if (value instanceof Float) {
-            // Assume a float sort is defined in sorts
-            return ctx.mkFP((float) value, sorts.getFloatSort());
-        }
-        if (value instanceof Double) {
-            // Assume a double sort is defined in sorts
-            return ctx.mkFP((double) value, sorts.getDoubleSort());
+        switch (value) {
+            case null -> {
+                return sorts.getNullConst();
+            }
+
+            // All int-like types are considered integers (including boolean)
+            case Integer i -> {
+                return ctx.mkBV((int) value, sorts.getIntBitSize());
+            }
+            case Byte b -> {
+                return ctx.mkBV((byte) value, sorts.getIntBitSize());
+            }
+            case Short i -> {
+                return ctx.mkBV((short) value, sorts.getIntBitSize());
+            }
+            case Character c -> {
+                return ctx.mkBV((char) value, sorts.getIntBitSize());
+            }
+            case Boolean b -> {
+                return ctx.mkBV((boolean) value ? 1 : 0, sorts.getIntBitSize());
+            }
+            case Long l -> {
+                return ctx.mkBV((long) value, sorts.getLongBitSize());
+            }
+            case String s -> {
+                return ctx.mkString(s);
+            }
+            case Float v -> {
+                // Assume a float sort is defined in sorts
+                return ctx.mkFP((float) value, sorts.getFloatSort());
+                // Assume a float sort is defined in sorts
+            }
+            case Double v -> {
+                // Assume a double sort is defined in sorts
+                return ctx.mkFP((double) value, sorts.getDoubleSort());
+                // Assume a double sort is defined in sorts
+            }
+            default -> {
+            }
         }
         if (value.getClass().isArray()) {
             return transformArray(value, expectedType);
@@ -91,10 +98,9 @@ public class JavaToZ3Transformer {
     }
 
     private Expr<?> transformArray(Object value, Type expectedType) {
-        if (!(expectedType instanceof ArrayType)) {
+        if (!(expectedType instanceof ArrayType arrType)) {
             throw new UnsupportedOperationException("Expected type is not an array type: " + expectedType);
         }
-        ArrayType arrType = (ArrayType) expectedType;
         Type elemType = arrType.getBaseType();
         int dim = arrType.getDimension();
 
@@ -115,7 +121,7 @@ public class JavaToZ3Transformer {
             for (; i < dim; i++) {
                 sizes[i] = ctx.mkBV(0, sorts.getIntBitSize());
             }
-            // Allocate a symbolic multi-dimensional array in the heap
+            // Allocate a symbolic multidimensional array in the heap
             Expr<?> ref = state.heap.allocateMultiArray(arrType, sizes, elemType);
 
             // Set the elements of the array
