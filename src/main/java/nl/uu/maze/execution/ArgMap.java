@@ -111,13 +111,13 @@ public class ArgMap {
         Object value = args.get(var);
         if (value instanceof ObjectRef) {
             ObjectRef ref = (ObjectRef) value;
-            if (singleUseOnly && getRefCount(ref.getVar()) > 1) {
+            // If set to singleUseOnly and the ref is used multiple times, or it's a
+            // parameter, don't follow the chain
+            if (singleUseOnly && (ref.getVar().contains("arg") || getRefCount(ref.getVar()) > 1)) {
                 return Optional.empty();
             }
             return followRef(ref.getVar(), singleUseOnly);
         }
-        // TODO: if not in argmap and object type it would have to default to empty
-        // Objectinstanc
         return Optional.ofNullable(value);
     }
 
