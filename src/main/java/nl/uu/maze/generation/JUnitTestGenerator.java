@@ -262,7 +262,9 @@ public class JUnitTestGenerator {
             builtObjects.add(ref.getVar());
         } else if (value.getClass().isArray()) {
             // For arrays, need to reference the array variable
-            addStatementTriple(methodBuilder, type, ref.getVar(), valueToString(value));
+            if (!builtObjects.contains(ref.getVar())) {
+                addStatementTriple(methodBuilder, type, ref.getVar(), arrayToString(value));
+            }
             if (var != null) {
                 addStatementTriple(methodBuilder, type, var, ref.getVar());
             }
