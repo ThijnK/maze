@@ -4,6 +4,7 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,6 +47,11 @@ public class ArgMap {
      * Map of objects converted to the correct Java type.
      */
     private Map<String, Object> converted = new HashMap<>();
+    /**
+     * Track of how many times a variable is referenced by an ObjectRef.
+     * Lazily instantiated to avoid unnecessary overhead.
+     */
+    private Map<String, Integer> refCount = null;
 
     public ArgMap() {
         this.args = new java.util.HashMap<>();
@@ -87,6 +93,50 @@ public class ArgMap {
     @Override
     public String toString() {
         return args.toString();
+    }
+
+    /**
+     * Follow a (chain of) reference(s) to the actual object.
+     * 
+     * @param var           The variable to start from
+     * @param singleUseOnly Whether to only follow the reference if it is a
+     *                      single-use
+     *                      reference (i.e., every entry along the chain is
+     *                      referenced only once)
+     * @return The object the reference points to or <code>null</code> if set to
+     *         single-use only and some reference along the chain is used more than
+     *         once
+     */
+    public Optional<Object> followRef(String var, boolean singleUseOnly) {
+        Object value = args.get(var);
+        if (value instanceof ObjectRef) {
+            ObjectRef ref = (ObjectRef) value;
+            if (singleUseOnly && getRefCount(ref.getVar()) > 1) {
+                return Optional.empty();
+            }
+            return followRef(ref.getVar(), singleUseOnly);
+        }
+        // TODO: if not in argmap and object type it would have to default to empty
+        // Objectinstanc
+        return Optional.ofNullable(value);
+    }
+
+    /**
+     * Get the number of times a variable is referenced by an ObjectRef.
+     */
+    public int getRefCount(String var) {
+        if (refCount != null) {
+            return refCount.getOrDefault(var, 0);
+        }
+
+        refCount = new HashMap<>();
+        for (Object value : args.values()) {
+            if (value instanceof ObjectRef) {
+                String ref = ((ObjectRef) value).getVar();
+                refCount.put(ref, refCount.getOrDefault(ref, 0) + 1);
+            }
+        }
+        return refCount.getOrDefault(var, 0);
     }
 
     /**

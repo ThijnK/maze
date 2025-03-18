@@ -203,7 +203,16 @@ public class JUnitTestGenerator {
             }
             // If the value is a reference to another object
             else if (value instanceof ObjectRef) {
-                buildFromReference(methodBuilder, argMap, builtObjects, (ObjectRef) value, type, var);
+                // If this reference, and any subsequent ones in the chain are used only
+                // once, then we can skip the chain and define the value directly on this var
+                Optional<Object> finalValue = argMap.followRef(var, true);
+                if (finalValue.isPresent()) {
+                    argMap.set(var, finalValue.get());
+                    buildFromReference(methodBuilder, argMap, builtObjects, new ObjectRef(var),
+                            type);
+                } else {
+                    buildFromReference(methodBuilder, argMap, builtObjects, (ObjectRef) value, type, var);
+                }
             }
             // Other parameters (non-object) can be defined immediately
             else {

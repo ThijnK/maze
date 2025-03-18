@@ -133,7 +133,7 @@ public class ObjectInstantiator {
             }
 
             // Generate random value for the parameter
-            arguments[i] = generateRandom(params[i].getType());
+            arguments[i] = getDefault(params[i].getType());
 
             // Add new argument to argMap
             if (argMap != null) {
@@ -144,13 +144,7 @@ public class ObjectInstantiator {
         return arguments;
     }
 
-    /**
-     * Generate a random value for the given type.
-     * 
-     * @param type The java class of the value to generate
-     * @return A random value or default of the given type
-     */
-    private static Object generateRandom(Class<?> type) {
+    private static Object getDefault(Class<?> type) {
         // Create empty array
         if (type.isArray()) {
             // Note: the newInstance method automatically deals with multi-dimensional
@@ -158,6 +152,39 @@ public class ObjectInstantiator {
             return Array.newInstance(type.getComponentType(), 0);
         }
 
+        switch (type.getName()) {
+            case "int":
+                return 0;
+            case "double":
+                return 0.0;
+            case "float":
+                return 0.0f;
+            case "long":
+                return 0L;
+            case "short":
+                return (short) 0;
+            case "byte":
+                return (byte) 0;
+            case "char":
+                return (char) 0;
+            case "boolean":
+                return false;
+            case "java.lang.String":
+                return "";
+            default:
+                // Objects are set to null
+                return null;
+        }
+    }
+
+    /**
+     * Generate a random value for the given type.
+     * 
+     * @param type The java class of the value to generate
+     * @return A random value or default of the given type
+     */
+    @SuppressWarnings("unused")
+    private static Object generateRandom(Class<?> type) {
         switch (type.getName()) {
             case "int":
                 return rand.nextInt(Integer.MIN_VALUE, Integer.MAX_VALUE);
@@ -177,11 +204,9 @@ public class ObjectInstantiator {
                 return (char) rand.nextInt(Character.MIN_VALUE, Character.MAX_VALUE);
             case "boolean":
                 return rand.nextBoolean();
-            case "java.lang.String":
-                return ""; // A very random string indeed
             default:
-                // Objects are set to null
-                return null;
+                // For other types, return default value
+                return getDefault(type);
         }
     }
 }
