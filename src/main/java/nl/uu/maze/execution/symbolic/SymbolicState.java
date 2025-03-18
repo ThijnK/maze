@@ -41,7 +41,7 @@ public class SymbolicState {
     private StmtGraph<?> cfg;
     private Stmt stmt;
     private int depth = 0;
-    private MethodType methodType = MethodType.METHOD;
+    private MethodType methodType = MethodType.CTOR;
 
     /** Mapping from variable names to symbolic expressions. */
     public final Map<String, Expr<?>> store;
@@ -66,6 +66,11 @@ public class SymbolicState {
      */
     private SymbolicState caller = null;
 
+    /**
+     * Indicates whether this state is part of the constructor's execution for the
+     * class under test.
+     */
+    private boolean isCtorState = true;
     private boolean isFinalState = false;
     /** Indicates whether an exception was thrown during symbolic execution. */
     private boolean exceptionThrown = false;
@@ -105,13 +110,25 @@ public class SymbolicState {
         // original here
         this.caller = state.caller;
 
+        this.isCtorState = state.isCtorState;
         this.isFinalState = state.isFinalState;
         this.exceptionThrown = state.exceptionThrown;
         this.isInfeasible = state.isInfeasible;
     }
 
-    public void setMethodType(MethodType methodType) {
-        this.methodType = methodType;
+    public boolean isCtorState() {
+        return isCtorState;
+    }
+
+    /**
+     * Switch to execution of the method under test, instead of the constructor for
+     * the class under test.
+     */
+    public void switchToMethodState() {
+        isCtorState = false;
+        methodType = MethodType.METHOD;
+        // Clear all variables except "this" variable
+        store.keySet().removeIf(var -> !var.equals("this"));
     }
 
     public MethodType getMethodType() {
@@ -139,6 +156,7 @@ public class SymbolicState {
 
     public void setCaller(SymbolicState caller) {
         this.caller = caller;
+        this.methodType = MethodType.CALLEE;
     }
 
     public SymbolicState getCaller() {

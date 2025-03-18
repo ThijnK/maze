@@ -176,7 +176,6 @@ public class DSEController {
                     searchStrategy.add(state);
                 } else {
                     SymbolicState state = new SymbolicState(ctorSoot.getSignature(), ctorCfg);
-                    state.setMethodType(MethodType.CTOR);
                     searchStrategy.add(state);
                 }
             }
@@ -186,7 +185,6 @@ public class DSEController {
             else {
                 if (initStates.isEmpty()) {
                     SymbolicState state = new SymbolicState(ctorSoot.getSignature(), ctorCfg);
-                    state.setMethodType(MethodType.CTOR);
                     searchStrategy.add(state);
                 } else {
                     for (SymbolicState state : initStates.values()) {
@@ -195,7 +193,7 @@ public class DSEController {
                         SymbolicState newState = state.clone();
                         // Only if the state was the final constructor state, set the current statement
                         // to the starting statement of the target method
-                        if (!state.getMethodType().isCtor()) {
+                        if (!state.isCtorState()) {
                             newState.setMethod(method.getSignature(), cfg);
                         }
                         searchStrategy.add(newState);
@@ -208,7 +206,7 @@ public class DSEController {
         while ((current = searchStrategy.next()) != null) {
             logger.debug("Current state: " + current);
             logger.debug("Next stmt: " + current.getStmt());
-            if (!current.getMethodType().isCtor() && current.isFinalState() || current.incrementDepth() >= MAX_DEPTH) {
+            if (!current.isCtorState() && current.isFinalState() || current.incrementDepth() >= MAX_DEPTH) {
                 if (!current.isInfeasible())
                     finalStates.add(current);
                 searchStrategy.remove(current);
@@ -220,9 +218,7 @@ public class DSEController {
             int currHash = concreteDriven ? TraceManager.hashCode(current.getMethodSignature()) : current.hashCode();
             List<SymbolicState> newStates = symbolic.step(current, concreteDriven);
             // Unless it's the ctor, we can simply add the new states and continue
-            if (!current.getMethodType().isCtor()) {
-                searchStrategy.add(newStates);
-            } else {
+            if (current.isCtorState()) {
                 initStates.remove(currHash);
                 // If any of the new ctor states are final states, set their current
                 // statement to the starting statement of the target method
@@ -239,7 +235,7 @@ public class DSEController {
                             continue;
                         }
 
-                        state.setMethodType(MethodType.METHOD);
+                        state.switchToMethodState();
                         // Clone the state to avoid modifying the original in subsequent execution (want
                         // to reuse this final ctor state for multiple methods)
                         initStates.put(hashCode, state.clone());
@@ -251,6 +247,8 @@ public class DSEController {
                         searchStrategy.add(state);
                     }
                 }
+            } else {
+                searchStrategy.add(newStates);
             }
         }
 

@@ -87,7 +87,6 @@ public class MethodInvoker {
         // Create a fresh state that will enter the method call
         SymbolicState callee = new SymbolicState(method.getSignature(), analyzer.getCFG(method));
         callee.setCaller(state);
-        callee.setMethodType(MethodType.CALLEE);
         // Also set the constraints to be the same as the caller state
         // This will copy references, so original constraints will be modified if the
         // callee state adds new constraints (intentionally)
