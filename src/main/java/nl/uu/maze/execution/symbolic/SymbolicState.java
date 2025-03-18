@@ -157,6 +157,7 @@ public class SymbolicState {
     public void setCaller(SymbolicState caller) {
         this.caller = caller;
         this.methodType = MethodType.CALLEE;
+        this.depth = caller.depth;
     }
 
     public SymbolicState getCaller() {
