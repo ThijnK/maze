@@ -281,6 +281,13 @@ public class JUnitTestGenerator {
      */
     private void buildObject(MethodSpec.Builder methodBuilder, String var, Object obj) {
         Class<?> clazz = obj.getClass();
+
+        // Need to construct enums differently
+        if (clazz.isEnum()) {
+            methodBuilder.addStatement("$T $L = $T.valueOf($L)", clazz, var, clazz, valueToString(obj.toString()));
+            return;
+        }
+
         Field[] fields = clazz.getDeclaredFields();
         buildObjectInstance(methodBuilder, var, clazz);
         for (Field field : fields) {
