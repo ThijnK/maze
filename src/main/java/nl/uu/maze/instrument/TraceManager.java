@@ -148,28 +148,18 @@ public class TraceManager {
         } else if (type instanceof ArrayType) {
             return "[" + typeToDescriptorComponent(((ArrayType) type).getElementType());
         } else {
-            switch (type.toString()) {
-                case "byte":
-                    return "B";
-                case "char":
-                    return "C";
-                case "double":
-                    return "D";
-                case "float":
-                    return "F";
-                case "int":
-                    return "I";
-                case "long":
-                    return "J";
-                case "short":
-                    return "S";
-                case "boolean":
-                    return "Z";
-                case "void":
-                    return "V";
-                default:
-                    throw new IllegalArgumentException("Unknown type: " + type);
-            }
+            return switch (type.toString()) {
+                case "byte" -> "B";
+                case "char" -> "C";
+                case "double" -> "D";
+                case "float" -> "F";
+                case "int" -> "I";
+                case "long" -> "J";
+                case "short" -> "S";
+                case "boolean" -> "Z";
+                case "void" -> "V";
+                default -> throw new IllegalArgumentException("Unknown type: " + type);
+            };
         }
     }
 
