@@ -138,9 +138,10 @@ public class SymbolicStateValidator {
                     } else {
                         argMap.set(var, ref);
                     }
+                } else {
+                    // Store the reference value for equality checks to other argument references
+                    refValues.put(expr, new ObjectRef(var));
                 }
-                // Store the reference value for equality checks to other argument references
-                refValues.put(expr, new ObjectRef(var));
             }
 
             // Remove potential suffixes (e.g., _elems, _len)
