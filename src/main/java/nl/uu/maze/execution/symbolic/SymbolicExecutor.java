@@ -21,7 +21,6 @@ import sootup.core.jimple.basic.LValue;
 import sootup.core.jimple.basic.Local;
 import sootup.core.jimple.basic.Value;
 import sootup.core.jimple.common.constant.IntConstant;
-import sootup.core.jimple.common.expr.AbstractInstanceInvokeExpr;
 import sootup.core.jimple.common.expr.AbstractInvokeExpr;
 import sootup.core.jimple.common.ref.*;
 import sootup.core.jimple.common.stmt.*;
@@ -423,25 +422,7 @@ public class SymbolicExecutor {
                 state.setFinalState();
                 return List.of(state);
             }
-            SymbolicState caller = state.getCaller().clone();
-
-            // Link relevant parts of the heap from the callee state to the caller state
-            // This is necessary to ensure that newly created objects in the callee's state
-            // that are referenced by the caller's state are linked correctly
-            caller.setConstraints(state.getPathConstraints(), state.getEngineConstraints());
-            caller.heap.setCounters(state.heap.getHeapCounter(), state.heap.getRefCounter());
-            caller.heap.setResolvedRefs(state.heap.getResolvedRefs());
-            AbstractInvokeExpr expr = caller.getStmt().getInvokeExpr();
-            if (expr instanceof AbstractInstanceInvokeExpr) {
-                caller.heap.linkHeapObject(caller.lookup(((AbstractInstanceInvokeExpr) expr).getBase().getName()),
-                        state.heap);
-            }
-            for (Immediate arg : expr.getArgs()) {
-                Expr<?> argExpr = jimpleToZ3.transform(arg, caller);
-                if (sorts.isRef(argExpr)) {
-                    caller.heap.linkHeapObject(argExpr, state.heap);
-                }
-            }
+            SymbolicState caller = state.returnToCaller();
 
             // If the caller state is a definition statement, we still need to complete the
             // assignment using the return value of the method that just finished execution
@@ -457,8 +438,8 @@ public class SymbolicExecutor {
                 }
                 return handleDefStmt((AbstractDefinitionStmt) caller.getStmt(), caller, replay);
             }
-            return handleOtherStmts(caller, replay);
 
+            return handleOtherStmts(caller, replay);
         }
 
         // Note: generally non-branching statements will not have more than 1 successor,

@@ -13,6 +13,9 @@ import nl.uu.maze.util.Z3ContextProvider;
 import nl.uu.maze.util.Z3Sorts;
 import nl.uu.maze.execution.symbolic.PathConstraint.SingleConstraint;
 import sootup.core.graph.StmtGraph;
+import sootup.core.jimple.basic.Immediate;
+import sootup.core.jimple.common.expr.AbstractInstanceInvokeExpr;
+import sootup.core.jimple.common.expr.AbstractInvokeExpr;
 import sootup.core.jimple.common.stmt.Stmt;
 import sootup.core.signatures.MethodSignature;
 import sootup.core.types.Type;
@@ -160,12 +163,42 @@ public class SymbolicState {
         this.depth = caller.depth;
     }
 
-    public SymbolicState getCaller() {
-        return caller;
-    }
-
     public boolean hasCaller() {
         return caller != null;
+    }
+
+    /**
+     * Return execution to the caller state by transferring return value and changes
+     * to heap and constraints.
+     */
+    public SymbolicState returnToCaller() {
+        if (caller == null) {
+            return this;
+        }
+        SymbolicState caller = this.caller.clone();
+
+        // Link relevant parts of the heap from the callee state to the caller state
+        // This is necessary to ensure that newly created objects in the callee's state
+        // that are referenced by the caller's state are linked correctly
+        caller.setConstraints(pathConstraints, engineConstraints);
+        caller.heap.setCounters(heap.getHeapCounter(), heap.getRefCounter());
+        caller.heap.setResolvedRefs(heap.getResolvedRefs());
+        // Last statement in the callee state always contains an invoke (possibly as
+        // part of a definition statement)
+        AbstractInvokeExpr expr = caller.getStmt().getInvokeExpr();
+        if (expr instanceof AbstractInstanceInvokeExpr) {
+            caller.heap.linkHeapObject(caller.lookup(((AbstractInstanceInvokeExpr) expr).getBase().getName()), heap);
+        }
+
+        // Link heap objects for arguments of the method call
+        for (Immediate arg : expr.getArgs()) {
+            Expr<?> argExpr = caller.lookup(arg.toString());
+            if (argExpr != null && Z3Sorts.getInstance().isRef(argExpr)) {
+                caller.heap.linkHeapObject(argExpr, heap);
+            }
+        }
+
+        return caller;
     }
 
     public Stmt getStmt() {
