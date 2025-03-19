@@ -177,7 +177,7 @@ public class SymbolicStateValidator {
                 // Skip if already set (e.g., to null)
                 continue;
             }
-            Object value = transformer.transformExpr(model.getConstInterp(decl), state.getParamType(var));
+            Object value = transformer.transformExpr(expr, state.getParamType(var));
             argMap.set(var, value);
         }
 
@@ -194,7 +194,7 @@ public class SymbolicStateValidator {
      * @param fillObjectFields Whether to fill object fields with their current
      *                         values on the heap
      * @return A map of values extracted from the model if the path condition is
-     *          satisfiable
+     *         satisfiable
      */
     public Optional<ArgMap> evaluate(SymbolicState state, boolean fillObjectFields) {
         Optional<Model> model = validate(state);

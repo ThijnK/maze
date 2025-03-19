@@ -83,7 +83,8 @@ public class ObjectInstantiation {
             if (!forceNew && cutInstances.containsKey(hash)) {
                 return cutInstances.get(hash);
             } else {
-                logger.debug("Creating instance of class {} with args: {}", ctor.getDeclaringClass().getSimpleName(), ArrayUtils.toString(args));
+                logger.debug("Creating instance of class {} with args: {}", ctor.getDeclaringClass().getSimpleName(),
+                        ArrayUtils.toString(args));
                 ctor.setAccessible(true);
                 Object instance = ctor.newInstance(args);
 
@@ -92,7 +93,8 @@ public class ObjectInstantiation {
                 return instance;
             }
         } catch (Exception e) {
-            logger.warn("Constructor of {} threw an exception: {}", ctor.getDeclaringClass().getSimpleName(), e.getMessage());
+            logger.warn("Constructor of {} threw an exception: {}", ctor.getDeclaringClass().getSimpleName(),
+                    e.getMessage());
             return null;
         }
     }
@@ -151,7 +153,7 @@ public class ObjectInstantiation {
             case "java.lang.String" -> "";
             default ->
                 // Objects are set to null
-                    null;
+                null;
         };
     }
 

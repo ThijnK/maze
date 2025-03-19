@@ -24,6 +24,8 @@ public class Z3ToJavaTransformer {
 
     /** Transform a Z3 expression to a Java object. */
     public Object transformExpr(Expr<?> expr, Type type) {
+        // Bool and the (ideal) integer won't actually appear, because they are modeled
+        // as bit vectors
         if (expr.isBool()) {
             return expr.isTrue();
         } else if (expr.isInt()) {

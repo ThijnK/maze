@@ -104,7 +104,7 @@ public class SymbolicState {
         this.retval = state.retval;
         this.pathConstraints = new ArrayList<>(state.pathConstraints);
         this.engineConstraints = new ArrayList<>(state.engineConstraints);
-        // Share param types map to avoid copying
+        // Share param types map
         this.paramTypes = state.paramTypes;
         // Note: caller state is lazily cloned when needed, so store a reference to the
         // original here
