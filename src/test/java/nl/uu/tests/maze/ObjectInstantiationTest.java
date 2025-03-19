@@ -12,21 +12,21 @@ import java.lang.reflect.Parameter;
 class ObjectInstantiationTest {
     @Test
     public void testCreateInstance_NoArgs() {
-        Object instance = ObjectInstantiation.createInstance(TestClassNoArgs.class, true);
+        Object instance = ObjectInstantiation.createInstance(TestClassNoArgs.class);
         assertNotNull(instance);
         assertInstanceOf(TestClassNoArgs.class, instance);
     }
 
     @Test
     public void testCreateInstance_WithArgs() {
-        Object instance = ObjectInstantiation.createInstance(TestClassWithArgs.class, true);
+        Object instance = ObjectInstantiation.createInstance(TestClassWithArgs.class);
         assertNotNull(instance);
         assertInstanceOf(TestClassWithArgs.class, instance);
     }
 
     @Test
     public void testCreateInstance_NoConstructors() {
-        Object instance = ObjectInstantiation.createInstance(TestClassNoConstructors.class, true);
+        Object instance = ObjectInstantiation.createInstance(TestClassNoConstructors.class);
         assertNotNull(instance);
         assertInstanceOf(TestClassNoConstructors.class, instance);
     }

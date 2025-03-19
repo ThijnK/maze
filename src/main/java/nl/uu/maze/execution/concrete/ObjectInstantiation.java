@@ -2,9 +2,6 @@ package nl.uu.maze.execution.concrete;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Random;
 import java.lang.reflect.Parameter;
 
@@ -25,13 +22,6 @@ public class ObjectInstantiation {
     private static final Random rand = new Random();
 
     /**
-     * Map of cut instances, indexed by their hash code.
-     * Used to keep track of instances of the CUT that have been previously created,
-     * to be able to reuse them when possible.
-     */
-    private static final Map<Integer, Object> cutInstances = new HashMap<>();
-
-    /**
      * Attempt to create an instance of the given class.
      * 
      * @param clazz    The class to instantiate
@@ -39,10 +29,10 @@ public class ObjectInstantiation {
      *                 reusing previously created instances
      * @return An instance of the class or null if the instance could not be created
      */
-    public static Object createInstance(Class<?> clazz, boolean forceNew) {
+    public static Object createInstance(Class<?> clazz) {
         // Try to create an instance using one of the constructors
         for (Constructor<?> ctor : clazz.getDeclaredConstructors()) {
-            Object instance = createInstance(ctor, generateArgs(ctor.getParameters(), MethodType.CTOR, null), forceNew);
+            Object instance = createInstance(ctor, generateArgs(ctor.getParameters(), MethodType.CTOR, null));
             if (instance != null) {
                 return instance;
             }
@@ -62,36 +52,22 @@ public class ObjectInstantiation {
      * @return An instance of the class or null if the instance could not be created
      */
     public static Object createInstance(Constructor<?> ctor, ArgMap argMap) {
-        return createInstance(ctor, generateArgs(ctor.getParameters(), MethodType.CTOR, argMap), false);
+        return createInstance(ctor, generateArgs(ctor.getParameters(), MethodType.CTOR, argMap));
     }
 
     /**
      * Attempt to create an instance of the given class using the given arguments.
      * 
-     * @param ctor     The constructor to use to create the instance
-     * @param args     The arguments to pass to the constructor
-     * @param forceNew Whether to force the creation of a new instance instead of
-     *                 reusing previously created instances
+     * @param ctor The constructor to use to create the instance
+     * @param args The arguments to pass to the constructor
      * @return An instance of the class or null if the instance could not be created
      */
-    public static Object createInstance(Constructor<?> ctor, Object[] args, boolean forceNew) {
+    public static Object createInstance(Constructor<?> ctor, Object[] args) {
         try {
-            int hash = Arrays.hashCode(args);
-            hash = 31 * hash + ctor.getDeclaringClass().getName().hashCode();
-            // Check if an instance of the class has already
-            // been created with the same arguments
-            if (!forceNew && cutInstances.containsKey(hash)) {
-                return cutInstances.get(hash);
-            } else {
-                logger.debug("Creating instance of class {} with args: {}", ctor.getDeclaringClass().getSimpleName(),
-                        ArrayUtils.toString(args));
-                ctor.setAccessible(true);
-                Object instance = ctor.newInstance(args);
-
-                // Store the instance in the cutInstances map
-                cutInstances.put(hash, instance);
-                return instance;
-            }
+            logger.debug("Creating instance of class {} with args: {}", ctor.getDeclaringClass().getSimpleName(),
+                    ArrayUtils.toString(args));
+            ctor.setAccessible(true);
+            return ctor.newInstance(args);
         } catch (Exception e) {
             logger.warn("Constructor of {} threw an exception: {}", ctor.getDeclaringClass().getSimpleName(),
                     e.getMessage());

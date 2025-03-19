@@ -38,7 +38,7 @@ public class ObjectUtils {
         }
 
         // Dummy instance which we'll copy fields into
-        Object copy = ObjectInstantiation.createInstance(clazz, true);
+        Object copy = ObjectInstantiation.createInstance(clazz);
 
         for (Field field : clazz.getDeclaredFields()) {
             try {
