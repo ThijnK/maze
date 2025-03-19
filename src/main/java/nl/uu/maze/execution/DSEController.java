@@ -35,7 +35,7 @@ public class DSEController {
     private static final Logger logger = LoggerFactory.getLogger(DSEController.class);
 
     /** Max path length for symbolic execution */
-    private final int MAX_DEPTH = 50;
+    private final int MAX_DEPTH = 40;
 
     private final boolean concreteDriven;
     private final Path outPath;
@@ -205,7 +205,7 @@ public class DSEController {
             logger.debug("Next stmt: {}", current.getStmt());
             if (!current.isCtorState() && current.isFinalState() || current.incrementDepth() >= MAX_DEPTH) {
                 if (!current.isInfeasible())
-                    finalStates.add(current);
+                    finalStates.add(current.returnToRootCaller());
                 searchStrategy.remove(current);
                 continue;
             }

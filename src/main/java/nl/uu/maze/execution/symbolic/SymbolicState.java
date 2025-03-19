@@ -201,6 +201,18 @@ public class SymbolicState {
         return caller;
     }
 
+    /**
+     * Return execution to the root caller state by traversing the chain of caller
+     * states.
+     */
+    public SymbolicState returnToRootCaller() {
+        SymbolicState state = this;
+        while (state.hasCaller()) {
+            state = state.returnToCaller();
+        }
+        return state;
+    }
+
     public Stmt getStmt() {
         return stmt;
     }
