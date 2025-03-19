@@ -315,17 +315,20 @@ public class SymbolicState {
     public boolean equals(Object obj) {
         if (obj == this)
             return true;
-        if (!(obj instanceof SymbolicState state))
+        if (!(obj instanceof SymbolicState other))
             return false;
 
-        return state.stmt.equals(stmt) && state.store.equals(store)
-                && state.pathConstraints.equals(pathConstraints) && state.heap.equals(heap);
+        return other.stmt.equals(stmt) && other.store.equals(store)
+                && other.pathConstraints.equals(pathConstraints) && other.engineConstraints.equals(engineConstraints)
+                && other.heap.equals(heap);
     }
 
     @Override
     public int hashCode() {
-        return stmt.hashCode() + store.hashCode() + pathConstraints.hashCode()
-                + engineConstraints.hashCode()
-                + heap.hashCode();
+        // A state should be uniquely identified by its current statement, as everything
+        // else (path constraints, heap, etc.) is based on the position in the program
+        // This avoids having to hash path constraints and heap etc., which can be very
+        // expensive
+        return stmt.hashCode();
     }
 }

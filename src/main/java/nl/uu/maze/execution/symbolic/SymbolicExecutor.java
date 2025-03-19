@@ -303,8 +303,8 @@ public class SymbolicExecutor {
                 // Static field assignments are considered out of scope
             }
             case JInstanceFieldRef ref ->
-                    state.heap.setField(ref.getBase().getName(), ref.getFieldSignature().getName(), value,
-                            ref.getFieldSignature().getType());
+                state.heap.setField(ref.getBase().getName(), ref.getFieldSignature().getName(), value,
+                        ref.getFieldSignature().getType());
             default -> state.assign(leftOp.toString(), value);
         }
 

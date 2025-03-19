@@ -288,8 +288,9 @@ public class JavaAnalyzer {
      */
     public StmtGraph<?> getCFG(JavaSootMethod method) {
         StmtGraph<?> cfg = method.getBody().getStmtGraph();
-        String urlToWebEditor = DotExporter.createUrlToWebeditor(cfg);
-        logger.info("CFG: {}", urlToWebEditor);
+        if (logger.isDebugEnabled()) {
+            logger.debug("CFG: {}", DotExporter.createUrlToWebeditor(cfg));
+        }
         return cfg;
     }
 }
