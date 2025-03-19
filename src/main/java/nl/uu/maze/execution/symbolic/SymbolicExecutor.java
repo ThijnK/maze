@@ -263,6 +263,15 @@ public class SymbolicExecutor {
                             ctx.mkBVSLT(index, len)));
                 }
             }
+            // If not a symbolic array, and replaying a trace, we still need to consume the
+            // trace entry for the array access
+            else if (replay) {
+                if (!TraceManager.hasEntries(state.getMethodSignature())
+                        || !TraceManager.consumeEntry(state.getMethodSignature()).isArrayAccess()) {
+                    state.setExceptionThrown();
+                    return List.of(state);
+                }
+            }
         }
 
         Expr<?> value;
