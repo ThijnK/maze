@@ -79,7 +79,7 @@ public abstract class ConcreteSearchStrategy implements SearchStrategy {
         PathConditionCandidate candidate;
         while ((candidate = next()) != null) {
             candidate.applyNegation();
-            if (!candidate.isExplored()) {
+            if (!isExplored(candidate)) {
                 Optional<Model> model = validator.validate(candidate.getPathConstraints());
                 if (model.isPresent()) {
                     return model;
@@ -90,19 +90,39 @@ public abstract class ConcreteSearchStrategy implements SearchStrategy {
     }
 
     /**
+     * Determines whether a path condition candidate has been explored before.
+     */
+    protected boolean isExplored(PathConditionCandidate candidate) {
+        StringBuilder sb = new StringBuilder();
+        for (PathConstraint constraint : candidate.getPathConstraints()) {
+            sb.append(constraint.toString());
+        }
+
+        int hash = sb.toString().hashCode();
+        return exploredPaths.contains(hash);
+    }
+
+    /**
      * Determines whether a symbolic state has been explored before, and adds it to
-     * the set of
-     * explored paths if not already explored.
+     * the set of explored paths if not already explored.
      * 
      * @param state The symbolic state to check
      * @return Whether the symbolic state has been explored before
      */
     protected boolean isExplored(SymbolicState state) {
-        int path = PathConditionCandidate.hash(state.getPathConstraints());
-        if (exploredPaths.contains(path)) {
+        // Add every prefix of the path as explored as well
+        List<Integer> prefixes = new ArrayList<>();
+        StringBuilder sb = new StringBuilder();
+        for (PathConstraint constraint : state.getPathConstraints()) {
+            sb.append(constraint.toString());
+            prefixes.add(sb.toString().hashCode());
+        }
+
+        int hash = sb.toString().hashCode();
+        if (exploredPaths.contains(hash)) {
             return true;
         }
-        exploredPaths.add(path);
+        exploredPaths.addAll(prefixes);
         return false;
     }
 
@@ -144,69 +164,30 @@ public abstract class ConcreteSearchStrategy implements SearchStrategy {
         public void applyNegation() {
             PathConstraint constraint = pathConstraints.get(index);
             AliasConstraint alias = constraint instanceof AliasConstraint ? (AliasConstraint) constraint : null;
-            // Make a copy of the path constraints to avoid modifying the original list
-            List<PathConstraint> newConstraints = new ArrayList<>(pathConstraints.size());
-            // Note: the negation creates a new PathConstraint instance, so original is
-            // not modified
-            PathConstraint negated = negateConstraint(constraint);
-            // For alias constraints, it may occur that this alias constraint conflicts with
-            // another path constraint (e.g., from an explicit null comparison in the
-            // program), so we filter out such conflicts
-            for (int i = 0; i < pathConstraints.size(); i++) {
-                if (i == index) {
-                    newConstraints.add(negated);
-                    continue;
-                }
 
+            // Only keep constraints up to the index we're negating
+            List<PathConstraint> newConstraints = new ArrayList<>(index + 1);
+            // Copy constraints before the negated one
+            for (int i = 0; i < index; i++) {
                 PathConstraint other = pathConstraints.get(i);
                 // Skip conflicting constraint when negating alias constraints
                 if (alias == null || !alias.isConflicting(other)) {
                     newConstraints.add(other);
                 }
             }
+
+            // Add the negated constraint (creates a new instance)
+            newConstraints.add(negateConstraint(constraint));
+
+            // Intentionally omit constraints after the negated one
+            // as they were derived assuming the non-negated version
+
             pathConstraints = newConstraints;
         }
 
         public PathConstraint negateConstraint(PathConstraint constraint) {
             return constraint instanceof CompositeConstraint ? ((CompositeConstraint) constraint).negate(subIndex)
                     : ((SingleConstraint) constraint).negate();
-        }
-
-        /**
-         * Compute the hash of a list of constraints to be used as a unique identifier
-         * of the path represented by this path condition.
-         * 
-         * @param pathConstraints The list of constraints to hash
-         * @return The hash of the list of constraints
-         */
-        public static int hash(List<PathConstraint> pathConstraints) {
-            StringBuilder sb = new StringBuilder();
-            for (PathConstraint constraint : pathConstraints) {
-                sb.append(constraint.toString());
-            }
-            return sb.toString().hashCode();
-        }
-
-        /**
-         * Check whether the path condition has been explored before.
-         * This not only checks if the path condition as a whole has been explored, but
-         * also checks if any prefix of the path condition that contains the negated
-         * constraint has already been explored. Such a prefix can be a terminating path
-         * that already occurs in the explored paths, so not checking the prefix could
-         * lead to exploring the same path multiple (or even infinite) times.
-         * 
-         * @return Whether the path condition has been explored before
-         */
-        public boolean isExplored() {
-            StringBuilder sb = new StringBuilder();
-            for (int i = 0; i <= index; i++) {
-                sb.append(pathConstraints.get(i).toString());
-                // Start checking prefixes starting from the negated constraint
-                if (i >= index && exploredPaths.contains(sb.toString().hashCode())) {
-                    return true;
-                }
-            }
-            return false;
         }
     }
 }
