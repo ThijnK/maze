@@ -242,8 +242,9 @@ public class MethodInvoker {
         if (heapObj instanceof ArrayObject arrObj) {
             // Traverse the array, select corresponding element from arrObj's symbolic
             // array, and add constraint that they are equal
-            if (heapObj instanceof MultiArrayObject) {
-                // TODO: not supported
+            if (heapObj instanceof MultiArrayObject multiArrObj) {
+                // Multi-dimensional arrays
+                addConcretizationConstraints(state, multiArrObj, object, 0, new int[multiArrObj.getDim()]);
             } else {
                 // Regular arrays
                 for (int i = 0; i < Array.getLength(object); i++) {
@@ -272,6 +273,25 @@ public class MethodInvoker {
                     // Add a constraint that the field value must equal the symbolic value
                     state.addEngineConstraint(ctx.mkEq(fieldValue, fieldExpr));
                 }
+            }
+        }
+    }
+
+    /**
+     * Recursively add constraints for the elements of a multi-dimensional array to
+     * equal the concretized elements of the given array.
+     */
+    private void addConcretizationConstraints(SymbolicState state, MultiArrayObject multiArrObj, Object object,
+            int currrentDim, int[] indices) {
+        if (currrentDim == multiArrObj.getDim()) {
+            // We have reached the end of the array, add the constraint
+            Expr<?> arrElemExpr = javaToZ3.transform(object, state);
+            state.addEngineConstraint(ctx.mkEq(multiArrObj.getElem(indices), arrElemExpr));
+        } else {
+            // Recursively traverse the array
+            for (int i = 0; i < Array.getLength(object); i++) {
+                indices[currrentDim] = i;
+                addConcretizationConstraints(state, multiArrObj, Array.get(object, i), currrentDim + 1, indices);
             }
         }
     }

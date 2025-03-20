@@ -197,6 +197,18 @@ public class HeapObjects {
         }
 
         /**
+         * Returns the element at the given indices by calculating the offset in the
+         * flattened multidimensional array.
+         */
+        public <E extends Sort> Expr<E> getElem(int... indices) {
+            BitVecExpr[] idxExprs = new BitVecExpr[indices.length];
+            for (int i = 0; i < indices.length; i++) {
+                idxExprs[i] = ctx.mkBV(indices[i], sorts.getIntBitSize());
+            }
+            return getElem(idxExprs);
+        }
+
+        /**
          * Sets the element at the given indices by calculating the offset in the
          * flattened multidimensional array.
          */
