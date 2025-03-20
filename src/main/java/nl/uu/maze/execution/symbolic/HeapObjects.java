@@ -46,6 +46,10 @@ public class HeapObjects {
             this.value = value;
         }
 
+        public HeapObjectField clone() {
+            return new HeapObjectField(value, type);
+        }
+
         @Override
         public String toString() {
             return value.toString();
@@ -92,7 +96,10 @@ public class HeapObjects {
 
         public HeapObject clone() {
             HeapObject obj = new HeapObject(type);
-            obj.fields.putAll(fields);
+            // Deep copy of fields
+            for (Entry<String, HeapObjectField> entry : fields.entrySet()) {
+                obj.fields.put(entry.getKey(), entry.getValue().clone());
+            }
             return obj;
         }
 
