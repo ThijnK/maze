@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 
 import nl.uu.maze.execution.ArgMap;
 import nl.uu.maze.execution.MethodType;
-import nl.uu.maze.util.ArrayUtils;
 
 /**
  * Instantiates objects using Java reflection and randomly generated
@@ -65,7 +64,7 @@ public class ObjectInstantiation {
     public static Object createInstance(Constructor<?> ctor, Object[] args) {
         try {
             logger.debug("Creating instance of class {} with args: {}", ctor.getDeclaringClass().getSimpleName(),
-                    ArrayUtils.toString(args));
+                    args);
             ctor.setAccessible(true);
             return ctor.newInstance(args);
         } catch (Exception e) {

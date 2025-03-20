@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 
 import nl.uu.maze.execution.ArgMap;
 import nl.uu.maze.execution.MethodType;
-import nl.uu.maze.util.ArrayUtils;
 
 public class ConcreteExecutor {
     private static final Logger logger = LoggerFactory.getLogger(ConcreteExecutor.class);
@@ -52,7 +51,7 @@ public class ConcreteExecutor {
     public Object execute(Object instance, Method method, ArgMap argMap) {
         try {
             Object[] args = ObjectInstantiation.generateArgs(method.getParameters(), MethodType.METHOD, argMap);
-            logger.debug("Executing method {} with args: {}", method.getName(), ArrayUtils.toString(args));
+            logger.debug("Executing method {} with args: {}", method.getName(), args);
             Object result = method.invoke(instance, args);
             logger.debug("Retval: {}", result == null ? "null" : result.toString());
 

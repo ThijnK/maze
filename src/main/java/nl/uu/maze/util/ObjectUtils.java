@@ -2,6 +2,7 @@ package nl.uu.maze.util;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
+import java.util.Arrays;
 
 import nl.uu.maze.execution.concrete.ObjectInstantiation;
 
@@ -89,7 +90,9 @@ public class ObjectUtils {
 
         for (Field field : updated.getClass().getDeclaredFields()) {
             try {
-                Field[] fieldPath = ArrayUtils.append(path, field);
+                Field[] fieldPath = Arrays.copyOf(path, path.length + 1);
+                fieldPath[fieldPath.length - 1] = field;
+
                 field.setAccessible(true);
                 Object oldValue = original != null ? field.get(original) : null;
                 Object newValue = field.get(updated);
