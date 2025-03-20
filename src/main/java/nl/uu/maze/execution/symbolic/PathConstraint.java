@@ -24,6 +24,11 @@ public abstract class PathConstraint {
         return getConstraint().toString();
     }
 
+    @Override
+    public int hashCode() {
+        return getConstraint().hashCode();
+    }
+
     /**
      * Represents the basic form of a path constraint as a single boolean
      * expression.

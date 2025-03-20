@@ -93,13 +93,7 @@ public abstract class ConcreteSearchStrategy implements SearchStrategy {
      * Determines whether a path condition candidate has been explored before.
      */
     protected boolean isExplored(PathConditionCandidate candidate) {
-        StringBuilder sb = new StringBuilder();
-        for (PathConstraint constraint : candidate.getPathConstraints()) {
-            sb.append(constraint.toString());
-        }
-
-        int hash = sb.toString().hashCode();
-        return exploredPaths.contains(hash);
+        return exploredPaths.contains(candidate.hashCode());
     }
 
     /**
@@ -112,14 +106,13 @@ public abstract class ConcreteSearchStrategy implements SearchStrategy {
     protected boolean isExplored(SymbolicState state) {
         // Add every prefix of the path as explored as well
         List<Integer> prefixes = new ArrayList<>();
-        StringBuilder sb = new StringBuilder();
+        int result = 1;
         for (PathConstraint constraint : state.getPathConstraints()) {
-            sb.append(constraint.toString());
-            prefixes.add(sb.toString().hashCode());
+            result = 31 * result + (constraint == null ? 0 : constraint.hashCode());
+            prefixes.add(result);
         }
 
-        int hash = sb.toString().hashCode();
-        if (exploredPaths.contains(hash)) {
+        if (exploredPaths.contains(result)) {
             return true;
         }
         exploredPaths.addAll(prefixes);
@@ -134,7 +127,7 @@ public abstract class ConcreteSearchStrategy implements SearchStrategy {
      * @implNote The index is stored separately to apply the negation "lazily"
      *           (i.e., only when the candidate is selected for exploration).
      */
-    public class PathConditionCandidate {
+    public static class PathConditionCandidate {
         private List<PathConstraint> pathConstraints;
         /** The index of the constraint to negate. */
         private final int index;
@@ -188,6 +181,15 @@ public abstract class ConcreteSearchStrategy implements SearchStrategy {
         public PathConstraint negateConstraint(PathConstraint constraint) {
             return constraint instanceof CompositeConstraint ? ((CompositeConstraint) constraint).negate(subIndex)
                     : ((SingleConstraint) constraint).negate();
+        }
+
+        @Override
+        public int hashCode() {
+            int result = 1;
+            for (PathConstraint constraint : pathConstraints) {
+                result = 31 * result + (constraint == null ? 0 : constraint.hashCode());
+            }
+            return result;
         }
     }
 }
