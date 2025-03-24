@@ -134,7 +134,7 @@ public class SymbolicExecutor {
         }
 
         if (trackCoverage)
-            CoverageTracker.getInstance().recordStmt(stmt);
+            CoverageTracker.getInstance().setCovered(stmt);
         return newStates;
     }
 
@@ -190,7 +190,7 @@ public class SymbolicExecutor {
         }
 
         if (trackCoverage)
-            CoverageTracker.getInstance().recordStmt(stmt);
+            CoverageTracker.getInstance().setCovered(stmt);
         return newStates;
     }
 
@@ -430,7 +430,7 @@ public class SymbolicExecutor {
 
         // Mark statement as covered
         if (trackCoverage && !state.isExceptionThrown()) {
-            CoverageTracker.getInstance().recordStmt(state.getStmt());
+            CoverageTracker.getInstance().setCovered(state.getStmt());
         }
 
         // Final state
