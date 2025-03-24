@@ -153,6 +153,10 @@ public class SymbolicState {
         setStmt(cfg.getStartingStmt());
     }
 
+    public StmtGraph<?> getCFG() {
+        return cfg;
+    }
+
     public MethodSignature getMethodSignature() {
         return methodSig;
     }
