@@ -36,10 +36,12 @@ public class SymbolicExecutor {
     private final MethodInvoker methodInvoker;
     private final JimpleToZ3Transformer jimpleToZ3 = new JimpleToZ3Transformer();
     private final SymbolicRefExtractor refExtractor = new SymbolicRefExtractor();
+    private final boolean trackCoverage;
 
     public SymbolicExecutor(ConcreteExecutor executor, SymbolicStateValidator validator,
-            JavaAnalyzer analyzer) {
+            JavaAnalyzer analyzer, boolean trackCoverage) {
         this.methodInvoker = new MethodInvoker(executor, validator, analyzer);
+        this.trackCoverage = trackCoverage;
     }
 
     /**
@@ -52,6 +54,11 @@ public class SymbolicExecutor {
      */
     public List<SymbolicState> step(SymbolicState state, boolean replay) {
         Stmt stmt = state.getStmt();
+        if (trackCoverage) {
+            // TODO: if alias resolution, the stmt isn't actually "executed"
+            // So add after the alias resolution is done
+            CoverageTracker.getInstance().recordStmt(stmt);
+        }
 
         switch (stmt) {
             case JIfStmt jIfStmt -> {

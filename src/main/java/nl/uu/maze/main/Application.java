@@ -31,7 +31,7 @@ public class Application {
 
     public static void main(String[] args) {
         try {
-            String strategyName = args.length > 0 ? args[0] : "";
+            String strategyName = "COS";// args.length > 0 ? args[0] : "";
 
             DSEController controller = new DSEController(classPath, className,
                     concreteDriven, strategyName,
