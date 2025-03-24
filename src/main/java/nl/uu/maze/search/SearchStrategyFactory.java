@@ -26,8 +26,8 @@ public class SearchStrategyFactory {
             case "CD-RandomSearch", "CD-Random", "CD-RS" -> new nl.uu.maze.search.concrete.RandomSearch();
             case "SD-RandomSearch", "SD-Random", "SD-RS" -> new nl.uu.maze.search.symbolic.RandomSearch();
             case "SD-RandomPathSearch", "SD-RandomPath", "SD-RPS" -> new nl.uu.maze.search.symbolic.RandomPathSearch();
-            case "SD-CoverageOptimizedSearch", "SD-CoverageOptimized", "SD-COS" ->
-                new nl.uu.maze.search.symbolic.CoverageOptimizedSearch();
+            case "SD-NearestUncoveredSearch", "SD-NearestUncovered", "SD-NUS" ->
+                new nl.uu.maze.search.symbolic.NearestUncoveredSearch();
             default -> {
                 logger.warn("Unknown search strategy: {}, defaulting to DFS", name);
                 yield concreteDriven ? new nl.uu.maze.search.concrete.DFS() : new nl.uu.maze.search.symbolic.DFS();
@@ -43,7 +43,7 @@ public class SearchStrategyFactory {
      */
     public static boolean requiresCoverageTracking(SearchStrategy strategy) {
         return switch (strategy.getClass().getSimpleName()) {
-            case "CoverageOptimizedSearch" -> true;
+            case "NearestUncoveredSearch" -> true;
             default -> false;
         };
     }

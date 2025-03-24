@@ -28,10 +28,11 @@ public class Application {
     private static final String className = "nl.uu.maze.example.ExampleClass";
     private static final String outPath = "src/test/java";
     private static final boolean concreteDriven = false;
+    private static final String defaultSearchStrategy = "NUS";
 
     public static void main(String[] args) {
         try {
-            String strategyName = "COS";// args.length > 0 ? args[0] : "";
+            String strategyName = args.length > 0 ? args[0] : defaultSearchStrategy;
 
             DSEController controller = new DSEController(classPath, className,
                     concreteDriven, strategyName,

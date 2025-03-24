@@ -12,7 +12,11 @@ import nl.uu.maze.util.Pair;
 import sootup.core.graph.StmtGraph;
 import sootup.core.jimple.common.stmt.Stmt;
 
-public class CoverageOptimizedSearch extends SymbolicSearchStrategy {
+/**
+ * Symbolic-driven search strategy that selects the state with the shortest
+ * distance to the nearest uncovered statement.
+ */
+public class NearestUncoveredSearch extends SymbolicSearchStrategy {
     private final CoverageTracker coverageTracker = CoverageTracker.getInstance();
     private final List<SymbolicState> states = new ArrayList<>();
 
