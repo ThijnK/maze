@@ -54,11 +54,6 @@ public class SymbolicExecutor {
      */
     public List<SymbolicState> step(SymbolicState state, boolean replay) {
         Stmt stmt = state.getStmt();
-        if (trackCoverage) {
-            // TODO: if alias resolution, the stmt isn't actually "executed"
-            // So add after the alias resolution is done
-            CoverageTracker.getInstance().recordStmt(stmt);
-        }
 
         switch (stmt) {
             case JIfStmt jIfStmt -> {
@@ -138,6 +133,8 @@ public class SymbolicExecutor {
             newStates.add(state);
         }
 
+        if (trackCoverage)
+            CoverageTracker.getInstance().recordStmt(stmt);
         return newStates;
     }
 
@@ -192,6 +189,8 @@ public class SymbolicExecutor {
             }
         }
 
+        if (trackCoverage)
+            CoverageTracker.getInstance().recordStmt(stmt);
         return newStates;
     }
 
@@ -428,6 +427,11 @@ public class SymbolicExecutor {
     private List<SymbolicState> handleOtherStmts(SymbolicState state, boolean replay) {
         List<SymbolicState> newStates = new ArrayList<>();
         List<Stmt> succs = state.getSuccessors();
+
+        // Mark statement as covered
+        if (trackCoverage && !state.isExceptionThrown()) {
+            CoverageTracker.getInstance().recordStmt(state.getStmt());
+        }
 
         // Final state
         if (succs.isEmpty()) {
