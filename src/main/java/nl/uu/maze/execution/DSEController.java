@@ -75,14 +75,14 @@ public class DSEController {
      * @param strategyName   The name of the search strategy to use
      * @param outPath        The output path for the generated test cases
      */
-    public DSEController(String classPath, String className, boolean concreteDriven, String strategyName,
+    public DSEController(String classPath, String className, boolean concreteDriven, SearchStrategy searchStrategy,
             String outPath)
             throws Exception {
         this.outPath = Path.of(outPath);
         this.concreteDriven = concreteDriven;
         this.instrumented = concreteDriven ? BytecodeInstrumentation.instrument(classPath, className) : null;
-        searchStrategy = SearchStrategyFactory.getStrategy(concreteDriven, strategyName);
-        replayStrategy = (SymbolicSearchStrategy) SearchStrategyFactory.getStrategy(false, "DFS");
+        this.searchStrategy = searchStrategy;
+        this.replayStrategy = SearchStrategyFactory.createSymbolicStrategy("DFS");
 
         this.analyzer = new JavaAnalyzer(classPath, instrumented != null ? instrumented.getClassLoader() : null);
         JavaClassType classType = analyzer.getClassType(className);

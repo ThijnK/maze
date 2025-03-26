@@ -8,10 +8,10 @@ import nl.uu.maze.search.SearchHeuristic;
 
 public class ProbabilisticSearch extends ConcreteSearchStrategy {
     private final List<PathConditionCandidate> candidates = new ArrayList<>();
-    private final SearchHeuristic<PathConditionCandidate>[] heuristics;
+    private final List<SearchHeuristic<PathConditionCandidate>> heuristics;
 
-    public ProbabilisticSearch(SearchHeuristic<PathConditionCandidate>[] heuristics) {
-        if (heuristics.length == 0) {
+    public ProbabilisticSearch(List<SearchHeuristic<PathConditionCandidate>> heuristics) {
+        if (heuristics.size() == 0) {
             throw new IllegalArgumentException("At least one heuristic must be provided");
         }
         this.heuristics = heuristics;

@@ -9,10 +9,10 @@ import nl.uu.maze.search.SymbolicSearchStrategy;
 
 public class ProbabilisticSearch extends SymbolicSearchStrategy {
     private final List<SymbolicState> states = new ArrayList<>();
-    private final SearchHeuristic<SymbolicState>[] heuristics;
+    private final List<SearchHeuristic<SymbolicState>> heuristics;
 
-    public ProbabilisticSearch(SearchHeuristic<SymbolicState>[] heuristics) {
-        if (heuristics.length == 0) {
+    public ProbabilisticSearch(List<SearchHeuristic<SymbolicState>> heuristics) {
+        if (heuristics.size() == 0) {
             throw new IllegalArgumentException("At least one heuristic must be provided");
         }
         this.heuristics = heuristics;

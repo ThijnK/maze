@@ -22,6 +22,10 @@ public class DistanceToUncoveredHeuristic extends SearchHeuristic<SymbolicState>
     private static final int MAX_WEIGHT = 1_000_000;
     private static final CoverageTracker coverageTracker = CoverageTracker.getInstance();
 
+    public DistanceToUncoveredHeuristic(double weight) {
+        super(weight);
+    }
+
     @Override
     public double calculateWeight(SymbolicState state) {
         // Multiplicative inverse so that lower distance is preferred

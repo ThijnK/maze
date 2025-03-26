@@ -51,27 +51,27 @@ public abstract class SearchHeuristic<T> {
      * @return The selected item (which is also removed from the input list)
      * @throws IllegalArgumentException if inputs are invalid
      */
-    public static <T> T weightedProbabilisticSelect(List<T> items, SearchHeuristic<T>[] heuristics) {
+    public static <T> T weightedProbabilisticSelect(List<T> items, List<SearchHeuristic<T>> heuristics) {
         // If only one or zero items, skip the calculations
         if (items.size() <= 1) {
             return items.isEmpty() ? null : items.remove(0);
         }
 
-        if (heuristics.length == 0) {
+        if (heuristics.size() == 0) {
             throw new IllegalArgumentException("Need at least one heuristic");
         }
 
         // Calculate weights for each heuristic, for each item
-        double[][] itemWeights = new double[heuristics.length][items.size()];
-        for (int i = 0; i < heuristics.length; i++) {
+        double[][] itemWeights = new double[heuristics.size()][items.size()];
+        for (int i = 0; i < heuristics.size(); i++) {
             for (int j = 0; j < items.size(); j++) {
-                itemWeights[i][j] = heuristics[i].calculateWeight(items.get(j));
+                itemWeights[i][j] = heuristics.get(i).calculateWeight(items.get(j));
             }
         }
 
         // Normalize weights per heuristic to ensure each heuristic contributes
         // proportionally to the composite score
-        for (int i = 0; i < heuristics.length; i++) {
+        for (int i = 0; i < heuristics.size(); i++) {
             // Shift all weights to be non-negative (if necessary)
             double minWeight = Arrays.stream(itemWeights[i]).min().getAsDouble();
             if (minWeight < 0) {
@@ -90,9 +90,9 @@ public abstract class SearchHeuristic<T> {
 
         // Calculate composite weights for each item
         double[] compositeWeights = new double[items.size()];
-        for (int i = 0; i < heuristics.length; i++) {
+        for (int i = 0; i < heuristics.size(); i++) {
             for (int j = 0; j < items.size(); j++) {
-                compositeWeights[j] += itemWeights[i][j] * heuristics[i].weight;
+                compositeWeights[j] += itemWeights[i][j] * heuristics.get(i).weight;
             }
         }
 
