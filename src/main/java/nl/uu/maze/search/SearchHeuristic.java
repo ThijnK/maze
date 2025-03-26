@@ -3,6 +3,13 @@ package nl.uu.maze.search;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * Search heuristics that are used in {@link ProbabilisticSearch} to determine a
+ * probabiliy of selecting a state.
+ * The weight of the heuristic determines how much influence it has on the
+ * composite score in the case where multiple heuristics are used.
+ * The higher the weight, the more influence the heuristic has.
+ */
 public abstract class SearchHeuristic<T> {
     /**
      * Weight of this heuristic if combined with others in a composite score.

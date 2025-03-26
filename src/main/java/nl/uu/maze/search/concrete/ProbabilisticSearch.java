@@ -6,6 +6,11 @@ import java.util.List;
 import nl.uu.maze.search.ConcreteSearchStrategy;
 import nl.uu.maze.search.SearchHeuristic;
 
+/**
+ * Concrete-driven search strategy for probabilistic search.
+ * This strategy selects the next candidate probabilistically based on the
+ * provided heuristics.
+ */
 public class ProbabilisticSearch extends ConcreteSearchStrategy {
     private final List<PathConditionCandidate> candidates = new ArrayList<>();
     private final List<SearchHeuristic<PathConditionCandidate>> heuristics;

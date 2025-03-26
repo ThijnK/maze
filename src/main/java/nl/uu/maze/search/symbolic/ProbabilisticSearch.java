@@ -7,6 +7,11 @@ import nl.uu.maze.execution.symbolic.SymbolicState;
 import nl.uu.maze.search.SearchHeuristic;
 import nl.uu.maze.search.SymbolicSearchStrategy;
 
+/**
+ * Symbolic-driven search strategy for probabilistic search.
+ * This strategy selects the next state probabilistically based on the provided
+ * heuristics.
+ */
 public class ProbabilisticSearch extends SymbolicSearchStrategy {
     private final List<SymbolicState> states = new ArrayList<>();
     private final List<SearchHeuristic<SymbolicState>> heuristics;
