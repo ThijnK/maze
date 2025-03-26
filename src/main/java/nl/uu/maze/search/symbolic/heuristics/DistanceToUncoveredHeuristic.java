@@ -38,9 +38,9 @@ public class DistanceToUncoveredHeuristic extends SearchHeuristic<SymbolicState>
     }
 
     private int calculateDistance(SymbolicState state) {
-        // Final states have a weight of -1
+        // Final states are always at distance 0 to prioritize finishing them
         if (!state.isCtorState() && state.isFinalState()) {
-            return -1;
+            return 0;
         }
 
         StmtGraph<?> cfg = state.getCFG();
