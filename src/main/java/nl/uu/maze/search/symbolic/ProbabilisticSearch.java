@@ -10,18 +10,12 @@ import nl.uu.maze.search.SymbolicSearchStrategy;
 public class ProbabilisticSearch extends SymbolicSearchStrategy {
     private final List<SymbolicState> states = new ArrayList<>();
     private final SearchHeuristic<SymbolicState>[] heuristics;
-    private final double[] heuristicWeights;
 
-    public ProbabilisticSearch(SearchHeuristic<SymbolicState>[] heuristics, double[] heuristicWeights) {
+    public ProbabilisticSearch(SearchHeuristic<SymbolicState>[] heuristics) {
         if (heuristics.length == 0) {
             throw new IllegalArgumentException("At least one heuristic must be provided");
         }
-        if (heuristics.length != heuristicWeights.length) {
-            throw new IllegalArgumentException("Heuristics and weights must have the same length");
-        }
-
         this.heuristics = heuristics;
-        this.heuristicWeights = heuristicWeights;
     }
 
     @Override
@@ -31,7 +25,7 @@ public class ProbabilisticSearch extends SymbolicSearchStrategy {
 
     @Override
     public SymbolicState next() {
-        return SearchHeuristic.weightedProbabilisticSelect(states, heuristics, heuristicWeights);
+        return SearchHeuristic.weightedProbabilisticSelect(states, heuristics);
     }
 
     @Override

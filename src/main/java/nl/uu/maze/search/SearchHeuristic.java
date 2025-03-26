@@ -4,21 +4,54 @@ import java.util.Arrays;
 import java.util.List;
 
 public abstract class SearchHeuristic<T> {
+    /**
+     * Weight of this heuristic if combined with others in a composite score.
+     * The higher the weight, the more influence this heuristic has on the composite
+     * score.
+     * Defaults to 1.
+     */
+    public final double weight;
+
+    /**
+     * Constructs a new heuristic with a given weight.
+     * The weight must be positive and non-zero.
+     * 
+     * @param weight The weight of this heuristic
+     * @throws IllegalArgumentException if weight is not positive
+     */
+    public SearchHeuristic(double weight) {
+        if (weight <= 0) {
+            throw new IllegalArgumentException("Weight must be positive");
+        }
+
+        this.weight = weight;
+    }
+
+    /**
+     * Constructs a new heuristic with a weight of 1.
+     */
+    public SearchHeuristic() {
+        this(1);
+    }
+
+    /**
+     * Calculates the weight of a state based on this heuristic.
+     *
+     * @param state The state to evaluate
+     * @return The weight of the state
+     */
     public abstract double calculateWeight(T state);
 
     /**
      * Selects and removes an item from the list based on a weighted combination of
      * the given heuristics.
      *
-     * @param items            The list of items to select from
-     * @param heuristics       List of heuristics to evaluate items
-     * @param heuristicWeights Weight distribution of heuristics
+     * @param items      The list of items to select from
+     * @param heuristics List of heuristics to evaluate items
      * @return The selected item (which is also removed from the input list)
      * @throws IllegalArgumentException if inputs are invalid
      */
-    public static <T> T weightedProbabilisticSelect(List<T> items,
-            SearchHeuristic<T>[] heuristics,
-            double[] heuristicWeights) {
+    public static <T> T weightedProbabilisticSelect(List<T> items, SearchHeuristic<T>[] heuristics) {
         // If only one or zero items, skip the calculations
         if (items.size() <= 1) {
             return items.isEmpty() ? null : items.remove(0);
@@ -26,9 +59,6 @@ public abstract class SearchHeuristic<T> {
 
         if (heuristics.length == 0) {
             throw new IllegalArgumentException("Need at least one heuristic");
-        }
-        if (heuristics.length != heuristicWeights.length) {
-            throw new IllegalArgumentException("Number of weights must match number of heuristics");
         }
 
         // Calculate weights for each heuristic, for each item
@@ -62,7 +92,7 @@ public abstract class SearchHeuristic<T> {
         double[] compositeWeights = new double[items.size()];
         for (int i = 0; i < heuristics.length; i++) {
             for (int j = 0; j < items.size(); j++) {
-                compositeWeights[j] += itemWeights[i][j] * heuristicWeights[i];
+                compositeWeights[j] += itemWeights[i][j] * heuristics[i].weight;
             }
         }
 
