@@ -28,8 +28,7 @@ public class SearchHeuristicFactory {
      * @throws IllegalArgumentException If the name is unknown
      * @throws NumberFormatException    If the weight is not a valid double
      */
-    public static SearchHeuristic<SymbolicState> createSymbolicHeuristic(String name, String weightString) {
-        Double weight = weightString.isEmpty() ? 1.0 : Double.parseDouble(weightString);
+    public static SearchHeuristic<SymbolicState> createSymbolicHeuristic(String name, double weight) {
         return switch (name) {
             case "UniformHeuristic", "Uniform", "UH" -> new nl.uu.maze.search.symbolic.heuristics.UniformHeuristic();
             case "DistanceToUncoveredHeuristic", "DistanceToUncovered", "DTUH" ->
@@ -48,8 +47,7 @@ public class SearchHeuristicFactory {
      * @throws IllegalArgumentException If the name is unknown
      * @throws NumberFormatException    If the weight is not a valid double
      */
-    public static SearchHeuristic<PathConditionCandidate> createConcreteHeuristic(String name, String weightString) {
-        Double weight = weightString.isEmpty() ? 1.0 : Double.parseDouble(weightString);
+    public static SearchHeuristic<PathConditionCandidate> createConcreteHeuristic(String name, double weight) {
         return switch (name) {
             case "UniformHeuristic", "Uniform", "UH" -> new nl.uu.maze.search.concrete.heuristics.UniformHeuristic();
             // case "DistanceToUncoveredHeuristic", "DistanceToUncovered", "DTUH" -> new
@@ -63,13 +61,18 @@ public class SearchHeuristicFactory {
      * names and weights.
      */
     private static <T> List<SearchHeuristic<T>> createHeuristics(String namesString, String weightsString,
-            BiFunction<String, String, SearchHeuristic<T>> factory) {
+            BiFunction<String, Double, SearchHeuristic<T>> factory) {
         String[] names = namesString.split(",");
         String[] weights = weightsString.split(",");
         List<SearchHeuristic<T>> heuristics = new ArrayList<>(names.length);
         for (int i = 0; i < names.length; i++) {
             try {
-                heuristics.add(factory.apply(names[i], weights.length >= i + 1 ? weights[i] : ""));
+                String weightString = weights.length >= i + 1 ? weights[i] : "";
+                double weight = weightString.isEmpty() ? 1.0 : Double.parseDouble(weightString);
+                if (weight <= 0) {
+                    throw new IllegalArgumentException("Weight must be positive");
+                }
+                heuristics.add(factory.apply(names[i], weight));
             } catch (IllegalArgumentException e) {
                 logger.warn("Unknown search heuristic: {}, skipping", names[i]);
             }
