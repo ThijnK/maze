@@ -203,7 +203,7 @@ public class DSEController {
         while ((current = searchStrategy.next()) != null) {
             logger.debug("Current state: {}", current);
             logger.debug("Next stmt: {}", current.getStmt());
-            if (!current.isCtorState() && current.isFinalState() || current.incrementDepth() >= MAX_DEPTH) {
+            if (!current.isCtorState() && current.isFinalState() || current.getDepth() >= MAX_DEPTH) {
                 if (!current.isInfeasible())
                     finalStates.add(current.returnToRootCaller());
                 searchStrategy.remove(current);

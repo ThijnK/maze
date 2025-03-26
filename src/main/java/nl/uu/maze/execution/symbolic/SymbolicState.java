@@ -27,7 +27,7 @@ import sootup.core.types.Type;
  * A symbolic state consists of:
  * <ul>
  * <li>The current statement being executed</li>
- * <li>The current depth of the symbolic execution</li>
+ * <li>The current depth of the symbolic execution in the CFG</li>
  * <li>A store which maps variable names to their (symbolic) values</li>
  * <li>A heap to store (symbolic) objects and arrays</li>
  * <li>The return value of the method this state is part of, if present</li>
@@ -136,6 +136,10 @@ public class SymbolicState {
 
     public MethodType getMethodType() {
         return methodType;
+    }
+
+    public int getDepth() {
+        return depth;
     }
 
     public int incrementDepth() {
