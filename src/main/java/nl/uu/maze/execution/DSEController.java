@@ -91,8 +91,7 @@ public class DSEController {
 
         this.concrete = new ConcreteExecutor();
         this.validator = new SymbolicStateValidator();
-        this.symbolic = new SymbolicExecutor(concrete, validator, analyzer,
-                SearchStrategyFactory.requiresCoverageTracking(searchStrategy));
+        this.symbolic = new SymbolicExecutor(concrete, validator, analyzer, searchStrategy.requiresCoverageData());
         this.generator = new JUnitTestGenerator(clazz, analyzer, concrete);
     }
 

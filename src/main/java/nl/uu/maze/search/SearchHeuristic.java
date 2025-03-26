@@ -42,6 +42,14 @@ public abstract class SearchHeuristic<T> {
     }
 
     /**
+     * Whether this heuristic requires coverage data to calculate weights.
+     * Defaults to <code>false</code>.
+     */
+    public boolean requiresCoverageData() {
+        return false;
+    }
+
+    /**
      * Calculates the weight of a state based on this heuristic.
      *
      * @param state The state to evaluate

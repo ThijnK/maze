@@ -27,6 +27,11 @@ public class DistanceToUncoveredHeuristic extends SearchHeuristic<SymbolicState>
     }
 
     @Override
+    public boolean requiresCoverageData() {
+        return true;
+    }
+
+    @Override
     public double calculateWeight(SymbolicState state) {
         // Multiplicative inverse so that lower distance is preferred
         return 1.0 / (calculateDistance(state) + 1);

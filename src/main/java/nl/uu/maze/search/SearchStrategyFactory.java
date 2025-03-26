@@ -118,17 +118,4 @@ public class SearchStrategyFactory {
             }
         };
     }
-
-    /**
-     * Returns whether the given search strategy requires coverage tracking.
-     * 
-     * @param strategy The search strategy
-     * @return Whether the search strategy requires coverage tracking
-     */
-    public static boolean requiresCoverageTracking(SearchStrategy strategy) {
-        return switch (strategy.getClass().getSimpleName()) {
-            case "ProbabilisticSearch" -> true;
-            default -> false;
-        };
-    }
 }

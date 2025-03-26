@@ -43,4 +43,10 @@ public abstract class SymbolicSearchStrategy implements SearchStrategy {
      *         states to explore
      */
     public abstract SymbolicState next();
+
+    // By default, search strategies do not require coverage data
+    // Subclasses can override this method if they do
+    public boolean requiresCoverageData() {
+        return false;
+    }
 }

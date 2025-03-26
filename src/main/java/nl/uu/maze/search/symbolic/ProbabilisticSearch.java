@@ -37,4 +37,9 @@ public class ProbabilisticSearch extends SymbolicSearchStrategy {
     public void reset() {
         states.clear();
     }
+
+    @Override
+    public boolean requiresCoverageData() {
+        return heuristics.stream().anyMatch(SearchHeuristic::requiresCoverageData);
+    }
 }

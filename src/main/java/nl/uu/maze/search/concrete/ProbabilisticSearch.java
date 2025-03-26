@@ -36,4 +36,9 @@ public class ProbabilisticSearch extends ConcreteSearchStrategy {
     public void reset() {
         candidates.clear();
     }
+
+    @Override
+    public boolean requiresCoverageData() {
+        return heuristics.stream().anyMatch(SearchHeuristic::requiresCoverageData);
+    }
 }

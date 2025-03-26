@@ -119,6 +119,12 @@ public abstract class ConcreteSearchStrategy implements SearchStrategy {
         return false;
     }
 
+    // By default, search strategies do not require coverage data
+    // Subclasses can override this method if they do
+    public boolean requiresCoverageData() {
+        return false;
+    }
+
     /**
      * Represents a candidate for a path condition to be explored.
      * A candidate consist of the path condition (a list of constraints) and the
