@@ -180,10 +180,12 @@ public class SymbolicExecutor {
         else {
             // For all cases, except the default case
             for (int i = 0; i < succs.size(); i++) {
-                SymbolicState newState = i == succs.size() - 1 ? state : state.clone();
+                boolean isLast = i == succs.size() - 1;
+                SymbolicState newState = isLast ? state : state.clone();
 
                 // Last successor is the default case
-                SwitchConstraint constraint = new SwitchConstraint(state, var, values, i >= cases.size() ? -1 : i);
+                SwitchConstraint constraint = new SwitchConstraint(state, var, values,
+                        i >= cases.size() ? -1 : i);
                 newState.addPathConstraint(constraint);
                 newState.setStmt(succs.get(i));
                 newStates.add(newState);

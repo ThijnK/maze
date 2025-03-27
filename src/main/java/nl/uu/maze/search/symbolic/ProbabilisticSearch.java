@@ -30,7 +30,7 @@ public class ProbabilisticSearch extends SymbolicSearchStrategy {
 
     @Override
     public SymbolicState next() {
-        return SearchHeuristic.weightedProbabilisticSelect(states, heuristics, (state) -> state);
+        return SearchHeuristic.weightedProbabilisticSelect(states, heuristics);
     }
 
     @Override

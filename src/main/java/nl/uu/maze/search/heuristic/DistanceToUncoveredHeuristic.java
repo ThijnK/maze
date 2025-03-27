@@ -4,7 +4,6 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 import nl.uu.maze.execution.symbolic.CoverageTracker;
-import nl.uu.maze.execution.symbolic.SymbolicState;
 import nl.uu.maze.util.Pair;
 import sootup.core.graph.StmtGraph;
 import sootup.core.jimple.common.stmt.Stmt;
@@ -31,20 +30,21 @@ public class DistanceToUncoveredHeuristic extends SearchHeuristic {
     }
 
     @Override
-    public double calculateWeight(SymbolicState state) {
+    public <T extends HeuristicTarget> double calculateWeight(T target) {
         // Multiplicative inverse so that lower distance is preferred
-        return 1.0 / (calculateDistance(state) + 1);
+        return 1.0 / (calculateDistance(target) + 1);
     }
 
-    private int calculateDistance(SymbolicState state) {
-        // Final states are always at distance 0 to prioritize finishing them
-        if (!state.isCtorState() && state.isFinalState()) {
+    private <T extends HeuristicTarget> int calculateDistance(T target) {
+        Stmt stmt = target.getStmt();
+        StmtGraph<?> cfg = target.getCFG();
+
+        // Prioritize final states
+        if (cfg.outDegree(stmt) == 0) {
             return 0;
         }
 
-        StmtGraph<?> cfg = state.getCFG();
         Queue<Pair<Stmt, Integer>> worklist = new LinkedList<>();
-        Stmt stmt = state.getStmt();
         int dist = 0;
         worklist.offer(Pair.of(stmt, dist));
 

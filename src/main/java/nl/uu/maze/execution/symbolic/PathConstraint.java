@@ -9,6 +9,8 @@ import com.microsoft.z3.Expr;
 
 import nl.uu.maze.util.Z3ContextProvider;
 import nl.uu.maze.util.Z3Utils;
+import sootup.core.graph.StmtGraph;
+import sootup.core.jimple.common.stmt.Stmt;
 
 /**
  * Represents a path constraint in symbolic execution.
@@ -16,16 +18,30 @@ import nl.uu.maze.util.Z3Utils;
  * to be taken in the program.
  */
 public abstract class PathConstraint {
-    /**
-     * Reference to the symbolic state that created this path constraint.
-     */
-    public final SymbolicState state;
+    protected final Stmt stmt;
+    protected final StmtGraph<?> cfg;
 
     /**
      * Create a new path constraint for the given symbolic state.
      */
     public PathConstraint(SymbolicState state) {
-        this.state = state;
+        // Extract the stmt and cfg from the state instead of storing a reference to the
+        // state, because the state may change
+        this.stmt = state.getStmt();
+        this.cfg = state.getCFG();
+    }
+
+    protected PathConstraint(Stmt stmt, StmtGraph<?> cfg) {
+        this.stmt = stmt;
+        this.cfg = cfg;
+    }
+
+    public Stmt getStmt() {
+        return stmt;
+    }
+
+    public StmtGraph<?> getCFG() {
+        return cfg;
     }
 
     public abstract BoolExpr getConstraint();
@@ -52,12 +68,17 @@ public abstract class PathConstraint {
             this.constraint = constraint;
         }
 
+        protected SingleConstraint(Stmt stmt, StmtGraph<?> cfg, BoolExpr constraint) {
+            super(stmt, cfg);
+            this.constraint = constraint;
+        }
+
         public BoolExpr getConstraint() {
             return constraint;
         }
 
         public SingleConstraint negate() {
-            return new SingleConstraint(state, Z3Utils.negate(constraint));
+            return new SingleConstraint(stmt, cfg, Z3Utils.negate(constraint));
         }
     }
 
@@ -102,6 +123,19 @@ public abstract class PathConstraint {
         public CompositeConstraint(SymbolicState state, Expr<?> expr, Expr<?>[] values, int index,
                 boolean allowDefault) {
             super(state);
+            this.expr = expr;
+            this.values = values;
+            this.allowDefault = allowDefault;
+            this.minIndex = allowDefault ? -1 : 0;
+            if (index < minIndex || index >= values.length) {
+                throw new IllegalArgumentException("Invalid index for composite constraint");
+            }
+            this.index = index;
+        }
+
+        protected CompositeConstraint(Stmt stmt, StmtGraph<?> cfg, Expr<?> expr, Expr<?>[] values, int index,
+                boolean allowDefault) {
+            super(stmt, cfg);
             this.expr = expr;
             this.values = values;
             this.allowDefault = allowDefault;
@@ -160,7 +194,7 @@ public abstract class PathConstraint {
             if (newIndex < minIndex || newIndex >= values.length) {
                 throw new IllegalArgumentException("Invalid index for composite constraint");
             }
-            return new CompositeConstraint(state, expr, values, newIndex, allowDefault);
+            return new CompositeConstraint(stmt, cfg, expr, values, newIndex, allowDefault);
         }
     }
 

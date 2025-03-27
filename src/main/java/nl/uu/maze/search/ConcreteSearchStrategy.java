@@ -12,6 +12,9 @@ import nl.uu.maze.execution.symbolic.PathConstraint;
 import nl.uu.maze.execution.symbolic.SymbolicState;
 import nl.uu.maze.execution.symbolic.SymbolicStateValidator;
 import nl.uu.maze.execution.symbolic.PathConstraint.SingleConstraint;
+import nl.uu.maze.search.heuristic.SearchHeuristic.HeuristicTarget;
+import sootup.core.graph.StmtGraph;
+import sootup.core.jimple.common.stmt.Stmt;
 import nl.uu.maze.execution.symbolic.PathConstraint.AliasConstraint;
 import nl.uu.maze.execution.symbolic.PathConstraint.CompositeConstraint;
 
@@ -133,7 +136,7 @@ public abstract class ConcreteSearchStrategy implements SearchStrategy {
      * @implNote The index is stored separately to apply the negation "lazily"
      *           (i.e., only when the candidate is selected for exploration).
      */
-    public static class PathConditionCandidate {
+    public static class PathConditionCandidate implements HeuristicTarget {
         private List<PathConstraint> pathConstraints;
         /** The index of the constraint to negate. */
         private final int index;
@@ -157,8 +160,12 @@ public abstract class ConcreteSearchStrategy implements SearchStrategy {
             return pathConstraints;
         }
 
-        public PathConstraint getConstraint() {
-            return pathConstraints.get(index);
+        public Stmt getStmt() {
+            return pathConstraints.get(index).getStmt();
+        }
+
+        public StmtGraph<?> getCFG() {
+            return pathConstraints.get(index).getCFG();
         }
 
         /**

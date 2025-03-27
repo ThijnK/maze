@@ -29,8 +29,7 @@ public class ProbabilisticSearch extends ConcreteSearchStrategy {
 
     @Override
     public PathConditionCandidate next() {
-        return SearchHeuristic.weightedProbabilisticSelect(candidates, heuristics,
-                (candidate) -> candidate.getConstraint().state);
+        return SearchHeuristic.weightedProbabilisticSelect(candidates, heuristics);
     }
 
     @Override
