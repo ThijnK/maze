@@ -170,7 +170,7 @@ public class SymbolicExecutor {
             TraceEntry entry = TraceManager.consumeEntry(state.getMethodSignature());
             assert entry != null;
             int branchIndex = entry.getValue();
-            SwitchConstraint constraint = new SwitchConstraint(var, values,
+            SwitchConstraint constraint = new SwitchConstraint(state, var, values,
                     branchIndex >= cases.size() ? -1 : branchIndex);
             state.addPathConstraint(constraint);
             state.setStmt(succs.get(branchIndex));
@@ -183,7 +183,7 @@ public class SymbolicExecutor {
                 SymbolicState newState = i == succs.size() - 1 ? state : state.clone();
 
                 // Last successor is the default case
-                SwitchConstraint constraint = new SwitchConstraint(var, values, i >= cases.size() ? -1 : i);
+                SwitchConstraint constraint = new SwitchConstraint(state, var, values, i >= cases.size() ? -1 : i);
                 newState.addPathConstraint(constraint);
                 newState.setStmt(succs.get(i));
                 newStates.add(newState);
@@ -371,7 +371,7 @@ public class SymbolicExecutor {
         }
         // Constrain the parameter to the right alias
         state.heap.setSingleAlias(symRef, alias);
-        AliasConstraint constraint = new AliasConstraint(symRef, aliasArr, i);
+        AliasConstraint constraint = new AliasConstraint(state, symRef, aliasArr, i);
         state.addPathConstraint(constraint);
     }
 
@@ -523,7 +523,7 @@ public class SymbolicExecutor {
             for (int i = 0; i < aliasArr.length; i++) {
                 SymbolicState newState = i == aliasArr.length - 1 ? state : state.clone();
                 newState.heap.setSingleAlias(symRef, aliasArr[i]);
-                AliasConstraint constraint = new AliasConstraint(symRef, aliasArr, i);
+                AliasConstraint constraint = new AliasConstraint(state, symRef, aliasArr, i);
                 // For parameters, we add alias constraints to the path constraints, so they can
                 // be used in the search space for concrete-driven DSE
                 // For non-parameters, we add them to the engine constraints, so they are not

@@ -264,7 +264,7 @@ public class SymbolicState {
     }
 
     public void addPathConstraint(BoolExpr constraint) {
-        pathConstraints.add(new SingleConstraint(constraint));
+        pathConstraints.add(new SingleConstraint(this, constraint));
     }
 
     public void addPathConstraint(PathConstraint constraint) {
@@ -272,7 +272,7 @@ public class SymbolicState {
     }
 
     public void addEngineConstraint(BoolExpr constraint) {
-        engineConstraints.add(new SingleConstraint(constraint));
+        engineConstraints.add(new SingleConstraint(this, constraint));
     }
 
     public void addEngineConstraint(PathConstraint constraint) {
@@ -333,7 +333,7 @@ public class SymbolicState {
                 .concat(Stream.of(Z3Sorts.getInstance().getNullConst()), heap.getAllConcreteRefs().stream())
                 .toArray(Expr<?>[]::new);
         if (conRefs.length > 1) {
-            engineConstraints.add(new SingleConstraint(ctx.mkDistinct(conRefs)));
+            engineConstraints.add(new SingleConstraint(this, ctx.mkDistinct(conRefs)));
         }
         return engineConstraints;
     }

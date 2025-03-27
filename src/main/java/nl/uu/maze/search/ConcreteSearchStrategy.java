@@ -157,6 +157,10 @@ public abstract class ConcreteSearchStrategy implements SearchStrategy {
             return pathConstraints;
         }
 
+        public PathConstraint getConstraint() {
+            return pathConstraints.get(index);
+        }
+
         /**
          * Apply the negation to the constraint at the index.
          */
@@ -184,7 +188,7 @@ public abstract class ConcreteSearchStrategy implements SearchStrategy {
             pathConstraints = newConstraints;
         }
 
-        public PathConstraint negateConstraint(PathConstraint constraint) {
+        private PathConstraint negateConstraint(PathConstraint constraint) {
             return constraint instanceof CompositeConstraint ? ((CompositeConstraint) constraint).negate(subIndex)
                     : ((SingleConstraint) constraint).negate();
         }

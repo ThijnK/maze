@@ -13,10 +13,21 @@ import nl.uu.maze.util.Z3Utils;
 /**
  * Represents a path constraint in symbolic execution.
  * A path constraint is a boolean expression that must be satisfied for a path
- * to
- * be taken in the program.
+ * to be taken in the program.
  */
 public abstract class PathConstraint {
+    /**
+     * Reference to the symbolic state that created this path constraint.
+     */
+    public final SymbolicState state;
+
+    /**
+     * Create a new path constraint for the given symbolic state.
+     */
+    public PathConstraint(SymbolicState state) {
+        this.state = state;
+    }
+
     public abstract BoolExpr getConstraint();
 
     @Override
@@ -36,7 +47,8 @@ public abstract class PathConstraint {
     public static class SingleConstraint extends PathConstraint {
         protected final BoolExpr constraint;
 
-        public SingleConstraint(BoolExpr constraint) {
+        public SingleConstraint(SymbolicState state, BoolExpr constraint) {
+            super(state);
             this.constraint = constraint;
         }
 
@@ -45,7 +57,7 @@ public abstract class PathConstraint {
         }
 
         public SingleConstraint negate() {
-            return new SingleConstraint(Z3Utils.negate(constraint));
+            return new SingleConstraint(state, Z3Utils.negate(constraint));
         }
     }
 
@@ -78,6 +90,7 @@ public abstract class PathConstraint {
         /**
          * Create a new composite constraint.
          * 
+         * @param state        The symbolic state that created this constraint
          * @param expr         The expression to constrain
          * @param values       The possible values for the expression
          * @param index        The index of the value that the expression should be
@@ -86,7 +99,9 @@ public abstract class PathConstraint {
          *                     from all values is allowed (<code>true</code> for switch
          *                     statements)
          */
-        public CompositeConstraint(Expr<?> expr, Expr<?>[] values, int index, boolean allowDefault) {
+        public CompositeConstraint(SymbolicState state, Expr<?> expr, Expr<?>[] values, int index,
+                boolean allowDefault) {
+            super(state);
             this.expr = expr;
             this.values = values;
             this.allowDefault = allowDefault;
@@ -145,7 +160,7 @@ public abstract class PathConstraint {
             if (newIndex < minIndex || newIndex >= values.length) {
                 throw new IllegalArgumentException("Invalid index for composite constraint");
             }
-            return new CompositeConstraint(expr, values, newIndex, allowDefault);
+            return new CompositeConstraint(state, expr, values, newIndex, allowDefault);
         }
     }
 
@@ -154,8 +169,8 @@ public abstract class PathConstraint {
      * The expression is constrained to be equal to one of the possible values.
      */
     public static class SwitchConstraint extends CompositeConstraint {
-        public SwitchConstraint(Expr<?> expr, Expr<?>[] values, int index) {
-            super(expr, values, index, true);
+        public SwitchConstraint(SymbolicState state, Expr<?> expr, Expr<?>[] values, int index) {
+            super(state, expr, values, index, true);
         }
     }
 
@@ -165,8 +180,8 @@ public abstract class PathConstraint {
      * concrete heap references.
      */
     public static class AliasConstraint extends CompositeConstraint {
-        public AliasConstraint(Expr<?> expr, Expr<?>[] values, int index) {
-            super(expr, values, index, false);
+        public AliasConstraint(SymbolicState state, Expr<?> expr, Expr<?>[] values, int index) {
+            super(state, expr, values, index, false);
         }
 
         /**
