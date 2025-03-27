@@ -41,13 +41,12 @@ public abstract class ConcreteSearchStrategy implements SearchStrategy {
             return false;
         }
 
-        // Add a candidate for every constraint in the path condition
-        List<PathConstraint> pathConstraints = state.getPathConstraints();
-        int length = pathConstraints.size();
-        // Add engine constraints, but don't include them as candidates for negation
-        // Note: this does not make a copy of the list, so the original list is modified
-        pathConstraints.addAll(state.getFullEngineConstraints());
-        for (int i = 0; i < length; i++) {
+        // Add a candidate for every path constraint in the path condition
+        // Exclude engine constraints from candidates
+        List<PathConstraint> pathConstraints = state.getFullEngineConstraints();
+        int engineConstraintsCount = pathConstraints.size();
+        pathConstraints.addAll(state.getPathConstraints());
+        for (int i = engineConstraintsCount; i < pathConstraints.size(); i++) {
             PathConstraint constraint = pathConstraints.get(i);
             // For switch constraints, we want one candidate for every possible value
             if (constraint instanceof CompositeConstraint) {
@@ -58,6 +57,7 @@ public abstract class ConcreteSearchStrategy implements SearchStrategy {
                 add(new PathConditionCandidate(pathConstraints, i));
             }
         }
+
         return true;
     }
 
