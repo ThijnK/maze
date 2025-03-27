@@ -1,11 +1,10 @@
-package nl.uu.maze.search.symbolic.heuristics;
+package nl.uu.maze.search.heuristic;
 
 import java.util.LinkedList;
 import java.util.Queue;
 
 import nl.uu.maze.execution.symbolic.CoverageTracker;
 import nl.uu.maze.execution.symbolic.SymbolicState;
-import nl.uu.maze.search.SearchHeuristic;
 import nl.uu.maze.util.Pair;
 import sootup.core.graph.StmtGraph;
 import sootup.core.jimple.common.stmt.Stmt;
@@ -14,7 +13,7 @@ import sootup.core.jimple.common.stmt.Stmt;
  * Distance heuristic that assigns a weight based on the distance to the nearest
  * uncovered statement.
  */
-public class DistanceToUncoveredHeuristic extends SearchHeuristic<SymbolicState> {
+public class DistanceToUncoveredHeuristic extends SearchHeuristic {
     /**
      * Maximum weight for a state, used if a state cannot reach an uncovered
      * statement.

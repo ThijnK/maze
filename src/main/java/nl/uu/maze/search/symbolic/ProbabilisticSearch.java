@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import nl.uu.maze.execution.symbolic.SymbolicState;
-import nl.uu.maze.search.SearchHeuristic;
 import nl.uu.maze.search.SymbolicSearchStrategy;
+import nl.uu.maze.search.heuristic.SearchHeuristic;
 
 /**
  * Symbolic-driven search strategy for probabilistic search.
@@ -14,9 +14,9 @@ import nl.uu.maze.search.SymbolicSearchStrategy;
  */
 public class ProbabilisticSearch extends SymbolicSearchStrategy {
     private final List<SymbolicState> states = new ArrayList<>();
-    private final List<SearchHeuristic<SymbolicState>> heuristics;
+    private final List<SearchHeuristic> heuristics;
 
-    public ProbabilisticSearch(List<SearchHeuristic<SymbolicState>> heuristics) {
+    public ProbabilisticSearch(List<SearchHeuristic> heuristics) {
         if (heuristics.size() == 0) {
             throw new IllegalArgumentException("At least one heuristic must be provided");
         }
@@ -30,7 +30,7 @@ public class ProbabilisticSearch extends SymbolicSearchStrategy {
 
     @Override
     public SymbolicState next() {
-        return SearchHeuristic.weightedProbabilisticSelect(states, heuristics);
+        return SearchHeuristic.weightedProbabilisticSelect(states, heuristics, (state) -> state);
     }
 
     @Override

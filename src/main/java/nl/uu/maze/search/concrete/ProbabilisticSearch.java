@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import nl.uu.maze.search.ConcreteSearchStrategy;
-import nl.uu.maze.search.SearchHeuristic;
+import nl.uu.maze.search.heuristic.SearchHeuristic;
 
 /**
  * Concrete-driven search strategy for probabilistic search.
@@ -13,9 +13,9 @@ import nl.uu.maze.search.SearchHeuristic;
  */
 public class ProbabilisticSearch extends ConcreteSearchStrategy {
     private final List<PathConditionCandidate> candidates = new ArrayList<>();
-    private final List<SearchHeuristic<PathConditionCandidate>> heuristics;
+    private final List<SearchHeuristic> heuristics;
 
-    public ProbabilisticSearch(List<SearchHeuristic<PathConditionCandidate>> heuristics) {
+    public ProbabilisticSearch(List<SearchHeuristic> heuristics) {
         if (heuristics.size() == 0) {
             throw new IllegalArgumentException("At least one heuristic must be provided");
         }
@@ -29,7 +29,8 @@ public class ProbabilisticSearch extends ConcreteSearchStrategy {
 
     @Override
     public PathConditionCandidate next() {
-        return SearchHeuristic.weightedProbabilisticSelect(candidates, heuristics);
+        return SearchHeuristic.weightedProbabilisticSelect(candidates, heuristics,
+                (candidate) -> candidate.getConstraint().state);
     }
 
     @Override

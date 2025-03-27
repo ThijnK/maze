@@ -1,7 +1,10 @@
-package nl.uu.maze.search;
+package nl.uu.maze.search.heuristic;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Function;
+
+import nl.uu.maze.execution.symbolic.SymbolicState;
 
 /**
  * Search heuristics that are used in {@link ProbabilisticSearch} to determine a
@@ -10,7 +13,7 @@ import java.util.List;
  * composite score in the case where multiple heuristics are used.
  * The higher the weight, the more influence the heuristic has.
  */
-public abstract class SearchHeuristic<T> {
+public abstract class SearchHeuristic {
     /**
      * Weight of this heuristic if combined with others in a composite score.
      * The higher the weight, the more influence this heuristic has on the composite
@@ -55,18 +58,22 @@ public abstract class SearchHeuristic<T> {
      * @param state The state to evaluate
      * @return The weight of the state
      */
-    public abstract double calculateWeight(T state);
+    public abstract double calculateWeight(SymbolicState state);
 
     /**
      * Selects and removes an item from the list based on a weighted combination of
      * the given heuristics.
      *
-     * @param items      The list of items to select from
-     * @param heuristics List of heuristics to evaluate items
+     * @param <T>            The type of items to select from
+     * @param items          The list of items to select from
+     * @param heuristics     List of heuristics to evaluate items
+     * @param stateExtractor Function to extract the symbolic state from an item,
+     *                       used by the heuristics
      * @return The selected item (which is also removed from the input list)
      * @throws IllegalArgumentException if inputs are invalid
      */
-    public static <T> T weightedProbabilisticSelect(List<T> items, List<SearchHeuristic<T>> heuristics) {
+    public static <T> T weightedProbabilisticSelect(List<T> items, List<SearchHeuristic> heuristics,
+            Function<T, SymbolicState> stateExtractor) {
         // If only one or zero items, skip the calculations
         if (items.size() <= 1) {
             return items.isEmpty() ? null : items.remove(0);
@@ -80,7 +87,7 @@ public abstract class SearchHeuristic<T> {
         double[][] itemWeights = new double[heuristics.size()][items.size()];
         for (int i = 0; i < heuristics.size(); i++) {
             for (int j = 0; j < items.size(); j++) {
-                itemWeights[i][j] = heuristics.get(i).calculateWeight(items.get(j));
+                itemWeights[i][j] = heuristics.get(i).calculateWeight(stateExtractor.apply(items.get(j)));
             }
         }
 
