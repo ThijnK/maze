@@ -2,6 +2,7 @@ package nl.uu.maze.search.heuristic;
 
 /**
  * Uniform heuristic that assigns the same weight to every state.
+ * Used for uniform random search.
  */
 public class UniformHeuristic extends SearchHeuristic {
     @Override
