@@ -286,7 +286,8 @@ public class BytecodeInstrumentation {
          * Check if the opcode is a conditional jump (if statement).
          * 
          * @param opcode The opcode to check
-         * @return True if the opcode is a conditional jump, false otherwise
+         * @return {@code true} if the opcode is a conditional jump, {@code false}
+         *         otherwise
          */
         private boolean isConditionalJump(int opcode) {
             return (opcode >= Opcodes.IFEQ && opcode <= Opcodes.IF_ACMPNE) || opcode == Opcodes.IFNULL
@@ -298,7 +299,8 @@ public class BytecodeInstrumentation {
          * on the stack).
          * 
          * @param opcode The conditional opcode to check
-         * @return True if the opcode requires two operands, false otherwise
+         * @return {@code true} if the opcode requires two operands, {@code false}
+         *         otherwise
          */
         private boolean requiresTwoOperands(int opcode) {
             return opcode >= Opcodes.IF_ICMPEQ && opcode <= Opcodes.IF_ACMPNE;

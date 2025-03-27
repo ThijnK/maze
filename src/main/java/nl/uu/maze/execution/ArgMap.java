@@ -103,7 +103,7 @@ public class ArgMap {
      *                      single-use
      *                      reference (i.e., every entry along the chain is
      *                      referenced only once)
-     * @return The object the reference points to or <code>null</code> if set to
+     * @return The object the reference points to or {@code null} if set to
      *         single-use only and some reference along the chain is used more than
      *         once
      */

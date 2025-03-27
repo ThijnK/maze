@@ -46,7 +46,7 @@ public abstract class SearchHeuristic {
 
     /**
      * Whether this heuristic requires coverage data to calculate weights.
-     * Defaults to <code>false</code>.
+     * Defaults to {@code false}.
      */
     public boolean requiresCoverageData() {
         return false;

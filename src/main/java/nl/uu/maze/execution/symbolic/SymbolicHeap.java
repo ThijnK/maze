@@ -47,11 +47,11 @@ public class SymbolicHeap {
     /**
      * Tracks indices of multidimensional array accesses.
      * In JVM bytecode, accessing a multidimensional array is done by accessing the
-     * array at each dimension separately, i.e., <code>arr[0][1]</code> becomes
-     * <code>$stack0 = arr[0]; $stack1 = $stack0[1];</code>
+     * array at each dimension separately, i.e., {@code arr[0][1]} becomes
+     * {@code $stack0 = arr[0]; $stack1 = $stack0[1];}
      * This map stores the indices of each dimension accessed so far for a given
      * array variable. In the example, the map would store
-     * <code>$stack0 -> [0]</code>.
+     * {@code $stack0 -> [0]}.
      * Only used for multidimensional arrays.
      */
     private Map<String, BitVecExpr[]> arrayIndices = new HashMap<>();

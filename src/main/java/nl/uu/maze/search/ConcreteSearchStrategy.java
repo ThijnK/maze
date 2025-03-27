@@ -33,8 +33,8 @@ public abstract class ConcreteSearchStrategy implements SearchStrategy {
      * Add a symbolic state to the search strategy if it has not been explored yet.
      * 
      * @param state The symbolic state to add
-     * @return True if the symbolic state was added, false if it has been previously
-     *         explored
+     * @return {@code true} if the symbolic state was added, {@code false} if it has
+     *         been previously explored
      */
     public boolean add(SymbolicState state) {
         if (isExplored(state)) {

@@ -104,7 +104,8 @@ public abstract class PathConstraint {
      * value the expression should be equal to.
      * If the index is -1, the expression is distinct from all values (relevant for
      * default case of switch statements), but this is only possible if the
-     * <code>allowDefault</code> parameter is set to <code>true</code>.
+     * {@code allowDefault} parameter is set to {@code true}.
+     * 
      * 
      * <p>
      * Two subclasses are provided, one for switch statements
@@ -132,7 +133,7 @@ public abstract class PathConstraint {
          * @param index        The index of the value that the expression should be
          *                     equal to
          * @param allowDefault Whether a default case where the expression is distinct
-         *                     from all values is allowed (<code>true</code> for switch
+         *                     from all values is allowed ({@code true} for switch
          *                     statements)
          */
         public CompositeConstraint(SymbolicState state, Expr<?> expr, Expr<?>[] values, int index,
