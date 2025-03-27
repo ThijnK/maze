@@ -2,6 +2,7 @@ package nl.uu.maze.search.heuristic;
 
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.Set;
 
 import nl.uu.maze.execution.symbolic.CoverageTracker;
 import nl.uu.maze.util.Pair;
@@ -45,6 +46,7 @@ public class DistanceToUncoveredHeuristic extends SearchHeuristic {
         }
 
         Queue<Pair<Stmt, Integer>> worklist = new LinkedList<>();
+        Set<Stmt> visited = new java.util.HashSet<>();
         int dist = 0;
         worklist.offer(Pair.of(stmt, dist));
 
@@ -52,6 +54,15 @@ public class DistanceToUncoveredHeuristic extends SearchHeuristic {
             Pair<Stmt, Integer> item = worklist.poll();
             stmt = item.first();
             dist = item.second();
+
+            // If a statement has been visited before, we're dealing with a loop, so we can
+            // skip it because the first iteration of the loop would have been the shortest
+            // path
+            boolean isNew = visited.add(stmt);
+            if (!isNew) {
+                continue;
+            }
+
             if (!coverageTracker.isCovered(stmt)) {
                 return dist;
             }
