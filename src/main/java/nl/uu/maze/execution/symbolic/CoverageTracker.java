@@ -26,9 +26,12 @@ public class CoverageTracker {
 
     /**
      * Marks a statement as covered.
+     * 
+     * @return {@code true} if the statement was not covered before, {@code false}
+     *         otherwise
      */
-    public void setCovered(Stmt stmt) {
-        coveredStmts.add(stmt.hashCode());
+    public boolean setCovered(Stmt stmt) {
+        return coveredStmts.add(stmt.hashCode());
     }
 
     /**

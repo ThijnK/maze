@@ -20,6 +20,8 @@ import sootup.core.jimple.common.stmt.Stmt;
 public abstract class PathConstraint {
     protected final Stmt stmt;
     protected final StmtGraph<?> cfg;
+    protected final int depth;
+    protected final List<Integer> newCoverageDepths;
 
     /**
      * Create a new path constraint for the given symbolic state.
@@ -29,11 +31,15 @@ public abstract class PathConstraint {
         // state, because the state may change
         this.stmt = state.getStmt();
         this.cfg = state.getCFG();
+        this.depth = state.getDepth();
+        this.newCoverageDepths = new ArrayList<>(state.getNewCoverageDepths());
     }
 
-    protected PathConstraint(Stmt stmt, StmtGraph<?> cfg) {
+    protected PathConstraint(Stmt stmt, StmtGraph<?> cfg, int depth, List<Integer> newCoverageDepths) {
         this.stmt = stmt;
         this.cfg = cfg;
+        this.depth = depth;
+        this.newCoverageDepths = new ArrayList<>(newCoverageDepths);
     }
 
     public Stmt getStmt() {
@@ -42,6 +48,14 @@ public abstract class PathConstraint {
 
     public StmtGraph<?> getCFG() {
         return cfg;
+    }
+
+    public int getDepth() {
+        return depth;
+    }
+
+    public List<Integer> getNewCoverageDepths() {
+        return newCoverageDepths;
     }
 
     public abstract BoolExpr getConstraint();
@@ -68,8 +82,9 @@ public abstract class PathConstraint {
             this.constraint = constraint;
         }
 
-        protected SingleConstraint(Stmt stmt, StmtGraph<?> cfg, BoolExpr constraint) {
-            super(stmt, cfg);
+        protected SingleConstraint(Stmt stmt, StmtGraph<?> cfg, int depth, List<Integer> newCoverageDepths,
+                BoolExpr constraint) {
+            super(stmt, cfg, depth, newCoverageDepths);
             this.constraint = constraint;
         }
 
@@ -78,7 +93,7 @@ public abstract class PathConstraint {
         }
 
         public SingleConstraint negate() {
-            return new SingleConstraint(stmt, cfg, Z3Utils.negate(constraint));
+            return new SingleConstraint(stmt, cfg, depth, newCoverageDepths, Z3Utils.negate(constraint));
         }
     }
 
@@ -133,9 +148,10 @@ public abstract class PathConstraint {
             this.index = index;
         }
 
-        protected CompositeConstraint(Stmt stmt, StmtGraph<?> cfg, Expr<?> expr, Expr<?>[] values, int index,
+        protected CompositeConstraint(Stmt stmt, StmtGraph<?> cfg, int depth, List<Integer> newCoverageDepths,
+                Expr<?> expr, Expr<?>[] values, int index,
                 boolean allowDefault) {
-            super(stmt, cfg);
+            super(stmt, cfg, depth, newCoverageDepths);
             this.expr = expr;
             this.values = values;
             this.allowDefault = allowDefault;
@@ -194,7 +210,7 @@ public abstract class PathConstraint {
             if (newIndex < minIndex || newIndex >= values.length) {
                 throw new IllegalArgumentException("Invalid index for composite constraint");
             }
-            return new CompositeConstraint(stmt, cfg, expr, values, newIndex, allowDefault);
+            return new CompositeConstraint(stmt, cfg, depth, newCoverageDepths, expr, values, newIndex, allowDefault);
         }
     }
 

@@ -141,5 +141,9 @@ public abstract class SearchHeuristic {
         public Stmt getStmt();
 
         public StmtGraph<?> getCFG();
+
+        public int getDepth();
+
+        public List<Integer> getNewCoverageDepths();
     }
 }

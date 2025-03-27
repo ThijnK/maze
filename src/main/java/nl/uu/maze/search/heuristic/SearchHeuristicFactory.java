@@ -24,10 +24,12 @@ public class SearchHeuristicFactory {
      * @throws NumberFormatException    If the weight is not a valid double
      */
     public static SearchHeuristic createHeuristic(String name, double weight) {
-        return switch (name) {
+        return switch (name.trim()) {
             case "UniformHeuristic", "Uniform", "UH" -> new nl.uu.maze.search.heuristic.UniformHeuristic();
             case "DistanceToUncoveredHeuristic", "DistanceToUncovered", "DTUH" ->
                 new nl.uu.maze.search.heuristic.DistanceToUncoveredHeuristic(weight);
+            case "RecentCoverageHeuristic", "RecentCoverage", "RCH" ->
+                new nl.uu.maze.search.heuristic.RecentCoverageHeuristic(weight);
             default -> throw new IllegalArgumentException("Unknown search heuristic: " + name);
         };
     }

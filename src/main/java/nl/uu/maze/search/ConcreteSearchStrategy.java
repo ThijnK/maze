@@ -168,6 +168,14 @@ public abstract class ConcreteSearchStrategy implements SearchStrategy {
             return pathConstraints.get(index).getCFG();
         }
 
+        public int getDepth() {
+            return pathConstraints.get(index).getDepth();
+        }
+
+        public List<Integer> getNewCoverageDepths() {
+            return pathConstraints.get(index).getNewCoverageDepths();
+        }
+
         /**
          * Apply the negation to the constraint at the index.
          */

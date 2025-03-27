@@ -133,9 +133,9 @@ public class SymbolicExecutor {
             newStates.add(state);
         }
 
-        state.incrementDepth();
         if (trackCoverage)
-            CoverageTracker.getInstance().setCovered(stmt);
+            state.recordCoverage();
+        state.incrementDepth();
         return newStates;
     }
 
@@ -192,9 +192,9 @@ public class SymbolicExecutor {
             }
         }
 
-        state.incrementDepth();
         if (trackCoverage)
-            CoverageTracker.getInstance().setCovered(stmt);
+            state.recordCoverage();
+        state.incrementDepth();
         return newStates;
     }
 
@@ -432,11 +432,9 @@ public class SymbolicExecutor {
         List<SymbolicState> newStates = new ArrayList<>();
         List<Stmt> succs = state.getSuccessors();
 
+        if (trackCoverage)
+            state.recordCoverage();
         state.incrementDepth();
-        // Mark statement as covered
-        if (trackCoverage && !state.isExceptionThrown()) {
-            CoverageTracker.getInstance().setCovered(state.getStmt());
-        }
 
         // Final state
         if (succs.isEmpty()) {

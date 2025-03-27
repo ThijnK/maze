@@ -69,6 +69,11 @@ public class SymbolicState implements HeuristicTarget {
      * When this is null, it means this state is in the main method under test.
      */
     private SymbolicState caller = null;
+    /**
+     * Track depths at which the state covered new code, for heuristic search
+     * strategies.
+     */
+    private final List<Integer> newCoverageDepths;
 
     /**
      * Indicates whether this state is part of the constructor's execution for the
@@ -90,6 +95,7 @@ public class SymbolicState implements HeuristicTarget {
         this.pathConstraints = new ArrayList<>();
         this.engineConstraints = new ArrayList<>();
         this.paramTypes = new HashMap<>();
+        this.newCoverageDepths = new ArrayList<>();
     }
 
     /*
@@ -108,11 +114,11 @@ public class SymbolicState implements HeuristicTarget {
         this.retval = state.retval;
         this.pathConstraints = new ArrayList<>(state.pathConstraints);
         this.engineConstraints = new ArrayList<>(state.engineConstraints);
-        // Share param types map
-        this.paramTypes = state.paramTypes;
+        this.paramTypes = new HashMap<>(state.paramTypes);
         // Note: caller state is lazily cloned when needed, so store a reference to the
         // original here
         this.caller = state.caller;
+        this.newCoverageDepths = new ArrayList<>(state.newCoverageDepths);
 
         this.isCtorState = state.isCtorState;
         this.isFinalState = state.isFinalState;
@@ -283,6 +289,19 @@ public class SymbolicState implements HeuristicTarget {
     public void setConstraints(List<PathConstraint> pathConstraints, List<PathConstraint> engineConstraints) {
         this.pathConstraints = pathConstraints;
         this.engineConstraints = engineConstraints;
+    }
+
+    public void recordCoverage() {
+        if (!exceptionThrown) {
+            boolean newCoverage = CoverageTracker.getInstance().setCovered(stmt);
+            if (newCoverage) {
+                newCoverageDepths.add(depth);
+            }
+        }
+    }
+
+    public List<Integer> getNewCoverageDepths() {
+        return newCoverageDepths;
     }
 
     public void setFinalState() {
