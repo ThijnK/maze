@@ -98,6 +98,9 @@ public class SymbolicExecutor {
             return splitStates.get();
         }
 
+        if (trackCoverage)
+            state.recordCoverage();
+
         List<Stmt> succs = state.getSuccessors();
         BoolExpr cond = (BoolExpr) jimpleToZ3.transform(stmt.getCondition(), state);
         List<SymbolicState> newStates = new ArrayList<>();
@@ -133,8 +136,6 @@ public class SymbolicExecutor {
             newStates.add(state);
         }
 
-        if (trackCoverage)
-            state.recordCoverage();
         state.incrementDepth();
         return newStates;
     }
@@ -149,6 +150,9 @@ public class SymbolicExecutor {
      * @return A list of successor symbolic states after executing the switch
      */
     private List<SymbolicState> handleSwitchStmt(JSwitchStmt stmt, SymbolicState state, boolean replay) {
+        if (trackCoverage)
+            state.recordCoverage();
+
         List<Stmt> succs = state.getSuccessors();
         Expr<?> var = state.lookup(stmt.getKey().toString());
         List<IntConstant> cases = stmt.getValues();
@@ -192,8 +196,6 @@ public class SymbolicExecutor {
             }
         }
 
-        if (trackCoverage)
-            state.recordCoverage();
         state.incrementDepth();
         return newStates;
     }

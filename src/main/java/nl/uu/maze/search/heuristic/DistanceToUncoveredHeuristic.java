@@ -52,7 +52,7 @@ public class DistanceToUncoveredHeuristic extends SearchHeuristic {
             Pair<Stmt, Integer> item = worklist.poll();
             stmt = item.first();
             dist = item.second();
-            if (!coverageTracker.isCovered(item.first())) {
+            if (!coverageTracker.isCovered(stmt)) {
                 return dist;
             }
 
