@@ -32,6 +32,7 @@ public class SearchHeuristicFactory {
                 new nl.uu.maze.search.heuristic.RecentCoverageHeuristic(weight);
             case "DepthHeuristic", "Depth", "DH" -> new nl.uu.maze.search.heuristic.DepthHeuristic(weight);
             case "QueryCostHeuristic", "QueryCost", "QCH" -> new nl.uu.maze.search.heuristic.QueryCostHeuristic(weight);
+            case "CallDepthHeuristic", "CallDepth", "CDH" -> new nl.uu.maze.search.heuristic.CallDepthHeuristic(weight);
             default -> throw new IllegalArgumentException("Unknown search heuristic: " + name);
         };
     }

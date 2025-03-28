@@ -184,6 +184,10 @@ public abstract class ConcreteSearchStrategy implements SearchStrategy {
             return cost;
         }
 
+        public int getCallDepth() {
+            return pathConstraints.get(index).getCallDepth();
+        }
+
         /**
          * Apply the negation to the constraint at the index.
          */

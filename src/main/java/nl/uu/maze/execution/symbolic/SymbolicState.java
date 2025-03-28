@@ -309,6 +309,10 @@ public class SymbolicState implements HeuristicTarget {
                 + engineConstraints.stream().mapToInt(PathConstraint::getEstimatedCost).sum();
     }
 
+    public int getCallDepth() {
+        return caller == null ? 0 : caller.getCallDepth() + 1;
+    }
+
     public void setFinalState() {
         this.isFinalState = true;
     }

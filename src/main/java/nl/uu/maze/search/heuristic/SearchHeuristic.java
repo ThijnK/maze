@@ -84,21 +84,23 @@ public abstract class SearchHeuristic {
 
         // Normalize weights per heuristic to ensure each heuristic contributes
         // proportionally to the composite score
-        for (int i = 0; i < heuristics.size(); i++) {
-            // Shift all weights to be non-negative (if necessary)
-            double minWeight = Arrays.stream(targetWeights[i]).min().getAsDouble();
-            if (minWeight < 0) {
-                for (int j = 0; j < targets.size(); j++) {
-                    targetWeights[i][j] = targetWeights[i][j] - minWeight + 1e-10; // Small epsilon to avoid zeros
+        if (heuristics.size() > 1) {
+            for (int i = 0; i < heuristics.size(); i++) {
+                // Shift all weights to be non-negative (if necessary)
+                double minWeight = Arrays.stream(targetWeights[i]).min().getAsDouble();
+                if (minWeight < 0) {
+                    for (int j = 0; j < targets.size(); j++) {
+                        targetWeights[i][j] = targetWeights[i][j] - minWeight + 1e-10; // Small epsilon to avoid zeros
+                    }
                 }
-            }
 
-            // Normalize weights
-            double totalWeight = Arrays.stream(targetWeights[i]).sum();
-            if (totalWeight != 0)
-                for (int j = 0; j < targets.size(); j++) {
-                    targetWeights[i][j] /= totalWeight;
-                }
+                // Normalize weights
+                double totalWeight = Arrays.stream(targetWeights[i]).sum();
+                if (totalWeight != 0)
+                    for (int j = 0; j < targets.size(); j++) {
+                        targetWeights[i][j] /= totalWeight;
+                    }
+            }
         }
 
         // Calculate composite weights for each target
@@ -156,5 +158,10 @@ public abstract class SearchHeuristic {
          * the target.
          */
         public int getEstimatedQueryCost();
+
+        /**
+         * Returns the call depth (number of nested function calls) of the target.
+         */
+        public int getCallDepth();
     }
 }
