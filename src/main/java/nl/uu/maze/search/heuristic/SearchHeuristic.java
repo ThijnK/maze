@@ -18,7 +18,6 @@ public abstract class SearchHeuristic {
      * Weight of this heuristic if combined with others in a composite score.
      * The higher the weight, the more influence this heuristic has on the composite
      * score.
-     * Defaults to 1.
      */
     public final double weight;
 
@@ -35,13 +34,6 @@ public abstract class SearchHeuristic {
         }
 
         this.weight = weight;
-    }
-
-    /**
-     * Constructs a new heuristic with a weight of 1.
-     */
-    public SearchHeuristic() {
-        this(1);
     }
 
     /**
