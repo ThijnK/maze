@@ -58,6 +58,8 @@ public class SymbolicState implements HeuristicTarget {
     private Expr<?> retval;
     /** Path constraints imposed by the program, e.g., if statements. */
     private List<PathConstraint> pathConstraints;
+    /** Cached hash of the path constraints for efficient hashCode(). */
+    private int pathConstraintsHash = 1;
     /** Constraints imposed by the engine, e.g., for array size bounds. */
     private List<PathConstraint> engineConstraints;
     /** Tracks SootUp types of parameters. */
@@ -113,6 +115,7 @@ public class SymbolicState implements HeuristicTarget {
         this.heap = state.heap.clone(this);
         this.retval = state.retval;
         this.pathConstraints = new ArrayList<>(state.pathConstraints);
+        this.pathConstraintsHash = state.pathConstraintsHash;
         this.engineConstraints = new ArrayList<>(state.engineConstraints);
         this.paramTypes = new HashMap<>(state.paramTypes);
         // Note: caller state is lazily cloned when needed, so store a reference to the
@@ -272,11 +275,14 @@ public class SymbolicState implements HeuristicTarget {
     }
 
     public void addPathConstraint(BoolExpr constraint) {
-        pathConstraints.add(new SingleConstraint(this, constraint));
+        PathConstraint pc = new SingleConstraint(this, constraint);
+        pathConstraints.add(pc);
+        pathConstraintsHash = 31 * pathConstraintsHash + pc.hashCode();
     }
 
     public void addPathConstraint(PathConstraint constraint) {
         pathConstraints.add(constraint);
+        pathConstraintsHash = 31 * pathConstraintsHash + constraint.hashCode();
     }
 
     public void addEngineConstraint(BoolExpr constraint) {
@@ -290,6 +296,12 @@ public class SymbolicState implements HeuristicTarget {
     public void setConstraints(List<PathConstraint> pathConstraints, List<PathConstraint> engineConstraints) {
         this.pathConstraints = pathConstraints;
         this.engineConstraints = engineConstraints;
+
+        // Recalculate hash of path constraints
+        pathConstraintsHash = 0;
+        for (PathConstraint pc : pathConstraints) {
+            pathConstraintsHash = 31 * pathConstraintsHash + pc.hashCode();
+        }
     }
 
     public void recordCoverage() {
@@ -408,10 +420,14 @@ public class SymbolicState implements HeuristicTarget {
 
     @Override
     public int hashCode() {
-        // A state should be uniquely identified by its current statement, as everything
-        // else (path constraints, heap, etc.) is based on the position in the program
-        // This avoids having to hash path constraints and heap etc., which can be very
-        // expensive
-        return stmt.hashCode();
+        // Optimization of this method is essential, because an inefficient hashCode can
+        // significantly slow down the search process
+        // Thus, we only consider the statement and path constraints for the hash code
+        // The statement should already uniquely define the state in most cases, and
+        // adding the path constraints ensures that we don't get collisions for loops or
+        // recursive calls
+        // The path constraints hash is cached, and updated every time a path constraint
+        // is added (or the path constraints are overwritten)
+        return 31 * stmt.hashCode() + pathConstraintsHash;
     }
 }
