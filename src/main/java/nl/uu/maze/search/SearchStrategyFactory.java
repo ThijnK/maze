@@ -58,6 +58,10 @@ public class SearchStrategyFactory {
             // with the UniformHeuristic
             case "UniformRandom", "UniformRandomSearch", "URS" -> new nl.uu.maze.search.symbolic.ProbabilisticSearch(
                     List.of(new nl.uu.maze.search.heuristic.UniformHeuristic()));
+            // Special case for coverage-optimized search, which uses predefined heuristics
+            case "CoverageOptimized", "CoverageOptimizedSearch", "COS" ->
+                new nl.uu.maze.search.symbolic.ProbabilisticSearch(
+                        createHeuristics("RecentCoverage, DistanceToUncovered", "0.5, 0.5"));
             case "RandomPath", "RandomPathSearch", "RPS" -> new nl.uu.maze.search.symbolic.RandomPathSearch();
             default -> {
                 logger.warn("Unknown search strategy: {}, defaulting to DFS", name);
@@ -97,6 +101,10 @@ public class SearchStrategyFactory {
             // with the UniformHeuristic
             case "UniformRandom", "UniformRandomSearch", "URS" -> new nl.uu.maze.search.concrete.ProbabilisticSearch(
                     List.of(new nl.uu.maze.search.heuristic.UniformHeuristic()));
+            // Special case for coverage-optimized search, which uses predefined heuristics
+            case "CoverageOptimized", "CoverageOptimizedSearch", "COS" ->
+                new nl.uu.maze.search.concrete.ProbabilisticSearch(
+                        createHeuristics("RecentCoverage, DistanceToUncovered", "0.5, 0.5"));
             default -> {
                 logger.warn("Unknown search strategy: {}, defaulting to DFS", name);
                 yield new nl.uu.maze.search.concrete.DFS();
