@@ -29,6 +29,9 @@ public interface SearchStrategy<T> {
      */
     public T next();
 
+    /**
+     * Reset the search strategy to its initial state.
+     */
     public void reset();
 
     /** Whether this search strategy requires data about statement coverage. */

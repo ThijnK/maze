@@ -173,6 +173,7 @@ public class SymbolicState implements HeuristicTarget {
     }
 
     public void setCaller(SymbolicState caller) {
+        this.isCtorState = false;
         this.caller = caller;
         this.methodType = MethodType.CALLEE;
         this.depth = caller.depth;
