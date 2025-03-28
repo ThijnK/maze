@@ -13,6 +13,11 @@ public class UniformHeuristic extends SearchHeuristic {
     }
 
     @Override
+    public String getName() {
+        return "UniformHeuristic";
+    }
+
+    @Override
     public <T extends HeuristicTarget> double calculateWeight(T target) {
         return 1.0;
     }

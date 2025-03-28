@@ -26,6 +26,10 @@ public class RandomPathSearch extends SymbolicSearchStrategy {
     private TreeNode<SymbolicState> current;
     private final Random random = new Random();
 
+    public String getName() {
+        return "RandomPathSearch";
+    }
+
     @Override
     public void add(SymbolicState state) {
         if (tree == null) {

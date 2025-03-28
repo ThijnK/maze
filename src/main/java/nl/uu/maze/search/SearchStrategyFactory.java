@@ -1,6 +1,8 @@
 package nl.uu.maze.search;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +25,8 @@ public class SearchStrategyFactory {
      * be created with their respective factory methods.
      * </p>
      * 
-     * @param name             The name of the search strategy
+     * @param name             The name of the search strategy, or multiple names
+     *                         separated by commas
      * @param heuristicNames   Comma-separated names of the heuristics to use (in
      *                         case of probabilistic search)
      * @param heuristicWeights Comma-separated weights of the heuristics to use (in
@@ -40,7 +43,8 @@ public class SearchStrategyFactory {
      * Creates a symbolic search strategy based on the given name and heuristics.
      * Defaults to DFS if the name could not be resolved to an existing strategy.
      * 
-     * @param name             The name of the search strategy
+     * @param name             The name of the search strategy, or multiple names
+     *                         separated by commas
      * @param heuristicNames   Comma-separated names of the heuristics to use (in
      *                         case of probabilistic search)
      * @param heuristicWeights Comma-separated weights of the heuristics to use (in
@@ -49,6 +53,25 @@ public class SearchStrategyFactory {
      */
     public static SymbolicSearchStrategy createSymbolicStrategy(String name, String heuristicNames,
             String heuristicWeights) {
+        // If multiple names provided, use them in interleaved search
+        if (name.contains(",")) {
+            String[] names = name.split(",");
+            Set<String> uniqueStrategies = new HashSet<>();
+            List<SymbolicSearchStrategy> strategies = new java.util.ArrayList<>();
+            for (String n : names) {
+                SymbolicSearchStrategy strategy = createSymbolicStrategy(n, heuristicNames, heuristicWeights);
+                if (uniqueStrategies.add(strategy.getName())) {
+                    strategies.add(strategy);
+                }
+            }
+            if (strategies.size() == 1) {
+                logger.warn("Multiple strategies provided, but only one unique strategy found: {}", name);
+                return strategies.get(0);
+            }
+
+            return new nl.uu.maze.search.symbolic.InterleavedSearch(strategies.toArray(SymbolicSearchStrategy[]::new));
+        }
+
         return switch (name) {
             case "DFS" -> new nl.uu.maze.search.symbolic.DFS();
             case "BFS" -> new nl.uu.maze.search.symbolic.BFS();
@@ -83,7 +106,8 @@ public class SearchStrategyFactory {
      * Creates a concrete search strategy based on the given name and heuristics.
      * Defaults to DFS if the name could not be resolved to an existing strategy.
      * 
-     * @param name             The name of the search strategy
+     * @param name             The name of the search strategy, or multiple names
+     *                         separated by commas
      * @param heuristicNames   Comma-separated names of the heuristics to use (in
      *                         case of probabilistic search)
      * @param heuristicWeights Comma-separated weights of the heuristics to use (in

@@ -23,6 +23,16 @@ public class ProbabilisticSearch extends SymbolicSearchStrategy {
         this.heuristics = heuristics;
     }
 
+    public String getName() {
+        StringBuilder sb = new StringBuilder("ProbabilisticSearch(");
+        for (SearchHeuristic heuristic : heuristics) {
+            sb.append(heuristic.getName()).append(", ");
+        }
+        sb.setLength(sb.length() - 2);
+        sb.append(")");
+        return sb.toString();
+    }
+
     @Override
     public void add(SymbolicState state) {
         states.add(state);

@@ -36,6 +36,8 @@ public abstract class SearchHeuristic {
         this.weight = weight;
     }
 
+    public abstract String getName();
+
     /**
      * Whether this heuristic requires coverage data to calculate weights.
      * Defaults to {@code false}.

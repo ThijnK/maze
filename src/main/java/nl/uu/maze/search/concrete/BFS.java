@@ -11,6 +11,10 @@ import nl.uu.maze.search.ConcreteSearchStrategy;
 public class BFS extends ConcreteSearchStrategy {
     private final Queue<PathConditionCandidate> candidates = new LinkedList<>();
 
+    public String getName() {
+        return "BreadthFirstSearch";
+    }
+
     @Override
     public void add(PathConditionCandidate candidate) {
         candidates.add(candidate);

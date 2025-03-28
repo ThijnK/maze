@@ -10,6 +10,10 @@ import nl.uu.maze.search.ConcreteSearchStrategy;
 public class DFS extends ConcreteSearchStrategy {
     private final Stack<PathConditionCandidate> candidates = new Stack<>();
 
+    public String getName() {
+        return "DepthFirstSearch";
+    }
+
     @Override
     public void add(PathConditionCandidate candidate) {
         candidates.push(candidate);

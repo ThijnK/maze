@@ -19,6 +19,11 @@ public class QueryCostHeuristic extends SearchHeuristic {
     }
 
     @Override
+    public String getName() {
+        return "QueryCostHeuristic";
+    }
+
+    @Override
     public <T extends HeuristicTarget> double calculateWeight(T target) {
         return target.getEstimatedQueryCost();
     }

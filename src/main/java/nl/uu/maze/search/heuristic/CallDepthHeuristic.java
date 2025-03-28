@@ -11,6 +11,11 @@ public class CallDepthHeuristic extends SearchHeuristic {
     }
 
     @Override
+    public String getName() {
+        return "CallDepthHeuristic";
+    }
+
+    @Override
     public <T extends HeuristicTarget> double calculateWeight(T target) {
         // Add one to avoid zero depth targets, which would cause them to be ignored
         // entirely if there is but a single target which has at least depth 1

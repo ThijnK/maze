@@ -19,6 +19,16 @@ public class InterleavedSearch extends SymbolicSearchStrategy {
         this.strategies = strategies;
     }
 
+    public String getName() {
+        StringBuilder sb = new StringBuilder("InterleavedSearch(");
+        for (SymbolicSearchStrategy strategy : strategies) {
+            sb.append(strategy.getName()).append(", ");
+        }
+        sb.setLength(sb.length() - 2);
+        sb.append(")");
+        return sb.toString();
+    }
+
     @Override
     public void add(SymbolicState state) {
         for (SymbolicSearchStrategy strategy : strategies) {

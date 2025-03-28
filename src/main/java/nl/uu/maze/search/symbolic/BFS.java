@@ -12,6 +12,10 @@ import nl.uu.maze.search.SymbolicSearchStrategy;
 public class BFS extends SymbolicSearchStrategy {
     private final Queue<SymbolicState> states = new LinkedList<>();
 
+    public String getName() {
+        return "BreadthFirstSearch";
+    }
+
     @Override
     public void add(SymbolicState state) {
         states.add(state);

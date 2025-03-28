@@ -11,6 +11,10 @@ import nl.uu.maze.search.SymbolicSearchStrategy;
 public class DFS extends SymbolicSearchStrategy {
     private final Stack<SymbolicState> states = new Stack<>();
 
+    public String getName() {
+        return "DepthFirstSearch";
+    }
+
     @Override
     public void add(SymbolicState state) {
         states.push(state);

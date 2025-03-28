@@ -18,6 +18,11 @@ public class DepthHeuristic extends SearchHeuristic {
     }
 
     @Override
+    public String getName() {
+        return "DepthHeuristic";
+    }
+
+    @Override
     public <T extends HeuristicTarget> double calculateWeight(T target) {
         int depth = target.getDepth();
         return Math.pow(2, depth); // 2^(depth)

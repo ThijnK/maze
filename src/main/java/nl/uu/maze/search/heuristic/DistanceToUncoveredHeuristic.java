@@ -26,6 +26,11 @@ public class DistanceToUncoveredHeuristic extends SearchHeuristic {
     }
 
     @Override
+    public String getName() {
+        return "DistanceToUncoveredHeuristic";
+    }
+
+    @Override
     public boolean requiresCoverageData() {
         return true;
     }

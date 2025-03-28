@@ -18,6 +18,16 @@ public class InterleavedSearch extends ConcreteSearchStrategy {
         this.strategies = strategies;
     }
 
+    public String getName() {
+        StringBuilder sb = new StringBuilder("InterleavedSearch(");
+        for (ConcreteSearchStrategy strategy : strategies) {
+            sb.append(strategy.getName()).append(", ");
+        }
+        sb.setLength(sb.length() - 2);
+        sb.append(")");
+        return sb.toString();
+    }
+
     @Override
     public void add(PathConditionCandidate state) {
         for (ConcreteSearchStrategy strategy : strategies) {

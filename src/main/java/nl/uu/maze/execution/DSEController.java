@@ -100,7 +100,7 @@ public class DSEController {
      *
      */
     public void run() throws Exception {
-        logger.info("Using search strategy: {}", searchStrategy.getClass().getSimpleName());
+        logger.info("Using search strategy: {}", searchStrategy.getName());
         Set<JavaSootMethod> methods = sootClass.getMethods();
         // Regex pattern to match non-standard method names (e.g., <init>, <clinit>)
         Pattern pattern = Pattern.compile("<[^>]+>");

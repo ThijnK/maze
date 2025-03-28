@@ -17,6 +17,11 @@ public class RecentCoverageHeuristic extends SearchHeuristic {
     }
 
     @Override
+    public String getName() {
+        return "RecentCoverageHeuristic";
+    }
+
+    @Override
     public boolean requiresCoverageData() {
         return true;
     }
