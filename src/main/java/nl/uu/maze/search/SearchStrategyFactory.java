@@ -52,16 +52,8 @@ public class SearchStrategyFactory {
         return switch (name) {
             case "DFS" -> new nl.uu.maze.search.symbolic.DFS();
             case "BFS" -> new nl.uu.maze.search.symbolic.BFS();
-            case "Probabilistic", "ProbabilisticSearch", "PS" -> {
-                List<SearchHeuristic> heuristics = SearchHeuristicFactory
-                        .createHeuristics(heuristicNames, heuristicWeights);
-                if (heuristics.size() == 0) {
-                    logger.warn("No heuristics provided for ProbabilisticSearch, defaulting to UniformHeuristic");
-                    yield new nl.uu.maze.search.symbolic.ProbabilisticSearch(
-                            List.of(new nl.uu.maze.search.heuristic.UniformHeuristic()));
-                }
-                yield new nl.uu.maze.search.symbolic.ProbabilisticSearch(heuristics);
-            }
+            case "Probabilistic", "ProbabilisticSearch", "PS" ->
+                new nl.uu.maze.search.symbolic.ProbabilisticSearch(createHeuristics(heuristicNames, heuristicWeights));
             // Special case for uniform random search, which is just probabilistic search
             // with the UniformHeuristic
             case "UniformRandom", "UniformRandomSearch", "URS" -> new nl.uu.maze.search.symbolic.ProbabilisticSearch(
@@ -99,16 +91,8 @@ public class SearchStrategyFactory {
         return switch (name) {
             case "DFS" -> new nl.uu.maze.search.concrete.DFS();
             case "BFS" -> new nl.uu.maze.search.concrete.BFS();
-            case "Probabilistic", "ProbabilisticSearch", "PS" -> {
-                List<SearchHeuristic> heuristics = SearchHeuristicFactory
-                        .createHeuristics(heuristicNames, heuristicWeights);
-                if (heuristics.size() == 0) {
-                    logger.warn("No heuristics provided for ProbabilisticSearch, defaulting to UniformHeuristic");
-                    yield new nl.uu.maze.search.concrete.ProbabilisticSearch(
-                            List.of(new nl.uu.maze.search.heuristic.UniformHeuristic()));
-                }
-                yield new nl.uu.maze.search.concrete.ProbabilisticSearch(heuristics);
-            }
+            case "Probabilistic", "ProbabilisticSearch", "PS" ->
+                new nl.uu.maze.search.concrete.ProbabilisticSearch(createHeuristics(heuristicNames, heuristicWeights));
             // Special case for uniform random search, which is just probabilistic search
             // with the UniformHeuristic
             case "UniformRandom", "UniformRandomSearch", "URS" -> new nl.uu.maze.search.concrete.ProbabilisticSearch(
@@ -118,5 +102,14 @@ public class SearchStrategyFactory {
                 yield new nl.uu.maze.search.concrete.DFS();
             }
         };
+    }
+
+    private static List<SearchHeuristic> createHeuristics(String heuristicNames, String heuristicWeights) {
+        List<SearchHeuristic> heuristics = SearchHeuristicFactory.createHeuristics(heuristicNames, heuristicWeights);
+        if (heuristics.size() == 0) {
+            logger.warn("No heuristics provided, defaulting to UniformHeuristic");
+            heuristics.add(new nl.uu.maze.search.heuristic.UniformHeuristic());
+        }
+        return heuristics;
     }
 }
