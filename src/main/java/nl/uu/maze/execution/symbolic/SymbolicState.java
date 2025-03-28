@@ -304,6 +304,11 @@ public class SymbolicState implements HeuristicTarget {
         return newCoverageDepths;
     }
 
+    public int getEstimatedQueryCost() {
+        return pathConstraints.stream().mapToInt(PathConstraint::getEstimatedCost).sum()
+                + engineConstraints.stream().mapToInt(PathConstraint::getEstimatedCost).sum();
+    }
+
     public void setFinalState() {
         this.isFinalState = true;
     }

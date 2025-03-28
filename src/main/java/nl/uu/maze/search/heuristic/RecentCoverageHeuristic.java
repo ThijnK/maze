@@ -2,6 +2,10 @@ package nl.uu.maze.search.heuristic;
 
 import java.util.List;
 
+/**
+ * A heuristic that prioritizes targets that have covered new statements
+ * recently.
+ */
 public class RecentCoverageHeuristic extends SearchHeuristic {
     /**
      * How many previous statements to consider as "recent".

@@ -130,12 +130,31 @@ public abstract class SearchHeuristic {
      * For example, a symbolic state or a path condition candidate.
      */
     public static interface HeuristicTarget {
+        /**
+         * Returns the statement (node within the CFG) that the target is associated
+         * with.
+         */
         public Stmt getStmt();
 
+        /**
+         * Returns the control flow graph that the target is part of.
+         */
         public StmtGraph<?> getCFG();
 
+        /**
+         * Returns the depth of the target in the execution tree.
+         */
         public int getDepth();
 
+        /**
+         * Returns the depths at which the target covered new code.
+         */
         public List<Integer> getNewCoverageDepths();
+
+        /**
+         * Returns the estimated cost of the query for the SMT solver associated with
+         * the target.
+         */
+        public int getEstimatedQueryCost();
     }
 }

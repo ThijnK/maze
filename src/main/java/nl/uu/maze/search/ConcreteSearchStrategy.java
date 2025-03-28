@@ -176,6 +176,14 @@ public abstract class ConcreteSearchStrategy implements SearchStrategy {
             return pathConstraints.get(index).getNewCoverageDepths();
         }
 
+        public int getEstimatedQueryCost() {
+            int cost = 0;
+            for (int i = 0; i <= index; i++) {
+                cost += pathConstraints.get(i).getEstimatedCost();
+            }
+            return cost;
+        }
+
         /**
          * Apply the negation to the constraint at the index.
          */

@@ -22,6 +22,8 @@ public abstract class PathConstraint {
     protected final StmtGraph<?> cfg;
     protected final int depth;
     protected final List<Integer> newCoverageDepths;
+    /** Estimated cost to solve this constraint. */
+    protected int estimatedCost = -1;
 
     /**
      * Create a new path constraint for the given symbolic state.
@@ -56,6 +58,17 @@ public abstract class PathConstraint {
 
     public List<Integer> getNewCoverageDepths() {
         return newCoverageDepths;
+    }
+
+    /**
+     * Get the estimated cost to solve this constraint.
+     */
+    public int getEstimatedCost() {
+        // Lazily initialize estimated cost
+        if (estimatedCost == -1) {
+            estimatedCost = Z3Utils.estimateCost(getConstraint());
+        }
+        return estimatedCost;
     }
 
     public abstract BoolExpr getConstraint();
