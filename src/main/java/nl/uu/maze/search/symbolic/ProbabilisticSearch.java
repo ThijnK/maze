@@ -29,6 +29,11 @@ public class ProbabilisticSearch extends SymbolicSearchStrategy {
     }
 
     @Override
+    public void remove(SymbolicState state) {
+        states.remove(state);
+    }
+
+    @Override
     public SymbolicState next() {
         return SearchHeuristic.weightedProbabilisticSelect(states, heuristics);
     }

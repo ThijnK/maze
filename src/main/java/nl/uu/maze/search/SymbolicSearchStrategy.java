@@ -26,15 +26,10 @@ public abstract class SymbolicSearchStrategy implements SearchStrategy {
 
     /**
      * Remove a symbolic state from the search strategy.
-     * Used to remove final states from the search strategy.
-     * Optional method, can be left unimplemented, as it may not be needed by all
-     * search strategies.
      * 
      * @param state The symbolic state to remove
      */
-    public void remove(SymbolicState state) {
-        // Default implementation does nothing
-    }
+    public abstract void remove(SymbolicState state);
 
     /**
      * Get the next symbolic state to explore.

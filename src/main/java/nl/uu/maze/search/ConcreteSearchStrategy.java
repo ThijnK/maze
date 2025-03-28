@@ -26,8 +26,12 @@ public abstract class ConcreteSearchStrategy implements SearchStrategy {
 
     /**
      * Add a candidate to the search strategy.
+     * 
+     * @param candidate The candidate to add
+     * @apiNote Use {@link #add(SymbolicState)} instead to derive path condition
+     *          candidates to add from a symbolic state
      */
-    protected abstract void add(PathConditionCandidate candidate);
+    public abstract void add(PathConditionCandidate candidate);
 
     /**
      * Add a symbolic state to the search strategy if it has not been explored yet.
@@ -62,12 +66,21 @@ public abstract class ConcreteSearchStrategy implements SearchStrategy {
     }
 
     /**
+     * Remove a path condition candidate from the search strategy.
+     * 
+     * @param candidate The candidate to remove
+     */
+    public abstract void remove(PathConditionCandidate candidate);
+
+    /**
      * Get the next candidate to explore.
      * 
      * @return The next candidate to explore, or null if there are no more
      *         candidates
+     * @apiNote Use {@link #next(SymbolicStateValidator)} instead to get candidates
+     *          that are satisfiable according to a validator
      */
-    protected abstract PathConditionCandidate next();
+    public abstract PathConditionCandidate next();
 
     /**
      * Get the next candidate to explore that is satisfiable according to the given

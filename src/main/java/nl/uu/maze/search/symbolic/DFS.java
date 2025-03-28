@@ -17,6 +17,11 @@ public class DFS extends SymbolicSearchStrategy {
     }
 
     @Override
+    public void remove(SymbolicState state) {
+        states.remove(state);
+    }
+
+    @Override
     public SymbolicState next() {
         return states.isEmpty() ? null : states.pop();
     }
