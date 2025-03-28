@@ -3,7 +3,6 @@ package nl.uu.maze.search.symbolic;
 import java.util.Arrays;
 
 import nl.uu.maze.execution.symbolic.SymbolicState;
-import nl.uu.maze.search.SymbolicSearchStrategy;
 
 public class InterleavedSearch extends SymbolicSearchStrategy {
     private static final long STRATEGY_TIMEOUT = 1000;

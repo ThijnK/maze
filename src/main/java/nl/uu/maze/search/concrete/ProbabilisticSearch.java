@@ -3,7 +3,6 @@ package nl.uu.maze.search.concrete;
 import java.util.ArrayList;
 import java.util.List;
 
-import nl.uu.maze.search.ConcreteSearchStrategy;
 import nl.uu.maze.search.heuristic.SearchHeuristic;
 
 /**

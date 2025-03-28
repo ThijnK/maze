@@ -7,8 +7,10 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import nl.uu.maze.search.concrete.ConcreteSearchStrategy;
 import nl.uu.maze.search.heuristic.SearchHeuristic;
 import nl.uu.maze.search.heuristic.SearchHeuristicFactory;
+import nl.uu.maze.search.symbolic.SymbolicSearchStrategy;
 
 /**
  * Factory class for creating search strategies.
@@ -33,7 +35,7 @@ public class SearchStrategyFactory {
      *                         case of probabilistic search)
      * @return A search strategy
      */
-    public static SearchStrategy createStrategy(String name, String heuristicNames, String heuristicWeights,
+    public static SearchStrategy<?> createStrategy(String name, String heuristicNames, String heuristicWeights,
             boolean concreteDriven) {
         return concreteDriven ? createConcreteStrategy(name, heuristicNames, heuristicWeights)
                 : createSymbolicStrategy(name, heuristicNames, heuristicWeights);

@@ -30,19 +30,17 @@ public class Application {
     private static final String className = "nl.uu.maze.example.ExampleClass";
     private static final String outPath = "src/test/java";
     private static final boolean concreteDriven = false;
-    private static final String defaultSearchStrategy = "Probabilistic";
+    private static final String defaultSearchStrategy = "BFS";
     // Comma separated list of heuristics to use for probabilistic search
-    private static final String searchHeuristics = "UniformHeuristic";
+    private static final String searchHeuristics = "CDH, DTUH";
     // Comma separated list of weights for the heuristics
-    private static final String heuristicWeights = "1.0";
+    private static final String heuristicWeights = "0.4, 0.6";
 
     public static void main(String[] args) {
         try {
-
             String strategyName = args.length > 0 ? args[0] : defaultSearchStrategy;
-
-            SearchStrategy strategy = SearchStrategyFactory.createStrategy(strategyName, searchHeuristics,
-                    heuristicWeights, concreteDriven);
+            SearchStrategy<?> strategy = SearchStrategyFactory.createStrategy(strategyName,
+                    searchHeuristics, heuristicWeights, concreteDriven);
             DSEController controller = new DSEController(classPath, className,
                     concreteDriven, strategy, outPath);
             controller.run();

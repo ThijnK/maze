@@ -1,18 +1,14 @@
-package nl.uu.maze.search;
+package nl.uu.maze.search.symbolic;
 
 import java.util.Collection;
 
 import nl.uu.maze.execution.symbolic.SymbolicState;
+import nl.uu.maze.search.SearchStrategy;
 
 /**
  * Abstract class for search strategies that operate on symbolic-driven DSE.
  */
-public abstract class SymbolicSearchStrategy implements SearchStrategy {
-    /**
-     * Add a symbolic state to the search strategy.
-     */
-    public abstract void add(SymbolicState state);
-
+public abstract class SymbolicSearchStrategy implements SearchStrategy<SymbolicState> {
     /**
      * Add multiple symbolic states to the search strategy.
      * 
@@ -23,21 +19,6 @@ public abstract class SymbolicSearchStrategy implements SearchStrategy {
             add(state);
         }
     }
-
-    /**
-     * Remove a symbolic state from the search strategy.
-     * 
-     * @param state The symbolic state to remove
-     */
-    public abstract void remove(SymbolicState state);
-
-    /**
-     * Get the next symbolic state to explore.
-     * 
-     * @return The next symbolic state to explore, or null if there are no more
-     *         states to explore
-     */
-    public abstract SymbolicState next();
 
     // By default, search strategies do not require coverage data
     // Subclasses can override this method if they do

@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import nl.uu.maze.execution.symbolic.SymbolicState;
-import nl.uu.maze.search.SymbolicSearchStrategy;
 import nl.uu.maze.search.heuristic.SearchHeuristic;
 
 /**

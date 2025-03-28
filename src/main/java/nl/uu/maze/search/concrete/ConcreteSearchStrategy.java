@@ -1,4 +1,4 @@
-package nl.uu.maze.search;
+package nl.uu.maze.search.concrete;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -11,25 +11,21 @@ import com.microsoft.z3.Model;
 import nl.uu.maze.execution.symbolic.PathConstraint;
 import nl.uu.maze.execution.symbolic.SymbolicState;
 import nl.uu.maze.execution.symbolic.SymbolicStateValidator;
-import nl.uu.maze.execution.symbolic.PathConstraint.SingleConstraint;
-import nl.uu.maze.search.heuristic.SearchHeuristic.HeuristicTarget;
-import sootup.core.graph.StmtGraph;
-import sootup.core.jimple.common.stmt.Stmt;
-import nl.uu.maze.execution.symbolic.PathConstraint.AliasConstraint;
 import nl.uu.maze.execution.symbolic.PathConstraint.CompositeConstraint;
+import nl.uu.maze.search.SearchStrategy;
 
 /**
  * Abstract class for search strategies that operate on concrete-driven DSE.
  */
-public abstract class ConcreteSearchStrategy implements SearchStrategy {
+public abstract class ConcreteSearchStrategy implements SearchStrategy<PathConditionCandidate> {
     private final Set<Integer> exploredPaths = new HashSet<>();
 
     /**
      * Add a candidate to the search strategy.
      * 
      * @param candidate The candidate to add
-     * @apiNote Use {@link #add(SymbolicState)} instead to derive path condition
-     *          candidates to add from a symbolic state
+     * @apiNote Use {@link #add(SymbolicState)} to derive path condition
+     *          candidates to add from a symbolic state instead
      */
     public abstract void add(PathConditionCandidate candidate);
 
@@ -64,13 +60,6 @@ public abstract class ConcreteSearchStrategy implements SearchStrategy {
 
         return true;
     }
-
-    /**
-     * Remove a path condition candidate from the search strategy.
-     * 
-     * @param candidate The candidate to remove
-     */
-    public abstract void remove(PathConditionCandidate candidate);
 
     /**
      * Get the next candidate to explore.
@@ -139,107 +128,5 @@ public abstract class ConcreteSearchStrategy implements SearchStrategy {
     // Subclasses can override this method if they do
     public boolean requiresCoverageData() {
         return false;
-    }
-
-    /**
-     * Represents a candidate for a path condition to be explored.
-     * A candidate consist of the path condition (a list of constraints) and the
-     * index of the constraint to negate.
-     * 
-     * @implNote The index is stored separately to apply the negation "lazily"
-     *           (i.e., only when the candidate is selected for exploration).
-     */
-    public static class PathConditionCandidate implements HeuristicTarget {
-        private List<PathConstraint> pathConstraints;
-        /** The index of the constraint to negate. */
-        private final int index;
-        /**
-         * The index of the new value to set an expr to when negating switch
-         * constraints.
-         */
-        private final int subIndex;
-
-        public PathConditionCandidate(List<PathConstraint> pathConstraints, int index) {
-            this(pathConstraints, index, -1);
-        }
-
-        public PathConditionCandidate(List<PathConstraint> pathConstraints, int index, int subIndex) {
-            this.pathConstraints = pathConstraints;
-            this.index = index;
-            this.subIndex = subIndex;
-        }
-
-        public List<PathConstraint> getPathConstraints() {
-            return pathConstraints;
-        }
-
-        public Stmt getStmt() {
-            return pathConstraints.get(index).getStmt();
-        }
-
-        public StmtGraph<?> getCFG() {
-            return pathConstraints.get(index).getCFG();
-        }
-
-        public int getDepth() {
-            return pathConstraints.get(index).getDepth();
-        }
-
-        public List<Integer> getNewCoverageDepths() {
-            return pathConstraints.get(index).getNewCoverageDepths();
-        }
-
-        public int getEstimatedQueryCost() {
-            int cost = 0;
-            for (int i = 0; i <= index; i++) {
-                cost += pathConstraints.get(i).getEstimatedCost();
-            }
-            return cost;
-        }
-
-        public int getCallDepth() {
-            return pathConstraints.get(index).getCallDepth();
-        }
-
-        /**
-         * Apply the negation to the constraint at the index.
-         */
-        public void applyNegation() {
-            PathConstraint constraint = pathConstraints.get(index);
-            AliasConstraint alias = constraint instanceof AliasConstraint ? (AliasConstraint) constraint : null;
-
-            // Only keep constraints up to the index we're negating
-            List<PathConstraint> newConstraints = new ArrayList<>(index + 1);
-            // Copy constraints before the negated one
-            for (int i = 0; i < index; i++) {
-                PathConstraint other = pathConstraints.get(i);
-                // Skip conflicting constraint when negating alias constraints
-                if (alias == null || !alias.isConflicting(other)) {
-                    newConstraints.add(other);
-                }
-            }
-
-            // Add the negated constraint (creates a new instance)
-            newConstraints.add(negateConstraint(constraint));
-
-            // Intentionally omit constraints after the negated one
-            // as they were derived assuming the non-negated version
-
-            pathConstraints = newConstraints;
-        }
-
-        private PathConstraint negateConstraint(PathConstraint constraint) {
-            return constraint instanceof CompositeConstraint ? ((CompositeConstraint) constraint).negate(subIndex)
-                    : ((SingleConstraint) constraint).negate();
-        }
-
-        @Override
-        public int hashCode() {
-            int result = 1;
-            for (PathConstraint constraint : pathConstraints) {
-                result = 31 * result + (constraint == null ? 0 : constraint.hashCode());
-            }
-            return result;
-        }
     }
 }

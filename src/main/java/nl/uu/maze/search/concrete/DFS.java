@@ -2,8 +2,6 @@ package nl.uu.maze.search.concrete;
 
 import java.util.Stack;
 
-import nl.uu.maze.search.ConcreteSearchStrategy;
-
 /**
  * Concrete-driven search strategy for Depth-First Search (DFS).
  */

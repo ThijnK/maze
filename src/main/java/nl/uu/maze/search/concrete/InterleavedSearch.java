@@ -2,8 +2,6 @@ package nl.uu.maze.search.concrete;
 
 import java.util.Arrays;
 
-import nl.uu.maze.search.ConcreteSearchStrategy;
-
 public class InterleavedSearch extends ConcreteSearchStrategy {
     private static final long STRATEGY_TIMEOUT = 1000;
 

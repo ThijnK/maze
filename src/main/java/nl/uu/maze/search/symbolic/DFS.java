@@ -3,7 +3,6 @@ package nl.uu.maze.search.symbolic;
 import java.util.Stack;
 
 import nl.uu.maze.execution.symbolic.SymbolicState;
-import nl.uu.maze.search.SymbolicSearchStrategy;
 
 /**
  * Symbolic-driven search strategy for Depth-First Search (DFS).

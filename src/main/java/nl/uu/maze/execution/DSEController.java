@@ -22,6 +22,8 @@ import nl.uu.maze.execution.symbolic.*;
 import nl.uu.maze.generation.JUnitTestGenerator;
 import nl.uu.maze.instrument.*;
 import nl.uu.maze.search.*;
+import nl.uu.maze.search.concrete.ConcreteSearchStrategy;
+import nl.uu.maze.search.symbolic.SymbolicSearchStrategy;
 import sootup.core.graph.StmtGraph;
 import sootup.java.core.JavaSootClass;
 import sootup.java.core.JavaSootMethod;
@@ -39,7 +41,7 @@ public class DSEController {
 
     private final boolean concreteDriven;
     private final Path outPath;
-    private final SearchStrategy searchStrategy;
+    private final SearchStrategy<?> searchStrategy;
     /** Search strategy used for symbolic replay of a trace (DFS). */
     private final SymbolicSearchStrategy replayStrategy;
     private final JavaAnalyzer analyzer;
@@ -75,7 +77,7 @@ public class DSEController {
      * @param strategyName   The name of the search strategy to use
      * @param outPath        The output path for the generated test cases
      */
-    public DSEController(String classPath, String className, boolean concreteDriven, SearchStrategy searchStrategy,
+    public DSEController(String classPath, String className, boolean concreteDriven, SearchStrategy<?> searchStrategy,
             String outPath)
             throws Exception {
         this.outPath = Path.of(outPath);

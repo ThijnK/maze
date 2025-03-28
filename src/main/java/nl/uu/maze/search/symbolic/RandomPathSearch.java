@@ -5,7 +5,6 @@ import java.util.Optional;
 import java.util.Random;
 
 import nl.uu.maze.execution.symbolic.SymbolicState;
-import nl.uu.maze.search.SymbolicSearchStrategy;
 import nl.uu.maze.util.Tree;
 import nl.uu.maze.util.Tree.TreeNode;
 
