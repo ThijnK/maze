@@ -21,7 +21,11 @@ public class SearchStrategyFactory {
     private final static Logger logger = LoggerFactory.getLogger(SearchStrategyFactory.class);
 
     private final static List<String> coverageOptimizedHeuristics = List.of("RecentCoverage", "DistanceToUncovered");
-    private final static List<String> coverageOptimizedWeights = List.of("0.5", "0.5");
+    private final static List<Double> coverageOptimizedWeights = List.of(0.5, 0.5);
+    private final static Set<String> validStrategies = Set.of("DepthFirst", "DepthFirstSearch", "DFS",
+            "BreadthFirst", "BreadthFirstSearch", "BFS", "Probabilistic", "ProbabilisticSearch", "PS",
+            "UniformRandom", "UniformRandomSearch", "URS", "CoverageOptimized", "CoverageOptimizedSearch", "COS",
+            "RandomPath", "RandomPathSearch", "RPS");
 
     /**
      * Creates a search strategy based on the given list of names and heuristics.
@@ -44,7 +48,7 @@ public class SearchStrategyFactory {
      * @return A search strategy
      */
     public static SearchStrategy<?> createStrategy(List<String> names, List<String> heuristicNames,
-            List<String> heuristicWeights,
+            List<Double> heuristicWeights,
             boolean concreteDriven) {
         return concreteDriven
                 ? createStrategy(names, heuristicNames, heuristicWeights, SearchStrategyFactory::createConcreteStrategy,
@@ -74,7 +78,7 @@ public class SearchStrategyFactory {
      * @return A search strategy
      */
     private static <T extends SearchStrategy<?>> T createStrategy(List<String> names, List<String> heuristicNames,
-            List<String> heuristicWeights, TriFunction<String, List<String>, List<String>, T> strategyFactory,
+            List<Double> heuristicWeights, TriFunction<String, List<String>, List<Double>, T> strategyFactory,
             Function<List<T>, T> interleavedCtor) {
         if (names.isEmpty()) {
             logger.warn("No search strategy provided, defaulting to DFS");
@@ -115,10 +119,11 @@ public class SearchStrategyFactory {
      * @return A symbolic search strategy
      */
     private static SymbolicSearchStrategy createSymbolicStrategy(String name, List<String> heuristicNames,
-            List<String> heuristicWeights) {
+            List<Double> heuristicWeights) {
         return switch (name) {
-            case "DFS" -> new nl.uu.maze.search.symbolic.DFS();
-            case "BFS" -> new nl.uu.maze.search.symbolic.BFS();
+            case "DepthFirst", "DepthFirstSearch", "DFS" -> new nl.uu.maze.search.symbolic.DFS();
+            case "BreadthFirst", "BreadthFirstSearch", "BFS" -> new nl.uu.maze.search.symbolic.BFS();
+            case "RandomPath", "RandomPathSearch", "RPS" -> new nl.uu.maze.search.symbolic.RandomPathSearch();
             case "Probabilistic", "ProbabilisticSearch", "PS" ->
                 new nl.uu.maze.search.symbolic.ProbabilisticSearch(
                         SearchHeuristicFactory.createHeuristics(heuristicNames, heuristicWeights));
@@ -150,10 +155,10 @@ public class SearchStrategyFactory {
      * @return A concrete search strategy
      */
     private static ConcreteSearchStrategy createConcreteStrategy(String name, List<String> heuristicNames,
-            List<String> heuristicWeights) {
+            List<Double> heuristicWeights) {
         return switch (name) {
-            case "DFS" -> new nl.uu.maze.search.concrete.DFS();
-            case "BFS" -> new nl.uu.maze.search.concrete.BFS();
+            case "DepthFirst", "DepthFirstSearch", "DFS" -> new nl.uu.maze.search.concrete.DFS();
+            case "BreadthFirst", "BreadthFirstSearch", "BFS" -> new nl.uu.maze.search.concrete.BFS();
             case "Probabilistic", "ProbabilisticSearch", "PS" ->
                 new nl.uu.maze.search.concrete.ProbabilisticSearch(
                         SearchHeuristicFactory.createHeuristics(heuristicNames, heuristicWeights));
@@ -171,5 +176,15 @@ public class SearchStrategyFactory {
                 yield new nl.uu.maze.search.concrete.DFS();
             }
         };
+    }
+
+    /**
+     * Checks if the given name is a valid search strategy.
+     * 
+     * @param name The name of the search strategy
+     * @return {@code true} if the name is valid, {@code false} otherwise
+     */
+    public static boolean isValidStrategy(String name) {
+        return validStrategies.contains(name);
     }
 }

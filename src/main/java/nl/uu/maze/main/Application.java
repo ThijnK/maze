@@ -6,6 +6,9 @@ import java.util.concurrent.Callable;
 import nl.uu.maze.execution.DSEController;
 import nl.uu.maze.search.SearchStrategy;
 import nl.uu.maze.search.SearchStrategyFactory;
+import nl.uu.maze.search.SearchStrategyValidator;
+import nl.uu.maze.search.heuristic.SearchHeuristicValidator;
+import nl.uu.maze.search.heuristic.SearchHeuristicWeightConverter;
 import nl.uu.maze.util.Z3ContextProvider;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
@@ -32,16 +35,16 @@ public class Application implements Callable<Integer> {
     private boolean concreteDriven;
 
     @Option(names = { "-s",
-            "--strategy" }, description = "Search strategy (BFS, DFS, etc.)", defaultValue = "DFS", split = ",", arity = "1..*")
+            "--strategy" }, description = "One or multiple of the available search strategies (BFS, DFS, etc.)", defaultValue = "DFS", split = ",", arity = "1..*", converter = SearchStrategyValidator.class)
     private List<String> searchStrategies;
 
     @Option(names = { "-hu",
-            "--heuristics" }, description = "Comma separated list of heuristics for probabilistic search", defaultValue = "Uniform", split = ",", arity = "1..*")
+            "--heuristic" }, description = "One or multiple of the available search heuristics to use for probabilistic search", defaultValue = "Uniform", split = ",", arity = "1..*", converter = SearchHeuristicValidator.class)
     private List<String> searchHeuristics;
 
     @Option(names = { "-hw",
-            "--weights" }, description = "Comma separated list of heuristic weights for probabilistic search", defaultValue = "1.0", split = ",", arity = "1..*")
-    private List<String> heuristicWeights;
+            "--weight" }, description = "Weights to use for the provided search heuristics", defaultValue = "1.0", split = ",", arity = "1..*", converter = SearchHeuristicWeightConverter.class)
+    private List<Double> heuristicWeights;
 
     @Override
     public Integer call() {

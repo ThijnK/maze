@@ -2,6 +2,7 @@ package nl.uu.maze.search.heuristic;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,6 +14,13 @@ import org.slf4j.LoggerFactory;
  */
 public class SearchHeuristicFactory {
     private final static Logger logger = LoggerFactory.getLogger(SearchHeuristicFactory.class);
+    private final static Set<String> validHeuristics = Set.of(
+            "UniformHeuristic", "Uniform", "UH",
+            "DistanceToUncoveredHeuristic", "DistanceToUncovered", "DTUH",
+            "RecentCoverageHeuristic", "RecentCoverage", "RCH",
+            "DepthHeuristic", "Depth", "DH",
+            "QueryCostHeuristic", "QueryCost", "QCH",
+            "CallDepthHeuristic", "CallDepth", "CDH");
 
     /**
      * Creates a search heuristic based on the given name and weight.
@@ -47,7 +55,7 @@ public class SearchHeuristicFactory {
      * @throws IllegalArgumentException If a weight is not positive
      * @see #createHeuristic(String, String)
      */
-    public static List<SearchHeuristic> createHeuristics(List<String> names, List<String> weights) {
+    public static List<SearchHeuristic> createHeuristics(List<String> names, List<Double> weights) {
         List<SearchHeuristic> heuristics = new ArrayList<>(names.size());
         if (names.isEmpty()) {
             logger.warn("No search heuristics provided, using default Uniform heuristic with weight 1.0");
@@ -56,8 +64,7 @@ public class SearchHeuristicFactory {
 
         for (int i = 0; i < names.size(); i++) {
             try {
-                String weightString = weights.size() >= i + 1 ? weights.get(i) : "";
-                double weight = weightString.isEmpty() ? 1.0 : Double.parseDouble(weightString);
+                double weight = weights.size() >= i + 1 ? weights.get(i) : 1.0;
                 if (weight <= 0) {
                     throw new IllegalArgumentException("Weight must be positive");
                 }
@@ -67,5 +74,15 @@ public class SearchHeuristicFactory {
             }
         }
         return heuristics;
+    }
+
+    /**
+     * Checks if the given heuristic name is valid.
+     * 
+     * @param name The name of the search heuristic
+     * @return True if the name is valid, false otherwise
+     */
+    public static boolean isValidHeuristic(String name) {
+        return validHeuristics.contains(name.trim());
     }
 }
