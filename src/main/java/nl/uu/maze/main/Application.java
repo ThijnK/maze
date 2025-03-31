@@ -3,6 +3,10 @@ package nl.uu.maze.main;
 import java.util.List;
 import java.util.concurrent.Callable;
 
+import org.slf4j.LoggerFactory;
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.Level;
+
 import nl.uu.maze.execution.DSEController;
 import nl.uu.maze.search.SearchStrategy;
 import nl.uu.maze.search.SearchStrategyFactory;
@@ -12,7 +16,9 @@ import nl.uu.maze.search.heuristic.SearchHeuristicFactory.ValidSearchHeuristic;
 import nl.uu.maze.util.Z3ContextProvider;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
+import picocli.CommandLine.ITypeConverter;
 import picocli.CommandLine.Option;
+import picocli.CommandLine.TypeConversionException;
 
 /**
  * The main class of the application.
@@ -48,9 +54,17 @@ public class Application implements Callable<Integer> {
             "--weight" }, description = "Weights to use for the provided search heuristics (default: ${DEFAULT-VALUE})", defaultValue = "1.0", split = ",", arity = "1..*", converter = SearchHeuristicWeightConverter.class, paramLabel = "<double>")
     private List<Double> heuristicWeights;
 
+    @Option(names = { "-l",
+            "--logLevel" }, description = "Log level (default: ${DEFAULT-VALUE}, options: ${COMPLETION_CANDIDATES})", defaultValue = "INFO", paramLabel = "<level>", converter = LogLevelConverter.class)
+    private Level logLevel;
+
     @Override
     public Integer call() {
         try {
+            // Set logging level
+            Logger rootLogger = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
+            rootLogger.setLevel(logLevel);
+
             List<String> searchStrategies = this.searchStrategies.stream().map(ValidSearchStrategy::name).toList();
             List<String> searchHeuristics = this.searchHeuristics.stream().map(ValidSearchHeuristic::name).toList();
             SearchStrategy<?> strategy = SearchStrategyFactory.createStrategy(
@@ -70,5 +84,21 @@ public class Application implements Callable<Integer> {
     public static void main(String[] args) {
         int exitCode = new CommandLine(new Application()).execute(args);
         System.exit(exitCode);
+    }
+
+    /**
+     * Type converter for the log level option.
+     */
+    public static class LogLevelConverter implements ITypeConverter<Level> {
+        @Override
+        public Level convert(String value) throws Exception {
+            Level level = Level.toLevel(value.toUpperCase());
+            if (level.equals(Level.DEBUG) && !value.equalsIgnoreCase("DEBUG")) {
+                throw new TypeConversionException(
+                        "expected one of [DEBUG, INFO, WARN, ERROR, TRACE, OFF] (case-insensitive) but was '" + value
+                                + "'");
+            }
+            return level;
+        }
     }
 }
