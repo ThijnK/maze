@@ -1,53 +1,65 @@
 package nl.uu.maze.main;
 
+import java.util.concurrent.Callable;
+
 import nl.uu.maze.execution.DSEController;
 import nl.uu.maze.search.SearchStrategy;
 import nl.uu.maze.search.SearchStrategyFactory;
 import nl.uu.maze.util.Z3ContextProvider;
+import picocli.CommandLine;
+import picocli.CommandLine.Command;
+import picocli.CommandLine.Option;
 
 /**
  * The main class of the application.
- * 
- * <p>
- * To run the application, execute the following command:
- * 
- * <pre>
- * mvn clean install exec:java
- * </pre>
- * </p>
- * 
- * <p>
- * To specify a search strategy, execute the following command:
- * 
- * <pre>
- * mvn clean install exec:java -Dexec.args="DFS"
- * </pre>
- * </p>
  */
-public class Application {
-    // Temporary specification of which class to run the app on
-    private static final String classPath = "target/classes";
-    private static final String className = "nl.uu.maze.example.ExampleClass";
-    private static final String outPath = "src/test/java";
-    private static final boolean concreteDriven = false;
-    private static final String defaultSearchStrategy = "BFS";
-    // Comma separated list of heuristics to use for probabilistic search
-    private static final String searchHeuristics = "CDH, DTUH";
-    // Comma separated list of weights for the heuristics
-    private static final String heuristicWeights = "0.4, 0.6";
+@Command(name = "maze", mixinStandardHelpOptions = true, version = "maze 1.0", description = "Run the Maze dynamic symbolic execution engine.", sortOptions = false)
+public class Application implements Callable<Integer> {
 
-    public static void main(String[] args) {
+    @Option(names = { "-cp", "--classPath" }, description = "Path to compiled classes", defaultValue = "target/classes")
+    private String classPath;
+
+    @Option(names = { "-cn",
+            "--className" }, description = "Fully qualified name of the class to run", defaultValue = "nl.uu.maze.example.ExampleClass")
+    private String className;
+
+    @Option(names = { "-o", "--outPath" }, description = "Output path for test files", defaultValue = "src/test/java")
+    private String outPath;
+
+    @Option(names = { "-cd",
+            "--concreteDriven" }, description = "Enable concrete driven execution", defaultValue = "false")
+    private boolean concreteDriven;
+
+    @Option(names = { "-s", "--strategy" }, description = "Search strategy (BFS, DFS, etc.)", defaultValue = "DFS")
+    private String searchStrategy;
+
+    @Option(names = { "-hu",
+            "--heuristics" }, description = "Comma separated list of heuristics for probabilistic search", defaultValue = "Uniform")
+    private String searchHeuristics;
+
+    @Option(names = { "-hw",
+            "--weights" }, description = "Comma separated list of heuristic weights for probabilistic search", defaultValue = "1.0")
+    private String heuristicWeights;
+
+    @Override
+    public Integer call() {
         try {
-            String strategyName = args.length > 0 ? args[0] : defaultSearchStrategy;
-            SearchStrategy<?> strategy = SearchStrategyFactory.createStrategy(strategyName,
-                    searchHeuristics, heuristicWeights, concreteDriven);
-            DSEController controller = new DSEController(classPath, className,
-                    concreteDriven, strategy, outPath);
+            SearchStrategy<?> strategy = SearchStrategyFactory.createStrategy(
+                    searchStrategy, searchHeuristics, heuristicWeights, concreteDriven);
+            DSEController controller = new DSEController(
+                    classPath, className, concreteDriven, strategy, outPath);
             controller.run();
+            return 0;
         } catch (Exception e) {
             e.printStackTrace();
+            return 1;
         } finally {
             Z3ContextProvider.close();
         }
+    }
+
+    public static void main(String[] args) {
+        int exitCode = new CommandLine(new Application()).execute(args);
+        System.exit(exitCode);
     }
 }
