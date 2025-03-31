@@ -2,7 +2,6 @@ package nl.uu.maze.search.heuristic;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,13 +13,6 @@ import org.slf4j.LoggerFactory;
  */
 public class SearchHeuristicFactory {
     private final static Logger logger = LoggerFactory.getLogger(SearchHeuristicFactory.class);
-    private final static Set<String> validHeuristics = Set.of(
-            "UniformHeuristic", "Uniform", "UH",
-            "DistanceToUncoveredHeuristic", "DistanceToUncovered", "DTUH",
-            "RecentCoverageHeuristic", "RecentCoverage", "RCH",
-            "DepthHeuristic", "Depth", "DH",
-            "QueryCostHeuristic", "QueryCost", "QCH",
-            "CallDepthHeuristic", "CallDepth", "CDH");
 
     /**
      * Creates a search heuristic based on the given name and weight.
@@ -33,13 +25,13 @@ public class SearchHeuristicFactory {
      */
     public static SearchHeuristic createHeuristic(String name, double weight) {
         return switch (name.trim()) {
-            case "UniformHeuristic", "Uniform", "UH" -> new UniformHeuristic();
-            case "DistanceToUncoveredHeuristic", "DistanceToUncovered", "DTUH" ->
+            case "Uniform", "UniformHeuristic", "UH" -> new UniformHeuristic();
+            case "DistanceToUncovered", "DistanceToUncoveredHeuristic", "DTUH" ->
                 new DistanceToUncoveredHeuristic(weight);
-            case "RecentCoverageHeuristic", "RecentCoverage", "RCH" -> new RecentCoverageHeuristic(weight);
-            case "DepthHeuristic", "Depth", "DH" -> new DepthHeuristic(weight);
-            case "QueryCostHeuristic", "QueryCost", "QCH" -> new QueryCostHeuristic(weight);
-            case "CallDepthHeuristic", "CallDepth", "CDH" -> new CallDepthHeuristic(weight);
+            case "RecentCoverage", "RecentCoverageHeuristic", "RCH" -> new RecentCoverageHeuristic(weight);
+            case "Depth", "DepthHeuristic", "DH" -> new DepthHeuristic(weight);
+            case "QueryCost", "QueryCostHeuristic", "QCH" -> new QueryCostHeuristic(weight);
+            case "CallDepth", "CallDepthHeuristic", "CDH" -> new CallDepthHeuristic(weight);
             default -> throw new IllegalArgumentException("Unknown search heuristic: " + name);
         };
     }
@@ -77,12 +69,15 @@ public class SearchHeuristicFactory {
     }
 
     /**
-     * Checks if the given heuristic name is valid.
-     * 
-     * @param name The name of the search heuristic
-     * @return True if the name is valid, false otherwise
+     * Enum representing the valid search heuristics.
+     * This enum is used for validation in the command line interface.
      */
-    public static boolean isValidHeuristic(String name) {
-        return validHeuristics.contains(name.trim());
+    public static enum ValidSearchHeuristic {
+        Uniform, UniformHeuristic, UH,
+        DistanceToUncovered, DistanceToUncoveredHeuristic, DTUH,
+        RecentCoverage, RecentCoverageHeuristic, RCH,
+        Depth, DepthHeuristic, DH,
+        QueryCost, QueryCostHeuristic, QCH,
+        CallDepth, CallDepthHeuristic, CDH;
     }
 }

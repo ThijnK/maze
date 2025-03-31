@@ -22,10 +22,6 @@ public class SearchStrategyFactory {
 
     private final static List<String> coverageOptimizedHeuristics = List.of("RecentCoverage", "DistanceToUncovered");
     private final static List<Double> coverageOptimizedWeights = List.of(0.5, 0.5);
-    private final static Set<String> validStrategies = Set.of("DepthFirst", "DepthFirstSearch", "DFS",
-            "BreadthFirst", "BreadthFirstSearch", "BFS", "Probabilistic", "ProbabilisticSearch", "PS",
-            "UniformRandom", "UniformRandomSearch", "URS", "CoverageOptimized", "CoverageOptimizedSearch", "COS",
-            "RandomPath", "RandomPathSearch", "RPS");
 
     /**
      * Creates a search strategy based on the given list of names and heuristics.
@@ -179,12 +175,15 @@ public class SearchStrategyFactory {
     }
 
     /**
-     * Checks if the given name is a valid search strategy.
-     * 
-     * @param name The name of the search strategy
-     * @return {@code true} if the name is valid, {@code false} otherwise
+     * Enum representing valid search strategies.
+     * This enum is used for validation in the command line interface.
      */
-    public static boolean isValidStrategy(String name) {
-        return validStrategies.contains(name);
+    public static enum ValidSearchStrategy {
+        DepthFirst, DepthFirstSearch, DFS,
+        BreadthFirst, BreadthFirstSearch, BFS,
+        Probabilistic, ProbabilisticSearch, PS,
+        UniformRandom, UniformRandomSearch, URS,
+        CoverageOptimized, CoverageOptimizedSearch, COS,
+        RandomPath, RandomPathSearch, RPS;
     }
 }
