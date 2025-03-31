@@ -61,7 +61,7 @@ public class SearchStrategyFactory {
             Set<String> uniqueStrategies = new HashSet<>();
             List<SymbolicSearchStrategy> strategies = new java.util.ArrayList<>();
             for (String n : names) {
-                SymbolicSearchStrategy strategy = createSymbolicStrategy(n, heuristicNames, heuristicWeights);
+                SymbolicSearchStrategy strategy = createSymbolicStrategy(n.trim(), heuristicNames, heuristicWeights);
                 if (uniqueStrategies.add(strategy.getName())) {
                     strategies.add(strategy);
                 }
