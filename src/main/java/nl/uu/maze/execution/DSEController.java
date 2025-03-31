@@ -23,6 +23,7 @@ import nl.uu.maze.generation.JUnitTestGenerator;
 import nl.uu.maze.instrument.*;
 import nl.uu.maze.search.*;
 import nl.uu.maze.search.concrete.ConcreteSearchStrategy;
+import nl.uu.maze.search.symbolic.DFS;
 import nl.uu.maze.search.symbolic.SymbolicSearchStrategy;
 import sootup.core.graph.StmtGraph;
 import sootup.java.core.JavaSootClass;
@@ -84,7 +85,7 @@ public class DSEController {
         this.concreteDriven = concreteDriven;
         this.instrumented = concreteDriven ? BytecodeInstrumentation.instrument(classPath, className) : null;
         this.searchStrategy = searchStrategy;
-        this.replayStrategy = SearchStrategyFactory.createSymbolicStrategy("DFS");
+        this.replayStrategy = new DFS();
 
         this.analyzer = new JavaAnalyzer(classPath, instrumented != null ? instrumented.getClassLoader() : null);
         JavaClassType classType = analyzer.getClassType(className);

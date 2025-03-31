@@ -1,6 +1,7 @@
 package nl.uu.maze.search.symbolic;
 
 import java.util.Arrays;
+import java.util.List;
 
 import nl.uu.maze.execution.symbolic.SymbolicState;
 
@@ -11,11 +12,11 @@ public class InterleavedSearch extends SymbolicSearchStrategy {
     private int currentStrategyIndex = 0;
     private long currentStrategyStartTime = 0;
 
-    public InterleavedSearch(SymbolicSearchStrategy... strategies) {
-        if (strategies.length == 0) {
+    public InterleavedSearch(List<SymbolicSearchStrategy> strategies) {
+        if (strategies.size() == 0) {
             throw new IllegalArgumentException("At least one strategy must be provided");
         }
-        this.strategies = strategies;
+        this.strategies = strategies.toArray(SymbolicSearchStrategy[]::new);
     }
 
     public String getName() {

@@ -25,45 +25,45 @@ public class SearchHeuristicFactory {
      */
     public static SearchHeuristic createHeuristic(String name, double weight) {
         return switch (name.trim()) {
-            case "UniformHeuristic", "Uniform", "UH" -> new nl.uu.maze.search.heuristic.UniformHeuristic();
+            case "UniformHeuristic", "Uniform", "UH" -> new UniformHeuristic();
             case "DistanceToUncoveredHeuristic", "DistanceToUncovered", "DTUH" ->
-                new nl.uu.maze.search.heuristic.DistanceToUncoveredHeuristic(weight);
-            case "RecentCoverageHeuristic", "RecentCoverage", "RCH" ->
-                new nl.uu.maze.search.heuristic.RecentCoverageHeuristic(weight);
-            case "DepthHeuristic", "Depth", "DH" -> new nl.uu.maze.search.heuristic.DepthHeuristic(weight);
-            case "QueryCostHeuristic", "QueryCost", "QCH" -> new nl.uu.maze.search.heuristic.QueryCostHeuristic(weight);
-            case "CallDepthHeuristic", "CallDepth", "CDH" -> new nl.uu.maze.search.heuristic.CallDepthHeuristic(weight);
+                new DistanceToUncoveredHeuristic(weight);
+            case "RecentCoverageHeuristic", "RecentCoverage", "RCH" -> new RecentCoverageHeuristic(weight);
+            case "DepthHeuristic", "Depth", "DH" -> new DepthHeuristic(weight);
+            case "QueryCostHeuristic", "QueryCost", "QCH" -> new QueryCostHeuristic(weight);
+            case "CallDepthHeuristic", "CallDepth", "CDH" -> new CallDepthHeuristic(weight);
             default -> throw new IllegalArgumentException("Unknown search heuristic: " + name);
         };
     }
 
     /**
-     * Creates an array of search heuristics based on the given names and weights.
+     * Creates a list of search heuristics based on the given names and weights.
+     * Defaults to the Uniform heuristic with weight 1.0 if no names are provided.
      * 
-     * @param namesString   The names of the search heuristics as a comma-separated
-     *                      string
-     * @param weightsString The weights of the search heuristics as a
-     *                      comma-separated
-     *                      string
+     * @param names   The names of the search heuristics
+     * @param weights The weights of the search heuristics
      * @return An array of search heuristics
      * @throws NumberFormatException    If a weight is not a valid double
      * @throws IllegalArgumentException If a weight is not positive
      * @see #createHeuristic(String, String)
      */
-    public static List<SearchHeuristic> createHeuristics(String namesString, String weightsString) {
-        String[] names = namesString.split(",");
-        String[] weights = weightsString.split(",");
-        List<SearchHeuristic> heuristics = new ArrayList<>(names.length);
-        for (int i = 0; i < names.length; i++) {
+    public static List<SearchHeuristic> createHeuristics(List<String> names, List<String> weights) {
+        List<SearchHeuristic> heuristics = new ArrayList<>(names.size());
+        if (names.isEmpty()) {
+            logger.warn("No search heuristics provided, using default Uniform heuristic with weight 1.0");
+            return List.of(new UniformHeuristic());
+        }
+
+        for (int i = 0; i < names.size(); i++) {
             try {
-                String weightString = weights.length >= i + 1 ? weights[i] : "";
+                String weightString = weights.size() >= i + 1 ? weights.get(i) : "";
                 double weight = weightString.isEmpty() ? 1.0 : Double.parseDouble(weightString);
                 if (weight <= 0) {
                     throw new IllegalArgumentException("Weight must be positive");
                 }
-                heuristics.add(createHeuristic(names[i], weight));
+                heuristics.add(createHeuristic(names.get(i), weight));
             } catch (IllegalArgumentException e) {
-                logger.warn("Unknown search heuristic: {}, skipping", names[i]);
+                logger.warn("Unknown search heuristic: {}, skipping", names.get(i));
             }
         }
         return heuristics;

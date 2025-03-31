@@ -1,6 +1,7 @@
 package nl.uu.maze.search.concrete;
 
 import java.util.Arrays;
+import java.util.List;
 
 public class InterleavedSearch extends ConcreteSearchStrategy {
     private static final long STRATEGY_TIMEOUT = 1000;
@@ -9,11 +10,11 @@ public class InterleavedSearch extends ConcreteSearchStrategy {
     private int currentStrategyIndex = 0;
     private long currentStrategyStartTime = 0;
 
-    public InterleavedSearch(ConcreteSearchStrategy... strategies) {
-        if (strategies.length == 0) {
+    public InterleavedSearch(List<ConcreteSearchStrategy> strategies) {
+        if (strategies.size() == 0) {
             throw new IllegalArgumentException("At least one strategy must be provided");
         }
-        this.strategies = strategies;
+        this.strategies = strategies.toArray(ConcreteSearchStrategy[]::new);
     }
 
     public String getName() {

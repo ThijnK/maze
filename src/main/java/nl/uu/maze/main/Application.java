@@ -1,5 +1,6 @@
 package nl.uu.maze.main;
 
+import java.util.List;
 import java.util.concurrent.Callable;
 
 import nl.uu.maze.execution.DSEController;
@@ -30,22 +31,23 @@ public class Application implements Callable<Integer> {
             "--concreteDriven" }, description = "Enable concrete driven execution", defaultValue = "false")
     private boolean concreteDriven;
 
-    @Option(names = { "-s", "--strategy" }, description = "Search strategy (BFS, DFS, etc.)", defaultValue = "DFS")
-    private String searchStrategy;
+    @Option(names = { "-s",
+            "--strategy" }, description = "Search strategy (BFS, DFS, etc.)", defaultValue = "DFS", split = ",", arity = "1..*")
+    private List<String> searchStrategies;
 
     @Option(names = { "-hu",
-            "--heuristics" }, description = "Comma separated list of heuristics for probabilistic search", defaultValue = "Uniform")
-    private String searchHeuristics;
+            "--heuristics" }, description = "Comma separated list of heuristics for probabilistic search", defaultValue = "Uniform", split = ",", arity = "1..*")
+    private List<String> searchHeuristics;
 
     @Option(names = { "-hw",
-            "--weights" }, description = "Comma separated list of heuristic weights for probabilistic search", defaultValue = "1.0")
-    private String heuristicWeights;
+            "--weights" }, description = "Comma separated list of heuristic weights for probabilistic search", defaultValue = "1.0", split = ",", arity = "1..*")
+    private List<String> heuristicWeights;
 
     @Override
     public Integer call() {
         try {
             SearchStrategy<?> strategy = SearchStrategyFactory.createStrategy(
-                    searchStrategy, searchHeuristics, heuristicWeights, concreteDriven);
+                    searchStrategies, searchHeuristics, heuristicWeights, concreteDriven);
             DSEController controller = new DSEController(
                     classPath, className, concreteDriven, strategy, outPath);
             controller.run();
