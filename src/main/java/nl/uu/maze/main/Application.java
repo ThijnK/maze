@@ -20,30 +20,32 @@ import picocli.CommandLine.Option;
 @Command(name = "maze", mixinStandardHelpOptions = true, version = "maze 1.0", description = "Run the Maze dynamic symbolic execution engine.", sortOptions = false)
 public class Application implements Callable<Integer> {
 
-    @Option(names = { "-cp", "--classPath" }, description = "Path to compiled classes", defaultValue = "target/classes")
+    @Option(names = { "-cp",
+            "--classPath" }, description = "Path to compiled classes", defaultValue = "target/classes", paramLabel = "<path>")
     private String classPath;
 
     @Option(names = { "-cn",
-            "--className" }, description = "Fully qualified name of the class to run", defaultValue = "nl.uu.maze.example.ExampleClass")
+            "--className" }, description = "Fully qualified name of the class to run", defaultValue = "nl.uu.maze.example.ExampleClass", paramLabel = "<class>")
     private String className;
 
-    @Option(names = { "-o", "--outPath" }, description = "Output path for test files", defaultValue = "src/test/java")
+    @Option(names = { "-o",
+            "--outPath" }, description = "Output path for test files", defaultValue = "src/test/java", paramLabel = "<path>")
     private String outPath;
 
     @Option(names = { "-cd",
-            "--concreteDriven" }, description = "Enable concrete driven execution", defaultValue = "false")
+            "--concreteDriven" }, description = "Enable concrete driven execution", defaultValue = "false", paramLabel = "<true|false>")
     private boolean concreteDriven;
 
     @Option(names = { "-s",
-            "--strategy" }, description = "One or multiple of the available search strategies (BFS, DFS, etc.)", defaultValue = "DFS", split = ",", arity = "1..*", converter = SearchStrategyValidator.class)
+            "--strategy" }, description = "One or multiple of the available search strategies (BFS, DFS, etc.)", defaultValue = "DFS", split = ",", arity = "1..*", converter = SearchStrategyValidator.class, paramLabel = "<name>")
     private List<String> searchStrategies;
 
     @Option(names = { "-hu",
-            "--heuristic" }, description = "One or multiple of the available search heuristics to use for probabilistic search", defaultValue = "Uniform", split = ",", arity = "1..*", converter = SearchHeuristicValidator.class)
+            "--heuristic" }, description = "One or multiple of the available search heuristics to use for probabilistic search", defaultValue = "Uniform", split = ",", arity = "1..*", converter = SearchHeuristicValidator.class, paramLabel = "<name>")
     private List<String> searchHeuristics;
 
     @Option(names = { "-hw",
-            "--weight" }, description = "Weights to use for the provided search heuristics", defaultValue = "1.0", split = ",", arity = "1..*", converter = SearchHeuristicWeightConverter.class)
+            "--weight" }, description = "Weights to use for the provided search heuristics", defaultValue = "1.0", split = ",", arity = "1..*", converter = SearchHeuristicWeightConverter.class, paramLabel = "<double>")
     private List<Double> heuristicWeights;
 
     @Override
