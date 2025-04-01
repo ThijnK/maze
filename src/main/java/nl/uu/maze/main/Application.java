@@ -11,7 +11,6 @@ import nl.uu.maze.execution.DSEController;
 import nl.uu.maze.search.SearchStrategy;
 import nl.uu.maze.search.SearchStrategyFactory;
 import nl.uu.maze.search.SearchStrategyFactory.ValidSearchStrategy;
-import nl.uu.maze.search.heuristic.SearchHeuristicWeightConverter;
 import nl.uu.maze.search.heuristic.SearchHeuristicFactory.ValidSearchHeuristic;
 import nl.uu.maze.util.Z3ContextProvider;
 import picocli.CommandLine;
@@ -101,4 +100,24 @@ public class Application implements Callable<Integer> {
             return level;
         }
     }
+
+    /**
+     * Type converter for double values representing heuristic weights.
+     */
+    public static class SearchHeuristicWeightConverter implements ITypeConverter<Double> {
+        @Override
+        public Double convert(String value) throws Exception {
+            try {
+                double doubleValue = Double.parseDouble(value);
+                if (Double.parseDouble(value) <= 0) {
+                    throw new TypeConversionException(
+                            "Heuristic weight must be a positive double: " + value);
+                }
+                return doubleValue;
+            } catch (NumberFormatException e) {
+                throw new TypeConversionException("Heuristic weight must be a valid double: " + value);
+            }
+        }
+    }
+
 }
