@@ -53,6 +53,10 @@ public class Application implements Callable<Integer> {
             "--weight" }, description = "Weights to use for the provided search heuristics (default: ${DEFAULT-VALUE})", defaultValue = "1.0", split = ",", arity = "1..*", converter = SearchHeuristicWeightConverter.class, paramLabel = "<double>")
     private List<Double> heuristicWeights;
 
+    @Option(names = { "-d",
+            "--maxDepth" }, description = "Maximum depth of the search (default: ${DEFAULT-VALUE})", defaultValue = "50", paramLabel = "<int>")
+    private int maxDepth;
+
     @Option(names = { "-l",
             "--logLevel" }, description = "Log level (default: ${DEFAULT-VALUE}, options: ${COMPLETION_CANDIDATES})", defaultValue = "INFO", paramLabel = "<level>", converter = LogLevelConverter.class)
     private Level logLevel;
@@ -69,7 +73,7 @@ public class Application implements Callable<Integer> {
             SearchStrategy<?> strategy = SearchStrategyFactory.createStrategy(
                     searchStrategies, searchHeuristics, heuristicWeights, concreteDriven);
             DSEController controller = new DSEController(
-                    classPath, className, concreteDriven, strategy, outPath);
+                    classPath, className, concreteDriven, strategy, outPath, maxDepth);
             controller.run();
             return 0;
         } catch (Exception e) {

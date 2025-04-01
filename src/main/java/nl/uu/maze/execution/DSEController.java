@@ -38,8 +38,7 @@ public class DSEController {
     private static final Logger logger = LoggerFactory.getLogger(DSEController.class);
 
     /** Max path length for symbolic execution */
-    private final int MAX_DEPTH = 40;
-
+    private final int maxDepth;
     private final boolean concreteDriven;
     private final Path outPath;
     private final SearchStrategy<?> searchStrategy;
@@ -77,11 +76,13 @@ public class DSEController {
      * @param concreteDriven Whether to use concrete-driven DSE (otherwise symbolic)
      * @param strategyName   The name of the search strategy to use
      * @param outPath        The output path for the generated test cases
+     * @param maxDepth       The maximum depth for symbolic execution
      */
     public DSEController(String classPath, String className, boolean concreteDriven, SearchStrategy<?> searchStrategy,
-            String outPath)
+            String outPath, int maxDepth)
             throws Exception {
         this.outPath = Path.of(outPath);
+        this.maxDepth = maxDepth;
         this.concreteDriven = concreteDriven;
         this.instrumented = concreteDriven ? BytecodeInstrumentation.instrument(classPath, className) : null;
         this.searchStrategy = searchStrategy;
@@ -207,7 +208,7 @@ public class DSEController {
         while ((current = searchStrategy.next()) != null) {
             logger.debug("Current state: {}", current);
             logger.debug("Next stmt: {}", current.getStmt());
-            if (!current.isCtorState() && current.isFinalState() || current.getDepth() >= MAX_DEPTH) {
+            if (!current.isCtorState() && current.isFinalState() || current.getDepth() >= maxDepth) {
                 if (!current.isInfeasible())
                     finalStates.add(current.returnToRootCaller());
                 searchStrategy.remove(current);
