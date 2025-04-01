@@ -9,15 +9,6 @@ import java.util.Map;
 public class BytecodeClassLoader extends ClassLoader {
     private final Map<String, Class<?>> classes = new HashMap<>();
 
-    /**
-     * Register a class that is already loaded in the JVM to this class loader
-     * 
-     * @param clazz The class to register
-     */
-    public void registerClass(Class<?> clazz) {
-        classes.put(clazz.getName(), clazz);
-    }
-
     @Override
     protected Class<?> findClass(String name) throws ClassNotFoundException {
         Class<?> clazz = classes.get(name);
@@ -25,13 +16,20 @@ public class BytecodeClassLoader extends ClassLoader {
     }
 
     /**
-     * Define a class from a byte array.
+     * Add a class from a byte array.
      * 
      * @param name       The name of the class
      * @param classBytes The byte array containing the class data
      * @return The defined class
      */
-    public Class<?> defineClass(String name, byte[] classBytes) {
-        return defineClass(name, classBytes, 0, classBytes.length);
+    public Class<?> addClass(String name, byte[] classBytes) {
+        if (classes.containsKey(name)) {
+            return classes.get(name);
+        }
+
+        Class<?> clazz = defineClass(name, classBytes, 0, classBytes.length);
+        resolveClass(clazz);
+        classes.put(name, clazz);
+        return clazz;
     }
 }

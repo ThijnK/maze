@@ -98,13 +98,14 @@ public class TraceManager {
      * descriptor.
      * This is used to identify methods in the {@link #traceEntries} map.
      * 
-     * @param className  The fully qualified name of the class
-     * @param methodName The name of the method
-     * @param descriptor The descriptor of the method
+     * @param resourcePath The resource path of the class (e.g.,
+     *                     "com/example/MyClass")
+     * @param methodName   The name of the method
+     * @param descriptor   The descriptor of the method
      * @return The method signature
      */
-    public static String buildMethodSignature(String className, String methodName, String descriptor) {
-        return "<" + className + ": " + methodName + descriptor + ">";
+    public static String buildMethodSignature(String resourcePath, String methodName, String descriptor) {
+        return "<" + resourcePath + ": " + methodName + descriptor + ">";
     }
 
     /**
