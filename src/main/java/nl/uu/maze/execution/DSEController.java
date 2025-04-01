@@ -104,7 +104,13 @@ public class DSEController {
      *
      */
     public void run() throws Exception {
+        logger.info("Running {} DSE on class: {}", concreteDriven ? "concrete-driven" : "symbolic-driven",
+                clazz.getSimpleName());
         logger.info("Using search strategy: {}", searchStrategy.getName());
+
+        logger.debug("Max depth: {}", maxDepth);
+        logger.debug("Output path: {}", outPath);
+
         Set<JavaSootMethod> methods = sootClass.getMethods();
         // Regex pattern to match non-standard method names (e.g., <init>, <clinit>)
         Pattern pattern = Pattern.compile("<[^>]+>");
