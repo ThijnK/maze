@@ -5,21 +5,21 @@ public interface SearchStrategy<T> {
     /**
      * Returns the full name of this search strategy.
      */
-    public String getName();
+    String getName();
 
     /**
      * Add an item to the search strategy.
      * 
      * @param item The new item to add
      */
-    public void add(T item);
+    void add(T item);
 
     /**
-     * Remove a item from the search strategy.
+     * Remove an item from the search strategy.
      * 
      * @param item The item to remove
      */
-    public void remove(T item);
+    void remove(T item);
 
     /**
      * Get the next item to explore.
@@ -27,13 +27,13 @@ public interface SearchStrategy<T> {
      * @return The next item to explore, or null if there are no more items to
      *         explore
      */
-    public T next();
+    T next();
 
     /**
      * Reset the search strategy to its initial state.
      */
-    public void reset();
+    void reset();
 
     /** Whether this search strategy requires data about statement coverage. */
-    public boolean requiresCoverageData();
+    boolean requiresCoverageData();
 }

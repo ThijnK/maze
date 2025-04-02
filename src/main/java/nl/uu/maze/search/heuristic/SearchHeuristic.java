@@ -7,8 +7,8 @@ import sootup.core.graph.StmtGraph;
 import sootup.core.jimple.common.stmt.Stmt;
 
 /**
- * Search heuristics that are used in {@link ProbabilisticSearch} to determine a
- * probabiliy of selecting a target.
+ * Search heuristics that are used in probabilistic search to determine a
+ * probability of selecting a target.
  * The weight of the heuristic determines how much influence it has on the
  * composite score in the case where multiple heuristics are used.
  * The higher the weight, the more influence the heuristic has.
@@ -69,10 +69,10 @@ public abstract class SearchHeuristic {
             List<SearchHeuristic> heuristics) {
         // If only one or zero targets, skip the calculations
         if (targets.size() <= 1) {
-            return targets.isEmpty() ? null : targets.remove(0);
+            return targets.isEmpty() ? null : targets.removeFirst();
         }
 
-        if (heuristics.size() == 0) {
+        if (heuristics.isEmpty()) {
             throw new IllegalArgumentException("Need at least one heuristic");
         }
 
@@ -133,37 +133,37 @@ public abstract class SearchHeuristic {
      * Interface for an object for which a search heuristic can calculate a weight.
      * For example, a symbolic state or a path condition candidate.
      */
-    public static interface HeuristicTarget {
+    public interface HeuristicTarget {
         /**
          * Returns the statement (node within the CFG) that the target is associated
          * with.
          */
-        public Stmt getStmt();
+        Stmt getStmt();
 
         /**
          * Returns the control flow graph that the target is part of.
          */
-        public StmtGraph<?> getCFG();
+        StmtGraph<?> getCFG();
 
         /**
          * Returns the depth of the target in the execution tree.
          */
-        public int getDepth();
+        int getDepth();
 
         /**
          * Returns the depths at which the target covered new code.
          */
-        public List<Integer> getNewCoverageDepths();
+        List<Integer> getNewCoverageDepths();
 
         /**
          * Returns the estimated cost of the query for the SMT solver associated with
          * the target.
          */
-        public int getEstimatedQueryCost();
+        int getEstimatedQueryCost();
 
         /**
          * Returns the call depth (number of nested function calls) of the target.
          */
-        public int getCallDepth();
+        int getCallDepth();
     }
 }

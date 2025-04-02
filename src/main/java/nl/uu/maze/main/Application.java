@@ -94,7 +94,7 @@ public class Application implements Callable<Integer> {
      */
     public static class LogLevelConverter implements ITypeConverter<Level> {
         @Override
-        public Level convert(String value) throws Exception {
+        public Level convert(String value) {
             Level level = Level.toLevel(value.toUpperCase());
             if (level.equals(Level.DEBUG) && !value.equalsIgnoreCase("DEBUG")) {
                 throw new TypeConversionException(
@@ -110,7 +110,7 @@ public class Application implements Callable<Integer> {
      */
     public static class SearchHeuristicWeightConverter implements ITypeConverter<Double> {
         @Override
-        public Double convert(String value) throws Exception {
+        public Double convert(String value) {
             try {
                 double doubleValue = Double.parseDouble(value);
                 if (Double.parseDouble(value) <= 0) {

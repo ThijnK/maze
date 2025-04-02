@@ -96,11 +96,11 @@ public class SearchStrategyFactory {
                         "Some strategies are duplicates or could not be resolved to an existing strategy, only the valid ones will be used.");
             }
 
-            return strategies.size() == 1 ? strategies.get(0)
+            return strategies.size() == 1 ? strategies.getFirst()
                     : interleavedCtor.apply(strategies);
         }
 
-        return strategyFactory.apply(names.get(0), heuristicNames, heuristicWeights);
+        return strategyFactory.apply(names.getFirst(), heuristicNames, heuristicWeights);
     }
 
     /**
@@ -133,7 +133,7 @@ public class SearchStrategyFactory {
                         SearchHeuristicFactory.createHeuristics(coverageOptimizedHeuristics,
                                 coverageOptimizedWeights));
             default -> {
-                logger.warn("Unknown search strategy: {}, defaulting to DFS", name);
+                logger.warn("Unknown symbolic search strategy: {}, defaulting to DFS", name);
                 yield new nl.uu.maze.search.symbolic.DFS();
             }
         };
@@ -168,7 +168,7 @@ public class SearchStrategyFactory {
                         SearchHeuristicFactory.createHeuristics(coverageOptimizedHeuristics,
                                 coverageOptimizedWeights));
             default -> {
-                logger.warn("Unknown search strategy: {}, defaulting to DFS", name);
+                logger.warn("Unknown concrete search strategy: {}, defaulting to DFS", name);
                 yield new nl.uu.maze.search.concrete.DFS();
             }
         };
@@ -178,12 +178,12 @@ public class SearchStrategyFactory {
      * Enum representing valid search strategies.
      * This enum is used for validation in the command line interface.
      */
-    public static enum ValidSearchStrategy {
+    public enum ValidSearchStrategy {
         DepthFirst, DepthFirstSearch, DFS,
         BreadthFirst, BreadthFirstSearch, BFS,
         Probabilistic, ProbabilisticSearch, PS,
         UniformRandom, UniformRandomSearch, URS,
         CoverageOptimized, CoverageOptimizedSearch, COS,
-        RandomPath, RandomPathSearch, RPS;
+        RandomPath, RandomPathSearch, RPS
     }
 }

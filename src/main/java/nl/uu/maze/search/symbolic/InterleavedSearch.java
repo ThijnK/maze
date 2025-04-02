@@ -13,7 +13,7 @@ public class InterleavedSearch extends SymbolicSearchStrategy {
     private long currentStrategyStartTime = 0;
 
     public InterleavedSearch(List<SymbolicSearchStrategy> strategies) {
-        if (strategies.size() == 0) {
+        if (strategies.isEmpty()) {
             throw new IllegalArgumentException("At least one strategy must be provided");
         }
         this.strategies = strategies.toArray(SymbolicSearchStrategy[]::new);

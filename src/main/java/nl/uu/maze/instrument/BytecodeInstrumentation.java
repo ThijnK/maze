@@ -82,7 +82,11 @@ public class BytecodeInstrumentation {
             return Set.of(); // Class not found
         }
         List<File> classFiles = new ArrayList<>();
-        for (File file : classPathDir.listFiles()) {
+        File[] files = classPathDir.listFiles();
+        if (files == null) {
+            return Set.of();
+        }
+        for (File file : files) {
             // Filter for class files of the main class and nested classes
             // (e.g., Foo$Bar.class for nested class Foo.Bar)
             if (file.getName().startsWith(simpleName) && file.getName().endsWith(".class")) {

@@ -15,7 +15,7 @@ public class ProbabilisticSearch extends ConcreteSearchStrategy {
     private final List<SearchHeuristic> heuristics;
 
     public ProbabilisticSearch(List<SearchHeuristic> heuristics) {
-        if (heuristics.size() == 0) {
+        if (heuristics.isEmpty()) {
             throw new IllegalArgumentException("At least one heuristic must be provided");
         }
         this.heuristics = heuristics;

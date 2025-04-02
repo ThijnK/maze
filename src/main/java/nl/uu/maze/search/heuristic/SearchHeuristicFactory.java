@@ -45,7 +45,6 @@ public class SearchHeuristicFactory {
      * @return An array of search heuristics
      * @throws NumberFormatException    If a weight is not a valid double
      * @throws IllegalArgumentException If a weight is not positive
-     * @see #createHeuristic(String, String)
      */
     public static List<SearchHeuristic> createHeuristics(List<String> names, List<Double> weights) {
         List<SearchHeuristic> heuristics = new ArrayList<>(names.size());
@@ -72,12 +71,12 @@ public class SearchHeuristicFactory {
      * Enum representing the valid search heuristics.
      * This enum is used for validation in the command line interface.
      */
-    public static enum ValidSearchHeuristic {
+    public enum ValidSearchHeuristic {
         Uniform, UniformHeuristic, UH,
         DistanceToUncovered, DistanceToUncoveredHeuristic, DTUH,
         RecentCoverage, RecentCoverageHeuristic, RCH,
         Depth, DepthHeuristic, DH,
         QueryCost, QueryCostHeuristic, QCH,
-        CallDepth, CallDepthHeuristic, CDH;
+        CallDepth, CallDepthHeuristic, CDH
     }
 }

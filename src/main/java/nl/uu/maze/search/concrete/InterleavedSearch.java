@@ -11,7 +11,7 @@ public class InterleavedSearch extends ConcreteSearchStrategy {
     private long currentStrategyStartTime = 0;
 
     public InterleavedSearch(List<ConcreteSearchStrategy> strategies) {
-        if (strategies.size() == 0) {
+        if (strategies.isEmpty()) {
             throw new IllegalArgumentException("At least one strategy must be provided");
         }
         this.strategies = strategies.toArray(ConcreteSearchStrategy[]::new);
