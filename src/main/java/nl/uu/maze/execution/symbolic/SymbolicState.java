@@ -44,6 +44,7 @@ public class SymbolicState implements HeuristicTarget {
     private MethodSignature methodSig;
     private StmtGraph<?> cfg;
     private Stmt stmt;
+    private Stmt prevStmt = null;
     private int depth = 0;
     private MethodType methodType = MethodType.CTOR;
 
@@ -76,6 +77,12 @@ public class SymbolicState implements HeuristicTarget {
      * strategies.
      */
     private final List<Integer> newCoverageDepths;
+    /**
+     * Track the branch history: which branches (encoded by hashing the branching
+     * statement and the index of the branch that was taken) were taken along the
+     * path leading to this state.
+     */
+    private final List<Integer> branchHistory;
 
     /**
      * Indicates whether this state is part of the constructor's execution for the
@@ -98,6 +105,7 @@ public class SymbolicState implements HeuristicTarget {
         this.engineConstraints = new ArrayList<>();
         this.paramTypes = new HashMap<>();
         this.newCoverageDepths = new ArrayList<>();
+        this.branchHistory = new ArrayList<>();
     }
 
     /*
@@ -108,6 +116,7 @@ public class SymbolicState implements HeuristicTarget {
         this.methodSig = state.methodSig;
         this.cfg = state.cfg;
         this.stmt = state.stmt;
+        this.prevStmt = state.prevStmt;
         this.depth = state.depth;
         this.methodType = state.methodType;
 
@@ -122,6 +131,7 @@ public class SymbolicState implements HeuristicTarget {
         // original here
         this.caller = state.caller;
         this.newCoverageDepths = new ArrayList<>(state.newCoverageDepths);
+        this.branchHistory = new ArrayList<>(state.branchHistory);
 
         this.isCtorState = state.isCtorState;
         this.isFinalState = state.isFinalState;
@@ -238,7 +248,12 @@ public class SymbolicState implements HeuristicTarget {
 
     public void setStmt(Stmt stmt) {
         isFinalState = false;
+        this.prevStmt = this.stmt;
         this.stmt = stmt;
+    }
+
+    public Stmt getPrevStmt() {
+        return prevStmt;
     }
 
     /** Get the successor statements for the current statement. */
@@ -304,6 +319,11 @@ public class SymbolicState implements HeuristicTarget {
         }
     }
 
+    /**
+     * Record the coverage of the current statement in the coverage tracker.
+     * If new coverage is found, add the current depth to the list of new coverage
+     * depths.
+     */
     public void recordCoverage() {
         if (!exceptionThrown) {
             boolean newCoverage = CoverageTracker.getInstance().setCovered(stmt);
@@ -313,8 +333,23 @@ public class SymbolicState implements HeuristicTarget {
         }
     }
 
+    /**
+     * Record a branch taken.
+     * This is used for branch history tracking.
+     * The branch is encoded by hashing the statement and the index of the
+     * branch taken.
+     */
+    public void recordBranch(Stmt branchStmt, int branchIndex) {
+        int hash = branchStmt.hashCode() + 31 * branchIndex;
+        branchHistory.add(hash);
+    }
+
     public List<Integer> getNewCoverageDepths() {
         return newCoverageDepths;
+    }
+
+    public List<Integer> getBranchHistory() {
+        return branchHistory;
     }
 
     public int getEstimatedQueryCost() {

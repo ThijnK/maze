@@ -37,11 +37,13 @@ public class SymbolicExecutor {
     private final JimpleToZ3Transformer jimpleToZ3 = new JimpleToZ3Transformer();
     private final SymbolicRefExtractor refExtractor = new SymbolicRefExtractor();
     private final boolean trackCoverage;
+    private final boolean trackBranchHistory;
 
     public SymbolicExecutor(ConcreteExecutor executor, SymbolicStateValidator validator,
-            JavaAnalyzer analyzer, boolean trackCoverage) {
+            JavaAnalyzer analyzer, boolean trackCoverage, boolean trackBranchHistory) {
         this.methodInvoker = new MethodInvoker(executor, validator, analyzer);
         this.trackCoverage = trackCoverage;
+        this.trackBranchHistory = trackBranchHistory;
     }
 
     /**
@@ -121,6 +123,8 @@ public class SymbolicExecutor {
             state.addPathConstraint(branchIndex == 0 ? Z3Utils.negate(cond) : cond);
             state.setStmt(succs.get(branchIndex));
             newStates.add(state);
+            if (trackBranchHistory)
+                state.recordBranch(stmt, branchIndex);
         }
         // Otherwise, follow both branches
         else {
@@ -134,6 +138,12 @@ public class SymbolicExecutor {
             state.addPathConstraint(cond);
             state.setStmt(succs.get(1));
             newStates.add(state);
+
+            if (trackBranchHistory) {
+                // Record the branch taken for both states
+                newState.recordBranch(stmt, 0);
+                state.recordBranch(stmt, 1);
+            }
         }
 
         state.incrementDepth();
@@ -179,6 +189,8 @@ public class SymbolicExecutor {
             state.addPathConstraint(constraint);
             state.setStmt(succs.get(branchIndex));
             newStates.add(state);
+            if (trackBranchHistory)
+                state.recordBranch(stmt, branchIndex);
         }
         // Otherwise, follow all branches
         else {
@@ -193,6 +205,8 @@ public class SymbolicExecutor {
                 newState.addPathConstraint(constraint);
                 newState.setStmt(succs.get(i));
                 newStates.add(newState);
+                if (trackBranchHistory)
+                    newState.recordBranch(stmt, i);
             }
         }
 

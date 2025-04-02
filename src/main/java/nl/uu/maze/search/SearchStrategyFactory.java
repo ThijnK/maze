@@ -123,6 +123,7 @@ public class SearchStrategyFactory {
             case "Probabilistic", "ProbabilisticSearch", "PS" ->
                 new nl.uu.maze.search.symbolic.ProbabilisticSearch(
                         SearchHeuristicFactory.createHeuristics(heuristicNames, heuristicWeights));
+            case "SubpathGuided", "SubpathGuidedSearch", "SGS" -> new nl.uu.maze.search.symbolic.SubpathGuidedSearch();
             // Special case for uniform random search, which is just probabilistic search
             // with the UniformHeuristic
             case "UniformRandom", "UniformRandomSearch", "URS" -> new nl.uu.maze.search.symbolic.ProbabilisticSearch(
@@ -182,6 +183,7 @@ public class SearchStrategyFactory {
         DepthFirst, DepthFirstSearch, DFS,
         BreadthFirst, BreadthFirstSearch, BFS,
         Probabilistic, ProbabilisticSearch, PS,
+        SubpathGuided, SubpathGuidedSearch, SGS,
         UniformRandom, UniformRandomSearch, URS,
         CoverageOptimized, CoverageOptimizedSearch, COS,
         RandomPath, RandomPathSearch, RPS

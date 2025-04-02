@@ -25,4 +25,9 @@ public abstract class SymbolicSearchStrategy implements SearchStrategy<SymbolicS
     public boolean requiresCoverageData() {
         return false;
     }
+
+    // By default, search strategies do not require branch history data
+    public boolean requiresBranchHistoryData() {
+        return false;
+    }
 }

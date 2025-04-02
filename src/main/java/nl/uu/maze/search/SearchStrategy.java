@@ -36,4 +36,7 @@ public interface SearchStrategy<T> {
 
     /** Whether this search strategy requires data about statement coverage. */
     boolean requiresCoverageData();
+
+    /** Whether this search strategy requires data about branch history. */
+    boolean requiresBranchHistoryData();
 }
