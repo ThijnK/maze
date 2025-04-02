@@ -49,8 +49,8 @@ public class SubpathGuidedSearch extends SymbolicSearchStrategy {
 
     @Override
     public SymbolicState next() {
-        if (states.isEmpty()) {
-            return null;
+        if (states.size() <= 1) {
+            return states.isEmpty() ? null : states.getFirst();
         }
 
         // Calculate subpath counts for all states

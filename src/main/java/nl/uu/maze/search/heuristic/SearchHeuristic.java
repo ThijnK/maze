@@ -141,6 +141,11 @@ public abstract class SearchHeuristic {
         Stmt getStmt();
 
         /**
+         * Returns the statement (node within the CFG) that precedes the target.
+         */
+        Stmt getPrevStmt();
+
+        /**
          * Returns the control flow graph that the target is part of.
          */
         StmtGraph<?> getCFG();
@@ -154,6 +159,12 @@ public abstract class SearchHeuristic {
          * Returns the depths at which the target covered new code.
          */
         List<Integer> getNewCoverageDepths();
+
+        /**
+         * Returns a list of integer-encoded branches that were taken along the path
+         * leading to this target.
+         */
+        List<Integer> getBranchHistory();
 
         /**
          * Returns the estimated cost of the query for the SMT solver associated with

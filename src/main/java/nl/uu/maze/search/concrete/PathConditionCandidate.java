@@ -46,6 +46,10 @@ public class PathConditionCandidate implements HeuristicTarget {
         return pathConstraints.get(index).getStmt();
     }
 
+    public Stmt getPrevStmt() {
+        return pathConstraints.get(index).getPrevStmt();
+    }
+
     public StmtGraph<?> getCFG() {
         return pathConstraints.get(index).getCFG();
     }
@@ -56,6 +60,10 @@ public class PathConditionCandidate implements HeuristicTarget {
 
     public List<Integer> getNewCoverageDepths() {
         return pathConstraints.get(index).getNewCoverageDepths();
+    }
+
+    public List<Integer> getBranchHistory() {
+        return pathConstraints.get(index).getBranchHistory();
     }
 
     public int getEstimatedQueryCost() {
