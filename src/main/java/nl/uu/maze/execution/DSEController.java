@@ -169,7 +169,9 @@ public class DSEController {
         // If static, start with target method, otherwise start with constructor
         if (method.isStatic()) {
             logger.debug("Executing target method: {}", method.getName());
-            searchStrategy.add(new SymbolicState(method.getSignature(), cfg));
+            SymbolicState state = new SymbolicState(method.getSignature(), cfg);
+            state.switchToMethodState();
+            searchStrategy.add(state);
         } else {
             logger.debug("Executing constructor: {}", ctorSoot.getName());
             // For concrete-driven, we'll be replaying a trace, so if the ctor has been
