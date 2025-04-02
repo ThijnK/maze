@@ -107,12 +107,11 @@ public class JUnitTestGenerator {
                 .addException(Exception.class)
                 .returns(void.class);
 
-        // For static methods, just call the method
+        // For static methods, just call the method without an instance
         if (method.isStatic()) {
-            // Add variable definitions for parameters
             List<String> params = addParamDefinitions(methodBuilder, method.getParameterTypes(), argMap,
                     MethodType.METHOD);
-            addMethodCall(methodBuilder, method, params, isException, isVoid);
+            addMethodCall(methodBuilder, clazz, method, params, isException, isVoid);
         }
         // For instance methods, create an instance of the class and call the method
         else {
@@ -132,7 +131,7 @@ public class JUnitTestGenerator {
                 methodBuilder.addCode("\n"); // White space between ctor and method call
                 List<String> params = addParamDefinitions(methodBuilder, method.getParameterTypes(), argMap,
                         MethodType.METHOD);
-                addMethodCall(methodBuilder, method, params, isException, isVoid);
+                addMethodCall(methodBuilder, clazz, method, params, isException, isVoid);
             }
         }
 
@@ -166,17 +165,36 @@ public class JUnitTestGenerator {
         classBuilder.addMethod(methodBuilder.build());
     }
 
-    private void addMethodCall(MethodSpec.Builder methodBuilder, JavaSootMethod method, List<String> params,
-            boolean isException, boolean isVoid) {
-        Class<?> returnType = analyzer.tryGetJavaClass(method.getReturnType()).orElse(Object.class);
+    /**
+     * Adds a method call to the given method builder, wrapping it in an assert
+     * throws statement if the method is expected to throw an exception.
+     * If the method is void, it will be called without an assignment. Otherwise,
+     * the return value will be assigned to a variable of the appropriate type.
+     */
+    private void addMethodCall(MethodSpec.Builder methodBuilder, Class<?> clazz, JavaSootMethod method,
+            List<String> params, boolean isException, boolean isVoid) {
         if (isException) {
-            methodBuilder.addStatement("$T.assertThrows($T.class, () -> cut.$L($L))", Assertions.class, Exception.class,
-                    method.getName(), String.join(", ", params));
+            if (method.isStatic())
+                methodBuilder.addStatement("$T.assertThrows($T.class, () -> $T.$L($L))", Assertions.class,
+                        Exception.class,
+                        clazz, method.getName(), String.join(", ", params));
+            else
+                methodBuilder.addStatement("$T.assertThrows($T.class, () -> cut.$L($L))", Assertions.class,
+                        Exception.class,
+                        method.getName(), String.join(", ", params));
         } else if (isVoid) {
-            methodBuilder.addStatement("cut.$L($L)", method.getName(), String.join(", ", params));
+            if (method.isStatic())
+                methodBuilder.addStatement("$T.$L($L)", clazz, method.getName(), String.join(", ", params));
+            else
+                methodBuilder.addStatement("cut.$L($L)", method.getName(), String.join(", ", params));
         } else {
-            methodBuilder.addStatement("$T retval = cut.$L($L)", returnType, method.getName(),
-                    String.join(", ", params));
+            Class<?> returnType = analyzer.tryGetJavaClass(method.getReturnType()).orElse(Object.class);
+            if (method.isStatic())
+                methodBuilder.addStatement("$T retval = $T.$L($L)", returnType, clazz, method.getName(),
+                        String.join(", ", params));
+            else
+                methodBuilder.addStatement("$T retval = cut.$L($L)", returnType, method.getName(),
+                        String.join(", ", params));
         }
     }
 
