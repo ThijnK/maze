@@ -28,16 +28,16 @@ public class InterleavedSearch extends ConcreteSearchStrategy {
     }
 
     @Override
-    public void add(PathConditionCandidate state) {
+    public void add(PathConditionCandidate candidate) {
         for (ConcreteSearchStrategy strategy : strategies) {
-            strategy.add(state);
+            strategy.add(candidate);
         }
     }
 
     @Override
-    public void remove(PathConditionCandidate state) {
+    public void remove(PathConditionCandidate candidate) {
         for (ConcreteSearchStrategy strategy : strategies) {
-            strategy.remove(state);
+            strategy.remove(candidate);
         }
     }
 
@@ -48,7 +48,7 @@ public class InterleavedSearch extends ConcreteSearchStrategy {
         }
         PathConditionCandidate next = strategies[currentStrategyIndex].next();
 
-        // Remove the selected state from the other strategies
+        // Remove the selected candidate from the other strategies
         if (next != null) {
             for (int i = 0; i < strategies.length; i++) {
                 if (i != currentStrategyIndex) {
