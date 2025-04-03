@@ -26,7 +26,7 @@ public abstract class PathConstraint {
     protected final List<Integer> branchHistory;
     /** Estimated cost to solve this constraint. */
     protected int estimatedCost = -1;
-    protected int callDepth = 0;
+    protected int callDepth;
 
     /**
      * Create a new path constraint for the given symbolic state.

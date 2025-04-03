@@ -23,9 +23,7 @@ public class ObjectInstantiation {
     /**
      * Attempt to create an instance of the given class.
      * 
-     * @param clazz    The class to instantiate
-     * @param forceNew Whether to force the creation of a new instance instead of
-     *                 reusing previously created instances
+     * @param clazz The class to instantiate
      * @return An instance of the class or null if the instance could not be created
      */
     public static Object createInstance(Class<?> clazz) {

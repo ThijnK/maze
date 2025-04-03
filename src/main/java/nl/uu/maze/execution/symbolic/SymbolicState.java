@@ -352,11 +352,6 @@ public class SymbolicState implements SearchTarget {
         return branchHistory;
     }
 
-    public int getEstimatedQueryCost() {
-        return pathConstraints.stream().mapToInt(PathConstraint::getEstimatedCost).sum()
-                + engineConstraints.stream().mapToInt(PathConstraint::getEstimatedCost).sum();
-    }
-
     public int getCallDepth() {
         return caller == null ? 0 : caller.getCallDepth() + 1;
     }

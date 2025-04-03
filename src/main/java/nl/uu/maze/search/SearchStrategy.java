@@ -61,7 +61,7 @@ public abstract class SearchStrategy<T extends SearchTarget> {
     }
 
     /**
-     * Attemps to convert this search strategy to a symbolic-driven search strategy.
+     * Attempts to convert this search strategy to a symbolic-driven search strategy.
      * This is only possible if this search strategy operates on symbolic states.
      */
     public SymbolicSearchStrategy toSymbolic() {
@@ -73,7 +73,7 @@ public abstract class SearchStrategy<T extends SearchTarget> {
     }
 
     /**
-     * Attemps to convert this search strategy to a concrete-driven search strategy.
+     * Attempts to convert this search strategy to a concrete-driven search strategy.
      * This is only possible if this search strategy operates on path condition
      * candidates.
      */

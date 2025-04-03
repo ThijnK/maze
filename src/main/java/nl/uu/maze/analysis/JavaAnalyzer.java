@@ -7,11 +7,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -223,7 +219,7 @@ public class JavaAnalyzer {
     public Pair<Constructor<?>, Object[]> getJavaConstructor(Class<?> clazz) {
         // Get all constructors of the class and sort them on number of parameters
         Constructor<?>[] ctors = clazz.getDeclaredConstructors();
-        Arrays.sort(ctors, (a, b) -> Integer.compare(a.getParameterCount(), b.getParameterCount()));
+        Arrays.sort(ctors, Comparator.comparingInt(Constructor::getParameterCount));
 
         // Find a constructor for which arguments can be generated
         for (Constructor<?> ctor : ctors) {

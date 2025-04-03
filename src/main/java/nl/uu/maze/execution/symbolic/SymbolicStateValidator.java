@@ -245,7 +245,7 @@ public class SymbolicStateValidator {
     }
 
     /**
-     * Fills the fields of objects in the given symbolic state with their current
+     * Fills object fields in the given symbolic state with their current
      * values on the heap, if not already set in the argument map.
      */
     private void fillObjectFields(SymbolicState state, ArgMap argMap, Model model) {

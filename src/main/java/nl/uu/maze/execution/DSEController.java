@@ -72,9 +72,10 @@ public class DSEController {
      * @param classPath      The class path to the target class
      * @param className      The name of the target class
      * @param concreteDriven Whether to use concrete-driven DSE (otherwise symbolic)
-     * @param strategyName   The name of the search strategy to use
+     * @param searchStrategy The search strategy to use
      * @param outPath        The output path for the generated test cases
      * @param maxDepth       The maximum depth for symbolic execution
+     * @param testTimeout    The timeout to apply to generated test cases
      */
     public DSEController(String classPath, String className, boolean concreteDriven, SearchStrategy<?> searchStrategy,
             String outPath, int maxDepth, long testTimeout)

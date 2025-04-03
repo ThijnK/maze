@@ -18,7 +18,7 @@ public class CoverageTracker {
         return instance;
     }
 
-    private Set<Integer> coveredStmts;
+    private final Set<Integer> coveredStmts;
 
     private CoverageTracker() {
         coveredStmts = new HashSet<>();

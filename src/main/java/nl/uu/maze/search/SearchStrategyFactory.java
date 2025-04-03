@@ -66,7 +66,7 @@ public class SearchStrategyFactory {
             }
 
             return strategies.size() == 1 ? strategies.getFirst()
-                    : new InterleavedSearch<T>(strategies);
+                    : new InterleavedSearch<>(strategies);
         }
 
         return createStrategy(names.getFirst(), heuristicNames, heuristicWeights);
@@ -89,26 +89,23 @@ public class SearchStrategyFactory {
     private static <T extends SearchTarget> SearchStrategy<T> createStrategy(String name, List<String> heuristicNames,
             List<Double> heuristicWeights) {
         return switch (name) {
-            case "DepthFirst", "DepthFirstSearch", "DFS" -> new DFS<T>();
-            case "BreadthFirst", "BreadthFirstSearch", "BFS" -> new BFS<T>();
-            case "RandomPath", "RandomPathSearch", "RPS" -> new RandomPathSearch<T>();
-            case "Probabilistic", "ProbabilisticSearch", "PS" ->
-                new ProbabilisticSearch<T>(
-                        SearchHeuristicFactory.createHeuristics(heuristicNames, heuristicWeights));
-            case "SubpathGuided", "SubpathGuidedSearch", "SGS" ->
-                new SubpathGuidedSearch<T>();
+            case "DepthFirst", "DepthFirstSearch", "DFS" -> new DFS<>();
+            case "BreadthFirst", "BreadthFirstSearch", "BFS" -> new BFS<>();
+            case "RandomPath", "RandomPathSearch", "RPS" -> new RandomPathSearch<>();
+            case "Probabilistic", "ProbabilisticSearch", "PS" -> new ProbabilisticSearch<>(
+                    SearchHeuristicFactory.createHeuristics(heuristicNames, heuristicWeights));
+            case "SubpathGuided", "SubpathGuidedSearch", "SGS" -> new SubpathGuidedSearch<>();
             // Special case for uniform random search, which is just probabilistic search
             // with the UniformHeuristic
-            case "UniformRandom", "UniformRandomSearch", "URS" -> new ProbabilisticSearch<T>(
+            case "UniformRandom", "UniformRandomSearch", "URS" -> new ProbabilisticSearch<>(
                     List.of(new UniformHeuristic()));
             // Special case for coverage-optimized search, which uses predefined heuristics
-            case "CoverageOptimized", "CoverageOptimizedSearch", "COS" ->
-                new ProbabilisticSearch<T>(
-                        SearchHeuristicFactory.createHeuristics(coverageOptimizedHeuristics,
-                                coverageOptimizedWeights));
+            case "CoverageOptimized", "CoverageOptimizedSearch", "COS" -> new ProbabilisticSearch<>(
+                    SearchHeuristicFactory.createHeuristics(coverageOptimizedHeuristics,
+                            coverageOptimizedWeights));
             default -> {
                 logger.warn("Unknown symbolic search strategy: {}, defaulting to DFS", name);
-                yield new DFS<T>();
+                yield new DFS<>();
             }
         };
     }
