@@ -2,6 +2,7 @@ package nl.uu.maze.util;
 
 import java.util.Arrays;
 
+import com.microsoft.z3.ArraySort;
 import com.microsoft.z3.BoolExpr;
 import com.microsoft.z3.Context;
 import com.microsoft.z3.Expr;
@@ -43,12 +44,14 @@ public class Z3Utils {
             return Arrays.stream(expr.getArgs()).mapToInt(Z3Utils::estimateCostInternal).sum();
         } else {
             Sort sort = expr.getSort();
-            // Weigh float and real expression more heavily than, e.g., boolean or integer
-            // expressions
-            // SeqSort is used for strings
+            // Float and sequence sorts (strings) are more expensive than integer sorts
             if (sort instanceof FPSort || sort instanceof SeqSort) {
                 return 3;
-            } else if (sort instanceof RealSort) {
+            }
+            // Reals are more optimized than arbitrary floating points, but still more
+            // expensive than integers, and array variables likely are more complex than
+            // primitive types
+            else if (sort instanceof RealSort || sort instanceof ArraySort) {
                 return 2;
             } else {
                 return 1;
