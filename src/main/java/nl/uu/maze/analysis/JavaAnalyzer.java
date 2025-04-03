@@ -221,8 +221,12 @@ public class JavaAnalyzer {
      *           an instance of an inner class as an argument.
      */
     public Pair<Constructor<?>, Object[]> getJavaConstructor(Class<?> clazz) {
+        // Get all constructors of the class and sort them on number of parameters
+        Constructor<?>[] ctors = clazz.getDeclaredConstructors();
+        Arrays.sort(ctors, (a, b) -> Integer.compare(a.getParameterCount(), b.getParameterCount()));
+
         // Find a constructor for which arguments can be generated
-        for (Constructor<?> ctor : clazz.getDeclaredConstructors()) {
+        for (Constructor<?> ctor : ctors) {
             try {
                 Object[] args = ObjectInstantiation.generateArgs(ctor.getParameters(), MethodType.CTOR, null);
                 return Pair.of(ctor, args);

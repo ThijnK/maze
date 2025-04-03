@@ -360,7 +360,8 @@ public class JUnitTestGenerator {
             Object arg = arguments[i];
             String argName = var + "_carg" + i;
             argNames[i] = argName;
-            methodBuilder.addStatement("$T $L = $L", arg.getClass(), argName, valueToString(arg));
+            methodBuilder.addStatement("$T $L = $L", arg != null ? arg.getClass() : Object.class, argName,
+                    valueToString(arg));
         }
         methodBuilder.addStatement("$T $L = new $T($L)", clazz, var, clazz, String.join(", ", argNames));
     }
