@@ -1,7 +1,6 @@
 package nl.uu.maze.search.strategy;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.Random;
 
 import nl.uu.maze.search.SearchStrategy;
@@ -30,11 +29,11 @@ public class RandomPathSearch<T extends SearchTarget> extends SearchStrategy<T> 
     }
 
     @Override
-    public void add(T state) {
+    public void add(T target) {
         if (tree == null) {
-            tree = new Tree<>(state);
+            tree = new Tree<>(target);
         } else {
-            current.addChild(state);
+            current.addChild(target);
         }
     }
 
@@ -51,15 +50,14 @@ public class RandomPathSearch<T extends SearchTarget> extends SearchStrategy<T> 
     }
 
     @Override
-    public void remove(T state) {
+    public void remove(T target) {
         // Remove the state from the tree by removing the path it's part of
         // Most likely the state to remove is the current tree node
         // If not, we need to find the node first
-        if (current.getValue().equals(state)) {
+        if (current.getValue().equals(target)) {
             tree.removePath(current);
         } else {
-            Optional<TreeNode<T>> node = tree.findNode(state);
-            node.ifPresent(TTreeNode -> tree.removePath(TTreeNode));
+            tree.findNode(target).ifPresent(node -> tree.removePath(node));
         }
     }
 

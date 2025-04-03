@@ -13,34 +13,34 @@ public abstract class SearchStrategy<T extends SearchTarget> {
     public abstract String getName();
 
     /**
-     * Add an item to the search strategy.
+     * Add a search target to the search strategy.
      * 
-     * @param item The new item to add
+     * @param target The new item to add
      */
-    public abstract void add(T item);
+    public abstract void add(T target);
 
     /**
-     * Add multiple items to the search strategy.
+     * Add multiple search targets to the search strategy.
      * 
-     * @param items The new items to add
+     * @param targets The new items to add
      */
-    public void add(Collection<T> items) {
-        for (T item : items) {
-            add(item);
+    public void add(Collection<T> targets) {
+        for (T target : targets) {
+            add(target);
         }
     }
 
     /**
-     * Remove an item from the search strategy.
+     * Remove a search target from the search strategy.
      * 
-     * @param item The item to remove
+     * @param target The target to remove
      */
-    public abstract void remove(T item);
+    public abstract void remove(T target);
 
     /**
-     * Get the next item to explore.
+     * Get the next search target to explore.
      * 
-     * @return The next item to explore, or null if there are no more items to
+     * @return The next target to explore, or null if there are no more targets to
      *         explore
      */
     public abstract T next();

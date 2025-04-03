@@ -9,29 +9,29 @@ import nl.uu.maze.search.SearchTarget;
  * Symbolic-driven search strategy for Depth-First Search (DFS).
  */
 public class DFS<T extends SearchTarget> extends SearchStrategy<T> {
-    private final Stack<T> states = new Stack<>();
+    private final Stack<T> targets = new Stack<>();
 
     public String getName() {
         return "DepthFirstSearch";
     }
 
     @Override
-    public void add(T state) {
-        states.push(state);
+    public void add(T target) {
+        targets.push(target);
     }
 
     @Override
-    public void remove(T state) {
-        states.remove(state);
+    public void remove(T target) {
+        targets.remove(target);
     }
 
     @Override
     public T next() {
-        return states.isEmpty() ? null : states.pop();
+        return targets.isEmpty() ? null : targets.pop();
     }
 
     @Override
     public void reset() {
-        states.clear();
+        targets.clear();
     }
 }

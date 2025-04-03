@@ -19,15 +19,15 @@ public class SubpathGuidedSearch<T extends SearchTarget> extends SearchStrategy<
     private static final int SUBPATH_LENGTH = 2; // Length of the subpath to consider
 
     private final Map<Integer, Integer> subpathCounts = new HashMap<>();
-    private final List<T> states = new ArrayList<>();
+    private final List<T> targets = new ArrayList<>();
     private final Random random = new Random();
 
     public String getName() {
         return "SubpathGuidedSearch";
     }
 
-    private int calculateSubpathHash(T state) {
-        List<Integer> branchHistory = state.getBranchHistory();
+    private int calculateSubpathHash(T target) {
+        List<Integer> branchHistory = target.getBranchHistory();
         int subpathHash = 0;
         int i = Math.max(0, branchHistory.size() - SUBPATH_LENGTH);
         for (; i < branchHistory.size(); i++) {
@@ -37,34 +37,34 @@ public class SubpathGuidedSearch<T extends SearchTarget> extends SearchStrategy<
     }
 
     @Override
-    public void add(T state) {
+    public void add(T target) {
         // If the state just branched, we have a new subpath to consider (because
         // subpaths in this context are only the branches that are taken, so a subpath
         // changes only when a branch is taken)
-        if (state.getPrevStmt() instanceof JIfStmt || state.getPrevStmt() instanceof JSwitchStmt) {
-            int subpathHash = calculateSubpathHash(state);
+        if (target.getPrevStmt() instanceof JIfStmt || target.getPrevStmt() instanceof JSwitchStmt) {
+            int subpathHash = calculateSubpathHash(target);
             subpathCounts.put(subpathHash, subpathCounts.getOrDefault(subpathHash, 0) + 1);
         }
-        states.add(state);
+        targets.add(target);
     }
 
     @Override
     public T next() {
-        if (states.size() <= 1) {
-            return states.isEmpty() ? null : states.getFirst();
+        if (targets.size() <= 1) {
+            return targets.isEmpty() ? null : targets.getFirst();
         }
 
         // Calculate subpath counts for all states
         Map<Integer, Integer> stateSubpathCounts = new HashMap<>();
-        for (T state : states) {
-            int subpathHash = calculateSubpathHash(state);
+        for (T target : targets) {
+            int subpathHash = calculateSubpathHash(target);
             stateSubpathCounts.put(subpathHash, subpathCounts.getOrDefault(subpathHash, 0));
         }
 
         // Select the state with the least frequent subpath, breaking ties randomly
         int minCount = Integer.MAX_VALUE;
         List<T> candidates = new ArrayList<>();
-        for (T state : states) {
+        for (T state : targets) {
             int subpathHash = calculateSubpathHash(state);
             int count = stateSubpathCounts.get(subpathHash);
             if (count < minCount) {
@@ -76,18 +76,18 @@ public class SubpathGuidedSearch<T extends SearchTarget> extends SearchStrategy<
             }
         }
         T selected = candidates.get(candidates.size() > 1 ? random.nextInt(candidates.size()) : 0);
-        states.remove(selected);
+        targets.remove(selected);
         return selected;
     }
 
     @Override
-    public void remove(T state) {
-        states.remove(state);
+    public void remove(T target) {
+        targets.remove(target);
     }
 
     @Override
     public void reset() {
-        states.clear();
+        targets.clear();
         subpathCounts.clear();
     }
 

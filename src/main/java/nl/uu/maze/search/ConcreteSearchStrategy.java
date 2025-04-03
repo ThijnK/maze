@@ -122,13 +122,13 @@ public class ConcreteSearchStrategy extends SearchStrategy<PathConditionCandidat
     }
 
     @Override
-    public void add(PathConditionCandidate item) {
-        strategy.add(item);
+    public void add(PathConditionCandidate candidate) {
+        strategy.add(candidate);
     }
 
     @Override
-    public void remove(PathConditionCandidate item) {
-        strategy.remove(item);
+    public void remove(PathConditionCandidate candidate) {
+        strategy.remove(candidate);
     }
 
     @Override

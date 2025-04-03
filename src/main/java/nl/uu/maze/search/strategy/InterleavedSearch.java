@@ -30,16 +30,16 @@ public class InterleavedSearch<T extends SearchTarget> extends SearchStrategy<T>
     }
 
     @Override
-    public void add(T state) {
+    public void add(T target) {
         for (SearchStrategy<T> strategy : strategies) {
-            strategy.add(state);
+            strategy.add(target);
         }
     }
 
     @Override
-    public void remove(T state) {
+    public void remove(T target) {
         for (SearchStrategy<T> strategy : strategies) {
-            strategy.remove(state);
+            strategy.remove(target);
         }
     }
 

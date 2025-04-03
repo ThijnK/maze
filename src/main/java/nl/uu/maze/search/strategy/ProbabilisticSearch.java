@@ -13,7 +13,7 @@ import nl.uu.maze.search.heuristic.SearchHeuristic;
  * heuristics.
  */
 public class ProbabilisticSearch<T extends SearchTarget> extends SearchStrategy<T> {
-    private final List<T> states = new ArrayList<>();
+    private final List<T> targets = new ArrayList<>();
     private final List<SearchHeuristic> heuristics;
 
     public ProbabilisticSearch(List<SearchHeuristic> heuristics) {
@@ -34,23 +34,23 @@ public class ProbabilisticSearch<T extends SearchTarget> extends SearchStrategy<
     }
 
     @Override
-    public void add(T state) {
-        states.add(state);
+    public void add(T target) {
+        targets.add(target);
     }
 
     @Override
-    public void remove(T state) {
-        states.remove(state);
+    public void remove(T target) {
+        targets.remove(target);
     }
 
     @Override
     public T next() {
-        return SearchHeuristic.weightedProbabilisticSelect(states, heuristics);
+        return SearchHeuristic.weightedProbabilisticSelect(targets, heuristics);
     }
 
     @Override
     public void reset() {
-        states.clear();
+        targets.clear();
     }
 
     @Override

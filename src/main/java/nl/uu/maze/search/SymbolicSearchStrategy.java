@@ -22,13 +22,13 @@ public class SymbolicSearchStrategy extends SearchStrategy<SymbolicState> {
     }
 
     @Override
-    public void add(SymbolicState item) {
-        strategy.add(item);
+    public void add(SymbolicState state) {
+        strategy.add(state);
     }
 
     @Override
-    public void remove(SymbolicState item) {
-        strategy.remove(item);
+    public void remove(SymbolicState state) {
+        strategy.remove(state);
     }
 
     @Override
