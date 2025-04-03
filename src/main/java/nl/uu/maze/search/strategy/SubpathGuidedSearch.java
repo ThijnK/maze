@@ -51,7 +51,7 @@ public class SubpathGuidedSearch<T extends SearchTarget> extends SearchStrategy<
     @Override
     public T next() {
         if (targets.size() <= 1) {
-            return targets.isEmpty() ? null : targets.getFirst();
+            return targets.isEmpty() ? null : targets.removeFirst();
         }
 
         // Calculate subpath counts for all states
