@@ -19,7 +19,7 @@ import sootup.core.jimple.common.stmt.Stmt;
  *           (i.e., only when the candidate is selected for exploration).
  */
 public class PathConditionCandidate implements SearchTarget {
-    private List<PathConstraint> pathConstraints;
+    private List<PathConstraint> constraints;
     /** The index of the constraint to negate. */
     private final int index;
     /**
@@ -33,63 +33,55 @@ public class PathConditionCandidate implements SearchTarget {
     }
 
     public PathConditionCandidate(List<PathConstraint> pathConstraints, int index, int subIndex) {
-        this.pathConstraints = pathConstraints;
+        this.constraints = pathConstraints;
         this.index = index;
         this.subIndex = subIndex;
     }
 
-    public List<PathConstraint> getPathConstraints() {
-        return pathConstraints;
+    public List<PathConstraint> getConstraints() {
+        return constraints;
     }
 
     public Stmt getStmt() {
-        return pathConstraints.get(index).getStmt();
+        return constraints.get(index).getStmt();
     }
 
     public Stmt getPrevStmt() {
-        return pathConstraints.get(index).getPrevStmt();
+        return constraints.get(index).getPrevStmt();
     }
 
     public StmtGraph<?> getCFG() {
-        return pathConstraints.get(index).getCFG();
+        return constraints.get(index).getCFG();
     }
 
     public int getDepth() {
-        return pathConstraints.get(index).getDepth();
+        return constraints.get(index).getDepth();
     }
 
     public List<Integer> getNewCoverageDepths() {
-        return pathConstraints.get(index).getNewCoverageDepths();
+        return constraints.get(index).getNewCoverageDepths();
     }
 
     public List<Integer> getBranchHistory() {
-        return pathConstraints.get(index).getBranchHistory();
-    }
-
-    public int getEstimatedQueryCost() {
-        int cost = 0;
-        for (int i = 0; i <= index; i++) {
-            cost += pathConstraints.get(i).getEstimatedCost();
-        }
-        return cost;
+        return constraints.get(index).getBranchHistory();
     }
 
     public int getCallDepth() {
-        return pathConstraints.get(index).getCallDepth();
+        return constraints.get(index).getCallDepth();
     }
 
     /**
      * Apply the negation to the constraint at the index.
      */
     public void applyNegation() {
-        PathConstraint constraint = pathConstraints.get(index);
+        PathConstraint constraint = constraints.get(index);
         AliasConstraint alias = constraint instanceof AliasConstraint ? (AliasConstraint) constraint : null;
 
         // Only keep constraints up to the index we're negating
         List<PathConstraint> newConstraints = new ArrayList<>(index + 1);
         // Copy constraints before the negated one
         for (int i = 0; i < index; i++) {
-            PathConstraint other = pathConstraints.get(i);
+            PathConstraint other = constraints.get(i);
             // Skip conflicting constraint when negating alias constraints
             if (alias == null || !alias.isConflicting(other)) {
                 newConstraints.add(other);
@@ -102,7 +94,7 @@ public class PathConditionCandidate implements SearchTarget {
         // Intentionally omit constraints after the negated one
         // as they were derived assuming the non-negated version
 
-        pathConstraints = newConstraints;
+        constraints = newConstraints;
     }
 
     private PathConstraint negateConstraint(PathConstraint constraint) {
@@ -113,7 +105,7 @@ public class PathConditionCandidate implements SearchTarget {
     @Override
     public int hashCode() {
         int result = 1;
-        for (PathConstraint constraint : pathConstraints) {
+        for (PathConstraint constraint : constraints) {
             result = 31 * result + (constraint == null ? 0 : constraint.hashCode());
         }
         return result;

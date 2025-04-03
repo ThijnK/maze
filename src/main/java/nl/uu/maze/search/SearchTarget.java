@@ -2,6 +2,7 @@ package nl.uu.maze.search;
 
 import java.util.List;
 
+import nl.uu.maze.execution.symbolic.PathConstraint;
 import sootup.core.graph.StmtGraph;
 import sootup.core.jimple.common.stmt.Stmt;
 
@@ -28,6 +29,11 @@ public interface SearchTarget {
     StmtGraph<?> getCFG();
 
     /**
+     * Returns the constraints that are associated with the target.
+     */
+    List<PathConstraint> getConstraints();
+
+    /**
      * Returns the depth of the target in the execution tree.
      */
     int getDepth();
@@ -42,12 +48,6 @@ public interface SearchTarget {
      * leading to this target.
      */
     List<Integer> getBranchHistory();
-
-    /**
-     * Returns the estimated cost of the query for the SMT solver associated with
-     * the target.
-     */
-    int getEstimatedQueryCost();
 
     /**
      * Returns the call depth (number of nested function calls) of the target.

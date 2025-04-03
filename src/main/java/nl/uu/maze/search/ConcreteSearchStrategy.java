@@ -77,7 +77,7 @@ public class ConcreteSearchStrategy extends SearchStrategy<PathConditionCandidat
         while ((candidate = next()) != null) {
             candidate.applyNegation();
             if (!isExplored(candidate)) {
-                Optional<Model> model = validator.validate(candidate.getPathConstraints());
+                Optional<Model> model = validator.validate(candidate.getConstraints());
                 if (model.isPresent()) {
                     return model;
                 }

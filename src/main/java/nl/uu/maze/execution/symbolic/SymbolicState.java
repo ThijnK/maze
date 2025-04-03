@@ -417,11 +417,10 @@ public class SymbolicState implements SearchTarget {
 
     /**
      * Returns the list of all constraints (path + engine constraints) for this
-     * state.
-     * Engine constraints will include additional constraints for concrete heap
-     * references to be distinct.
+     * state. Engine constraints will include additional constraints for concrete
+     * heap references to be distinct.
      */
-    public List<PathConstraint> getAllConstraints() {
+    public List<PathConstraint> getConstraints() {
         List<PathConstraint> allConstraints = new ArrayList<>(getPathConstraints());
         allConstraints.addAll(getFullEngineConstraints());
         return allConstraints;

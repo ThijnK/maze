@@ -27,6 +27,8 @@ public class QueryCostHeuristic extends SearchHeuristic {
 
     @Override
     public <T extends SearchTarget> double calculateWeight(T target) {
-        return target.getEstimatedQueryCost();
+        return target.getConstraints().stream()
+                .mapToInt(constraint -> constraint.getEstimatedCost())
+                .sum();
     }
 }
