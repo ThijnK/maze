@@ -61,6 +61,10 @@ public class Application implements Callable<Integer> {
             "--logLevel" }, description = "Log level (default: ${DEFAULT-VALUE}, options: ${COMPLETION_CANDIDATES})", defaultValue = "INFO", paramLabel = "<level>", converter = LogLevelConverter.class)
     private Level logLevel;
 
+    @Option(names = { "-t",
+            "--testTimeout" }, description = "Timeout to apply to generated test cases (default: ${DEFAULT-VALUE})", defaultValue = "no timeout", paramLabel = "<long>", converter = TestTimeoutConverter.class)
+    private long testTimeout;
+
     @Override
     public Integer call() {
         try {
@@ -73,7 +77,7 @@ public class Application implements Callable<Integer> {
             SearchStrategy<?> strategy = SearchStrategyFactory.createStrategy(searchStrategies, searchHeuristics,
                     heuristicWeights);
             DSEController controller = new DSEController(
-                    classPath, className, concreteDriven, strategy, outPath, maxDepth);
+                    classPath, className, concreteDriven, strategy, outPath, maxDepth, testTimeout);
             controller.run();
             return 0;
         } catch (Exception e) {
@@ -124,4 +128,25 @@ public class Application implements Callable<Integer> {
         }
     }
 
+    /**
+     * Type converter for long values representing test timeouts.
+     */
+    public static class TestTimeoutConverter implements ITypeConverter<Long> {
+        @Override
+        public Long convert(String value) {
+            try {
+                if (value == null || value.isEmpty() || value.equalsIgnoreCase("no timeout")) {
+                    return 0L; // No timeout specified
+                }
+                long longValue = Long.parseLong(value);
+                if (longValue < 0) {
+                    throw new TypeConversionException(
+                            "Test timeout must be a positive long: " + value);
+                }
+                return longValue;
+            } catch (NumberFormatException e) {
+                throw new TypeConversionException("Test timeout must be a valid long: " + value);
+            }
+        }
+    }
 }

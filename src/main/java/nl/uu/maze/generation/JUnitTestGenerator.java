@@ -20,6 +20,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 import org.junit.jupiter.api.Assertions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,10 +55,16 @@ public class JUnitTestGenerator {
     private final Set<Class<?>> primitiveWrappers = Set.of(Boolean.class, Byte.class, Short.class, Integer.class,
             Long.class, Float.class, Double.class, Character.class);
 
-    public JUnitTestGenerator(Class<?> clazz, JavaAnalyzer analyzer, ConcreteExecutor executor) {
+    public JUnitTestGenerator(Class<?> clazz, JavaAnalyzer analyzer, ConcreteExecutor executor, long testTimeout) {
         testClassName = clazz.getSimpleName() + "Test";
         classBuilder = TypeSpec.classBuilder(testClassName)
                 .addModifiers(Modifier.PUBLIC);
+
+        if (testTimeout > 0) {
+            AnnotationSpec.Builder timeoutAnnotation = AnnotationSpec.builder(Timeout.class);
+            timeoutAnnotation.addMember("value", "$L", testTimeout);
+            classBuilder.addAnnotation(timeoutAnnotation.build());
+        }
         this.clazz = clazz;
         this.methodCount = new java.util.HashMap<>();
         this.analyzer = analyzer;
@@ -101,6 +108,7 @@ public class JUnitTestGenerator {
         boolean isVoid = method.getReturnType().toString().equals("void");
         boolean isException = retval instanceof Exception;
 
+        // The method name TEMP will be replaced with the actual test name later
         MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder("TEMP")
                 .addModifiers(Modifier.PUBLIC)
                 .addAnnotation(Test.class)

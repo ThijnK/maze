@@ -77,7 +77,7 @@ public class DSEController {
      * @param maxDepth       The maximum depth for symbolic execution
      */
     public DSEController(String classPath, String className, boolean concreteDriven, SearchStrategy<?> searchStrategy,
-            String outPath, int maxDepth)
+            String outPath, int maxDepth, long testTimeout)
             throws Exception {
         this.outPath = Path.of(outPath);
         this.maxDepth = maxDepth;
@@ -95,7 +95,7 @@ public class DSEController {
         this.validator = new SymbolicStateValidator();
         this.symbolic = new SymbolicExecutor(concrete, validator, analyzer, searchStrategy.requiresCoverageData(),
                 searchStrategy.requiresBranchHistoryData());
-        this.generator = new JUnitTestGenerator(clazz, analyzer, concrete);
+        this.generator = new JUnitTestGenerator(clazz, analyzer, concrete, testTimeout);
     }
 
     /**
