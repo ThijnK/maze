@@ -4,15 +4,18 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.function.Function;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import nl.uu.maze.search.concrete.ConcreteSearchStrategy;
 import nl.uu.maze.search.heuristic.SearchHeuristicFactory;
-import nl.uu.maze.search.symbolic.SymbolicSearchStrategy;
-import nl.uu.maze.util.TriFunction;
+import nl.uu.maze.search.heuristic.UniformHeuristic;
+import nl.uu.maze.search.strategy.BFS;
+import nl.uu.maze.search.strategy.DFS;
+import nl.uu.maze.search.strategy.InterleavedSearch;
+import nl.uu.maze.search.strategy.ProbabilisticSearch;
+import nl.uu.maze.search.strategy.RandomPathSearch;
+import nl.uu.maze.search.strategy.SubpathGuidedSearch;
 
 /**
  * Factory class for creating search strategies.
@@ -29,64 +32,30 @@ public class SearchStrategyFactory {
      * Defaults to DFS none of the given names could be resolved to an existing
      * strategy.
      * 
-     * <p>
-     * Search strategies specifically for symbolic-driven or concrete-driven DSE can
-     * be created with their respective factory methods.
-     * </p>
-     * 
+     * @param <T>              The type of the search target (e.g., symbolic state
+     *                         or
+     *                         path condition candidate)
      * @param names            The names of the search strategies (singleton list
      *                         for a single strategy)
      * @param heuristicNames   The names of the heuristics to use (in case of
      *                         probabilistic search)
      * @param heuristicWeights The weights of the heuristics to use (in case of
      *                         probabilistic search)
-     * @param concreteDriven   Whether to create a concrete-driven search strategy
      * @return A search strategy
      */
-    public static SearchStrategy<?> createStrategy(List<String> names, List<String> heuristicNames,
-            List<Double> heuristicWeights,
-            boolean concreteDriven) {
-        return concreteDriven
-                ? createStrategy(names, heuristicNames, heuristicWeights, SearchStrategyFactory::createConcreteStrategy,
-                        nl.uu.maze.search.concrete.InterleavedSearch::new)
-                : createStrategy(names, heuristicNames, heuristicWeights, SearchStrategyFactory::createSymbolicStrategy,
-                        nl.uu.maze.search.symbolic.InterleavedSearch::new);
-    }
-
-    /**
-     * Creates a search strategy based on the given list of names and heuristics.
-     * If multiple names are provided, they are used in interleaved search.
-     * Defaults to DFS none of the given names could be resolved to an existing
-     * strategy.
-     * 
-     * @param <T>              The type of the search strategy (concrete or
-     *                         symbolic)
-     * @param names            The names of the search strategies (singleton list
-     *                         for a single strategy)
-     * @param heuristicNames   The names of the heuristics to use (in case of
-     *                         probabilistic search)
-     * @param heuristicWeights The weights of the heuristics to use (in case of
-     *                         probabilistic search)
-     * @param strategyFactory  The factory method to create a search strategy of the
-     *                         right type
-     * @param interleavedCtor  The constructor for the interleaved search strategy
-     *                         of the right type
-     * @return A search strategy
-     */
-    private static <T extends SearchStrategy<?>> T createStrategy(List<String> names, List<String> heuristicNames,
-            List<Double> heuristicWeights, TriFunction<String, List<String>, List<Double>, T> strategyFactory,
-            Function<List<T>, T> interleavedCtor) {
+    public static <T extends SearchTarget> SearchStrategy<T> createStrategy(List<String> names,
+            List<String> heuristicNames, List<Double> heuristicWeights) {
         if (names.isEmpty()) {
             logger.warn("No search strategy provided, defaulting to DFS");
-            return strategyFactory.apply("DFS", heuristicNames, heuristicWeights);
+            return createStrategy("DFS", heuristicNames, heuristicWeights);
         }
 
         // If multiple names provided, use them in interleaved search
         if (names.size() > 1) {
             Set<String> uniqueStrategies = new HashSet<>();
-            List<T> strategies = new ArrayList<>();
+            List<SearchStrategy<T>> strategies = new ArrayList<>();
             for (String name : names) {
-                T strategy = strategyFactory.apply(name, heuristicNames, heuristicWeights);
+                SearchStrategy<T> strategy = createStrategy(name, heuristicNames, heuristicWeights);
                 if (uniqueStrategies.add(strategy.getName())) {
                     strategies.add(strategy);
                 }
@@ -97,81 +66,49 @@ public class SearchStrategyFactory {
             }
 
             return strategies.size() == 1 ? strategies.getFirst()
-                    : interleavedCtor.apply(strategies);
+                    : new InterleavedSearch<T>(strategies);
         }
 
-        return strategyFactory.apply(names.getFirst(), heuristicNames, heuristicWeights);
+        return createStrategy(names.getFirst(), heuristicNames, heuristicWeights);
     }
 
     /**
-     * Creates a symbolic search strategy based on the given name.
+     * Creates a single search strategy based on the given name.
      * Defaults to DFS if the name is unknown.
      * 
+     * @param <T>              The type of the search target (e.g., symbolic state
+     *                         or
+     *                         path condition candidate)
      * @param name             The name of the search strategy
      * @param heuristicNames   The names of the heuristics to use (in case of
      *                         probabilistic search)
      * @param heuristicWeights The weights of the heuristics to use (in case of
      *                         probabilistic search)
-     * @return A symbolic search strategy
+     * @return A search strategy
      */
-    private static SymbolicSearchStrategy createSymbolicStrategy(String name, List<String> heuristicNames,
+    private static <T extends SearchTarget> SearchStrategy<T> createStrategy(String name, List<String> heuristicNames,
             List<Double> heuristicWeights) {
         return switch (name) {
-            case "DepthFirst", "DepthFirstSearch", "DFS" -> new nl.uu.maze.search.symbolic.DFS();
-            case "BreadthFirst", "BreadthFirstSearch", "BFS" -> new nl.uu.maze.search.symbolic.BFS();
-            case "RandomPath", "RandomPathSearch", "RPS" -> new nl.uu.maze.search.symbolic.RandomPathSearch();
+            case "DepthFirst", "DepthFirstSearch", "DFS" -> new DFS<T>();
+            case "BreadthFirst", "BreadthFirstSearch", "BFS" -> new BFS<T>();
+            case "RandomPath", "RandomPathSearch", "RPS" -> new RandomPathSearch<T>();
             case "Probabilistic", "ProbabilisticSearch", "PS" ->
-                new nl.uu.maze.search.symbolic.ProbabilisticSearch(
+                new ProbabilisticSearch<T>(
                         SearchHeuristicFactory.createHeuristics(heuristicNames, heuristicWeights));
-            case "SubpathGuided", "SubpathGuidedSearch", "SGS" -> new nl.uu.maze.search.symbolic.SubpathGuidedSearch();
+            case "SubpathGuided", "SubpathGuidedSearch", "SGS" ->
+                new SubpathGuidedSearch<T>();
             // Special case for uniform random search, which is just probabilistic search
             // with the UniformHeuristic
-            case "UniformRandom", "UniformRandomSearch", "URS" -> new nl.uu.maze.search.symbolic.ProbabilisticSearch(
-                    List.of(new nl.uu.maze.search.heuristic.UniformHeuristic()));
+            case "UniformRandom", "UniformRandomSearch", "URS" -> new ProbabilisticSearch<T>(
+                    List.of(new UniformHeuristic()));
             // Special case for coverage-optimized search, which uses predefined heuristics
             case "CoverageOptimized", "CoverageOptimizedSearch", "COS" ->
-                new nl.uu.maze.search.symbolic.ProbabilisticSearch(
+                new ProbabilisticSearch<T>(
                         SearchHeuristicFactory.createHeuristics(coverageOptimizedHeuristics,
                                 coverageOptimizedWeights));
             default -> {
                 logger.warn("Unknown symbolic search strategy: {}, defaulting to DFS", name);
-                yield new nl.uu.maze.search.symbolic.DFS();
-            }
-        };
-    }
-
-    /**
-     * Creates a concrete search strategy based on the given name.
-     * Defaults to DFS if the name is unknown.
-     * 
-     * @param name             The name of the search strategy
-     * @param heuristicNames   The names of the heuristics to use (in case of
-     *                         probabilistic search)
-     * @param heuristicWeights The weights of the heuristics to use (in case of
-     *                         probabilistic search)
-     * @return A concrete search strategy
-     */
-    private static ConcreteSearchStrategy createConcreteStrategy(String name, List<String> heuristicNames,
-            List<Double> heuristicWeights) {
-        return switch (name) {
-            case "DepthFirst", "DepthFirstSearch", "DFS" -> new nl.uu.maze.search.concrete.DFS();
-            case "BreadthFirst", "BreadthFirstSearch", "BFS" -> new nl.uu.maze.search.concrete.BFS();
-            case "Probabilistic", "ProbabilisticSearch", "PS" ->
-                new nl.uu.maze.search.concrete.ProbabilisticSearch(
-                        SearchHeuristicFactory.createHeuristics(heuristicNames, heuristicWeights));
-            case "SubpathGuided", "SubpathGuidedSearch", "SGS" -> new nl.uu.maze.search.concrete.SubpathGuidedSearch();
-            // Special case for uniform random search, which is just probabilistic search
-            // with the UniformHeuristic
-            case "UniformRandom", "UniformRandomSearch", "URS" -> new nl.uu.maze.search.concrete.ProbabilisticSearch(
-                    List.of(new nl.uu.maze.search.heuristic.UniformHeuristic()));
-            // Special case for coverage-optimized search, which uses predefined heuristics
-            case "CoverageOptimized", "CoverageOptimizedSearch", "COS" ->
-                new nl.uu.maze.search.concrete.ProbabilisticSearch(
-                        SearchHeuristicFactory.createHeuristics(coverageOptimizedHeuristics,
-                                coverageOptimizedWeights));
-            default -> {
-                logger.warn("Unknown concrete search strategy: {}, defaulting to DFS", name);
-                yield new nl.uu.maze.search.concrete.DFS();
+                yield new DFS<T>();
             }
         };
     }

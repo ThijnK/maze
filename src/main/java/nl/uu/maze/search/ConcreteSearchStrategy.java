@@ -1,4 +1,4 @@
-package nl.uu.maze.search.concrete;
+package nl.uu.maze.search;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -8,31 +8,33 @@ import java.util.Set;
 
 import com.microsoft.z3.Model;
 
+import nl.uu.maze.execution.concrete.PathConditionCandidate;
 import nl.uu.maze.execution.symbolic.PathConstraint;
 import nl.uu.maze.execution.symbolic.SymbolicState;
 import nl.uu.maze.execution.symbolic.SymbolicStateValidator;
 import nl.uu.maze.execution.symbolic.PathConstraint.CompositeConstraint;
-import nl.uu.maze.search.SearchStrategy;
 
 /**
- * Abstract class for search strategies that operate on concrete-driven DSE.
+ * Wrapper class for search strategies that operate on concrete-driven DSE.
+ * This is just a type-specialized wrapper for the generic search strategy.
+ * It is used to make a clear distinction between symbolic-driven search and
+ * concrete-driven search, and to allow the concrete-driven search to add
+ * additional specialization.
  */
-public abstract class ConcreteSearchStrategy implements SearchStrategy<PathConditionCandidate> {
+public class ConcreteSearchStrategy extends SearchStrategy<PathConditionCandidate> {
+    private final SearchStrategy<PathConditionCandidate> strategy;
     private final Set<Integer> exploredPaths = new HashSet<>();
 
-    /**
-     * Add a candidate to the search strategy.
-     * 
-     * @param candidate The candidate to add
-     * @apiNote Use {@link #add(SymbolicState)} to derive path condition
-     *          candidates to add from a symbolic state instead
-     */
-    public abstract void add(PathConditionCandidate candidate);
+    public ConcreteSearchStrategy(SearchStrategy<PathConditionCandidate> searchStrategy) {
+        this.strategy = searchStrategy;
+    }
 
     /**
-     * Add a symbolic state to the search strategy if it has not been explored yet.
+     * If the given symbolic state has not been explored before, extracts path
+     * condition candidates from the symbolic state and adds them to the search
+     * strategy. Otherwise, it does nothing.
      * 
-     * @param state The symbolic state to add
+     * @param state The symbolic state to extract candidates from
      * @return {@code true} if the symbolic state was added, {@code false} if it has
      *         been previously explored
      */
@@ -62,16 +64,6 @@ public abstract class ConcreteSearchStrategy implements SearchStrategy<PathCondi
     }
 
     /**
-     * Get the next candidate to explore.
-     * 
-     * @return The next candidate to explore, or null if there are no more
-     *         candidates
-     * @apiNote Use {@link #next(SymbolicStateValidator)} instead to get candidates
-     *          that are satisfiable according to a validator
-     */
-    public abstract PathConditionCandidate next();
-
-    /**
      * Get the next candidate to explore that is satisfiable according to the given
      * validator.
      * 
@@ -97,7 +89,7 @@ public abstract class ConcreteSearchStrategy implements SearchStrategy<PathCondi
     /**
      * Determines whether a path condition candidate has been explored before.
      */
-    protected boolean isExplored(PathConditionCandidate candidate) {
+    private boolean isExplored(PathConditionCandidate candidate) {
         return exploredPaths.contains(candidate.hashCode());
     }
 
@@ -108,7 +100,7 @@ public abstract class ConcreteSearchStrategy implements SearchStrategy<PathCondi
      * @param state The symbolic state to check
      * @return Whether the symbolic state has been explored before
      */
-    protected boolean isExplored(SymbolicState state) {
+    private boolean isExplored(SymbolicState state) {
         // Add every prefix of the path as explored as well
         List<Integer> prefixes = new ArrayList<>();
         int result = 1;
@@ -124,14 +116,39 @@ public abstract class ConcreteSearchStrategy implements SearchStrategy<PathCondi
         return false;
     }
 
-    // By default, search strategies do not require coverage data
-    // Subclasses can override this method if they do
-    public boolean requiresCoverageData() {
-        return false;
+    @Override
+    public String getName() {
+        return strategy.getName();
     }
 
-    // By default, search strategies do not require branch history data
+    @Override
+    public void add(PathConditionCandidate item) {
+        strategy.add(item);
+    }
+
+    @Override
+    public void remove(PathConditionCandidate item) {
+        strategy.remove(item);
+    }
+
+    @Override
+    public PathConditionCandidate next() {
+        return strategy.next();
+    }
+
+    @Override
+    public void reset() {
+        strategy.reset();
+        exploredPaths.clear();
+    }
+
+    @Override
+    public boolean requiresCoverageData() {
+        return strategy.requiresCoverageData();
+    }
+
+    @Override
     public boolean requiresBranchHistoryData() {
-        return false;
+        return strategy.requiresBranchHistoryData();
     }
 }

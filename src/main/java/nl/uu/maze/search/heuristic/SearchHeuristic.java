@@ -3,8 +3,7 @@ package nl.uu.maze.search.heuristic;
 import java.util.Arrays;
 import java.util.List;
 
-import sootup.core.graph.StmtGraph;
-import sootup.core.jimple.common.stmt.Stmt;
+import nl.uu.maze.search.SearchTarget;
 
 /**
  * Search heuristics that are used in probabilistic search to determine a
@@ -53,7 +52,7 @@ public abstract class SearchHeuristic {
      * @param target The target to evaluate
      * @return The weight of the target
      */
-    public abstract <T extends HeuristicTarget> double calculateWeight(T target);
+    public abstract <T extends SearchTarget> double calculateWeight(T target);
 
     /**
      * Selects and removes a target from the list based on a weighted combination of
@@ -65,7 +64,7 @@ public abstract class SearchHeuristic {
      * @return The selected target (which is also removed from the input list)
      * @throws IllegalArgumentException if inputs are invalid
      */
-    public static <T extends HeuristicTarget> T weightedProbabilisticSelect(List<T> targets,
+    public static <T extends SearchTarget> T weightedProbabilisticSelect(List<T> targets,
             List<SearchHeuristic> heuristics) {
         // If only one or zero targets, skip the calculations
         if (targets.size() <= 1) {
@@ -127,54 +126,5 @@ public abstract class SearchHeuristic {
 
         // Remove and return the selected target
         return targets.remove(selectedIndex);
-    }
-
-    /**
-     * Interface for an object for which a search heuristic can calculate a weight.
-     * For example, a symbolic state or a path condition candidate.
-     */
-    public interface HeuristicTarget {
-        /**
-         * Returns the statement (node within the CFG) that the target is associated
-         * with.
-         */
-        Stmt getStmt();
-
-        /**
-         * Returns the statement (node within the CFG) that precedes the target.
-         */
-        Stmt getPrevStmt();
-
-        /**
-         * Returns the control flow graph that the target is part of.
-         */
-        StmtGraph<?> getCFG();
-
-        /**
-         * Returns the depth of the target in the execution tree.
-         */
-        int getDepth();
-
-        /**
-         * Returns the depths at which the target covered new code.
-         */
-        List<Integer> getNewCoverageDepths();
-
-        /**
-         * Returns a list of integer-encoded branches that were taken along the path
-         * leading to this target.
-         */
-        List<Integer> getBranchHistory();
-
-        /**
-         * Returns the estimated cost of the query for the SMT solver associated with
-         * the target.
-         */
-        int getEstimatedQueryCost();
-
-        /**
-         * Returns the call depth (number of nested function calls) of the target.
-         */
-        int getCallDepth();
     }
 }

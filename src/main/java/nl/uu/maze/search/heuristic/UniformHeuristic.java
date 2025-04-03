@@ -1,5 +1,7 @@
 package nl.uu.maze.search.heuristic;
 
+import nl.uu.maze.search.SearchTarget;
+
 /**
  * Uniform heuristic that assigns the same weight to every state.
  * Used for uniform random search.
@@ -18,7 +20,7 @@ public class UniformHeuristic extends SearchHeuristic {
     }
 
     @Override
-    public <T extends HeuristicTarget> double calculateWeight(T target) {
+    public <T extends SearchTarget> double calculateWeight(T target) {
         return 1.0;
     }
 }

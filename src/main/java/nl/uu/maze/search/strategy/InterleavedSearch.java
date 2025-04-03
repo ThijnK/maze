@@ -1,27 +1,27 @@
-package nl.uu.maze.search.symbolic;
+package nl.uu.maze.search.strategy;
 
-import java.util.Arrays;
 import java.util.List;
 
-import nl.uu.maze.execution.symbolic.SymbolicState;
+import nl.uu.maze.search.SearchStrategy;
+import nl.uu.maze.search.SearchTarget;
 
-public class InterleavedSearch extends SymbolicSearchStrategy {
+public class InterleavedSearch<T extends SearchTarget> extends SearchStrategy<T> {
     private static final long STRATEGY_TIMEOUT = 1000;
 
-    private final SymbolicSearchStrategy[] strategies;
+    private final List<SearchStrategy<T>> strategies;
     private int currentStrategyIndex = 0;
     private long currentStrategyStartTime = 0;
 
-    public InterleavedSearch(List<SymbolicSearchStrategy> strategies) {
+    public InterleavedSearch(List<SearchStrategy<T>> strategies) {
         if (strategies.isEmpty()) {
             throw new IllegalArgumentException("At least one strategy must be provided");
         }
-        this.strategies = strategies.toArray(SymbolicSearchStrategy[]::new);
+        this.strategies = strategies;
     }
 
     public String getName() {
         StringBuilder sb = new StringBuilder("InterleavedSearch(");
-        for (SymbolicSearchStrategy strategy : strategies) {
+        for (SearchStrategy<T> strategy : strategies) {
             sb.append(strategy.getName()).append(", ");
         }
         sb.setLength(sb.length() - 2);
@@ -30,38 +30,38 @@ public class InterleavedSearch extends SymbolicSearchStrategy {
     }
 
     @Override
-    public void add(SymbolicState state) {
-        for (SymbolicSearchStrategy strategy : strategies) {
+    public void add(T state) {
+        for (SearchStrategy<T> strategy : strategies) {
             strategy.add(state);
         }
     }
 
     @Override
-    public void remove(SymbolicState state) {
-        for (SymbolicSearchStrategy strategy : strategies) {
+    public void remove(T state) {
+        for (SearchStrategy<T> strategy : strategies) {
             strategy.remove(state);
         }
     }
 
     @Override
-    public SymbolicState next() {
+    public T next() {
         if (currentStrategyStartTime == 0) {
             currentStrategyStartTime = System.currentTimeMillis();
         }
-        SymbolicState next = strategies[currentStrategyIndex].next();
+        T next = strategies.get(currentStrategyIndex).next();
 
         // Remove the selected state from the other strategies
         if (next != null) {
-            for (int i = 0; i < strategies.length; i++) {
+            for (int i = 0; i < strategies.size(); i++) {
                 if (i != currentStrategyIndex) {
-                    strategies[i].remove(next);
+                    strategies.get(i).remove(next);
                 }
             }
         }
 
         long currentTime = System.currentTimeMillis();
         if (currentTime - currentStrategyStartTime > STRATEGY_TIMEOUT) {
-            currentStrategyIndex = (currentStrategyIndex + 1) % strategies.length;
+            currentStrategyIndex = (currentStrategyIndex + 1) % strategies.size();
             currentStrategyStartTime = currentTime;
         }
 
@@ -70,13 +70,18 @@ public class InterleavedSearch extends SymbolicSearchStrategy {
 
     @Override
     public void reset() {
-        for (SymbolicSearchStrategy strategy : strategies) {
+        for (SearchStrategy<T> strategy : strategies) {
             strategy.reset();
         }
     }
 
     @Override
     public boolean requiresCoverageData() {
-        return Arrays.stream(strategies).anyMatch(SymbolicSearchStrategy::requiresCoverageData);
+        return strategies.stream().anyMatch(SearchStrategy::requiresCoverageData);
+    }
+
+    @Override
+    public boolean requiresBranchHistoryData() {
+        return strategies.stream().anyMatch(SearchStrategy::requiresBranchHistoryData);
     }
 }

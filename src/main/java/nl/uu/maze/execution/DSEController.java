@@ -22,9 +22,7 @@ import nl.uu.maze.execution.symbolic.*;
 import nl.uu.maze.generation.JUnitTestGenerator;
 import nl.uu.maze.instrument.*;
 import nl.uu.maze.search.*;
-import nl.uu.maze.search.concrete.ConcreteSearchStrategy;
-import nl.uu.maze.search.symbolic.DFS;
-import nl.uu.maze.search.symbolic.SymbolicSearchStrategy;
+import nl.uu.maze.search.strategy.DFS;
 import sootup.core.graph.StmtGraph;
 import sootup.java.core.JavaSootClass;
 import sootup.java.core.JavaSootMethod;
@@ -86,7 +84,7 @@ public class DSEController {
         this.concreteDriven = concreteDriven;
         this.instrumented = concreteDriven ? BytecodeInstrumentation.instrument(classPath, className) : null;
         this.searchStrategy = searchStrategy;
-        this.replayStrategy = new DFS();
+        this.replayStrategy = new SymbolicSearchStrategy(new DFS<SymbolicState>());
 
         this.analyzer = new JavaAnalyzer(classPath, instrumented != null ? instrumented.getClassLoader() : null);
         JavaClassType classType = analyzer.getClassType(className);
@@ -138,9 +136,9 @@ public class DSEController {
 
             logger.info("Processing method: {}", method.getName());
             if (concreteDriven) {
-                runConcreteDriven(method, (ConcreteSearchStrategy) searchStrategy);
+                runConcreteDriven(method, searchStrategy.toConcrete());
             } else {
-                runSymbolicDriven(method, (SymbolicSearchStrategy) searchStrategy);
+                runSymbolicDriven(method, searchStrategy.toSymbolic());
             }
             searchStrategy.reset();
         }

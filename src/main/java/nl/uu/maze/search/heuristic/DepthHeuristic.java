@@ -1,5 +1,7 @@
 package nl.uu.maze.search.heuristic;
 
+import nl.uu.maze.search.SearchTarget;
+
 /**
  * A heuristic that prioritizes deeper paths by exponentially increasing the
  * weight of targets as they go deeper in the execution tree.
@@ -23,7 +25,7 @@ public class DepthHeuristic extends SearchHeuristic {
     }
 
     @Override
-    public <T extends HeuristicTarget> double calculateWeight(T target) {
+    public <T extends SearchTarget> double calculateWeight(T target) {
         int depth = target.getDepth();
         return Math.pow(2, depth); // 2^(depth)
     }

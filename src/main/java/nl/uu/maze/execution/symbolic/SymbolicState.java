@@ -12,7 +12,7 @@ import nl.uu.maze.execution.MethodType;
 import nl.uu.maze.util.Z3ContextProvider;
 import nl.uu.maze.util.Z3Sorts;
 import nl.uu.maze.execution.symbolic.PathConstraint.SingleConstraint;
-import nl.uu.maze.search.heuristic.SearchHeuristic.HeuristicTarget;
+import nl.uu.maze.search.SearchTarget;
 import sootup.core.graph.StmtGraph;
 import sootup.core.jimple.basic.Immediate;
 import sootup.core.jimple.common.expr.AbstractInstanceInvokeExpr;
@@ -38,7 +38,7 @@ import sootup.core.types.Type;
  * </ul>
  * </p>
  */
-public class SymbolicState implements HeuristicTarget {
+public class SymbolicState implements SearchTarget {
     private static final Context ctx = Z3ContextProvider.getContext();
 
     private MethodSignature methodSig;

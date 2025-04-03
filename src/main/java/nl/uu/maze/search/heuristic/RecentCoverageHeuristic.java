@@ -2,6 +2,8 @@ package nl.uu.maze.search.heuristic;
 
 import java.util.List;
 
+import nl.uu.maze.search.SearchTarget;
+
 /**
  * A heuristic that prioritizes targets that have covered new statements
  * recently.
@@ -27,7 +29,7 @@ public class RecentCoverageHeuristic extends SearchHeuristic {
     }
 
     @Override
-    public <T extends HeuristicTarget> double calculateWeight(T target) {
+    public <T extends SearchTarget> double calculateWeight(T target) {
         int targetDepth = target.getDepth();
         List<Integer> coverageDepths = target.getNewCoverageDepths();
 

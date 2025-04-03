@@ -1,5 +1,7 @@
 package nl.uu.maze.search.heuristic;
 
+import nl.uu.maze.search.SearchTarget;
+
 /**
  * A heuristic that prioritizes targets with deeply nested function calls.
  * This can be useful to ensure that deeply nested function calls are not
@@ -16,7 +18,7 @@ public class CallDepthHeuristic extends SearchHeuristic {
     }
 
     @Override
-    public <T extends HeuristicTarget> double calculateWeight(T target) {
+    public <T extends SearchTarget> double calculateWeight(T target) {
         // Add one to avoid zero depth targets, which would cause them to be ignored
         // entirely if there is but a single target which has at least depth 1
         return target.getCallDepth() + 1;

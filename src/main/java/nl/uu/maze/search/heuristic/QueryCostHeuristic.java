@@ -1,5 +1,7 @@
 package nl.uu.maze.search.heuristic;
 
+import nl.uu.maze.search.SearchTarget;
+
 /**
  * A heuristic that prioritizes targets with lower estimated SMT query costs.
  * 
@@ -24,7 +26,7 @@ public class QueryCostHeuristic extends SearchHeuristic {
     }
 
     @Override
-    public <T extends HeuristicTarget> double calculateWeight(T target) {
+    public <T extends SearchTarget> double calculateWeight(T target) {
         return target.getEstimatedQueryCost();
     }
 }

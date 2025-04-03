@@ -70,8 +70,8 @@ public class Application implements Callable<Integer> {
 
             List<String> searchStrategies = this.searchStrategies.stream().map(ValidSearchStrategy::name).toList();
             List<String> searchHeuristics = this.searchHeuristics.stream().map(ValidSearchHeuristic::name).toList();
-            SearchStrategy<?> strategy = SearchStrategyFactory.createStrategy(
-                    searchStrategies, searchHeuristics, heuristicWeights, concreteDriven);
+            SearchStrategy<?> strategy = SearchStrategyFactory.createStrategy(searchStrategies, searchHeuristics,
+                    heuristicWeights);
             DSEController controller = new DSEController(
                     classPath, className, concreteDriven, strategy, outPath, maxDepth);
             controller.run();

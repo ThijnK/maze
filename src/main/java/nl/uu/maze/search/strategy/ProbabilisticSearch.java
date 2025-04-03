@@ -1,9 +1,10 @@
-package nl.uu.maze.search.symbolic;
+package nl.uu.maze.search.strategy;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import nl.uu.maze.execution.symbolic.SymbolicState;
+import nl.uu.maze.search.SearchStrategy;
+import nl.uu.maze.search.SearchTarget;
 import nl.uu.maze.search.heuristic.SearchHeuristic;
 
 /**
@@ -11,8 +12,8 @@ import nl.uu.maze.search.heuristic.SearchHeuristic;
  * This strategy selects the next state probabilistically based on the provided
  * heuristics.
  */
-public class ProbabilisticSearch extends SymbolicSearchStrategy {
-    private final List<SymbolicState> states = new ArrayList<>();
+public class ProbabilisticSearch<T extends SearchTarget> extends SearchStrategy<T> {
+    private final List<T> states = new ArrayList<>();
     private final List<SearchHeuristic> heuristics;
 
     public ProbabilisticSearch(List<SearchHeuristic> heuristics) {
@@ -33,17 +34,17 @@ public class ProbabilisticSearch extends SymbolicSearchStrategy {
     }
 
     @Override
-    public void add(SymbolicState state) {
+    public void add(T state) {
         states.add(state);
     }
 
     @Override
-    public void remove(SymbolicState state) {
+    public void remove(T state) {
         states.remove(state);
     }
 
     @Override
-    public SymbolicState next() {
+    public T next() {
         return SearchHeuristic.weightedProbabilisticSelect(states, heuristics);
     }
 

@@ -5,6 +5,7 @@ import java.util.Queue;
 import java.util.Set;
 
 import nl.uu.maze.execution.symbolic.CoverageTracker;
+import nl.uu.maze.search.SearchTarget;
 import nl.uu.maze.util.Pair;
 import sootup.core.graph.StmtGraph;
 import sootup.core.jimple.common.stmt.Stmt;
@@ -36,12 +37,12 @@ public class DistanceToUncoveredHeuristic extends SearchHeuristic {
     }
 
     @Override
-    public <T extends HeuristicTarget> double calculateWeight(T target) {
+    public <T extends SearchTarget> double calculateWeight(T target) {
         // Multiplicative inverse so that lower distance is preferred
         return 1.0 / (calculateDistance(target) + 1);
     }
 
-    private <T extends HeuristicTarget> int calculateDistance(T target) {
+    private <T extends SearchTarget> int calculateDistance(T target) {
         Stmt stmt = target.getStmt();
         StmtGraph<?> cfg = target.getCFG();
 

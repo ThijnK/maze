@@ -1,11 +1,11 @@
-package nl.uu.maze.search.concrete;
+package nl.uu.maze.execution.concrete;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import nl.uu.maze.execution.symbolic.PathConstraint;
 import nl.uu.maze.execution.symbolic.PathConstraint.*;
-import nl.uu.maze.search.heuristic.SearchHeuristic.HeuristicTarget;
+import nl.uu.maze.search.SearchTarget;
 import sootup.core.graph.StmtGraph;
 import sootup.core.jimple.common.stmt.Stmt;
 
@@ -18,7 +18,7 @@ import sootup.core.jimple.common.stmt.Stmt;
  * @implNote The index is stored separately to apply the negation "lazily"
  *           (i.e., only when the candidate is selected for exploration).
  */
-public class PathConditionCandidate implements HeuristicTarget {
+public class PathConditionCandidate implements SearchTarget {
     private List<PathConstraint> pathConstraints;
     /** The index of the constraint to negate. */
     private final int index;
