@@ -89,7 +89,7 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
         // Handle arithmetic operations
         if (l instanceof BitVecExpr && r instanceof BitVecExpr) {
             Pair<BitVecExpr, BitVecExpr> coerced = coerceToSameSort((BitVecExpr) l, (BitVecExpr) r);
-            return bvOperation.apply(coerced.first(), coerced.second());
+            return bvOperation.apply(coerced.getFirst(), coerced.getSecond());
         } else if (l instanceof FPExpr && r instanceof FPExpr && fpOperation != null) {
             return fpOperation.apply((FPExpr) l, (FPExpr) r);
         }
@@ -97,10 +97,10 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
         // FP and the other is a bit vector
         else if (l instanceof FPExpr && r instanceof BitVecExpr && fpOperation != null) {
             Pair<FPExpr, FPExpr> coerced = coerceToSameSort((BitVecExpr) r, (FPExpr) l);
-            return fpOperation.apply(coerced.second(), coerced.first());
+            return fpOperation.apply(coerced.getSecond(), coerced.getFirst());
         } else if (l instanceof BitVecExpr && r instanceof FPExpr && fpOperation != null) {
             Pair<FPExpr, FPExpr> coerced = coerceToSameSort((BitVecExpr) l, (FPExpr) r);
-            return fpOperation.apply(coerced.first(), coerced.second());
+            return fpOperation.apply(coerced.getFirst(), coerced.getSecond());
         } else {
             throw new UnsupportedOperationException(
                     "Unsupported operand types: " + l.getSort() + " and " + r.getSort());

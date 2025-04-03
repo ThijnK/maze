@@ -21,8 +21,7 @@ public record Pair<First, Second>(First first, Second second) {
      *
      * @return the first value
      */
-    @Override
-    public First first() {
+    public First getFirst() {
         return first;
     }
 
@@ -31,8 +30,7 @@ public record Pair<First, Second>(First first, Second second) {
      *
      * @return the second value
      */
-    @Override
-    public Second second() {
+    public Second getSecond() {
         return second;
     }
 

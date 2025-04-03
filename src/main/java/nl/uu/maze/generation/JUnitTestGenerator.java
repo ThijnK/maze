@@ -354,7 +354,7 @@ public class JUnitTestGenerator {
      * constructor arguments.
      */
     private void buildObjectInstance(MethodSpec.Builder methodBuilder, String var, Class<?> clazz) {
-        Object[] arguments = analyzer.getJavaConstructor(clazz).second();
+        Object[] arguments = analyzer.getJavaConstructor(clazz).getSecond();
         String[] argNames = new String[arguments.length];
         for (int i = 0; i < arguments.length; i++) {
             Object arg = arguments[i];

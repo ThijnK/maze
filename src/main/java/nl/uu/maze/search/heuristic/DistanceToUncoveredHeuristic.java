@@ -58,8 +58,8 @@ public class DistanceToUncoveredHeuristic extends SearchHeuristic {
 
         while (!worklist.isEmpty()) {
             Pair<Stmt, Integer> item = worklist.poll();
-            stmt = item.first();
-            dist = item.second();
+            stmt = item.getFirst();
+            dist = item.getSecond();
 
             // If a statement has been visited before, we're dealing with a loop, so we can
             // skip it because the first iteration of the loop would have been the shortest
