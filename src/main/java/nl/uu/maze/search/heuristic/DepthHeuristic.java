@@ -5,14 +5,28 @@ import nl.uu.maze.search.SearchTarget;
 /**
  * Depth Heuristic (DH).
  * <p>
- * Exponentially increases weights for states deeper in the execution tree.
- * Useful for pushing exploration toward program behaviors that only emerge
- * after many execution steps. Less effective for concrete-driven DSE since
- * target depths aren't known at negation time.
+ * Assigns weights based on the depth of a target in the control flow graph,
+ * allowing a preference for deeper targets (or vice versa).
+ * Less effective for concrete-driven DSE since target depths aren't known at
+ * the time of negating a path constraint.
+ * <p>
+ * Two variants are available:
+ * <ul>
+ * <li>Greatest (GDH): prefers deeper targets.</li>
+ * <li>Smallest (SDH): prefers shallower targets.</li>
+ * </ul>
  */
 public class DepthHeuristic extends SearchHeuristic {
-    public DepthHeuristic(double weight) {
+    private final boolean preferDeepest;
+
+    /**
+     * @param weight        The weight of the heuristic.
+     * @param preferDeepest If {@code true}, prefers deeper targets, otherwise
+     *                      prefers shallower targets.
+     */
+    public DepthHeuristic(double weight, boolean preferDeepest) {
         super(weight);
+        this.preferDeepest = preferDeepest;
     }
 
     @Override
@@ -22,7 +36,6 @@ public class DepthHeuristic extends SearchHeuristic {
 
     @Override
     public <T extends SearchTarget> double calculateWeight(T target) {
-        int depth = target.getDepth();
-        return Math.pow(2, depth); // 2^(depth)
+        return applyExponentialScaling(target.getDepth(), 0.3, preferDeepest);
     }
 }

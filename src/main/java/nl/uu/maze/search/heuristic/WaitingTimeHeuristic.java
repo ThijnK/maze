@@ -13,7 +13,6 @@ import nl.uu.maze.search.SearchTarget;
  * <li>Longest (LWTH): prefers targets with longer waiting time.</li>
  * <li>Shortest (SWTH): prefers targets with shorter waiting time.</li>
  * </ul>
- * The default is SWTH.
  */
 public class WaitingTimeHeuristic extends SearchHeuristic {
     private final boolean preferLongest;

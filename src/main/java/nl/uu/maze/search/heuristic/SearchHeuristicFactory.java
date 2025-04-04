@@ -29,15 +29,17 @@ public class SearchHeuristicFactory {
             case "DistanceToUncovered", "DistanceToUncoveredHeuristic", "DTUH" ->
                 new DistanceToUncoveredHeuristic(weight);
             case "RecentCoverage", "RecentCoverageHeuristic", "RCH" -> new RecentCoverageHeuristic(weight);
-            case "Depth", "DepthHeuristic", "DH" -> new DepthHeuristic(weight);
             case "QueryCost", "QueryCostHeuristic", "QCH" -> new QueryCostHeuristic(weight);
-            case "CallDepth", "CallDepthHeuristic", "CDH" -> new CallDepthHeuristic(weight);
-            // For the waiting time heuristic, we have two variants, and the default should
-            // be shortest waiting time first
-            case "WaitingTime", "ShortestWaitingTime", "WaitingTimeHeuristic", "ShortestWaitingTimeHeuristic", "WTH",
-                    "SWTH" ->
+            case "SmallestDepth", "SmallestDepthHeuristic", "SDH" -> new DepthHeuristic(weight, false);
+            case "GreatestDepth", "GreatestDepthHeuristic", "GDH" -> new DepthHeuristic(weight, true);
+            case "SmallestCallDepth", "SmallestCallDepthHeuristic", "SCDH" ->
+                new CallDepthHeuristic(weight, false);
+            case "GreatestCallDepth", "GreatestCallDepthHeuristic", "GCDH" ->
+                new CallDepthHeuristic(weight, true);
+            case "ShortestWaitingTime", "ShortestWaitingTimeHeuristic", "SWTH" ->
                 new WaitingTimeHeuristic(weight, false);
-            case "LongestWaitingTime", "LongestWaitingTimeHeuristic", "LWTH" -> new WaitingTimeHeuristic(weight, true);
+            case "LongestWaitingTime", "LongestWaitingTimeHeuristic", "LWTH" ->
+                new WaitingTimeHeuristic(weight, true);
             default -> throw new IllegalArgumentException("Unknown search heuristic: " + name);
         };
     }
@@ -81,10 +83,11 @@ public class SearchHeuristicFactory {
         Uniform, UniformHeuristic, UH,
         DistanceToUncovered, DistanceToUncoveredHeuristic, DTUH,
         RecentCoverage, RecentCoverageHeuristic, RCH,
-        Depth, DepthHeuristic, DH,
         QueryCost, QueryCostHeuristic, QCH,
-        CallDepth, CallDepthHeuristic, CDH,
-        WaitingTime, WaitingTimeHeuristic, WTH,
+        SmallestDepth, SmallestDepthHeuristic, SDH,
+        GreatestDepth, GreatestDepthHeuristic, GDH,
+        SmallestCallDepth, SmallestCallDepthHeuristic, SCDH,
+        GreatestCallDepth, GreatestCallDepthHeuristic, GCDH,
         ShortestWaitingTime, ShortestWaitingTimeHeuristic, SWTH,
         LongestWaitingTime, LongestWaitingTimeHeuristic, LWTH
     }

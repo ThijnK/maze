@@ -5,13 +5,27 @@ import nl.uu.maze.search.SearchTarget;
 /**
  * Call Depth Heuristic (CDH).
  * <p>
- * Favors states with deeper call stacks, ensuring that deeply nested function
- * calls get explored rather than being neglected. This helps reach code that
- * might only execute after several layers of function calls.
+ * Assigns weights based on the call depth of a target, allowing a preference
+ * for deeply nested function calls (or vice versa).
+ * <p>
+ * Two variants are available:
+ * <ul>
+ * <li>Greatest (GCDH): prefers targets more deeply nested in fuction
+ * calls.</li>
+ * <li>Smallest (SCDH): prefers less deeply nested targets.</li>
+ * </ul>
  */
 public class CallDepthHeuristic extends SearchHeuristic {
-    public CallDepthHeuristic(double weight) {
+    private final boolean preferDeepest;
+
+    /**
+     * @param weight        The weight of the heuristic.
+     * @param preferDeepest If {@code true}, prefers deeper targets, otherwise
+     *                      prefers shallower targets.
+     */
+    public CallDepthHeuristic(double weight, boolean preferDeepest) {
         super(weight);
+        this.preferDeepest = preferDeepest;
     }
 
     @Override
@@ -21,8 +35,6 @@ public class CallDepthHeuristic extends SearchHeuristic {
 
     @Override
     public <T extends SearchTarget> double calculateWeight(T target) {
-        // Add one to avoid zero depth targets, which would cause them to be ignored
-        // entirely if there is but a single target which has at least depth 1
-        return target.getCallDepth() + 1;
+        return applyExponentialScaling(target.getCallDepth(), 0.25, preferDeepest);
     }
 }
