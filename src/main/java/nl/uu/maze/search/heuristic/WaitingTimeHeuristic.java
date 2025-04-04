@@ -18,6 +18,11 @@ import nl.uu.maze.search.SearchTarget;
 public class WaitingTimeHeuristic extends SearchHeuristic {
     private final boolean preferLongest;
 
+    /**
+     * @param weight        The weight of the heuristic.
+     * @param preferLongest If {@code true}, prefers targets with longer waiting
+     *                      time, otherwise prefers shorter waiting time.
+     */
     public WaitingTimeHeuristic(double weight, boolean preferLongest) {
         super(weight);
         this.preferLongest = preferLongest;
@@ -33,13 +38,7 @@ public class WaitingTimeHeuristic extends SearchHeuristic {
 
     @Override
     public <T extends SearchTarget> double calculateWeight(T target) {
-        // Use exponential decay or growth to strengthen the differences between
-        // waiting times
-        double factor = 0.3; // Adjust this factor to control the steepness of the curve
-        // -1 prefers shortest waiting time (exponential decay)
-        // 1 prefers longest waiting time (exponential growth)
-        double direction = preferLongest ? 1 : -1;
-        return Math.exp(direction * factor * target.getWaitingTime());
+        return applyExponentialScaling(target.getWaitingTime(), 0.3, preferLongest);
     }
 
 }

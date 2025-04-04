@@ -49,4 +49,27 @@ public abstract class SearchHeuristic {
      * @return The weight of the target
      */
     public abstract <T extends SearchTarget> double calculateWeight(T target);
+
+    /**
+     * Applies exponential scaling to a value based on a factor and a
+     * preference for higher or lower values.
+     * This strengthens the differences between values, i.e., two values close to
+     * each other are transformed to a much larger difference (depending on the
+     * factor).
+     * 
+     * @param value        The value to scale
+     * @param factor       The factor to scale the value by. Smaller values means
+     *                     less aggressive scaling.
+     * @param preferHigher If {@code true}, prefers higher values (factor remains
+     *                     unchanged), otherwise prefers lower values (factor is
+     *                     negated).
+     * @return The scaled value
+     */
+    protected double applyExponentialScaling(double value, double factor, boolean preferHigher) {
+        // Use exponential decay or growth to strengthen the differences between values
+        // -1 prefers lower values (exponential decay)
+        // 1 prefers higher values (exponential growth)
+        double direction = preferHigher ? 1 : -1;
+        return Math.exp(direction * factor * value);
+    }
 }
