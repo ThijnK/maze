@@ -11,8 +11,11 @@ import sootup.core.jimple.common.stmt.JIfStmt;
 import sootup.core.jimple.javabytecode.stmt.JSwitchStmt;
 
 /**
- * Search strategy for subpath-guided search.
- * It selects the next target whose length-n subpath has occurred least often.
+ * Subpath-Guided Search (SGS) strategy.
+ * <p>
+ * Tracks frequency of execution subpaths and prioritizes states with
+ * rarely seen patterns. This drives exploration toward less-visited code
+ * regions.
  */
 public class SubpathGuidedSearch<T extends SearchTarget> extends SearchStrategy<T> {
     private static final int SUBPATH_LENGTH = 2; // Length of the subpath to consider

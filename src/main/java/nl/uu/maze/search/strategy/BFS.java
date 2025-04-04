@@ -6,7 +6,12 @@ import java.util.Queue;
 import nl.uu.maze.search.SearchTarget;
 
 /**
- * Symbolic-driven search strategy for Breadth-First Search (BFS).
+ * Breadth-First Search (BFS) strategy.
+ * <p>
+ * Explores all nodes at the current depth before moving deeper.
+ * This approach guarantees finding the shortest path to a target state,
+ * which can be valuable when looking for minimal test cases or when
+ * path length directly impacts solving performance.
  */
 public class BFS<T extends SearchTarget> extends SearchStrategy<T> {
     private final Queue<T> targets = new LinkedList<>();

@@ -11,8 +11,11 @@ import sootup.core.graph.StmtGraph;
 import sootup.core.jimple.common.stmt.Stmt;
 
 /**
- * Distance heuristic that assigns a weight based on the distance to the nearest
- * uncovered statement.
+ * Distance To Uncovered Heuristic (DTUH)
+ * <p>
+ * Assigns weights based on how close a state is to reaching uncovered code.
+ * States that are fewer steps away from uncovered statements receive higher
+ * priority, guiding the search toward unexplored regions of the program.
  */
 public class DistanceToUncoveredHeuristic extends SearchHeuristic {
     /**

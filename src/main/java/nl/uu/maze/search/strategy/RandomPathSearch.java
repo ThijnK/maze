@@ -8,15 +8,12 @@ import nl.uu.maze.util.Tree;
 import nl.uu.maze.util.Tree.TreeNode;
 
 /**
- * Symbolic-driven search strategy that keeps track of the execution tree and
- * selects the next state to explore by walking the tree from the root to one of
- * the leaves, randomly selecting the branch to follow at each node.
+ * Random Path Search (RPS) strategy.
  * <p>
- * Where random search selects the next state to explore
- * uniformly at random from the set of all states, this search strategy gives
- * preference to states that are closer to the root of the execution tree, and
- * thus have a lower path length. This helps to keep the path conditions shorter
- * and more manageable.
+ * Maintains an execution tree and selects paths by randomly walking from
+ * root to leaf. Designed specifically for symbolic-driven execution, it
+ * naturally favors states closer to the root, keeping path conditions shorter
+ * and easier for constraint solvers to handle compared to pure random search.
  */
 public class RandomPathSearch<T extends SearchTarget> extends SearchStrategy<T> {
     private Tree<T> tree;

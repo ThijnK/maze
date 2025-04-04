@@ -3,8 +3,11 @@ package nl.uu.maze.search.heuristic;
 import nl.uu.maze.search.SearchTarget;
 
 /**
- * Uniform heuristic that assigns the same weight to every state.
- * Used for uniform random search.
+ * Uniform Heuristic (UH)
+ * <p>
+ * Assigns the same weight to every state, effectively creating a random
+ * search when used alone (no other heuristics). Useful as a baseline or in
+ * combination with other heuristics to introduce some randomness.
  */
 public class UniformHeuristic extends SearchHeuristic {
     /**

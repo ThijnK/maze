@@ -5,8 +5,11 @@ import java.util.List;
 import nl.uu.maze.search.SearchTarget;
 
 /**
- * A heuristic that prioritizes targets that have covered new statements
- * recently.
+ * Recent Coverage Heuristic (RCH).
+ * <p>
+ * Prioritizes states that have recently discovered new code, focusing on
+ * "hot" exploration paths. This helps concentrate resources on states that
+ * are actively expanding coverage rather than those that have stagnated.
  */
 public class RecentCoverageHeuristic extends SearchHeuristic {
     /**

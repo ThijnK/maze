@@ -6,8 +6,7 @@ import nl.uu.maze.search.SearchTarget;
  * Search heuristics that are used in probabilistic search to determine a
  * probability of selecting a target.
  * The weight of the heuristic determines how much influence it has on the
- * composite score in the case where multiple heuristics are used.
- * The higher the weight, the more influence the heuristic has.
+ * composite score in case multiple heuristics are used.
  */
 public abstract class SearchHeuristic {
     /**

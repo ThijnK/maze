@@ -6,7 +6,9 @@ import nl.uu.maze.execution.concrete.PathConditionCandidate;
 import nl.uu.maze.execution.symbolic.SymbolicState;
 import nl.uu.maze.search.SearchTarget;
 
-/** Root interface for search strategy hierarchy */
+/**
+ * Root interface for search strategy hierarchy
+ */
 public abstract class SearchStrategy<T extends SearchTarget> {
     /**
      * Returns the full name of this search strategy.

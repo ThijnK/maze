@@ -3,9 +3,11 @@ package nl.uu.maze.search.heuristic;
 import nl.uu.maze.search.SearchTarget;
 
 /**
- * A heuristic that prioritizes targets with deeply nested function calls.
- * This can be useful to ensure that deeply nested function calls are not
- * ignored in favor of paths with fewer function calls.
+ * Call Depth Heuristic (CDH).
+ * <p>
+ * Favors states with deeper call stacks, ensuring that deeply nested function
+ * calls get explored rather than being neglected. This helps reach code that
+ * might only execute after several layers of function calls.
  */
 public class CallDepthHeuristic extends SearchHeuristic {
     public CallDepthHeuristic(double weight) {

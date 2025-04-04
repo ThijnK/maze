@@ -3,17 +3,13 @@ package nl.uu.maze.search.heuristic;
 import nl.uu.maze.search.SearchTarget;
 
 /**
- * A heuristic that prioritizes targets with lower estimated SMT query costs.
- * 
+ * Query Cost Heuristic (QCH).
  * <p>
- * The query cost for a target is generally based on the complexity of the path
- * constraints to be solved.
- * A path constraint is a boolean expression, which can involve different types
- * of arguments, such as integers, floating point numbers, strings, etc., so the
- * cost of a path constraint can be estimated based on the number of nodes in
- * the expression tree and their types (floating point numbers are
- * considered more costly than integers, for example).
- * </p>
+ * Favors states with simpler path constraints that are cheaper to solve.
+ * Path constraint cost is estimated based on the complexity of boolean
+ * expressions and their argument types (with floating point operations
+ * generally more expensive than integer operations, for example). This helps
+ * avoid spending excessive time on states with expensive solver queries.
  */
 public class QueryCostHeuristic extends SearchHeuristic {
     public QueryCostHeuristic(double weight) {

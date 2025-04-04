@@ -3,16 +3,12 @@ package nl.uu.maze.search.heuristic;
 import nl.uu.maze.search.SearchTarget;
 
 /**
- * A heuristic that prioritizes deeper paths by exponentially increasing the
- * weight of targets as they go deeper in the execution tree.
- * This heuristic can be useful in combination with others to prioritize deeper
- * paths.
- * 
+ * Depth Heuristic (DH).
  * <p>
- * Note that this heuristic is not very useful for concrete-driven DSE, as the
- * actual depth a target will reach is not known beforehand (at the time of
- * negation).
- * </p>
+ * Exponentially increases weights for states deeper in the execution tree.
+ * Useful for pushing exploration toward program behaviors that only emerge
+ * after many execution steps. Less effective for concrete-driven DSE since
+ * target depths aren't known at negation time.
  */
 public class DepthHeuristic extends SearchHeuristic {
     public DepthHeuristic(double weight) {

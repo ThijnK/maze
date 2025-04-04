@@ -4,6 +4,13 @@ import java.util.List;
 
 import nl.uu.maze.search.SearchTarget;
 
+/**
+ * Interleaved Search strategy.
+ * <p>
+ * Alternates between multiple search strategies using a round-robin approach.
+ * This prevents any single strategy from getting stuck in unproductive regions
+ * of the search space.
+ */
 public class InterleavedSearch<T extends SearchTarget> extends SearchStrategy<T> {
     private static final long STRATEGY_TIMEOUT = 1000;
 
