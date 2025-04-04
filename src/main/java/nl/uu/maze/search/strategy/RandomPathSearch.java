@@ -28,8 +28,23 @@ public class RandomPathSearch<T extends SearchTarget> extends SearchStrategy<T> 
     public void add(T target) {
         if (tree == null) {
             tree = new Tree<>(target);
+            current = tree.getRoot();
         } else {
             current.addChild(target);
+            // Remove state from current node (don't need it anymore)
+            current.setValue(null);
+        }
+    }
+
+    @Override
+    public void remove(T target) {
+        // Remove the state from the tree by removing the path it's part of
+        // Most likely the state to remove is the current tree node
+        // If not, we need to find the node first
+        if (current != null && current.hasValue() && current.getValue().equals(target)) {
+            tree.removePath(current);
+        } else {
+            tree.findNode(target).ifPresent(node -> tree.removePath(node));
         }
     }
 
@@ -46,15 +61,10 @@ public class RandomPathSearch<T extends SearchTarget> extends SearchStrategy<T> 
     }
 
     @Override
-    public void remove(T target) {
-        // Remove the state from the tree by removing the path it's part of
-        // Most likely the state to remove is the current tree node
-        // If not, we need to find the node first
-        if (current.getValue().equals(target)) {
-            tree.removePath(current);
-        } else {
-            tree.findNode(target).ifPresent(node -> tree.removePath(node));
-        }
+    public void select(T target) {
+        // When a specific target is selected, we need to set the current node to that
+        // node, so that adding new targets will be added as children of that node
+        tree.findNode(target).ifPresent(node -> current = node);
     }
 
     @Override

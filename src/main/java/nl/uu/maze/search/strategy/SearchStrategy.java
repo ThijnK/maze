@@ -49,6 +49,25 @@ public abstract class SearchStrategy<T extends SearchTarget> {
     public abstract T next();
 
     /**
+     * Select a specific target.
+     * Instead of the search strategy selecting the next target with the next()
+     * method, this method tells the search strategy to select a specific target.
+     * This is useful in cases where a strategy combines multiple other search
+     * strategies (e.g., interleaved search), to tell the other strategies which
+     * target was selected by another strategy.
+     * <p>
+     * By default, this method simply removes the target from the search
+     * strategy. But subclasses may override this method to implement different
+     * behaviors, such as the random path search strategy, where the selected target
+     * isn't removed, but rather set as the current node, so a tree can be built.
+     * 
+     * @param target The state to select
+     */
+    public void select(T target) {
+        remove(target);
+    }
+
+    /**
      * Reset the search strategy to its initial state.
      */
     public abstract void reset();

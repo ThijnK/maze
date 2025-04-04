@@ -56,11 +56,12 @@ public class InterleavedSearch<T extends SearchTarget> extends SearchStrategy<T>
         }
         T next = strategies.get(currentStrategyIndex).next();
 
-        // Remove the selected state from the other strategies
+        // Let the other strategies know which state was selected
+        // This is important for strategies that maintain their own state
         if (next != null) {
             for (int i = 0; i < strategies.size(); i++) {
                 if (i != currentStrategyIndex) {
-                    strategies.get(i).remove(next);
+                    strategies.get(i).select(next);
                 }
             }
         }

@@ -18,7 +18,7 @@ public class Tree<T> {
      * @param <T> The type of value held in each node.
      */
     public static class TreeNode<T> {
-        private final T value;
+        private T value;
         private final TreeNode<T> parent;
         private final List<TreeNode<T>> children;
 
@@ -30,6 +30,14 @@ public class Tree<T> {
 
         public T getValue() {
             return value;
+        }
+
+        public void setValue(T value) {
+            this.value = value;
+        }
+
+        public boolean hasValue() {
+            return value != null;
         }
 
         public TreeNode<T> getParent() {
@@ -95,7 +103,7 @@ public class Tree<T> {
             return Optional.empty();
         }
 
-        if (current.getValue().equals(value)) {
+        if (current.hasValue() && current.getValue().equals(value)) {
             return Optional.of(current);
         }
 
