@@ -33,18 +33,13 @@ public class WaitingTimeHeuristic extends SearchHeuristic {
 
     @Override
     public <T extends SearchTarget> double calculateWeight(T target) {
-        // We use exponential decay or growth to strengthen the differences between
+        // Use exponential decay or growth to strengthen the differences between
         // waiting times
-        // The ratio between the weight of waiting time 1 and waiting time 10 is set to
-        // roughly 30, which translates to an exponantial base of ~1.45 and a decay
-        // factor of ~0.38
-
-        if (preferLongest) {
-            // Prefer longest waiting time (exponential growth)
-            return Math.pow(1.45, target.getWaitingTime());
-        }
-        // Prefer shortest waiting time (exponential decay)
-        return Math.exp(-0.38 * target.getWaitingTime());
+        double factor = 0.3; // Adjust this factor to control the steepness of the curve
+        // -1 prefers shortest waiting time (exponential decay)
+        // 1 prefers longest waiting time (exponential growth)
+        double direction = preferLongest ? 1 : -1;
+        return Math.exp(direction * factor * target.getWaitingTime());
     }
 
 }

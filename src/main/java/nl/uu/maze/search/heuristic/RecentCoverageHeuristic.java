@@ -48,7 +48,8 @@ public class RecentCoverageHeuristic extends SearchHeuristic {
             }
         }
 
-        return recentCoverage;
+        // Use exponential growth to strengthen the differences between values
+        double factor = 0.3; // Adjust this factor to control the steepness of the curve
+        return Math.exp(factor * recentCoverage);
     }
-
 }

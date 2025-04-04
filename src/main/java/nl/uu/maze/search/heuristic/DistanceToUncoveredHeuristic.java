@@ -41,8 +41,10 @@ public class DistanceToUncoveredHeuristic extends SearchHeuristic {
 
     @Override
     public <T extends SearchTarget> double calculateWeight(T target) {
-        // Multiplicative inverse so that lower distance is preferred
-        return 1.0 / (calculateDistance(target) + 1);
+        // Use exponential decay to strengthen the differences between query costs
+        // and to prefer lower costs over higher costs
+        double factor = 0.3; // Adjust this factor to control the steepness of the curve
+        return Math.exp(-factor * calculateDistance(target));
     }
 
     private <T extends SearchTarget> int calculateDistance(T target) {

@@ -23,8 +23,12 @@ public class QueryCostHeuristic extends SearchHeuristic {
 
     @Override
     public <T extends SearchTarget> double calculateWeight(T target) {
-        return target.getConstraints().stream()
+        int queryCost = target.getConstraints().stream()
                 .mapToInt(constraint -> constraint.getEstimatedCost())
                 .sum();
+        // Use exponential decay to strengthen the differences between query costs
+        // and to prefer lower costs over higher costs
+        double factor = 0.3; // Adjust this factor to control the steepness of the curve
+        return Math.exp(-factor * queryCost);
     }
 }
