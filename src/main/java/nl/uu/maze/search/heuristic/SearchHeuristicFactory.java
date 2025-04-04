@@ -32,6 +32,7 @@ public class SearchHeuristicFactory {
             case "Depth", "DepthHeuristic", "DH" -> new DepthHeuristic(weight);
             case "QueryCost", "QueryCostHeuristic", "QCH" -> new QueryCostHeuristic(weight);
             case "CallDepth", "CallDepthHeuristic", "CDH" -> new CallDepthHeuristic(weight);
+            case "WaitingTime", "WaitingTimeHeuristic", "WTH" -> new WaitingTimeHeuristic(weight);
             default -> throw new IllegalArgumentException("Unknown search heuristic: " + name);
         };
     }
@@ -77,6 +78,7 @@ public class SearchHeuristicFactory {
         RecentCoverage, RecentCoverageHeuristic, RCH,
         Depth, DepthHeuristic, DH,
         QueryCost, QueryCostHeuristic, QCH,
-        CallDepth, CallDepthHeuristic, CDH
+        CallDepth, CallDepthHeuristic, CDH,
+        WaitingTime, WaitingTimeHeuristic, WTH
     }
 }

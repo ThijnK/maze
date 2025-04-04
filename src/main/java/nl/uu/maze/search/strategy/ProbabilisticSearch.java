@@ -19,6 +19,7 @@ import nl.uu.maze.search.heuristic.SearchHeuristic;
 public class ProbabilisticSearch<T extends SearchTarget> extends SearchStrategy<T> {
     private final List<T> targets = new ArrayList<>();
     private final List<SearchHeuristic> heuristics;
+    private int iteration = 0;
 
     public ProbabilisticSearch(List<SearchHeuristic> heuristics) {
         if (heuristics.isEmpty()) {
@@ -40,6 +41,7 @@ public class ProbabilisticSearch<T extends SearchTarget> extends SearchStrategy<
     @Override
     public void add(T target) {
         targets.add(target);
+        target.setIteration(iteration);
     }
 
     @Override
@@ -49,7 +51,8 @@ public class ProbabilisticSearch<T extends SearchTarget> extends SearchStrategy<
 
     @Override
     public T next() {
-        return weightedProbabilisticSelect(targets, heuristics);
+        iteration++;
+        return weightedProbabilisticSelect();
     }
 
     @Override
@@ -66,28 +69,22 @@ public class ProbabilisticSearch<T extends SearchTarget> extends SearchStrategy<
      * Selects and removes a target from the list based on a weighted combination of
      * the given heuristics.
      *
-     * @param <T>        The type of targets to select from
-     * @param targets    The list of targets to select from
-     * @param heuristics List of heuristics to evaluate targets with
-     * @return The selected target (which is also removed from the input list)
-     * @throws IllegalArgumentException if inputs are invalid
+     * @return The selected target (which is also removed from the list of targets)
      */
-    public static <T extends SearchTarget> T weightedProbabilisticSelect(List<T> targets,
-            List<SearchHeuristic> heuristics) {
+    public T weightedProbabilisticSelect() {
         // If only one or zero targets, skip the calculations
         if (targets.size() <= 1) {
             return targets.isEmpty() ? null : targets.removeFirst();
-        }
-
-        if (heuristics.isEmpty()) {
-            throw new IllegalArgumentException("Need at least one heuristic");
         }
 
         // Calculate weights for each heuristic, for each item
         double[][] targetWeights = new double[heuristics.size()][targets.size()];
         for (int i = 0; i < heuristics.size(); i++) {
             for (int j = 0; j < targets.size(); j++) {
-                targetWeights[i][j] = heuristics.get(i).calculateWeight(targets.get(j));
+                T target = targets.get(j);
+                target.setWaitingTime(iteration - target.getIteration());
+                double weight = heuristics.get(i).calculateWeight(target);
+                targetWeights[i][j] = weight;// heuristics.get(i).calculateWeight(targets.get(j));
             }
         }
 

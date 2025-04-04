@@ -53,4 +53,26 @@ public interface SearchTarget {
      * Returns the call depth (number of nested function calls) of the target.
      */
     int getCallDepth();
+
+    /**
+     * Sets the iteration at which the target was added to the search strategy.
+     */
+    void setIteration(int iteration);
+
+    /**
+     * Returns the iteration at which the target entered the search strategy.
+     */
+    int getIteration();
+
+    /**
+     * Sets the waiting time of the target, which is the number of iterations since
+     * it was added to the search strategy.
+     */
+    void setWaitingTime(int age);
+
+    /**
+     * Returns the waiting time of the target, which is the number of iterations
+     * since it was added to the search strategy.
+     */
+    int getWaitingTime();
 }

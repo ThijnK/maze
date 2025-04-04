@@ -27,6 +27,16 @@ public class PathConditionCandidate implements SearchTarget {
      * constraints.
      */
     private final int subIndex;
+    /** The iteration at which the candidate was added to the search strategy. */
+    private int iteration = -1;
+
+    /**
+     * The waiting time of this candidate as the number of iterations since it was
+     * added to the search strategy.
+     * This is used to determine the priority of this state in some search
+     * heuristics.
+     */
+    private int waitingTime = 0;
 
     public PathConditionCandidate(List<PathConstraint> pathConstraints, int index) {
         this(pathConstraints, index, -1);
@@ -68,6 +78,22 @@ public class PathConditionCandidate implements SearchTarget {
 
     public int getCallDepth() {
         return constraints.get(index).getCallDepth();
+    }
+
+    public void setIteration(int iteration) {
+        this.iteration = iteration;
+    }
+
+    public int getIteration() {
+        return iteration;
+    }
+
+    public void setWaitingTime(int waitingTime) {
+        this.waitingTime = waitingTime;
+    }
+
+    public int getWaitingTime() {
+        return waitingTime;
     }
 
     /**

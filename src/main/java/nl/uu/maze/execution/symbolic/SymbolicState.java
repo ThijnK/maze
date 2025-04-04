@@ -83,6 +83,17 @@ public class SymbolicState implements SearchTarget {
      * path leading to this state.
      */
     private final List<Integer> branchHistory;
+    /**
+     * The iteration at which this state was added to the search strategy.
+     */
+    private int iteration = -1;
+    /**
+     * The waiting time of this state as the number of iterations since it was added
+     * to the search strategy.
+     * This is used to determine the priority of this state in some search
+     * heuristics.
+     */
+    private int waitingTime = 0;
 
     /**
      * Indicates whether this state is part of the constructor's execution for the
@@ -350,6 +361,22 @@ public class SymbolicState implements SearchTarget {
 
     public List<Integer> getBranchHistory() {
         return branchHistory;
+    }
+
+    public void setIteration(int iteration) {
+        this.iteration = iteration;
+    }
+
+    public int getIteration() {
+        return iteration;
+    }
+
+    public void setWaitingTime(int waitingTime) {
+        this.waitingTime = waitingTime;
+    }
+
+    public int getWaitingTime() {
+        return waitingTime;
     }
 
     public int getCallDepth() {
