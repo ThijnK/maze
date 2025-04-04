@@ -13,8 +13,8 @@ public class UniformHeuristic extends SearchHeuristic {
     /**
      * Constructs a new uniform heuristic with a weight of 1.0.
      */
-    public UniformHeuristic() {
-        super(1.0);
+    public UniformHeuristic(double weight) {
+        super(weight);
     }
 
     @Override

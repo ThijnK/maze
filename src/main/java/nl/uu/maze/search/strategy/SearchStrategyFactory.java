@@ -93,7 +93,7 @@ public class SearchStrategyFactory {
             // Special case for uniform random search, which is just probabilistic search
             // with the UniformHeuristic
             case "UniformRandom", "UniformRandomSearch", "URS" -> new ProbabilisticSearch<>(
-                    List.of(new UniformHeuristic()));
+                    List.of(new UniformHeuristic(1.0)));
             // Special case for coverage-optimized search, which uses predefined heuristics
             case "CoverageOptimized", "CoverageOptimizedSearch", "COS" -> new ProbabilisticSearch<>(
                     SearchHeuristicFactory.createHeuristics(coverageOptimizedHeuristics,

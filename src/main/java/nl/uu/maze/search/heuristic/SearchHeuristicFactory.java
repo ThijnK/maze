@@ -25,7 +25,7 @@ public class SearchHeuristicFactory {
      */
     public static SearchHeuristic createHeuristic(String name, double weight) {
         return switch (name.trim()) {
-            case "Uniform", "UniformHeuristic", "UH" -> new UniformHeuristic();
+            case "Uniform", "UniformHeuristic", "UH" -> new UniformHeuristic(weight);
             case "DistanceToUncovered", "DistanceToUncoveredHeuristic", "DTUH" ->
                 new DistanceToUncoveredHeuristic(weight);
             case "RecentCoverage", "RecentCoverageHeuristic", "RCH" -> new RecentCoverageHeuristic(weight);
@@ -56,7 +56,7 @@ public class SearchHeuristicFactory {
         List<SearchHeuristic> heuristics = new ArrayList<>(names.size());
         if (names.isEmpty()) {
             logger.warn("No search heuristics provided, using default Uniform heuristic with weight 1.0");
-            return List.of(new UniformHeuristic());
+            return List.of(new UniformHeuristic(1.0));
         }
 
         for (int i = 0; i < names.size(); i++) {
