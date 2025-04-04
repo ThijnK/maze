@@ -32,7 +32,12 @@ public class SearchHeuristicFactory {
             case "Depth", "DepthHeuristic", "DH" -> new DepthHeuristic(weight);
             case "QueryCost", "QueryCostHeuristic", "QCH" -> new QueryCostHeuristic(weight);
             case "CallDepth", "CallDepthHeuristic", "CDH" -> new CallDepthHeuristic(weight);
-            case "WaitingTime", "WaitingTimeHeuristic", "WTH" -> new WaitingTimeHeuristic(weight);
+            // For the waiting time heuristic, we have two variants, and the default should
+            // be shortest waiting time first
+            case "WaitingTime", "ShortestWaitingTime", "WaitingTimeHeuristic", "ShortestWaitingTimeHeuristic", "WTH",
+                    "SWTH" ->
+                new WaitingTimeHeuristic(weight, false);
+            case "LongestWaitingTime", "LongestWaitingTimeHeuristic", "LWTH" -> new WaitingTimeHeuristic(weight, true);
             default -> throw new IllegalArgumentException("Unknown search heuristic: " + name);
         };
     }
@@ -79,6 +84,8 @@ public class SearchHeuristicFactory {
         Depth, DepthHeuristic, DH,
         QueryCost, QueryCostHeuristic, QCH,
         CallDepth, CallDepthHeuristic, CDH,
-        WaitingTime, WaitingTimeHeuristic, WTH
+        WaitingTime, WaitingTimeHeuristic, WTH,
+        ShortestWaitingTime, ShortestWaitingTimeHeuristic, SWTH,
+        LongestWaitingTime, LongestWaitingTimeHeuristic, LWTH
     }
 }
