@@ -1,9 +1,10 @@
-package nl.uu.maze.search;
+package nl.uu.maze.search.strategy;
 
 import java.util.Collection;
 
 import nl.uu.maze.execution.concrete.PathConditionCandidate;
 import nl.uu.maze.execution.symbolic.SymbolicState;
+import nl.uu.maze.search.SearchTarget;
 
 /** Root interface for search strategy hierarchy */
 public abstract class SearchStrategy<T extends SearchTarget> {
@@ -61,7 +62,8 @@ public abstract class SearchStrategy<T extends SearchTarget> {
     }
 
     /**
-     * Attempts to convert this search strategy to a symbolic-driven search strategy.
+     * Attempts to convert this search strategy to a symbolic-driven search
+     * strategy.
      * This is only possible if this search strategy operates on symbolic states.
      */
     public SymbolicSearchStrategy toSymbolic() {
@@ -73,7 +75,8 @@ public abstract class SearchStrategy<T extends SearchTarget> {
     }
 
     /**
-     * Attempts to convert this search strategy to a concrete-driven search strategy.
+     * Attempts to convert this search strategy to a concrete-driven search
+     * strategy.
      * This is only possible if this search strategy operates on path condition
      * candidates.
      */

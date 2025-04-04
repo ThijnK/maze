@@ -1,4 +1,4 @@
-package nl.uu.maze.search;
+package nl.uu.maze.search.strategy;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -8,14 +8,9 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import nl.uu.maze.search.SearchTarget;
 import nl.uu.maze.search.heuristic.SearchHeuristicFactory;
 import nl.uu.maze.search.heuristic.UniformHeuristic;
-import nl.uu.maze.search.strategy.BFS;
-import nl.uu.maze.search.strategy.DFS;
-import nl.uu.maze.search.strategy.InterleavedSearch;
-import nl.uu.maze.search.strategy.ProbabilisticSearch;
-import nl.uu.maze.search.strategy.RandomPathSearch;
-import nl.uu.maze.search.strategy.SubpathGuidedSearch;
 
 /**
  * Factory class for creating search strategies.

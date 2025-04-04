@@ -3,7 +3,6 @@ package nl.uu.maze.search.strategy;
 import java.util.LinkedList;
 import java.util.Queue;
 
-import nl.uu.maze.search.SearchStrategy;
 import nl.uu.maze.search.SearchTarget;
 
 /**

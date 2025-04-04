@@ -3,7 +3,6 @@ package nl.uu.maze.search.strategy;
 import java.util.List;
 import java.util.Random;
 
-import nl.uu.maze.search.SearchStrategy;
 import nl.uu.maze.search.SearchTarget;
 import nl.uu.maze.util.Tree;
 import nl.uu.maze.util.Tree.TreeNode;

@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import nl.uu.maze.search.SearchStrategy;
 import nl.uu.maze.search.SearchTarget;
 import sootup.core.jimple.common.stmt.JIfStmt;
 import sootup.core.jimple.javabytecode.stmt.JSwitchStmt;

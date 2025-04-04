@@ -2,7 +2,6 @@ package nl.uu.maze.search.strategy;
 
 import java.util.Stack;
 
-import nl.uu.maze.search.SearchStrategy;
 import nl.uu.maze.search.SearchTarget;
 
 /**

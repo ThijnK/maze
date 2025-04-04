@@ -8,10 +8,10 @@ import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.Level;
 
 import nl.uu.maze.execution.DSEController;
-import nl.uu.maze.search.SearchStrategy;
-import nl.uu.maze.search.SearchStrategyFactory;
-import nl.uu.maze.search.SearchStrategyFactory.ValidSearchStrategy;
 import nl.uu.maze.search.heuristic.SearchHeuristicFactory.ValidSearchHeuristic;
+import nl.uu.maze.search.strategy.SearchStrategy;
+import nl.uu.maze.search.strategy.SearchStrategyFactory;
+import nl.uu.maze.search.strategy.SearchStrategyFactory.ValidSearchStrategy;
 import nl.uu.maze.util.Z3ContextProvider;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;

@@ -2,7 +2,6 @@ package nl.uu.maze.search.strategy;
 
 import java.util.List;
 
-import nl.uu.maze.search.SearchStrategy;
 import nl.uu.maze.search.SearchTarget;
 
 public class InterleavedSearch<T extends SearchTarget> extends SearchStrategy<T> {

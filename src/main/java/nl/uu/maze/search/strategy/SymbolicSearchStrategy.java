@@ -1,4 +1,4 @@
-package nl.uu.maze.search;
+package nl.uu.maze.search.strategy;
 
 import nl.uu.maze.execution.symbolic.SymbolicState;
 

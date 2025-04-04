@@ -1,4 +1,4 @@
-package nl.uu.maze.search;
+package nl.uu.maze.search.strategy;
 
 import java.util.ArrayList;
 import java.util.HashSet;
