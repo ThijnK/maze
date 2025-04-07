@@ -58,7 +58,7 @@ public class Application implements Callable<Integer> {
     private int maxDepth;
 
     @Option(names = { "-l",
-            "--logLevel" }, description = "Log level (default: ${DEFAULT-VALUE}, options: ${COMPLETION_CANDIDATES})", defaultValue = "INFO", paramLabel = "<level>", converter = LogLevelConverter.class)
+            "--logLevel" }, description = "Log level (default: ${DEFAULT-VALUE}, options: OFF, INFO, WARN, ERROR, TRACE, DEBUG)", defaultValue = "INFO", paramLabel = "<level>", converter = LogLevelConverter.class)
     private Level logLevel;
 
     @Option(names = { "-t",
@@ -72,7 +72,8 @@ public class Application implements Callable<Integer> {
             Logger rootLogger = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
             rootLogger.setLevel(logLevel);
 
-            List<String> searchStrategies = this.searchStrategies.stream().map(ValidSearchStrategy::name).toList();
+            List<String> searchStrategies = this.searchStrategies.stream().map(ValidSearchStrategy::name)
+                    .toList();
             List<String> searchHeuristics = this.searchHeuristics.stream().map(ValidSearchHeuristic::name).toList();
             SearchStrategy<?> strategy = SearchStrategyFactory.createStrategy(searchStrategies, searchHeuristics,
                     heuristicWeights);
