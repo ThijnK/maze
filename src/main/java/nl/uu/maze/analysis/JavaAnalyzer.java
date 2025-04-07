@@ -267,8 +267,9 @@ public class JavaAnalyzer {
      * 
      * @param classType The class type to search in
      */
-    public JavaSootClass getSootClass(JavaClassType classType) throws NoSuchElementException {
-        return view.getClass(classType).orElseThrow();
+    public JavaSootClass getSootClass(JavaClassType classType) throws ClassNotFoundException {
+        return view.getClass(classType).orElseThrow(() -> new ClassNotFoundException(
+                "Class " + classType.getFullyQualifiedName() + " not found in class path"));
     }
 
     /**

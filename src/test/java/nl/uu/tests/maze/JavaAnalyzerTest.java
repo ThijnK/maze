@@ -68,7 +68,7 @@ public class JavaAnalyzerTest {
     }
 
     @Test
-    public void testGetCFG() {
+    public void testGetCFG() throws ClassNotFoundException {
         JavaClassType classType = analyzer.getClassType(className);
         JavaSootClass sootClass = analyzer.getSootClass(classType);
         Set<JavaSootMethod> methods = sootClass.getMethods();
