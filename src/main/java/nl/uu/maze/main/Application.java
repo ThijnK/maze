@@ -24,6 +24,7 @@ import picocli.CommandLine.TypeConversionException;
  */
 @Command(name = "maze", mixinStandardHelpOptions = true, version = "maze 1.0", descriptionHeading = "%nDescription:%n", description = "Generate tests for the specified Java class using dynamic symbolic execution (DSE).", optionListHeading = "%nOptions:%n", sortOptions = false)
 public class Application implements Callable<Integer> {
+    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(Application.class);
 
     @Option(names = { "-cp",
             "--classPath" }, description = "Path to compiled classes", required = true, paramLabel = "<path>")
@@ -82,7 +83,7 @@ public class Application implements Callable<Integer> {
             controller.run();
             return 0;
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("An error occurred: {}", e.getMessage());
             return 1;
         } finally {
             Z3ContextProvider.close();
