@@ -44,6 +44,12 @@ Alternatively, you can run the packaged JAR file directly:
 java -jar target/maze-1.0-jar-with-dependencies.jar --help
 ```
 
+For example, to run the application on a specific Java class located in the `/tareget/classes` directory using BFS (rather than the default DFS), use the following command:
+
+```bash
+java -jar target/maze-1.0-jar-with-dependencies.jar --classPath target/classes --className com.example.MyClass --outPath tests --strategy BFS
+```
+
 ### Installing Z3
 
 Z3 is a theorem prover developed by Microsoft, which is used in this project to solve constraints in the symbolic execution engine.
