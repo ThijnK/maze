@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Factory class for creating search heuristics, which are used in
- * ProbabilisticSearch to determine the weight of each state in the random
+ * ProbabilisticSearch to determine the weight of each target in the random
  * selection.
  */
 public class SearchHeuristicFactory {

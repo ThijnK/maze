@@ -13,13 +13,13 @@ import sootup.core.jimple.common.stmt.Stmt;
 /**
  * Distance To Uncovered Heuristic (DTUH)
  * <p>
- * Assigns weights based on how close a state is to reaching uncovered code.
- * States that are fewer steps away from uncovered statements receive higher
+ * Assigns weights based on how close a target is to reaching uncovered code.
+ * Targets that are fewer steps away from uncovered statements receive higher
  * priority, guiding the search toward unexplored regions of the program.
  */
 public class DistanceToUncoveredHeuristic extends SearchHeuristic {
     /**
-     * Maximum weight for a state, used if a state cannot reach an uncovered
+     * Maximum weight for a target, used if a target cannot reach an uncovered
      * statement.
      */
     private static final int MAX_WEIGHT = 1_000_000;
@@ -48,7 +48,7 @@ public class DistanceToUncoveredHeuristic extends SearchHeuristic {
         Stmt stmt = target.getStmt();
         StmtGraph<?> cfg = target.getCFG();
 
-        // Prioritize final states
+        // Prioritize final targets
         if (cfg.outDegree(stmt) == 0) {
             return 0;
         }

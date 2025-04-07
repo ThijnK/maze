@@ -7,9 +7,9 @@ import nl.uu.maze.search.SearchTarget;
 /**
  * Recent Coverage Heuristic (RCH).
  * <p>
- * Prioritizes states that have recently discovered new code, focusing on
- * "hot" exploration paths. This helps concentrate resources on states that
- * are actively expanding coverage rather than those that have stagnated.
+ * Prioritizes targets that have recently discovered new code, focusing on
+ * "hot" exploration paths. This helps concentrate resources on targets that
+ * are actively expanding coverage rather than those that may have stagnated.
  */
 public class RecentCoverageHeuristic extends SearchHeuristic {
     /**

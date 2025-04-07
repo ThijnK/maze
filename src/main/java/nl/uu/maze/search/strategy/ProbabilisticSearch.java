@@ -10,11 +10,11 @@ import nl.uu.maze.search.heuristic.SearchHeuristic;
 /**
  * Probabilistic Search (PS) strategy.
  * <p>
- * Selects states based on weights calculated from one or multiple heuristics.
- * By combining multiple heuristics and playing around with their weights, you
- * have the potential to create a wide variety of search strategies. Different
- * heuristics can complement each other, allowing for a more nuanced evaluation
- * of states.
+ * Selects states based on a weighted probability distribution calculated from
+ * one or multiple heuristics. By combining multiple heuristics and playing
+ * around with their weights, you have the potential to create a wide variety of
+ * search strategies. Different heuristics can complement each other, allowing
+ * for a more nuanced evaluation of states.
  */
 public class ProbabilisticSearch<T extends SearchTarget> extends SearchStrategy<T> {
     private final List<T> targets = new ArrayList<>();
