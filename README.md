@@ -1,15 +1,18 @@
 # Maze
 
-Maze is a dynamic symbolic execution (DSE) engine designed for automated test generation.
-It leverages symbolic execution and concrete execution to explore program paths and generate test cases.
+Maze is a dynamic symbolic execution (DSE) engine for automated test generation.
+It uses a combination of symbolic and concrete execution to explore program paths and generate test cases that mazimize code coverage.
 
-The project is being developed as part of a master's thesis at Utrecht University and focuses on the exploration of different search strategies.
+The project was developed as part of a master's thesis at Utrecht University.
+The thesis focuses on comparing the effectiveness of different search strategies and heuristics in DSE engines.
 
 ## Getting Started
 
 To get started with Maze, follow the instructions below to set up your environment and run the application.
 
 ### Prerequisites
+
+Before you begin, ensure you have the following software installed on your machine:
 
 - Java Development Kit (JDK) 21 or higher
 - Apache Maven
@@ -27,67 +30,21 @@ mvn clean install
 
 ### Running the Application
 
-To run the application, use the following Maven command:
+You can run the application using the following Maven command:
 
 ```bash
-mvn exec:java
+mvn exec:java -Dexec.args="--help"
 ```
 
-You can specify a search strategy by providing it as an argument:
+This will display the help message with available options and arguments.
+
+Alternatively, you can run the packaged JAR file directly:
 
 ```bash
-mvn exec:java -Dexec.args="DFS"
+java -jar target/maze-1.0-jar-with-dependencies.jar --help
 ```
 
-Replace `DFS` with the desired search strategy (e.g., `BFS`, `Random`, `RandomPath`).
-
-### Running the Tests
-
-To run the tests, use the following Maven command:
-
-```bash
-mvn test
-```
-
-## Structure
-
-The project is structured roughly as displayed by the following tree, which shows which classes control which other classes and what their responsibilities are:
-
-```cs
-Application
-└── ExecutionController             // Controls the execution of a program, combining symbolic and concrete execution
-    ├── ConcreteExecutor            // Concrete execution engine, instantiates objects and executes methods
-    │   ├── ObjectInstantiator      // Instantiates primitive types and objects
-    │   ├── BytecodeInstrumenter    // Instruments bytecode to collect symbolic traces
-    │   └── TraceManager            // Manages symbolic traces
-    ├── SymbolicExecutor            // Symbolic execution engine, explores a program using a given search strategy
-    │   ├── SymbolicState           // Represents a symbolic state in the symbolic execution engine
-    │   └── SymbolicStateValidator  // Validates symbolic states using Z3 to produce inputs for concrete execution and/or test case generation
-    ├── SearchStrategy              // Interface for search strategies
-    │   ├── SearchStrategyFactory   // Factory for creating search strategies
-    │   ├── ConcreteSearchStrategy  // Abstract class for concrete-driven search strategies
-    │   │   ├── DFS                 // Concrete-driven DFS
-    │   │   ├── BFS                 // Concrete-driven BFS
-    │   │   └── ...                 // Other concrete-driven search strategies
-    │   └── SymbolicSearchStrategy  // Abstract class for symbolic-driven search strategies
-    │       ├── DFS                 // Symbolic-driven DFS
-    │       ├── BFS                 // Symbolic-driven BFS
-    │       └── ...                 // Other search strategies
-    └── JUnitTestGenerator          // Generates JUnit test cases
-```
-
-## Dependencies
-
-Maze relies on the following libraries and frameworks to function effectively:
-
-- [SootUp](https://soot-oss.github.io/SootUp/latest/) for Java bytecode analysis and transformation.
-- [Z3 Theorem Prover](https://github.com/Z3Prover/z3) for constraint solving.
-- [ASM](https://asm.ow2.io/) for bytecode manipulation.
-- [JavaPoet](https://github.com/square/javapoet) for Java source code generation.
-- [Logback](https://logback.qos.ch/) for logging.
-- [JUnit 5](https://junit.org/junit5/) for testing.
-
-## Installing Z3
+### Installing Z3
 
 Z3 is a theorem prover developed by Microsoft, which is used in this project to solve constraints in the symbolic execution engine.
 
@@ -106,7 +63,7 @@ Replace the path and version number in the command above with the correct values
 
 **Note**: It is possible that Z3 will not work after installing it this way, in which case your best bet is to build Z3 from source as described below.
 
-### Building Z3 from source
+#### Building Z3 from source
 
 If for some reason you need to build Z3 from source, follow the instructions below.
 
@@ -129,6 +86,18 @@ You'll also need some other C++ build tools, which you can install using the Vis
 
 After building the java bindings, the `build` directly should contain the files needed to run Z3, including the `com.microsoft.z3.jar` file.
 Set the environment variables and install into your local maven repository as described above.
+
+## Dependencies
+
+Maze relies on the following libraries and frameworks to function effectively:
+
+- [SootUp](https://soot-oss.github.io/SootUp/latest/) for Java bytecode analysis and transformation.
+- [Z3 Theorem Prover](https://github.com/Z3Prover/z3) for constraint solving.
+- [ASM](https://asm.ow2.io/) for bytecode manipulation.
+- [JavaPoet](https://github.com/square/javapoet) for Java source code generation.
+- [Logback](https://logback.qos.ch/) for logging.
+- [JUnit 5](https://junit.org/junit5/) for testing.
+- [Picocli](https://picocli.info/) for command-line argument parsing.
 
 ## License
 

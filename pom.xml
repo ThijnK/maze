@@ -6,10 +6,10 @@
 
     <groupId>nl.uu</groupId>
     <artifactId>maze</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0</version>
 
     <name>maze</name>
-    <description>Concolic execution engine for automated test generation.</description>
+    <description>Dynamic symbolic execution engine for automated test generation.</description>
     <url>https://github.com/ThijnK/maze</url>
 
     <properties>
@@ -113,10 +113,49 @@
 
     <build>
         <plugins>
+            <!-- Jar Plugin -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.4.2</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <mainClass>nl.uu.maze.main.Application</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+
+            <!-- Assembly Plugin for Packaging -->
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>3.7.1</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <mainClass>nl.uu.maze.main.Application</mainClass>
+                        </manifest>
+                    </archive>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
             <!-- Compiler Plugin -->
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.11.0</version>
+                <version>3.14.0</version>
                 <configuration>
                     <source>${maven.compiler.source}</source>
                     <target>${maven.compiler.target}</target>
@@ -133,14 +172,14 @@
             <!-- Surefire Plugin for Tests -->
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.1.2</version>
+                <version>3.5.3</version>
             </plugin>
 
             <!-- Exec Plugin to Run Main Class -->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
-                <version>3.1.0</version>
+                <version>3.5.0</version>
                 <executions>
                     <execution>
                         <goals>
@@ -156,7 +195,7 @@
             <!-- Clean Plugin -->
             <plugin>
                 <artifactId>maven-clean-plugin</artifactId>
-                <version>3.3.1</version>
+                <version>3.4.1</version>
             </plugin>
 
             <!-- Resource Plugin -->
@@ -181,32 +220,6 @@
                         <id>default-report</id>
                         <goals>
                             <goal>report</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <!-- Assembly plugin to package the app -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <version>3.5.0</version>
-                <configuration>
-                    <archive>
-                        <manifest>
-                            <mainClass>nl.uu.maze.main.Application</mainClass>
-                        </manifest>
-                    </archive>
-                    <descriptorRefs>
-                        <descriptorRef>jar-with-dependencies</descriptorRef>
-                    </descriptorRefs>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>make-assembly</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>single</goal>
                         </goals>
                     </execution>
                 </executions>
