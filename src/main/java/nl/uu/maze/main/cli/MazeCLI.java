@@ -36,16 +36,12 @@ public class MazeCLI implements Callable<Integer> {
     private String className;
 
     @Option(names = { "-o",
-            "--outPath" }, description = "Output path for test files", paramLabel = "<path>")
+            "--outPath" }, description = "Output path for test files", required = true, paramLabel = "<path>")
     private String outPath;
 
     @Option(names = { "-p",
             "--packageName" }, description = "Package name to use for generated test files (default: ${DEFAULT-VALUE})", defaultValue = "no package", paramLabel = "<name>", converter = PackageNameConverter.class)
     private String packageName;
-
-    @Option(names = { "-i",
-            "--interactive" }, description = "Run in interactive mode, where you can specify classes to run on one by one (default: ${DEFAULT-VALUE})", defaultValue = "false", paramLabel = "<true|false>")
-    private boolean interactiveMode;
 
     @Option(names = { "-cd",
             "--concreteDriven" }, description = "Use concrete-driven DSE instead of symbolic-driven DSE (default: ${DEFAULT-VALUE})", defaultValue = "false", paramLabel = "<true|false>")
@@ -75,18 +71,20 @@ public class MazeCLI implements Callable<Integer> {
             "--testTimeout" }, description = "Timeout to apply to generated test cases (default: ${DEFAULT-VALUE})", defaultValue = "no timeout", paramLabel = "<long>", converter = TestTimeoutConverter.class)
     private long testTimeout;
 
+    @Option(names = { "-b",
+            "--benchmark" }, description = "Run in benchmark mode according to the protocol expected by JUGE (default: ${DEFAULT-VALUE})", defaultValue = "false", paramLabel = "<true|false>")
+    private boolean benchmarkMode;
+
     @Override
     public Integer call() {
-        // Check for required options (classPath, className, outPath)
+        // Check for required options (classPath, className)
         // Note: not using picocli required options, because they are only required if
-        // not in interactive mode
-        if (!interactiveMode) {
+        // not in benchmark mode
+        if (!benchmarkMode) {
             if (classPath == null || classPath.isEmpty()) {
                 throw new ParameterException(new CommandLine(this), "Missing required option: '--classPath=<path>'");
             } else if (className == null || className.isEmpty()) {
                 throw new ParameterException(new CommandLine(this), "Missing required option: '--className=<class>'");
-            } else if (outPath == null || outPath.isEmpty()) {
-                throw new ParameterException(new CommandLine(this), "Missing required option: '--outPath=<path>'");
             }
         }
 
@@ -101,8 +99,8 @@ public class MazeCLI implements Callable<Integer> {
             SearchStrategy<?> strategy = SearchStrategyFactory.createStrategy(searchStrategies, searchHeuristics,
                     heuristicWeights);
 
-            if (interactiveMode) {
-                runInteractiveMode(strategy);
+            if (benchmarkMode) {
+                runBenchmarkMode(strategy);
             } else {
                 runNormalMode(strategy);
             }
@@ -121,7 +119,7 @@ public class MazeCLI implements Callable<Integer> {
         controller.run(className);
     }
 
-    private void runInteractiveMode(SearchStrategy<?> strategy) throws Exception {
+    private void runBenchmarkMode(SearchStrategy<?> strategy) throws Exception {
 
     }
 }
