@@ -39,7 +39,7 @@ public class Application implements Callable<Integer> {
     private String outPath;
 
     @Option(names = { "-p",
-            "--packageName" }, description = "Package name to use for generated test files (default: ${DEFAULT-VALUE})", defaultValue = "no package", paramLabel = "<name>")
+            "--packageName" }, description = "Package name to use for generated test files (default: ${DEFAULT-VALUE})", defaultValue = "no package", paramLabel = "<name>", converter = PackageNameConverter.class)
     private String packageName;
 
     @Option(names = { "-cd",
@@ -153,6 +153,24 @@ public class Application implements Callable<Integer> {
             } catch (NumberFormatException e) {
                 throw new TypeConversionException("Test timeout must be a valid long: " + value);
             }
+        }
+    }
+
+    /**
+     * Type converter for package names.
+     */
+    public static class PackageNameConverter implements ITypeConverter<String> {
+        @Override
+        public String convert(String value) {
+            if (value == null || value.isEmpty() || value.equalsIgnoreCase("no package")) {
+                return ""; // No package will be defined
+            }
+
+            if (!value.matches("^([a-zA-Z_][a-zA-Z0-9_]*)(\\.[a-zA-Z_][a-zA-Z0-9_]*)*$")) {
+                throw new TypeConversionException("Invalid package name: " + value);
+            }
+
+            return value;
         }
     }
 }
