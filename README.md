@@ -102,6 +102,7 @@ Maze provides the following command-line options:
 | `--classPath`      | `-cp` | Path to compiled classes                                                   | Yes      | -          |
 | `--className`      | `-cn` | Fully qualified name of the class to run                                   | Yes      | -          |
 | `--outPath`        | `-o`  | Output path for test files                                                 | Yes      | -          |
+| `--packageName`    | `-p`  | Package name to use for generated test files                               | No       | No package |
 | `--strategy`       | `-s`  | One or multiple of the search strategies to use                            | No       | `DFS`      |
 | `--heuristic`      | `-hu` | One or multiple of the search heuristics to use (for probabilistic search) | No       | `Uniform`  |
 | `--weight`         | `-hw` | Weights for the provided heuristics                                        | No       | `1.0`      |
