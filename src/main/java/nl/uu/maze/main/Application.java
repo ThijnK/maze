@@ -38,6 +38,10 @@ public class Application implements Callable<Integer> {
             "--outPath" }, description = "Output path for test files", required = true, paramLabel = "<path>")
     private String outPath;
 
+    @Option(names = { "-p",
+            "--packageName" }, description = "Package name to use for generated test files (default: ${DEFAULT-VALUE})", defaultValue = "no package", paramLabel = "<name>")
+    private String packageName;
+
     @Option(names = { "-cd",
             "--concreteDriven" }, description = "Use concrete-driven DSE instead of symbolic-driven DSE (default: ${DEFAULT-VALUE})", defaultValue = "false", paramLabel = "<true|false>")
     private boolean concreteDriven;
@@ -79,7 +83,7 @@ public class Application implements Callable<Integer> {
             SearchStrategy<?> strategy = SearchStrategyFactory.createStrategy(searchStrategies, searchHeuristics,
                     heuristicWeights);
             DSEController controller = new DSEController(
-                    classPath, className, concreteDriven, strategy, outPath, maxDepth, testTimeout);
+                    classPath, className, concreteDriven, strategy, outPath, maxDepth, testTimeout, packageName);
             controller.run();
             return 0;
         } catch (Exception e) {

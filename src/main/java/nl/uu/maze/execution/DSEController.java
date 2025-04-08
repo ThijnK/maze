@@ -78,9 +78,10 @@ public class DSEController {
      * @param outPath        The output path for the generated test cases
      * @param maxDepth       The maximum depth for symbolic execution
      * @param testTimeout    The timeout to apply to generated test cases
+     * @param packageName    The package name for the generated test files
      */
     public DSEController(String classPath, String className, boolean concreteDriven, SearchStrategy<?> searchStrategy,
-            String outPath, int maxDepth, long testTimeout)
+            String outPath, int maxDepth, long testTimeout, String packageName)
             throws Exception {
         this.outPath = Path.of(outPath);
         this.maxDepth = maxDepth;
@@ -98,7 +99,7 @@ public class DSEController {
         this.validator = new SymbolicStateValidator();
         this.symbolic = new SymbolicExecutor(concrete, validator, analyzer, searchStrategy.requiresCoverageData(),
                 searchStrategy.requiresBranchHistoryData());
-        this.generator = new JUnitTestGenerator(clazz, analyzer, concrete, testTimeout);
+        this.generator = new JUnitTestGenerator(clazz, analyzer, concrete, testTimeout, packageName);
     }
 
     /**
