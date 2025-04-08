@@ -26,15 +26,16 @@ public class BytecodeInstrumentation {
      * This will also instrument all nested classes and classes which the main class
      * depends on (as long as they can be found in the classpath).
      * 
-     * @param classPath The path to the class file
-     * @param className The name of the class
+     * @param classPath   The path to the class file
+     * @param className   The name of the class
+     * @param classLoader The class loader to load the instrumented classes in
      * @return The instrumented class
      * @throws IOException            If an I/O error occurs while reading class
      *                                files
      * @throws ClassNotFoundException If the main class cannot be found
      */
-    public static Class<?> instrument(String classPath, String className) throws IOException, ClassNotFoundException {
-        BytecodeClassLoader classLoader = new BytecodeClassLoader();
+    public static Class<?> instrument(String classPath, String className, BytecodeClassLoader classLoader)
+            throws IOException, ClassNotFoundException {
         Set<String> processedClasses = new HashSet<>();
         Queue<String> classesToProcess = new LinkedList<>();
 
@@ -43,7 +44,8 @@ public class BytecodeInstrumentation {
 
         while (!classesToProcess.isEmpty()) {
             String currentClass = classesToProcess.poll();
-            if (!processedClasses.add(currentClass)) {
+            // Skip if already processed or in the class loader
+            if (!processedClasses.add(currentClass) || classLoader.findClass(currentClass) != null) {
                 continue;
             }
 
@@ -64,6 +66,13 @@ public class BytecodeInstrumentation {
             throw new ClassNotFoundException("Class " + className + " not found in class loader.");
         }
         return mainClass;
+    }
+
+    /**
+     * Create a new BytecodeClassLoader instance.
+     */
+    public static BytecodeClassLoader createBytecodeClassLoader() {
+        return new BytecodeClassLoader();
     }
 
     /**

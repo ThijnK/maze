@@ -4,9 +4,6 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLClassLoader;
-import java.nio.file.Paths;
 import java.util.*;
 
 import org.slf4j.Logger;
@@ -44,9 +41,7 @@ public class JavaAnalyzer {
 
     public JavaAnalyzer(String classPath, ClassLoader classLoader) throws MalformedURLException {
         AnalysisInputLocation inputLocation = new JavaClassPathAnalysisInputLocation(classPath);
-        // Set up a custom URL loader for the class path
-        URL classUrl = Paths.get(classPath).toUri().toURL();
-        this.classLoader = classLoader != null ? classLoader : new URLClassLoader(new URL[] { classUrl });
+        this.classLoader = classLoader;
         view = new JavaView(inputLocation);
         identifierFactory = view.getIdentifierFactory();
     }

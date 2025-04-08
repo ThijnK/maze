@@ -100,9 +100,12 @@ public class MazeCLI implements Callable<Integer> {
             List<String> searchHeuristics = this.searchHeuristics.stream().map(ValidSearchHeuristic::name).toList();
             SearchStrategy<?> strategy = SearchStrategyFactory.createStrategy(searchStrategies, searchHeuristics,
                     heuristicWeights);
-            DSEController controller = new DSEController(
-                    classPath, className, concreteDriven, strategy, outPath, maxDepth, testTimeout, packageName);
-            controller.run();
+
+            if (interactiveMode) {
+                runInteractiveMode(strategy);
+            } else {
+                runNormalMode(strategy);
+            }
             return 0;
         } catch (Exception e) {
             logger.error("An error occurred: {}", e.getMessage());
@@ -110,5 +113,15 @@ public class MazeCLI implements Callable<Integer> {
         } finally {
             Z3ContextProvider.close();
         }
+    }
+
+    private void runNormalMode(SearchStrategy<?> strategy) throws Exception {
+        DSEController controller = new DSEController(classPath, concreteDriven, strategy, outPath,
+                maxDepth, testTimeout, packageName);
+        controller.run(className);
+    }
+
+    private void runInteractiveMode(SearchStrategy<?> strategy) throws Exception {
+
     }
 }

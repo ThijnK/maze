@@ -2,7 +2,10 @@ package nl.uu.maze.execution;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -37,6 +40,8 @@ import sootup.java.core.types.JavaClassType;
 public class DSEController {
     private static final Logger logger = LoggerFactory.getLogger(DSEController.class);
 
+    private final String classPath;
+    private final ClassLoader classLoader;
     /** Max path length for symbolic execution */
     private final int maxDepth;
     private final boolean concreteDriven;
@@ -45,9 +50,9 @@ public class DSEController {
     /** Search strategy used for symbolic replay of a trace (DFS). */
     private final SymbolicSearchStrategy replayStrategy;
     private final JavaAnalyzer analyzer;
-    private final JavaSootClass sootClass;
-    private final Class<?> clazz;
-    private final Class<?> instrumented;
+    private JavaSootClass sootClass;
+    private Class<?> clazz;
+    private Class<?> instrumented;
 
     private final SymbolicExecutor symbolic;
     private final SymbolicStateValidator validator;
@@ -72,7 +77,6 @@ public class DSEController {
      * Create a new execution controller.
      * 
      * @param classPath      The class path to the target class
-     * @param className      The name of the target class
      * @param concreteDriven Whether to use concrete-driven DSE (otherwise symbolic)
      * @param searchStrategy The search strategy to use
      * @param outPath        The output path for the generated test cases
@@ -80,20 +84,19 @@ public class DSEController {
      * @param testTimeout    The timeout to apply to generated test cases
      * @param packageName    The package name for the generated test files
      */
-    public DSEController(String classPath, String className, boolean concreteDriven, SearchStrategy<?> searchStrategy,
+    public DSEController(String classPath, boolean concreteDriven, SearchStrategy<?> searchStrategy,
             String outPath, int maxDepth, long testTimeout, String packageName)
             throws Exception {
+        this.classPath = classPath;
+        this.classLoader = concreteDriven ? BytecodeInstrumentation.createBytecodeClassLoader()
+                : new URLClassLoader(new URL[] { Paths.get(classPath).toUri().toURL() });
         this.outPath = Path.of(outPath);
         this.maxDepth = maxDepth;
         this.concreteDriven = concreteDriven;
-        this.instrumented = concreteDriven ? BytecodeInstrumentation.instrument(classPath, className) : null;
         this.searchStrategy = searchStrategy;
         this.replayStrategy = new SymbolicSearchStrategy(new DFS<SymbolicState>());
 
-        this.analyzer = new JavaAnalyzer(classPath, instrumented != null ? instrumented.getClassLoader() : null);
-        JavaClassType classType = analyzer.getClassType(className);
-        this.sootClass = analyzer.getSootClass(classType);
-        this.clazz = analyzer.getJavaClass(classType);
+        this.analyzer = new JavaAnalyzer(classPath, classLoader);
 
         this.concrete = new ConcreteExecutor();
         this.validator = new SymbolicStateValidator();
@@ -103,10 +106,23 @@ public class DSEController {
     }
 
     /**
-     * Run the dynamic symbolic execution engine.
-     *
+     * Run the dynamic symbolic execution engine on the given class.
+     * 
+     * @param className The name of the class to execute on
+     * @throws Exception If an error occurs during execution, or if the class cannot
+     *                   be found in the class path
      */
-    public void run() throws Exception {
+    public void run(String className) throws Exception {
+        // Instrument the class if concrete-driven
+        // If this class was instrumented before, it will reuse previous results
+        this.instrumented = concreteDriven
+                ? BytecodeInstrumentation.instrument(classPath, className, (BytecodeClassLoader) classLoader)
+                : null;
+
+        JavaClassType classType = analyzer.getClassType(className);
+        this.sootClass = analyzer.getSootClass(classType);
+        this.clazz = analyzer.getJavaClass(classType);
+
         logger.info("Running {} DSE on class: {}", concreteDriven ? "concrete-driven" : "symbolic-driven",
                 clazz.getSimpleName());
         logger.info("Using search strategy: {}", searchStrategy.getName());
