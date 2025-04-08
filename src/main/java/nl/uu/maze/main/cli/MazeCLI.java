@@ -1,5 +1,9 @@
 package nl.uu.maze.main.cli;
 
+import java.io.File;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 
@@ -13,6 +17,7 @@ import nl.uu.maze.search.heuristic.SearchHeuristicFactory.ValidSearchHeuristic;
 import nl.uu.maze.search.strategy.SearchStrategy;
 import nl.uu.maze.search.strategy.SearchStrategyFactory;
 import nl.uu.maze.search.strategy.SearchStrategyFactory.ValidSearchStrategy;
+import nl.uu.maze.util.LoggerOutputStream;
 import nl.uu.maze.util.Z3ContextProvider;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
@@ -119,7 +124,33 @@ public class MazeCLI implements Callable<Integer> {
         controller.run(className);
     }
 
+    /**
+     * Run in benchmark mode according to the protocol expected by JUGE, as defined
+     * here: https://github.com/JUnitContest/JUGE/blob/master/docs/DETAILS.md
+     */
     private void runBenchmarkMode(SearchStrategy<?> strategy) throws Exception {
+        SBSTChannel channel = new SBSTChannel(new InputStreamReader(System.in), new OutputStreamWriter(System.out),
+                new LoggerOutputStream(logger, Level.DEBUG));
+        channel.token("BENCHMARK");
+        channel.directory(); // Ignore directory with SUT source code
+        channel.directory(); // Ignore directory with SUT compiled class files
+        int n = channel.number();
+        List<File> classPath = new ArrayList<File>();
+        for (int i = 0; i < n; i++) {
+            classPath.add(channel.directory_jarfile());
+        }
 
+        // TODO: for now, we'll assume only one class path is provided
+        DSEController controller = new DSEController(classPath.get(0).getAbsolutePath(), concreteDriven, strategy,
+                outPath, maxDepth, testTimeout, packageName);
+
+        int m = channel.number();
+        channel.emit("READY");
+        for (int i = 0; i < m; i++) {
+            channel.longnumber(); // Ignore time budget
+            String className = channel.className();
+            controller.run(className);
+            channel.emit("READY");
+        }
     }
 }

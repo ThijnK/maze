@@ -13,6 +13,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -43,23 +44,38 @@ public class JUnitTestGenerator {
     private final JavaAnalyzer analyzer;
     private final ConcreteExecutor executor;
 
-    private final String testClassName;
     private final String testPackageName;
-    private final TypeSpec.Builder classBuilder;
-    private final Class<?> clazz;
+    private final long testTimeout;
+    private TypeSpec.Builder classBuilder;
+    private Class<?> clazz;
+    private String testClassName;
 
     /** Map of method names to the number of test cases generated for each method */
-    private final Map<String, Integer> methodCount;
+    private final Map<String, Integer> methodCount = new HashMap<>();
     private final Set<Integer> builtTestCases = new HashSet<>();
     private boolean setFieldAdded = false;
 
     private final Set<Class<?>> primitiveWrappers = Set.of(Boolean.class, Byte.class, Short.class, Integer.class,
             Long.class, Float.class, Double.class, Character.class);
 
-    public JUnitTestGenerator(Class<?> clazz, JavaAnalyzer analyzer, ConcreteExecutor executor, long testTimeout,
-            String packageName) {
+    public JUnitTestGenerator(JavaAnalyzer analyzer, ConcreteExecutor executor, long testTimeout, String packageName) {
+        this.testPackageName = packageName;
+        this.analyzer = analyzer;
+        this.executor = executor;
+        this.testTimeout = testTimeout;
+    }
+
+    /**
+     * Initializes the test generator for a given class. This method should be
+     * called
+     * before generating test cases.
+     * 
+     * @param clazz The class to generate test cases for
+     */
+    public void initializeForClass(Class<?> clazz) {
+        this.clazz = clazz;
         testClassName = clazz.getSimpleName() + "Test";
-        testPackageName = packageName;
+
         classBuilder = TypeSpec.classBuilder(testClassName)
                 .addModifiers(Modifier.PUBLIC);
 
@@ -68,10 +84,9 @@ public class JUnitTestGenerator {
             timeoutAnnotation.addMember("value", "$L", testTimeout);
             classBuilder.addAnnotation(timeoutAnnotation.build());
         }
-        this.clazz = clazz;
-        this.methodCount = new java.util.HashMap<>();
-        this.analyzer = analyzer;
-        this.executor = executor;
+        methodCount.clear();
+        builtTestCases.clear();
+        setFieldAdded = false;
     }
 
     /**
@@ -99,6 +114,10 @@ public class JUnitTestGenerator {
      *               method invocation
      */
     public void addMethodTestCase(JavaSootMethod method, JavaSootMethod ctor, ArgMap argMap) {
+        if (classBuilder == null) {
+            throw new IllegalStateException("Test class not initialized. Call initializeForClass() first.");
+        }
+
         Object retval;
         try {
             Constructor<?> _ctor = ctor != null ? analyzer.getJavaConstructor(ctor, clazz) : null;
@@ -458,6 +477,10 @@ public class JUnitTestGenerator {
      * @param path The path to write the test cases to
      */
     public void writeToFile(Path path) {
+        if (classBuilder == null) {
+            throw new IllegalStateException("Test class not initialized. Call initializeForClass() first.");
+        }
+
         try {
             JavaFile javaFile = JavaFile
                     .builder(testPackageName, classBuilder.build())

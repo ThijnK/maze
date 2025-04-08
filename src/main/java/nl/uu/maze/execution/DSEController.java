@@ -102,7 +102,7 @@ public class DSEController {
         this.validator = new SymbolicStateValidator();
         this.symbolic = new SymbolicExecutor(concrete, validator, analyzer, searchStrategy.requiresCoverageData(),
                 searchStrategy.requiresBranchHistoryData());
-        this.generator = new JUnitTestGenerator(clazz, analyzer, concrete, testTimeout, packageName);
+        this.generator = new JUnitTestGenerator(analyzer, concrete, testTimeout, packageName);
     }
 
     /**
@@ -122,6 +122,7 @@ public class DSEController {
         JavaClassType classType = analyzer.getClassType(className);
         this.sootClass = analyzer.getSootClass(classType);
         this.clazz = analyzer.getJavaClass(classType);
+        generator.initializeForClass(clazz);
 
         logger.info("Running {} DSE on class: {}", concreteDriven ? "concrete-driven" : "symbolic-driven",
                 clazz.getSimpleName());
