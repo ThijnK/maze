@@ -32,11 +32,11 @@ import picocli.CommandLine.ParameterException;
 public class MazeCLI implements Callable<Integer> {
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(MazeCLI.class);
 
-    @Option(names = { "-cp",
+    @Option(names = { "-c",
             "--classPath" }, description = "Path to compiled classes", paramLabel = "<path>")
     private String classPath;
 
-    @Option(names = { "-cn",
+    @Option(names = { "-n",
             "--className" }, description = "Fully qualified name of the class to run", paramLabel = "<class>")
     private String className;
 
@@ -48,19 +48,19 @@ public class MazeCLI implements Callable<Integer> {
             "--packageName" }, description = "Package name to use for generated test files (default: ${DEFAULT-VALUE})", defaultValue = "no package", paramLabel = "<name>", converter = PackageNameConverter.class)
     private String packageName;
 
-    @Option(names = { "-cd",
-            "--concreteDriven" }, description = "Use concrete-driven DSE instead of symbolic-driven DSE (default: ${DEFAULT-VALUE})", defaultValue = "false", paramLabel = "<true|false>")
-    private boolean concreteDriven;
+    @Option(names = { "-l",
+            "--logLevel" }, description = "Log level (default: ${DEFAULT-VALUE}, options: OFF, INFO, WARN, ERROR, TRACE, DEBUG)", defaultValue = "INFO", paramLabel = "<level>", converter = LogLevelConverter.class)
+    private Level logLevel;
 
     @Option(names = { "-s",
             "--strategy" }, description = "One or multiple of the available search strategies (default: ${DEFAULT-VALUE}, options: ${COMPLETION-CANDIDATES})", defaultValue = "DFS", split = ",", arity = "1..*", paramLabel = "<name>")
     private List<ValidSearchStrategy> searchStrategies;
 
-    @Option(names = { "-hu",
+    @Option(names = { "-u",
             "--heuristic" }, description = "One or multiple of the available search heuristics to use for probabilistic search (default: ${DEFAULT-VALUE}, options: ${COMPLETION-CANDIDATES})", defaultValue = "UH", split = ",", arity = "1..*", paramLabel = "<name>")
     private List<ValidSearchHeuristic> searchHeuristics;
 
-    @Option(names = { "-hw",
+    @Option(names = { "-w",
             "--weight" }, description = "Weights to use for the provided search heuristics (default: ${DEFAULT-VALUE})", defaultValue = "1.0", split = ",", arity = "1..*", converter = SearchHeuristicWeightConverter.class, paramLabel = "<double>")
     private List<Double> heuristicWeights;
 
@@ -68,15 +68,19 @@ public class MazeCLI implements Callable<Integer> {
             "--maxDepth" }, description = "Maximum depth of the search (default: ${DEFAULT-VALUE})", defaultValue = "50", paramLabel = "<int>")
     private int maxDepth;
 
-    @Option(names = { "-l",
-            "--logLevel" }, description = "Log level (default: ${DEFAULT-VALUE}, options: OFF, INFO, WARN, ERROR, TRACE, DEBUG)", defaultValue = "INFO", paramLabel = "<level>", converter = LogLevelConverter.class)
-    private Level logLevel;
+    @Option(names = { "-b",
+            "--timeBudget" }, description = "Time budget for the search in ms (default: ${DEFAULT-VALUE})", defaultValue = "no budget", paramLabel = "<long>", converter = TimeBudgetConverter.class)
+    private long timeBudget;
 
     @Option(names = { "-t",
-            "--testTimeout" }, description = "Timeout to apply to generated test cases (default: ${DEFAULT-VALUE})", defaultValue = "no timeout", paramLabel = "<long>", converter = TestTimeoutConverter.class)
+            "--testTimeout" }, description = "Timeout to apply to generated test cases in ms (default: ${DEFAULT-VALUE})", defaultValue = "no timeout", paramLabel = "<long>", converter = TestTimeoutConverter.class)
     private long testTimeout;
 
-    @Option(names = { "-b",
+    @Option(names = { "-C",
+            "--concreteDriven" }, description = "Use concrete-driven DSE instead of symbolic-driven DSE (default: ${DEFAULT-VALUE})", defaultValue = "false", paramLabel = "<true|false>")
+    private boolean concreteDriven;
+
+    @Option(names = { "-B",
             "--benchmark" }, description = "Run in benchmark mode according to the protocol expected by JUGE (default: ${DEFAULT-VALUE})", defaultValue = "false", paramLabel = "<true|false>")
     private boolean benchmarkMode;
 

@@ -99,19 +99,21 @@ Maze provides the following command-line options:
 
 | Option             | Alias | Description                                                                | Required | Default    |
 | ------------------ | ----- | -------------------------------------------------------------------------- | -------- | ---------- |
-| `--classPath`      | `-cp` | Path to compiled classes                                                   | Yes      | -          |
-| `--className`      | `-cn` | Fully qualified name of the class to run                                   | Yes      | -          |
+| `--help`           | `-h`  | Show help message                                                          | No       | -          |
+| `--version`        | `-V`  | Show version information                                                   | No       | -          |
+| `--classPath`      | `-c`  | Path to compiled classes                                                   | Yes      | -          |
+| `--className`      | `-n`  | Fully qualified name of the class to run                                   | Yes      | -          |
 | `--outPath`        | `-o`  | Output path for test files                                                 | Yes      | -          |
 | `--packageName`    | `-p`  | Package name to use for generated test files                               | No       | No package |
-| `--strategy`       | `-s`  | One or multiple of the search strategies to use                            | No       | `DFS`      |
-| `--heuristic`      | `-hu` | One or multiple of the search heuristics to use (for probabilistic search) | No       | `Uniform`  |
-| `--weight`         | `-hw` | Weights for the provided heuristics                                        | No       | `1.0`      |
-| `--maxDepth`       | `-d`  | Maximum depth of the search                                                | No       | `50`       |
 | `--logLevel`       | `-l`  | Log level (OFF, INFO, WARN, ERROR, TRACE, DEBUG)                           | No       | `INFO`     |
+| `--strategy`       | `-s`  | One or multiple of the search strategies to use                            | No       | `DFS`      |
+| `--heuristic`      | `-u`  | One or multiple of the search heuristics to use (for probabilistic search) | No       | `Uniform`  |
+| `--weight`         | `-w`  | Weights for the provided heuristics                                        | No       | `1.0`      |
+| `--maxDepth`       | `-d`  | Maximum depth of the search                                                | No       | `50`       |
+| `--timeBudget`     | `-b`  | Time budget for the engine (in ms)                                         | No       | No budget  |
 | `--testTimeout`    | `-t`  | Timeout to apply to generated test cases (in ms)                           | No       | No timeout |
-| `--concreteDriven` | `-cd` | Use concrete-driven DSE instead of symbolic-driven                         | No       | `false`    |
-| `--help`           | -     | Show help message                                                          | No       | -          |
-| `--version`        | -     | Show version information                                                   | No       | -          |
+| `--concreteDriven` | `-C`  | Use concrete-driven DSE instead of symbolic-driven                         | No       | `false`    |
+| `--benchmark`      | `-B`  | Run in benchmark mode according to the protocol expected by JUGE           | No       | `false`    |
 
 ## Project Structure
 
