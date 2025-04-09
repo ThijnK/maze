@@ -366,6 +366,11 @@ public class SymbolicExecutor {
             state.setExceptionThrown();
             return;
         }
+        // For callee states, parameters are passed, so not symbolic and are thus
+        // already resolved to a single alias
+        if (state.getMethodType().isCallee() || state.heap.isResolved(symRef)) {
+            return;
+        }
 
         Set<Expr<?>> aliases = state.heap.getAliases(symRef);
         if (aliases == null) {

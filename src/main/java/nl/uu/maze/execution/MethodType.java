@@ -33,4 +33,8 @@ public enum MethodType {
     public boolean isCtor() {
         return this == CTOR;
     }
+
+    public boolean isCallee() {
+        return this == CALLEE;
+    }
 }
