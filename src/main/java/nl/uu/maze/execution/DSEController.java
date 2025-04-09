@@ -6,7 +6,6 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -177,22 +176,21 @@ public class DSEController {
     }
 
     /**
-     * Run symbolic-driven DSE on the given method, evaluating and generating test
-     * cases for the final states found.
+     * Generate a test case for the given method and symbolic state.
      */
-    private void runSymbolicDriven(JavaSootMethod method, SymbolicSearchStrategy searchStrategy) {
-        List<SymbolicState> finalStates = runSymbolic(method, searchStrategy);
-        List<ArgMap> argMap = validator.evaluate(finalStates);
-        generator.addMethodTestCases(method, ctorSoot, argMap);
+    private void generateTestCase(JavaSootMethod method, SymbolicState state) {
+        Optional<ArgMap> argMap = validator.evaluate(state);
+        if (argMap.isPresent()) {
+            generator.addMethodTestCase(method, ctorSoot, argMap.get());
+        }
     }
 
     /**
-     * Run symbolic-driven DSE on the given method, returning the final states
-     * found.
+     * Run symbolic-driven DSE on the given method.
+     * Returns the final state if this is a symbolic replay for concrete-driven DSE.
      */
-    private List<SymbolicState> runSymbolic(JavaSootMethod method, SymbolicSearchStrategy searchStrategy) {
+    private Optional<SymbolicState> runSymbolicDriven(JavaSootMethod method, SymbolicSearchStrategy searchStrategy) {
         StmtGraph<?> cfg = analyzer.getCFG(method);
-        List<SymbolicState> finalStates = new ArrayList<>();
 
         // If static, start with target method, otherwise start with constructor
         if (method.isStatic()) {
@@ -252,8 +250,14 @@ public class DSEController {
             logger.debug("Current state: {}", current);
             logger.debug("Next stmt: {}", current.getStmt());
             if (!current.isCtorState() && current.isFinalState() || current.getDepth() >= maxDepth) {
-                if (!current.isInfeasible())
-                    finalStates.add(current.returnToRootCaller());
+                if (!current.isInfeasible()) {
+                    // For concrete-driven, we only care about one final state, so we can stop
+                    if (concreteDriven)
+                        return Optional.of(current);
+                    // For symblic-driven, generate test case
+                    else
+                        generateTestCase(method, current.returnToRootCaller());
+                }
                 searchStrategy.remove(current);
                 continue;
             }
@@ -271,11 +275,15 @@ public class DSEController {
                     int hashCode = concreteDriven ? TraceManager.hashCode(state.getMethodSignature())
                             : state.hashCode();
                     if (state.isFinalState()) {
-                        // If the state is an exception-throwing state, immediately add it to the
-                        // final states, or if it is infeasible, skip it
+                        // If the state is an exception-throwing state, generate test case and stop
+                        // exploring (i.e., don't go into the target method)
                         if (state.isExceptionThrown() || state.isInfeasible()) {
-                            if (!state.isInfeasible())
-                                finalStates.add(state);
+                            if (!state.isInfeasible()) {
+                                if (concreteDriven)
+                                    return Optional.of(state);
+                                else
+                                    generateTestCase(method, state);
+                            }
                             searchStrategy.remove(state);
                             continue;
                         }
@@ -297,7 +305,7 @@ public class DSEController {
             }
         }
 
-        return finalStates;
+        return Optional.empty();
     }
 
     /** Run concrete-driven DSE on the given method. */
@@ -316,17 +324,19 @@ public class DSEController {
             TraceManager.clearEntries();
             concrete.execute(ctor, javaMethod, argMap);
             // Assume symbolic replay will produce a single final state
-            SymbolicState finalState = runSymbolic(method, replayStrategy).getFirst();
-            logger.debug("Replayed state: {}", finalState);
+            Optional<SymbolicState> finalState = runSymbolicDriven(method, replayStrategy);
+            logger.debug("Replayed state: {}", finalState.isPresent() ? finalState.get() : "none");
 
-            boolean isNew = searchStrategy.add(finalState);
-            // Only add a new test case if this path has not been explored before
-            // Note: this particular check will catch only certain edge cases that are not
-            // caught by the search strategy
-            if (isNew) {
-                // For the first concrete execution, argMap is populated by the concrete
-                // executor
-                generator.addMethodTestCase(method, ctorSoot, argMap);
+            if (finalState.isPresent()) {
+                boolean isNew = searchStrategy.add(finalState.get());
+                // Only add a new test case if this path has not been explored before
+                // Note: this particular check will catch only certain edge cases that are not
+                // caught by the search strategy
+                if (isNew) {
+                    // For the first concrete execution, argMap is populated by the concrete
+                    // executor
+                    generator.addMethodTestCase(method, ctorSoot, argMap);
+                }
             }
 
             Optional<Model> model = searchStrategy.next(validator);
@@ -337,7 +347,11 @@ public class DSEController {
 
             // If a new path condition is found, evaluate it to get the next set of
             // arguments which will be used in the next iteration for concrete execution
-            argMap = validator.evaluate(model.get(), finalState, false);
+            // TODO: finalState may not be the correct state to use for this evaluation!
+            // TODO: it depends on the path condition candidate, so those should store
+            // states (but does not have to be the exact state in that position, it's fine
+            // if it's the final state for the same path (so no need to clone maybe))
+            argMap = validator.evaluate(model.get(), finalState.get(), false);
         }
     }
 }
