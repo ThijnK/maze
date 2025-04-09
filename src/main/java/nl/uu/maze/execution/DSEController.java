@@ -27,6 +27,7 @@ import nl.uu.maze.search.strategy.ConcreteSearchStrategy;
 import nl.uu.maze.search.strategy.DFS;
 import nl.uu.maze.search.strategy.SearchStrategy;
 import nl.uu.maze.search.strategy.SymbolicSearchStrategy;
+import nl.uu.maze.util.Pair;
 import sootup.core.graph.StmtGraph;
 import sootup.java.core.JavaSootClass;
 import sootup.java.core.JavaSootMethod;
@@ -347,19 +348,16 @@ public class DSEController {
                 break;
             }
 
-            Optional<Model> model = searchStrategy.next(validator);
+            Optional<Pair<Model, SymbolicState>> candidate = searchStrategy.next(validator);
             // If we cannot find a new path condition, we are done
-            if (model.isEmpty()) {
+            if (candidate.isEmpty()) {
                 break;
             }
 
             // If a new path condition is found, evaluate it to get the next set of
             // arguments which will be used in the next iteration for concrete execution
-            // TODO: finalState may not be the correct state to use for this evaluation!
-            // TODO: it depends on the path condition candidate, so those should store
-            // states (but does not have to be the exact state in that position, it's fine
-            // if it's the final state for the same path (so no need to clone maybe))
-            argMap = validator.evaluate(model.get(), finalState.get(), false);
+            Pair<Model, SymbolicState> pair = candidate.get();
+            argMap = validator.evaluate(pair.getFirst(), pair.getSecond(), false);
         }
     }
 }

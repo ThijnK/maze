@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import nl.uu.maze.execution.symbolic.PathConstraint;
+import nl.uu.maze.execution.symbolic.SymbolicState;
 import nl.uu.maze.execution.symbolic.PathConstraint.*;
 import nl.uu.maze.search.SearchTarget;
 import sootup.core.graph.StmtGraph;
@@ -19,6 +20,12 @@ import sootup.core.jimple.common.stmt.Stmt;
  *           (i.e., only when the candidate is selected for exploration).
  */
 public class PathConditionCandidate implements SearchTarget {
+    /**
+     * Reference to the (final) state at the time of creating this candidate.
+     * This is NOT the state at the time the constraint this candidate will negate
+     * was added!
+     */
+    private final SymbolicState state;
     private List<PathConstraint> constraints;
     /** The index of the constraint to negate. */
     private final int index;
@@ -38,11 +45,12 @@ public class PathConditionCandidate implements SearchTarget {
      */
     private int waitingTime = 0;
 
-    public PathConditionCandidate(List<PathConstraint> pathConstraints, int index) {
-        this(pathConstraints, index, -1);
+    public PathConditionCandidate(SymbolicState state, List<PathConstraint> pathConstraints, int index) {
+        this(state, pathConstraints, index, -1);
     }
 
-    public PathConditionCandidate(List<PathConstraint> pathConstraints, int index, int subIndex) {
+    public PathConditionCandidate(SymbolicState state, List<PathConstraint> pathConstraints, int index, int subIndex) {
+        this.state = state;
         this.constraints = pathConstraints;
         this.index = index;
         this.subIndex = subIndex;
@@ -50,6 +58,10 @@ public class PathConditionCandidate implements SearchTarget {
 
     public List<PathConstraint> getConstraints() {
         return constraints;
+    }
+
+    public SymbolicState getState() {
+        return state;
     }
 
     public Stmt getStmt() {

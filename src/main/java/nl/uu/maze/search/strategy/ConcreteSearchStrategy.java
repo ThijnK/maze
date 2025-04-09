@@ -13,6 +13,7 @@ import nl.uu.maze.execution.symbolic.PathConstraint;
 import nl.uu.maze.execution.symbolic.SymbolicState;
 import nl.uu.maze.execution.symbolic.SymbolicStateValidator;
 import nl.uu.maze.execution.symbolic.PathConstraint.CompositeConstraint;
+import nl.uu.maze.util.Pair;
 
 /**
  * Wrapper class for search strategies that operate on concrete-driven DSE.
@@ -53,10 +54,10 @@ public class ConcreteSearchStrategy extends SearchStrategy<PathConditionCandidat
             // For switch constraints, we want one candidate for every possible value
             if (constraint instanceof CompositeConstraint) {
                 for (Integer j : ((CompositeConstraint) constraint).getPossibleIndices()) {
-                    add(new PathConditionCandidate(pathConstraints, i, j));
+                    add(new PathConditionCandidate(state, pathConstraints, i, j));
                 }
             } else {
-                add(new PathConditionCandidate(pathConstraints, i));
+                add(new PathConditionCandidate(state, pathConstraints, i));
             }
         }
 
@@ -71,7 +72,7 @@ public class ConcreteSearchStrategy extends SearchStrategy<PathConditionCandidat
      * @return The Z3 model of the next candidate to explore, or empty if there are
      *         no more candidates
      */
-    public Optional<Model> next(SymbolicStateValidator validator) {
+    public Optional<Pair<Model, SymbolicState>> next(SymbolicStateValidator validator) {
         // Find the first candidate that has not been explored yet and is satisfiable
         PathConditionCandidate candidate;
         while ((candidate = next()) != null) {
@@ -79,7 +80,7 @@ public class ConcreteSearchStrategy extends SearchStrategy<PathConditionCandidat
             if (!isExplored(candidate)) {
                 Optional<Model> model = validator.validate(candidate.getConstraints());
                 if (model.isPresent()) {
-                    return model;
+                    return Optional.of(Pair.of(model.get(), candidate.getState()));
                 }
             }
         }
