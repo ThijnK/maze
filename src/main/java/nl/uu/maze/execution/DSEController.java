@@ -55,6 +55,7 @@ public class DSEController {
     private Class<?> instrumented;
     /** After this time, stop the process as soon as possible. */
     private long deadline;
+    private boolean deadlineReached = false;
 
     private final SymbolicExecutor symbolic;
     private final SymbolicStateValidator validator;
@@ -128,6 +129,7 @@ public class DSEController {
         this.clazz = analyzer.getJavaClass(classType);
         generator.initializeForClass(clazz);
         deadline = timeBudget > 0 ? System.currentTimeMillis() + timeBudget : Long.MAX_VALUE;
+        deadlineReached = false;
 
         logger.info("Running {} DSE on class: {}", concreteDriven ? "concrete-driven" : "symbolic-driven",
                 clazz.getSimpleName());
@@ -155,14 +157,12 @@ public class DSEController {
         }
 
         for (JavaSootMethod method : methods) {
+            if (deadlineReached) {
+                break;
+            }
             // Skip non-public and non-standard methods (e.g., <init>, <clinit>)
             if (!method.isPublic() || pattern.matcher(method.getName()).matches()) {
                 continue;
-            }
-            // Check if we are over the time budget
-            if (System.currentTimeMillis() >= deadline) {
-                logger.info("Time budget exceeded, stopping execution");
-                break;
             }
 
             logger.info("Processing method: {}", method.getName());
@@ -245,8 +245,9 @@ public class DSEController {
         while ((current = searchStrategy.next()) != null) {
             // Check if we are over the time budget
             if (System.currentTimeMillis() >= deadline) {
-                logger.info("Time budget exceeded, stopping exploration of {}", method.getName());
-                break;
+                logger.info("Time budget exceeded, stopping execution");
+                deadlineReached = true;
+                return concreteDriven ? Optional.of(current) : Optional.empty();
             }
 
             logger.debug("Current state: {}", current);
@@ -318,7 +319,8 @@ public class DSEController {
         while (true) {
             // Check time budget
             if (System.currentTimeMillis() >= deadline) {
-                logger.info("Time budget exceeded, stopping exploration of {}", method.getName());
+                logger.info("Time budget exceeded, stopping execution");
+                deadlineReached = true;
                 break;
             }
 
@@ -339,6 +341,10 @@ public class DSEController {
                     // executor
                     generator.addMethodTestCase(method, ctorSoot, argMap);
                 }
+            }
+
+            if (deadlineReached) {
+                break;
             }
 
             Optional<Model> model = searchStrategy.next(validator);
