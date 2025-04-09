@@ -20,37 +20,35 @@ import java.util.Set;
  * execution.
  * Uses the ASM library.
  */
-public class BytecodeInstrumentation {
+public class BytecodeInstrumenter {
+    private BytecodeClassLoader classLoader = new BytecodeClassLoader();
+    private Set<String> processedClasses = new HashSet<>();
+
     /**
      * Instrument a class file to record symbolic traces.
      * This will also instrument all nested classes and classes which the main class
      * depends on (as long as they can be found in the classpath).
      * 
-     * @param classPath   The path to the class file
-     * @param className   The name of the class
-     * @param classLoader The class loader to load the instrumented classes in
+     * @param classPath The path to the class file
+     * @param className The name of the class
      * @return The instrumented class
      * @throws IOException            If an I/O error occurs while reading class
      *                                files
      * @throws ClassNotFoundException If the main class cannot be found
      */
-    public static Class<?> instrument(String classPath, String className, BytecodeClassLoader classLoader)
-            throws IOException, ClassNotFoundException {
-        Set<String> processedClasses = new HashSet<>();
+    public Class<?> instrument(String classPath, String className) throws IOException, ClassNotFoundException {
         Queue<String> classesToProcess = new LinkedList<>();
-
-        // Start with the main class to instrument
         classesToProcess.add(className);
 
         while (!classesToProcess.isEmpty()) {
             String currentClass = classesToProcess.poll();
-            // Skip if already processed or in the class loader
-            if (!processedClasses.add(currentClass) || classLoader.findClass(currentClass) != null) {
+            // Skip if already processed
+            if (!processedClasses.add(currentClass)) {
                 continue;
             }
 
             // Instrument current class and any nested classes
-            Set<String> dependencies = instrumentClassAndGetDependencies(classPath, currentClass, classLoader);
+            Set<String> dependencies = instrumentClassAndGetDependencies(classPath, currentClass);
 
             // Add new dependencies to the queue
             for (String dependency : dependencies) {
@@ -61,26 +59,22 @@ public class BytecodeInstrumentation {
         }
 
         // Find the main class in the class loader and return it
-        Class<?> mainClass = classLoader.findClass(className);
-        if (mainClass == null) {
-            throw new ClassNotFoundException("Class " + className + " not found in class loader.");
-        }
-        return mainClass;
+        return classLoader.findClass(className);
     }
 
     /**
-     * Create a new BytecodeClassLoader instance.
+     * Get the class loader used by this instrumentation to store instrumented
+     * classes.
      */
-    public static BytecodeClassLoader createBytecodeClassLoader() {
-        return new BytecodeClassLoader();
+    public BytecodeClassLoader getClassLoader() {
+        return classLoader;
     }
 
     /**
      * Instrument a single class and its nested classes, and return their
      * dependencies.
      */
-    private static Set<String> instrumentClassAndGetDependencies(String classPath, String className,
-            BytecodeClassLoader classLoader) throws IOException {
+    private Set<String> instrumentClassAndGetDependencies(String classPath, String className) throws IOException {
         String simpleName = className.substring(className.lastIndexOf('.') + 1);
         String packageName = className.substring(0, className.lastIndexOf('.'));
         String resourcePath = packageName.replace(".", "/");

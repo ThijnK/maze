@@ -115,7 +115,7 @@ public class MazeCLI implements Callable<Integer> {
             }
             return 0;
         } catch (Exception e) {
-            logger.error("An error occurred: {}", e.getMessage());
+            logger.error("An error occurred: {}: {}", e.getClass().getName(), e.getMessage());
             return 1;
         } finally {
             Z3ContextProvider.close();

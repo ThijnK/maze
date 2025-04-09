@@ -49,6 +49,7 @@ public class DSEController {
     /** Search strategy used for symbolic replay of a trace (DFS). */
     private final SymbolicSearchStrategy replayStrategy;
     private final JavaAnalyzer analyzer;
+    private final BytecodeInstrumenter instrumenter;
     private JavaSootClass sootClass;
     private Class<?> clazz;
     private Class<?> instrumented;
@@ -89,7 +90,8 @@ public class DSEController {
             String outPath, int maxDepth, long testTimeout, String packageName)
             throws Exception {
         this.classPath = classPath;
-        this.classLoader = concreteDriven ? BytecodeInstrumentation.createBytecodeClassLoader()
+        instrumenter = new BytecodeInstrumenter();
+        this.classLoader = concreteDriven ? instrumenter.getClassLoader()
                 : new URLClassLoader(new URL[] { Paths.get(classPath).toUri().toURL() });
         this.outPath = Path.of(outPath);
         this.maxDepth = maxDepth;
@@ -118,7 +120,7 @@ public class DSEController {
         // Instrument the class if concrete-driven
         // If this class was instrumented before, it will reuse previous results
         this.instrumented = concreteDriven
-                ? BytecodeInstrumentation.instrument(classPath, className, (BytecodeClassLoader) classLoader)
+                ? instrumenter.instrument(classPath, className)
                 : null;
 
         JavaClassType classType = analyzer.getClassType(className);
