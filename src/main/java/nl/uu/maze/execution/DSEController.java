@@ -53,6 +53,8 @@ public class DSEController {
     private JavaSootClass sootClass;
     private Class<?> clazz;
     private Class<?> instrumented;
+    /** After this time, stop the process as soon as possible. */
+    private long deadline;
 
     private final SymbolicExecutor symbolic;
     private final SymbolicStateValidator validator;
@@ -81,7 +83,7 @@ public class DSEController {
      * @param searchStrategy The search strategy to use
      * @param outPath        The output path for the generated test cases
      * @param maxDepth       The maximum depth for symbolic execution
-     * @param testTimeout    The timeout to apply to generated test cases
+     * @param testTimeout    The timeout to apply to generated test cases in ms
      * @param packageName    The package name for the generated test files
      */
     public DSEController(String classPath, boolean concreteDriven, SearchStrategy<?> searchStrategy,
@@ -108,11 +110,12 @@ public class DSEController {
     /**
      * Run the dynamic symbolic execution engine on the given class.
      * 
-     * @param className The name of the class to execute on
+     * @param className  The name of the class to execute on
+     * @param timeBudget The time budget for the search in ms (0 for no timeout)
      * @throws Exception If an error occurs during execution, or if the class cannot
      *                   be found in the class path
      */
-    public void run(String className) throws Exception {
+    public void run(String className, long timeBudget) throws Exception {
         // Instrument the class if concrete-driven
         // If this class was instrumented before, it will reuse previous results
         this.instrumented = concreteDriven
@@ -123,6 +126,7 @@ public class DSEController {
         this.sootClass = analyzer.getSootClass(classType);
         this.clazz = analyzer.getJavaClass(classType);
         generator.initializeForClass(clazz);
+        deadline = timeBudget > 0 ? System.currentTimeMillis() + timeBudget : Long.MAX_VALUE;
 
         logger.info("Running {} DSE on class: {}", concreteDriven ? "concrete-driven" : "symbolic-driven",
                 clazz.getSimpleName());
@@ -153,6 +157,11 @@ public class DSEController {
             // Skip non-public and non-standard methods (e.g., <init>, <clinit>)
             if (!method.isPublic() || pattern.matcher(method.getName()).matches()) {
                 continue;
+            }
+            // Check if we are over the time budget
+            if (System.currentTimeMillis() >= deadline) {
+                logger.info("Time budget exceeded, stopping execution");
+                break;
             }
 
             logger.info("Processing method: {}", method.getName());
@@ -234,6 +243,12 @@ public class DSEController {
 
         SymbolicState current;
         while ((current = searchStrategy.next()) != null) {
+            // Check if we are over the time budget
+            if (System.currentTimeMillis() >= deadline) {
+                logger.info("Time budget exceeded, stopping exploration of {}", method.getName());
+                break;
+            }
+
             logger.debug("Current state: {}", current);
             logger.debug("Next stmt: {}", current.getStmt());
             if (!current.isCtorState() && current.isFinalState() || current.getDepth() >= maxDepth) {
@@ -291,6 +306,12 @@ public class DSEController {
         ArgMap argMap = new ArgMap();
 
         while (true) {
+            // Check time budget
+            if (System.currentTimeMillis() >= deadline) {
+                logger.info("Time budget exceeded, stopping exploration of {}", method.getName());
+                break;
+            }
+
             // Concrete execution followed by symbolic replay
             TraceManager.clearEntries();
             concrete.execute(ctor, javaMethod, argMap);

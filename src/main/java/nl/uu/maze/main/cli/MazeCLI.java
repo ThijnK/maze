@@ -125,7 +125,7 @@ public class MazeCLI implements Callable<Integer> {
     private void runNormalMode(SearchStrategy<?> strategy) throws Exception {
         DSEController controller = new DSEController(classPath, concreteDriven, strategy, outPath,
                 maxDepth, testTimeout, packageName);
-        controller.run(className);
+        controller.run(className, timeBudget);
     }
 
     /**
@@ -151,9 +151,9 @@ public class MazeCLI implements Callable<Integer> {
         int m = channel.number();
         channel.emit("READY");
         for (int i = 0; i < m; i++) {
-            channel.longnumber(); // Ignore time budget
+            long timeBudget = channel.longnumber();
             String className = channel.className();
-            controller.run(className);
+            controller.run(className, timeBudget);
             channel.emit("READY");
         }
     }
