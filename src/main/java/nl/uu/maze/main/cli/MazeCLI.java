@@ -62,11 +62,11 @@ public class MazeCLI implements Callable<Integer> {
     private int maxDepth;
 
     @Option(names = { "-b",
-            "--time-budget" }, description = "Time budget for the search in ms (default: ${DEFAULT-VALUE})", defaultValue = "no budget", paramLabel = "<long>", converter = TimeBudgetConverter.class)
+            "--time-budget" }, description = "Time budget for the search in seconds (default: ${DEFAULT-VALUE})", defaultValue = "no budget", paramLabel = "<long>", converter = TimeBudgetConverter.class)
     private long timeBudget;
 
     @Option(names = { "-t",
-            "--test-timeout" }, description = "Timeout to apply to generated test cases in ms (default: ${DEFAULT-VALUE})", defaultValue = "no timeout", paramLabel = "<long>", converter = TestTimeoutConverter.class)
+            "--test-timeout" }, description = "Timeout to apply to generated test cases in seconds (default: ${DEFAULT-VALUE})", defaultValue = "no timeout", paramLabel = "<long>", converter = TestTimeoutConverter.class)
     private long testTimeout;
 
     @Option(names = { "-C",
@@ -89,8 +89,8 @@ public class MazeCLI implements Callable<Integer> {
                     heuristicWeights);
 
             DSEController controller = new DSEController(classPath, concreteDriven, strategy, outPath,
-                    maxDepth, testTimeout, packageName);
-            controller.run(className, timeBudget);
+                    maxDepth, testTimeout * 1000L, packageName);
+            controller.run(className, timeBudget * 1000L);
             return 0;
         } catch (Exception e) {
             logger.error("An error occurred: {}: {}", e.getClass().getName(), e.getMessage());

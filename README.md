@@ -110,8 +110,8 @@ Maze provides the following command-line options:
 | `--heuristic`       | `-u`  | One or multiple of the search heuristics to use (for probabilistic search) | No       | `Uniform`  |
 | `--weight`          | `-w`  | Weights for the provided heuristics                                        | No       | `1.0`      |
 | `--max-depth`       | `-d`  | Maximum depth of the search                                                | No       | `50`       |
-| `--time-budget`     | `-b`  | Time budget for the engine (in ms)                                         | No       | No budget  |
-| `--test-timeout`    | `-t`  | Timeout to apply to generated test cases (in ms)                           | No       | No timeout |
+| `--time-budget`     | `-b`  | Time budget for the engine (in seconds)                                    | No       | No budget  |
+| `--test-timeout`    | `-t`  | Timeout to apply to generated test cases (in seconds)                      | No       | No timeout |
 | `--concrete-driven` | `-C`  | Use concrete-driven DSE instead of symbolic-driven                         | No       | `false`    |
 
 ## Project Structure
