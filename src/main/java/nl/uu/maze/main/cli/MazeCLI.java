@@ -26,23 +26,23 @@ public class MazeCLI implements Callable<Integer> {
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(MazeCLI.class);
 
     @Option(names = { "-c",
-            "--classPath" }, description = "Path to compiled classes", required = true, paramLabel = "<path>")
+            "--classpath" }, description = "Path to compiled classes", required = true, paramLabel = "<path>")
     private String classPath;
 
     @Option(names = { "-n",
-            "--className" }, description = "Fully qualified name of the class to run", required = true, paramLabel = "<class>")
+            "--classname" }, description = "Fully qualified name of the class to generate tests for", required = true, paramLabel = "<class>")
     private String className;
 
     @Option(names = { "-o",
-            "--outPath" }, description = "Output path for test files", required = true, paramLabel = "<path>")
+            "--output-path" }, description = "Output path to write generated test files to", required = true, paramLabel = "<path>")
     private String outPath;
 
     @Option(names = { "-p",
-            "--packageName" }, description = "Package name to use for generated test files (default: ${DEFAULT-VALUE})", defaultValue = "no package", paramLabel = "<name>", converter = PackageNameConverter.class)
+            "--package-name" }, description = "Package name to use for generated test files (default: ${DEFAULT-VALUE})", defaultValue = "no package", paramLabel = "<name>", converter = PackageNameConverter.class)
     private String packageName;
 
     @Option(names = { "-l",
-            "--logLevel" }, description = "Log level (default: ${DEFAULT-VALUE}, options: OFF, INFO, WARN, ERROR, TRACE, DEBUG)", defaultValue = "INFO", paramLabel = "<level>", converter = LogLevelConverter.class)
+            "--log-level" }, description = "Log level (default: ${DEFAULT-VALUE}, options: OFF, INFO, WARN, ERROR, TRACE, DEBUG)", defaultValue = "INFO", paramLabel = "<level>", converter = LogLevelConverter.class)
     private Level logLevel;
 
     @Option(names = { "-s",
@@ -58,19 +58,19 @@ public class MazeCLI implements Callable<Integer> {
     private List<Double> heuristicWeights;
 
     @Option(names = { "-d",
-            "--maxDepth" }, description = "Maximum depth of the search (default: ${DEFAULT-VALUE})", defaultValue = "50", paramLabel = "<int>")
+            "--max-depth" }, description = "Maximum depth of the search (default: ${DEFAULT-VALUE})", defaultValue = "50", paramLabel = "<int>")
     private int maxDepth;
 
     @Option(names = { "-b",
-            "--timeBudget" }, description = "Time budget for the search in ms (default: ${DEFAULT-VALUE})", defaultValue = "no budget", paramLabel = "<long>", converter = TimeBudgetConverter.class)
+            "--time-budget" }, description = "Time budget for the search in ms (default: ${DEFAULT-VALUE})", defaultValue = "no budget", paramLabel = "<long>", converter = TimeBudgetConverter.class)
     private long timeBudget;
 
     @Option(names = { "-t",
-            "--testTimeout" }, description = "Timeout to apply to generated test cases in ms (default: ${DEFAULT-VALUE})", defaultValue = "no timeout", paramLabel = "<long>", converter = TestTimeoutConverter.class)
+            "--test-timeout" }, description = "Timeout to apply to generated test cases in ms (default: ${DEFAULT-VALUE})", defaultValue = "no timeout", paramLabel = "<long>", converter = TestTimeoutConverter.class)
     private long testTimeout;
 
     @Option(names = { "-C",
-            "--concreteDriven" }, description = "Use concrete-driven DSE instead of symbolic-driven DSE (default: ${DEFAULT-VALUE})", defaultValue = "false", paramLabel = "<true|false>")
+            "--concrete-driven" }, description = "Use concrete-driven DSE instead of symbolic-driven DSE (default: ${DEFAULT-VALUE})", defaultValue = "false", paramLabel = "<true|false>")
     private boolean concreteDriven;
 
     @Override

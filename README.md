@@ -97,22 +97,22 @@ Set the environment variables and install into your local maven repository as de
 
 Maze provides the following command-line options:
 
-| Option             | Alias | Description                                                                | Required | Default    |
-| ------------------ | ----- | -------------------------------------------------------------------------- | -------- | ---------- |
-| `--help`           | `-h`  | Show help message                                                          | No       | -          |
-| `--version`        | `-V`  | Show version information                                                   | No       | -          |
-| `--classPath`      | `-c`  | Path to compiled classes                                                   | Yes      | -          |
-| `--className`      | `-n`  | Fully qualified name of the class to run                                   | Yes      | -          |
-| `--outPath`        | `-o`  | Output path for test files                                                 | Yes      | -          |
-| `--packageName`    | `-p`  | Package name to use for generated test files                               | No       | No package |
-| `--logLevel`       | `-l`  | Log level (OFF, INFO, WARN, ERROR, TRACE, DEBUG)                           | No       | `INFO`     |
-| `--strategy`       | `-s`  | One or multiple of the search strategies to use                            | No       | `DFS`      |
-| `--heuristic`      | `-u`  | One or multiple of the search heuristics to use (for probabilistic search) | No       | `Uniform`  |
-| `--weight`         | `-w`  | Weights for the provided heuristics                                        | No       | `1.0`      |
-| `--maxDepth`       | `-d`  | Maximum depth of the search                                                | No       | `50`       |
-| `--timeBudget`     | `-b`  | Time budget for the engine (in ms)                                         | No       | No budget  |
-| `--testTimeout`    | `-t`  | Timeout to apply to generated test cases (in ms)                           | No       | No timeout |
-| `--concreteDriven` | `-C`  | Use concrete-driven DSE instead of symbolic-driven                         | No       | `false`    |
+| Option              | Alias | Description                                                                | Required | Default    |
+| ------------------- | ----- | -------------------------------------------------------------------------- | -------- | ---------- |
+| `--help`            | `-h`  | Show help message                                                          | No       | -          |
+| `--version`         | `-V`  | Show version information                                                   | No       | -          |
+| `--classpath`       | `-c`  | Path to compiled classes                                                   | Yes      | -          |
+| `--classname`       | `-n`  | Fully qualified name of the class to generate tests for                    | Yes      | -          |
+| `--output-path`     | `-o`  | Output path to write generated test files to                               | Yes      | -          |
+| `--package-name`    | `-p`  | Package name to use for generated test files                               | No       | No package |
+| `--log-level`       | `-l`  | Log level (OFF, INFO, WARN, ERROR, TRACE, DEBUG)                           | No       | `INFO`     |
+| `--strategy`        | `-s`  | One or multiple of the search strategies to use                            | No       | `DFS`      |
+| `--heuristic`       | `-u`  | One or multiple of the search heuristics to use (for probabilistic search) | No       | `Uniform`  |
+| `--weight`          | `-w`  | Weights for the provided heuristics                                        | No       | `1.0`      |
+| `--max-depth`       | `-d`  | Maximum depth of the search                                                | No       | `50`       |
+| `--time-budget`     | `-b`  | Time budget for the engine (in ms)                                         | No       | No budget  |
+| `--test-timeout`    | `-t`  | Timeout to apply to generated test cases (in ms)                           | No       | No timeout |
+| `--concrete-driven` | `-C`  | Use concrete-driven DSE instead of symbolic-driven                         | No       | `false`    |
 
 ## Project Structure
 
