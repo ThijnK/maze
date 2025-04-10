@@ -21,7 +21,7 @@ public class JavaAnalyzerTest {
 
     @BeforeAll
     public static void setUp() throws Exception {
-        analyzer = new JavaAnalyzer(classPath, null);
+        analyzer = new JavaAnalyzer(classPath, JavaAnalyzerTest.class.getClassLoader());
     }
 
     @Test
