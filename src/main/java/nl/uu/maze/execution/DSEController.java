@@ -138,6 +138,7 @@ public class DSEController {
 
         logger.debug("Max depth: {}", maxDepth);
         logger.debug("Output path: {}", outPath);
+        logger.debug("Time budget: {} ms", timeBudget);
 
         Set<JavaSootMethod> methods = sootClass.getMethods();
         // Regex pattern to match non-standard method names (e.g., <init>, <clinit>)
