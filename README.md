@@ -113,7 +113,6 @@ Maze provides the following command-line options:
 | `--timeBudget`     | `-b`  | Time budget for the engine (in ms)                                         | No       | No budget  |
 | `--testTimeout`    | `-t`  | Timeout to apply to generated test cases (in ms)                           | No       | No timeout |
 | `--concreteDriven` | `-C`  | Use concrete-driven DSE instead of symbolic-driven                         | No       | `false`    |
-| `--benchmark`      | `-B`  | Run in benchmark mode according to the protocol expected by JUGE           | No       | `false`    |
 
 ## Project Structure
 

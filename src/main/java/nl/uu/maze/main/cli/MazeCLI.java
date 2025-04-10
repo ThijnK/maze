@@ -1,9 +1,5 @@
 package nl.uu.maze.main.cli;
 
-import java.io.File;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 
@@ -17,12 +13,9 @@ import nl.uu.maze.search.heuristic.SearchHeuristicFactory.ValidSearchHeuristic;
 import nl.uu.maze.search.strategy.SearchStrategy;
 import nl.uu.maze.search.strategy.SearchStrategyFactory;
 import nl.uu.maze.search.strategy.SearchStrategyFactory.ValidSearchStrategy;
-import nl.uu.maze.util.LoggerOutputStream;
 import nl.uu.maze.util.Z3ContextProvider;
-import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
-import picocli.CommandLine.ParameterException;
 
 /**
  * Main class for the Maze application that provides a command-line interface
@@ -33,11 +26,11 @@ public class MazeCLI implements Callable<Integer> {
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(MazeCLI.class);
 
     @Option(names = { "-c",
-            "--classPath" }, description = "Path to compiled classes", paramLabel = "<path>")
+            "--classPath" }, description = "Path to compiled classes", required = true, paramLabel = "<path>")
     private String classPath;
 
     @Option(names = { "-n",
-            "--className" }, description = "Fully qualified name of the class to run", paramLabel = "<class>")
+            "--className" }, description = "Fully qualified name of the class to run", required = true, paramLabel = "<class>")
     private String className;
 
     @Option(names = { "-o",
@@ -80,23 +73,8 @@ public class MazeCLI implements Callable<Integer> {
             "--concreteDriven" }, description = "Use concrete-driven DSE instead of symbolic-driven DSE (default: ${DEFAULT-VALUE})", defaultValue = "false", paramLabel = "<true|false>")
     private boolean concreteDriven;
 
-    @Option(names = { "-B",
-            "--benchmark" }, description = "Run in benchmark mode according to the protocol expected by JUGE (default: ${DEFAULT-VALUE})", defaultValue = "false", paramLabel = "<true|false>")
-    private boolean benchmarkMode;
-
     @Override
     public Integer call() {
-        // Check for required options (classPath, className)
-        // Note: not using picocli required options, because they are only required if
-        // not in benchmark mode
-        if (!benchmarkMode) {
-            if (classPath == null || classPath.isEmpty()) {
-                throw new ParameterException(new CommandLine(this), "Missing required option: '--classPath=<path>'");
-            } else if (className == null || className.isEmpty()) {
-                throw new ParameterException(new CommandLine(this), "Missing required option: '--className=<class>'");
-            }
-        }
-
         try {
             // Set logging level
             Logger rootLogger = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
@@ -104,57 +82,21 @@ public class MazeCLI implements Callable<Integer> {
 
             List<String> searchStrategies = this.searchStrategies.stream().map(ValidSearchStrategy::name)
                     .toList();
-            List<String> searchHeuristics = this.searchHeuristics.stream().map(ValidSearchHeuristic::name).toList();
-            SearchStrategy<?> strategy = SearchStrategyFactory.createStrategy(searchStrategies, searchHeuristics,
+            List<String> searchHeuristics = this.searchHeuristics.stream().map(ValidSearchHeuristic::name)
+                    .toList();
+            SearchStrategy<?> strategy = SearchStrategyFactory.createStrategy(searchStrategies,
+                    searchHeuristics,
                     heuristicWeights);
 
-            if (benchmarkMode) {
-                runBenchmarkMode(strategy);
-            } else {
-                runNormalMode(strategy);
-            }
+            DSEController controller = new DSEController(classPath, concreteDriven, strategy, outPath,
+                    maxDepth, testTimeout, packageName);
+            controller.run(className, timeBudget);
             return 0;
         } catch (Exception e) {
             logger.error("An error occurred: {}: {}", e.getClass().getName(), e.getMessage());
             return 1;
         } finally {
             Z3ContextProvider.close();
-        }
-    }
-
-    private void runNormalMode(SearchStrategy<?> strategy) throws Exception {
-        DSEController controller = new DSEController(classPath, concreteDriven, strategy, outPath,
-                maxDepth, testTimeout, packageName);
-        controller.run(className, timeBudget);
-    }
-
-    /**
-     * Run in benchmark mode according to the protocol expected by JUGE, as defined
-     * here: https://github.com/JUnitContest/JUGE/blob/master/docs/DETAILS.md
-     */
-    private void runBenchmarkMode(SearchStrategy<?> strategy) throws Exception {
-        SBSTChannel channel = new SBSTChannel(new InputStreamReader(System.in), new OutputStreamWriter(System.out),
-                new LoggerOutputStream(logger, Level.DEBUG));
-        channel.token("BENCHMARK");
-        channel.directory(); // Ignore directory with SUT source code
-        channel.directory(); // Ignore directory with SUT compiled class files
-        int n = channel.number();
-        List<File> classPath = new ArrayList<File>();
-        for (int i = 0; i < n; i++) {
-            classPath.add(channel.directory_jarfile());
-        }
-
-        // TODO: for now, we'll assume only one class path is provided
-        DSEController controller = new DSEController(classPath.get(0).getAbsolutePath(), concreteDriven, strategy,
-                outPath, maxDepth, testTimeout, packageName);
-
-        int m = channel.number();
-        channel.emit("READY");
-        for (int i = 0; i < m; i++) {
-            long timeBudget = channel.longnumber();
-            String className = channel.className();
-            controller.run(className, timeBudget);
-            channel.emit("READY");
         }
     }
 }
