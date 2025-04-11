@@ -58,12 +58,18 @@ public class MethodInvoker {
     /**
      * Execute a method call, symbolically if available, and otherwise concretely.
      * 
+     * @param state       The current symbolic state
+     * @param expr        The method call expression to execute
+     * @param storeResult Whether to store the result of the method call in the
+     *                    return value of the state (i.e., for definition
+     *                    statements)
+     * 
      * @return A new symbolic state if the method was executed symbolically, or
      *         an empty optional if the method was executed concretely (meaning
      *         execution should continue with whatever state this method was called
      *         with)
      */
-    public Optional<SymbolicState> executeMethod(SymbolicState state, AbstractInvokeExpr expr) {
+    public Optional<SymbolicState> executeMethod(SymbolicState state, AbstractInvokeExpr expr, boolean storeResult) {
         if (expr instanceof JDynamicInvokeExpr) {
             throw new UnsupportedOperationException("Dynamic invocation is not supported");
         }
@@ -76,7 +82,7 @@ public class MethodInvoker {
         }
         // Otherwise, execute it concretely
         else {
-            executeConcrete(state, expr, base);
+            executeConcrete(state, expr, base, storeResult);
             return Optional.empty();
         }
     }
@@ -129,7 +135,7 @@ public class MethodInvoker {
     }
 
     /** Execute a method call concretely. */
-    private void executeConcrete(SymbolicState state, AbstractInvokeExpr expr, Local base) {
+    private void executeConcrete(SymbolicState state, AbstractInvokeExpr expr, Local base, boolean storeResult) {
         MethodSignature methodSig = expr.getMethodSignature();
         boolean isCtor = methodSig.getName().equals("<init>");
         Object executable = getExecutable(methodSig, isCtor);
@@ -187,8 +193,8 @@ public class MethodInvoker {
 
         Type retType = methodSig.getType();
         // Store the return value in the state
-        state.setReturnValue(
-                !retType.equals(VoidType.getInstance()) ? javaToZ3.transform(retval, state, retType) : null);
+        boolean setNullResult = !storeResult || retType.equals(VoidType.getInstance());
+        state.setReturnValue(setNullResult ? null : javaToZ3.transform(retval, state, retType));
         if (base != null && instance != null) {
             updateModifiedFields(state, base, original, instance);
         }

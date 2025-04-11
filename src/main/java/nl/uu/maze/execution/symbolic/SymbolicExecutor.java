@@ -315,7 +315,7 @@ public class SymbolicExecutor {
             }
             // If not already executed, first execute the method
             else {
-                Optional<SymbolicState> callee = methodInvoker.executeMethod(state, stmt.getInvokeExpr());
+                Optional<SymbolicState> callee = methodInvoker.executeMethod(state, stmt.getInvokeExpr(), true);
                 // If callee is not empty, the method will be executed symbolically by
                 // {@link DSEController}, so relinquish control here
                 if (callee.isPresent()) {
@@ -415,7 +415,7 @@ public class SymbolicExecutor {
         }
 
         // Handle method invocation
-        Optional<SymbolicState> callee = methodInvoker.executeMethod(state, expr);
+        Optional<SymbolicState> callee = methodInvoker.executeMethod(state, expr, false);
         // If executed concretely, immediately continue with the next statement
         return callee.map(List::of).orElseGet(() -> handleOtherStmts(state, replay));
     }
