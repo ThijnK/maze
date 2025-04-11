@@ -430,8 +430,9 @@ public class SymbolicHeap {
      * the original object (including alias map entries).
      */
     public void linkHeapObject(Expr<?> symRef, SymbolicHeap otherHeap) {
-        aliasMap.put(symRef, otherHeap.getAliases(symRef));
-        for (Expr<?> conRef : otherHeap.getAliases(symRef)) {
+        Set<Expr<?>> aliases = otherHeap.getAliases(symRef);
+        aliasMap.put(symRef, aliases);
+        for (Expr<?> conRef : aliases) {
             HeapObject obj = otherHeap.get(conRef);
             if (obj == null) {
                 continue;

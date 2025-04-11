@@ -148,6 +148,19 @@ public class DSEController {
         logger.debug("Output path: {}", outPath);
         logger.debug("Time budget: {} ms", timeBudget);
 
+        // Write test cases regardless of whether the execution was successful or not,
+        // so that intermediate results are not lost
+        try {
+            run();
+        } finally {
+            generator.writeToFile(outPath);
+        }
+    }
+
+    /**
+     * Run the dynamic symbolic execution engine on the current class.
+     */
+    private void run() throws Exception {
         Set<JavaSootMethod> methods = sootClass.getMethods();
         // Regex pattern to match non-standard method names (e.g., <init>, <clinit>)
         Pattern pattern = Pattern.compile("<[^>]+>");
@@ -186,8 +199,6 @@ public class DSEController {
             }
             searchStrategy.reset();
         }
-
-        generator.writeToFile(outPath);
     }
 
     /**
