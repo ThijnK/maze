@@ -1,5 +1,6 @@
 package nl.uu.maze.execution;
 
+import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.net.URL;
@@ -40,7 +41,6 @@ import sootup.java.core.types.JavaClassType;
 public class DSEController {
     private static final Logger logger = LoggerFactory.getLogger(DSEController.class);
 
-    private final String classPath;
     private final ClassLoader classLoader;
     /** Max path length for symbolic execution */
     private final int maxDepth;
@@ -91,10 +91,17 @@ public class DSEController {
     public DSEController(String classPath, boolean concreteDriven, SearchStrategy<?> searchStrategy,
             String outPath, int maxDepth, long testTimeout, String packageName)
             throws Exception {
-        this.classPath = classPath;
-        instrumenter = new BytecodeInstrumenter();
-        this.classLoader = concreteDriven ? instrumenter.getClassLoader()
-                : new URLClassLoader(new URL[] { Paths.get(classPath).toUri().toURL() });
+        instrumenter = new BytecodeInstrumenter(classPath);
+        if (concreteDriven) {
+            this.classLoader = instrumenter.getClassLoader();
+        } else {
+            String[] paths = classPath.split(File.pathSeparator);
+            URL[] urls = new URL[paths.length];
+            for (int i = 0; i < paths.length; i++) {
+                urls[i] = Paths.get(paths[i]).toUri().toURL();
+            }
+            this.classLoader = new URLClassLoader(urls);
+        }
         this.outPath = Path.of(outPath);
         this.maxDepth = maxDepth;
         this.concreteDriven = concreteDriven;
@@ -122,7 +129,7 @@ public class DSEController {
         // Instrument the class if concrete-driven
         // If this class was instrumented before, it will reuse previous results
         this.instrumented = concreteDriven
-                ? instrumenter.instrument(classPath, className)
+                ? instrumenter.instrument(className)
                 : null;
 
         JavaClassType classType = analyzer.getClassType(className);

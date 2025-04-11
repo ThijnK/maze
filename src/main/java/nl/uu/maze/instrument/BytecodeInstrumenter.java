@@ -21,22 +21,32 @@ import java.util.Set;
  * Uses the ASM library.
  */
 public class BytecodeInstrumenter {
+    private String[] classPaths;
     private BytecodeClassLoader classLoader = new BytecodeClassLoader();
     private Set<String> processedClasses = new HashSet<>();
+
+    /**
+     * Constructor for the BytecodeInstrumenter.
+     * 
+     * @param classPath The classpath (or multiple separated by path separators) to
+     *                  search for class files to instrument.
+     */
+    public BytecodeInstrumenter(String classPath) {
+        classPaths = classPath.split(File.pathSeparator);
+    }
 
     /**
      * Instrument a class file to record symbolic traces.
      * This will also instrument all nested classes and classes which the main class
      * depends on (as long as they can be found in the classpath).
      * 
-     * @param classPath The path to the class file
      * @param className The name of the class
      * @return The instrumented class
      * @throws IOException            If an I/O error occurs while reading class
      *                                files
      * @throws ClassNotFoundException If the main class cannot be found
      */
-    public Class<?> instrument(String classPath, String className) throws IOException, ClassNotFoundException {
+    public Class<?> instrument(String className) throws IOException, ClassNotFoundException {
         Queue<String> classesToProcess = new LinkedList<>();
         classesToProcess.add(className);
 
@@ -48,7 +58,7 @@ public class BytecodeInstrumenter {
             }
 
             // Instrument current class and any nested classes
-            Set<String> dependencies = instrumentClassAndGetDependencies(classPath, currentClass);
+            Set<String> dependencies = instrumentClassAndGetDependencies(currentClass);
 
             // Add new dependencies to the queue
             for (String dependency : dependencies) {
@@ -74,10 +84,23 @@ public class BytecodeInstrumenter {
      * Instrument a single class and its nested classes, and return their
      * dependencies.
      */
-    private Set<String> instrumentClassAndGetDependencies(String classPath, String className) throws IOException {
+    private Set<String> instrumentClassAndGetDependencies(String className) throws IOException, ClassNotFoundException {
         String simpleName = className.substring(className.lastIndexOf('.') + 1);
         String packageName = className.substring(0, className.lastIndexOf('.'));
         String resourcePath = packageName.replace(".", "/");
+
+        // Find the first classpath that contains the class file
+        String classPath = null;
+        for (String path : classPaths) {
+            File file = new File(path, resourcePath);
+            if (file.exists()) {
+                classPath = path;
+                break;
+            }
+        }
+        if (classPath == null) {
+            throw new ClassNotFoundException("Class " + className + " not found in classpath");
+        }
 
         // Collect class files (main + nested)
         File classPathDir = new File(classPath, resourcePath);
