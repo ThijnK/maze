@@ -7,6 +7,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -165,7 +166,10 @@ public class DSEController {
             logger.info("Using constructor: {}", ctorSoot.getSignature());
         }
 
-        for (JavaSootMethod method : methods) {
+        // Sort methods by name to ensure consistent ordering
+        JavaSootMethod[] methodsArray = methods.toArray(JavaSootMethod[]::new);
+        Arrays.sort(methodsArray, (m1, m2) -> m1.getName().compareTo(m2.getName()));
+        for (JavaSootMethod method : methodsArray) {
             if (deadlineReached) {
                 break;
             }
