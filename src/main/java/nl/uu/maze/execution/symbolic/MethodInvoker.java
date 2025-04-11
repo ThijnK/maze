@@ -125,7 +125,7 @@ public class MethodInvoker {
 
             // If the argument is a reference, link the heap object from caller state to
             // the callee state
-            if (sorts.isRef(argExpr)) {
+            if (argExpr != null && sorts.isRef(argExpr)) {
                 callee.heap.linkHeapObject(argExpr, state.heap);
             }
         }

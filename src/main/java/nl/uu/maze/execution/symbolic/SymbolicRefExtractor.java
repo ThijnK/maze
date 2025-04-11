@@ -4,6 +4,7 @@ import javax.annotation.Nonnull;
 
 import com.microsoft.z3.Expr;
 
+import sootup.core.jimple.basic.Immediate;
 import sootup.core.jimple.basic.Local;
 import sootup.core.jimple.basic.Value;
 import sootup.core.jimple.common.expr.*;
@@ -46,28 +47,43 @@ public class SymbolicRefExtractor extends AbstractValueVisitor<Expr<?>> {
         return null;
     }
 
-    private void handleBinaryExpr(Value op1, Value op2) {
-        Expr<?> left = extract(op1);
-        if (left != null) {
-            setResult(left);
+    private void extractMultiple(Local value, Value... values) {
+        Expr<?> res = extract(value);
+        if (res != null) {
+            setResult(res);
             return;
         }
-        setResult(extract(op2));
+        extractMultiple(values);
+    }
+
+    private void extractMultiple(Value... values) {
+        for (Value value : values) {
+            Expr<?> res = extract(value);
+            if (res != null) {
+                setResult(res);
+                return;
+            }
+        }
     }
 
     @Override
     public void caseEqExpr(@Nonnull JEqExpr expr) {
-        handleBinaryExpr(expr.getOp1(), expr.getOp2());
+        extractMultiple(expr.getOp1(), expr.getOp2());
     }
 
     @Override
     public void caseNeExpr(@Nonnull JNeExpr expr) {
-        handleBinaryExpr(expr.getOp1(), expr.getOp2());
+        extractMultiple(expr.getOp1(), expr.getOp2());
     }
 
     @Override
     public void caseLocal(@Nonnull Local local) {
         setResult(extract(local.getName()));
+    }
+
+    @Override
+    public void caseCastExpr(@Nonnull JCastExpr expr) {
+        setResult(extract(expr.getOp().toString()));
     }
 
     @Override
@@ -92,16 +108,21 @@ public class SymbolicRefExtractor extends AbstractValueVisitor<Expr<?>> {
 
     @Override
     public void caseInterfaceInvokeExpr(@Nonnull JInterfaceInvokeExpr expr) {
-        setResult(extract(expr.getBase().getName()));
+        extractMultiple(expr.getBase(), expr.getArgs().toArray(Immediate[]::new));
     }
 
     @Override
     public void caseSpecialInvokeExpr(@Nonnull JSpecialInvokeExpr expr) {
-        setResult(extract(expr.getBase().getName()));
+        extractMultiple(expr.getBase(), expr.getArgs().toArray(Immediate[]::new));
     }
 
     @Override
     public void caseVirtualInvokeExpr(@Nonnull JVirtualInvokeExpr expr) {
-        setResult(extract(expr.getBase().getName()));
+        extractMultiple(expr.getBase(), expr.getArgs().toArray(Immediate[]::new));
+    }
+
+    @Override
+    public void caseStaticInvokeExpr(@Nonnull JStaticInvokeExpr expr) {
+        extractMultiple(expr.getArgs().toArray(Immediate[]::new));
     }
 }
