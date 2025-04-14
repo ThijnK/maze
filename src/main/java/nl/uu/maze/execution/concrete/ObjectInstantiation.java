@@ -27,6 +27,10 @@ public class ObjectInstantiation {
      * @return An instance of the class or null if the instance could not be created
      */
     public static Object createInstance(Class<?> clazz) {
+        if (clazz.isInterface()) {
+            throw new IllegalArgumentException("Cannot create instance of an interface: " + clazz.getSimpleName());
+        }
+
         // Try to create an instance using one of the constructors
         for (Constructor<?> ctor : clazz.getDeclaredConstructors()) {
             Object instance = createInstance(ctor, generateArgs(ctor.getParameters(), MethodType.CTOR, null));

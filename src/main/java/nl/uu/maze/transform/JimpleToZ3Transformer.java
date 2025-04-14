@@ -79,6 +79,10 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
         Expr<?> l = transform(op1);
         Expr<?> r = transform(op2);
 
+        if (l == null || r == null) {
+            throw new IllegalArgumentException("Operands cannot be null: " + op1 + ", " + op2);
+        }
+
         // Handle reference and null comparisons, and string comparisons
         Sort refSort = sorts.getRefSort();
         if (l.getSort().equals(refSort) || r.getSort().equals(refSort) || l.getSort().equals(sorts.getStringSort())

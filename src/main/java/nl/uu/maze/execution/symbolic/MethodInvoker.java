@@ -29,6 +29,7 @@ import sootup.core.jimple.basic.Local;
 import sootup.core.jimple.common.expr.AbstractInstanceInvokeExpr;
 import sootup.core.jimple.common.expr.AbstractInvokeExpr;
 import sootup.core.jimple.common.expr.JDynamicInvokeExpr;
+import sootup.core.jimple.common.expr.JInterfaceInvokeExpr;
 import sootup.core.signatures.MethodSignature;
 import sootup.core.types.Type;
 import sootup.core.types.VoidType;
@@ -70,14 +71,14 @@ public class MethodInvoker {
      *         with)
      */
     public Optional<SymbolicState> executeMethod(SymbolicState state, AbstractInvokeExpr expr, boolean storeResult) {
-        if (expr instanceof JDynamicInvokeExpr) {
-            throw new UnsupportedOperationException("Dynamic invocation is not supported");
+        if (expr instanceof JDynamicInvokeExpr || expr instanceof JInterfaceInvokeExpr) {
+            throw new UnsupportedOperationException(expr.getClass().getSimpleName() + " is not supported");
         }
 
         Local base = expr instanceof AbstractInstanceInvokeExpr ? ((AbstractInstanceInvokeExpr) expr).getBase() : null;
         Optional<JavaSootMethod> methodOpt = analyzer.tryGetSootMethod(expr.getMethodSignature());
         // If available internally, we can symbolically execute it
-        if (methodOpt.isPresent()) {
+        if (methodOpt.isPresent() && methodOpt.get().hasBody()) {
             return executeSymbolic(state, methodOpt.get(), expr, base);
         }
         // Otherwise, execute it concretely
@@ -171,14 +172,14 @@ public class MethodInvoker {
                     }
                     instance = argMap.toJava(base.getName(), clazz);
                     if (instance == null) {
-                        logger.warn("Failed to find instance for base: {}", base.getName());
-                        return;
+                        throw new UnsupportedOperationException(
+                                "Failed to create instance for base: " + base.getName());
                     }
                     original = ObjectUtils.shallowCopy(instance, instance.getClass());
                     addConcretizationConstraints(state, heapObj, instance);
                 } catch (ClassNotFoundException | NoSuchMethodException e) {
-                    logger.error("Failed to find class or method for base: {}", base.getName());
-                    return;
+                    throw new UnsupportedOperationException(
+                            "Failed to find class or method for base: " + base.getName());
                 }
             }
             setMethodArguments(state, expr.getArgs(), isCtor, argMap);
