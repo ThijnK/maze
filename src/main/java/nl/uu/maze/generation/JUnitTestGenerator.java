@@ -503,11 +503,11 @@ public class JUnitTestGenerator {
         if (value == null) {
             return "null";
         }
-        if (value instanceof String) {
-            return "\"" + value + "\"";
+        if (value instanceof String str) {
+            return "\"" + escapeString(str) + "\"";
         }
-        if (value instanceof Character) {
-            return "'" + value + "'";
+        if (value instanceof Character c) {
+            return "'" + escapeChar(c) + "'";
         }
         if (value.getClass().isArray()) {
             return arrayToString(value);
@@ -533,6 +533,42 @@ public class JUnitTestGenerator {
                 && !Float.isNaN((float) value) ? "F"
                         : value instanceof Long ? "L" : "";
         return value + postfix;
+    }
+
+    private String escapeString(String str) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < str.length(); i++) {
+            char c = str.charAt(i);
+            if (c == '\\' || c == '"') {
+                sb.append('\\').append(c);
+            } else if (Character.isISOControl(c)) {
+                sb.append(String.format("\\u%04x", (int) c));
+            } else {
+                sb.append(c);
+            }
+        }
+        return sb.toString();
+    }
+
+    private String escapeChar(char c) {
+        switch (c) {
+            case '\b':
+                return "\\b";
+            case '\t':
+                return "\\t";
+            case '\n':
+                return "\\n";
+            case '\f':
+                return "\\f";
+            case '\r':
+                return "\\r";
+            case '\'':
+                return "\\'";
+            case '\\':
+                return "\\\\";
+            default:
+                return Character.isISOControl(c) ? String.format("\\u%04x", (int) c) : Character.toString(c);
+        }
     }
 
     /**
