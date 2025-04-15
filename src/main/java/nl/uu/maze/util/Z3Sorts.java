@@ -89,6 +89,13 @@ public class Z3Sorts {
     }
 
     /**
+     * Check if the given Z3 sort is a reference.
+     */
+    public boolean isRef(Sort sort) {
+        return sort.equals(refSort);
+    }
+
+    /**
      * Check if the given Z3 expression is the null constant.
      */
     public boolean isNull(Expr<?> expr) {

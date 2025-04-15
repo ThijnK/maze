@@ -1,5 +1,6 @@
 package nl.uu.maze.execution.symbolic;
 
+import java.io.File;
 import java.lang.reflect.*;
 import java.util.List;
 import java.util.Map.Entry;
@@ -31,6 +32,7 @@ import sootup.core.jimple.common.expr.AbstractInvokeExpr;
 import sootup.core.jimple.common.expr.JDynamicInvokeExpr;
 import sootup.core.jimple.common.expr.JInterfaceInvokeExpr;
 import sootup.core.signatures.MethodSignature;
+import sootup.core.types.ClassType;
 import sootup.core.types.Type;
 import sootup.core.types.VoidType;
 import sootup.java.core.JavaSootMethod;
@@ -71,12 +73,20 @@ public class MethodInvoker {
      *         with)
      */
     public Optional<SymbolicState> executeMethod(SymbolicState state, AbstractInvokeExpr expr, boolean storeResult) {
-        if (expr instanceof JDynamicInvokeExpr || expr instanceof JInterfaceInvokeExpr) {
+        if (expr instanceof JDynamicInvokeExpr) {
             throw new UnsupportedOperationException(expr.getClass().getSimpleName() + " is not supported");
         }
-
         Local base = expr instanceof AbstractInstanceInvokeExpr ? ((AbstractInstanceInvokeExpr) expr).getBase() : null;
-        Optional<JavaSootMethod> methodOpt = analyzer.tryGetSootMethod(expr.getMethodSignature());
+        MethodSignature methodSig = expr.getMethodSignature();
+
+        // For interface invoke expressions, try to resolve the method call to a
+        // concrete class
+        if (expr instanceof JInterfaceInvokeExpr && base != null && base.getType() instanceof ClassType baseType) {
+            // Substitute interface class type with class type of the base
+            methodSig = new MethodSignature(baseType, methodSig.getSubSignature());
+        }
+
+        Optional<JavaSootMethod> methodOpt = analyzer.tryGetSootMethod(methodSig);
         // If available internally, we can symbolically execute it
         if (methodOpt.isPresent() && methodOpt.get().hasBody()) {
             return executeSymbolic(state, methodOpt.get(), expr, base);
