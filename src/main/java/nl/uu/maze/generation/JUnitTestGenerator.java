@@ -1,28 +1,18 @@
 package nl.uu.maze.generation;
 
-import sootup.core.types.ArrayType;
 import sootup.core.types.ClassType;
 import sootup.core.types.Type;
 import sootup.java.core.JavaSootMethod;
 
 import javax.lang.model.element.Modifier;
 
-import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.Timeout;
-import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,8 +21,7 @@ import com.palantir.javapoet.*;
 import nl.uu.maze.analysis.JavaAnalyzer;
 import nl.uu.maze.execution.ArgMap;
 import nl.uu.maze.execution.ArgMap.*;
-import nl.uu.maze.execution.concrete.ConcreteExecutor;
-import nl.uu.maze.execution.concrete.ObjectInstantiation;
+import nl.uu.maze.execution.concrete.*;
 import nl.uu.maze.execution.concrete.ConcreteExecutor.ConstructorException;
 import nl.uu.maze.execution.MethodType;
 
@@ -188,7 +177,8 @@ public class JUnitTestGenerator {
                 // If not a reference, create a new value for the retval
                 if (!isReference) {
                     if (isPrimitive(retval) || retval.getClass().isArray()) {
-                        methodBuilder.addStatement("$T expected = $L", retval.getClass(), valueToString(retval));
+                        methodBuilder.addStatement("$T expected = $L", retval.getClass(),
+                                JavaLiteralFormatter.valueToString(retval));
                     } else {
                         buildObject(methodBuilder, "expected", retval);
                     }
@@ -282,7 +272,8 @@ public class JUnitTestGenerator {
             // Other parameters (non-object) can be defined immediately
             else {
                 // If the ArgMap contains no value, use a default value
-                String valueStr = !argMap.containsKey(var) ? getDefaultValue(paramTypes.get(i)) : valueToString(value);
+                String valueStr = !argMap.containsKey(var) ? JavaLiteralFormatter.getDefaultValue(paramTypes.get(i))
+                        : JavaLiteralFormatter.valueToString(value);
                 addStatementTriple(methodBuilder, type, var, valueStr);
             }
         }
@@ -317,7 +308,8 @@ public class JUnitTestGenerator {
     private void buildFromReference(MethodSpec.Builder methodBuilder, ArgMap argMap, Set<String> builtObjects,
             ObjectRef ref, Type type, String var) {
         Object value = argMap.getOrDefault(ref.getVar(),
-                type instanceof ClassType ? new ObjectInstance((ClassType) type) : getDefaultValue(type));
+                type instanceof ClassType ? new ObjectInstance((ClassType) type)
+                        : JavaLiteralFormatter.getDefaultValue(type));
         if (value == null) {
             // If the reference is null, just define the variable itself as null without
             // referencing
@@ -336,7 +328,7 @@ public class JUnitTestGenerator {
         } else if (value.getClass().isArray()) {
             // For arrays, need to reference the array variable
             if (!builtObjects.contains(ref.getVar())) {
-                addStatementTriple(methodBuilder, type, ref.getVar(), arrayToString(value));
+                addStatementTriple(methodBuilder, type, ref.getVar(), JavaLiteralFormatter.arrayToString(value));
             }
             if (var != null) {
                 addStatementTriple(methodBuilder, type, var, ref.getVar());
@@ -346,7 +338,7 @@ public class JUnitTestGenerator {
             // Other primitive values can be directly defined on the variable itself
             addStatementTriple(methodBuilder, type, var, (String) value);
         } else {
-            addStatementTriple(methodBuilder, type, var, valueToString(value));
+            addStatementTriple(methodBuilder, type, var, JavaLiteralFormatter.valueToString(value));
         }
     }
 
@@ -359,7 +351,8 @@ public class JUnitTestGenerator {
 
         // Need to construct enums differently
         if (clazz.isEnum()) {
-            methodBuilder.addStatement("$T $L = $T.valueOf($L)", clazz, var, clazz, valueToString(obj.toString()));
+            methodBuilder.addStatement("$T $L = $T.valueOf($L)", clazz, var, clazz,
+                    JavaLiteralFormatter.valueToString(obj.toString()));
             return;
         }
 
@@ -375,10 +368,12 @@ public class JUnitTestGenerator {
                 addSetFieldMethod();
                 String fieldVar = var + "_" + field.getName();
                 if (value.getClass().isArray()) {
-                    methodBuilder.addStatement("$T $L = $L", field.getType(), fieldVar, arrayToString(value));
+                    methodBuilder.addStatement("$T $L = $L", field.getType(), fieldVar,
+                            JavaLiteralFormatter.arrayToString(value));
                     methodBuilder.addStatement("setField($L, \"$L\", $L)", var, field.getName(), fieldVar);
                 } else if (isPrimitive(value)) {
-                    methodBuilder.addStatement("setField($L, \"$L\", $L)", var, field.getName(), valueToString(value));
+                    methodBuilder.addStatement("setField($L, \"$L\", $L)", var, field.getName(),
+                            JavaLiteralFormatter.valueToString(value));
                 } else {
                     buildObject(methodBuilder, fieldVar, value);
                     methodBuilder.addStatement("setField($L, \"$L\", $L)", var, field.getName(), fieldVar);
@@ -401,7 +396,7 @@ public class JUnitTestGenerator {
             String argName = var + "_carg" + i;
             argNames[i] = argName;
             methodBuilder.addStatement("$T $L = $L", arg != null ? arg.getClass() : Object.class, argName,
-                    valueToString(arg));
+                    JavaLiteralFormatter.valueToString(arg));
         }
         methodBuilder.addStatement("$T $L = new $T($L)", clazz, var, clazz, String.join(", ", argNames));
     }
@@ -457,7 +452,7 @@ public class JUnitTestGenerator {
                 methodBuilder.addStatement("setField($L, \"$L\", $L)", var, entry.getKey(), ref.getVar());
             } else {
                 methodBuilder.addStatement("setField($L, \"$L\", $L)", var, entry.getKey(),
-                        valueToString(entry.getValue().getValue()));
+                        JavaLiteralFormatter.valueToString(entry.getValue().getValue()));
             }
         }
     }
@@ -511,139 +506,6 @@ public class JUnitTestGenerator {
         } catch (Exception e) {
             logger.error("Failed to generate JUnit test cases: {}", e.getMessage());
         }
-    }
-
-    /**
-     * Converts a value to a string representation that can be used in a Java
-     * source file.
-     */
-    private String valueToString(Object value) {
-        if (value == null) {
-            return "null";
-        }
-        if (value instanceof String str) {
-            return "\"" + escapeString(str) + "\"";
-        }
-        if (value instanceof Character c) {
-            return "'" + escapeChar(c) + "'";
-        }
-        if (value.getClass().isArray()) {
-            return arrayToString(value);
-        }
-
-        // Handle special cases for float and double
-        if (value instanceof Float) {
-            if (Float.isNaN((float) value)) {
-                return "Float.NaN";
-            } else if (Float.isInfinite((float) value)) {
-                return ((float) value > 0) ? "Float.POSITIVE_INFINITY" : "Float.NEGATIVE_INFINITY";
-            }
-        } else if (value instanceof Double) {
-            if (Double.isNaN((double) value)) {
-                return "Double.NaN";
-            } else if (Double.isInfinite((double) value)) {
-                return ((double) value > 0) ? "Double.POSITIVE_INFINITY" : "Double.NEGATIVE_INFINITY";
-            }
-        }
-
-        // Add a "F" or "L" postfix for float and long literals
-        String postfix = value instanceof Float && !Float.isInfinite((float) value)
-                && !Float.isNaN((float) value) ? "F"
-                        : value instanceof Long ? "L" : "";
-        return value + postfix;
-    }
-
-    private String escapeString(String str) {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < str.length(); i++) {
-            char c = str.charAt(i);
-            if (c == '\\' || c == '"') {
-                sb.append('\\').append(c);
-            } else if (Character.isISOControl(c)) {
-                sb.append(String.format("\\u%04x", (int) c));
-            } else {
-                sb.append(c);
-            }
-        }
-        return sb.toString();
-    }
-
-    private String escapeChar(char c) {
-        switch (c) {
-            case '\b':
-                return "\\b";
-            case '\t':
-                return "\\t";
-            case '\n':
-                return "\\n";
-            case '\f':
-                return "\\f";
-            case '\r':
-                return "\\r";
-            case '\'':
-                return "\\'";
-            case '\\':
-                return "\\\\";
-            default:
-                return Character.isISOControl(c) ? String.format("\\u%04x", (int) c) : Character.toString(c);
-        }
-    }
-
-    /**
-     * Converts an array to a string representation that can be used in a Java
-     * source file.
-     */
-    private String arrayToString(Object arr) {
-        if (arr == null) {
-            return "null";
-        }
-        // If it's not an array, just return its string representation
-        if (!arr.getClass().isArray()) {
-            return valueToString(arr);
-        }
-
-        int length = Array.getLength(arr);
-        if (length == 0) {
-            return "{}";
-        }
-
-        StringBuilder sb = new StringBuilder();
-        sb.append("{ ");
-        for (int i = 0; i < length; i++) {
-            sb.append(arrayToString(Array.get(arr, i)));
-            if (i < length - 1) {
-                sb.append(", ");
-            }
-        }
-        sb.append(" }");
-        return sb.toString();
-    }
-
-    /**
-     * Gets the default value for the given type.
-     * Useful when solver does not provide a value for a parameter (in cases where
-     * the parameter does not affect the execution path).
-     * 
-     * @param type The SootUp type
-     * @return The default value for the given type as a string
-     */
-    private String getDefaultValue(Type type) {
-        if (type instanceof ArrayType) {
-            return "{}";
-        }
-
-        return switch (type.toString()) {
-            case "int" -> "0";
-            case "boolean" -> "false";
-            case "char" -> "'\\u0000'";
-            case "byte" -> "(byte) 0";
-            case "short" -> "(short) 0";
-            case "long" -> "0L";
-            case "float" -> "0.0f";
-            case "double" -> "0.0";
-            case "java.lang.String" -> "\"\"";
-            default -> "null";
-        };
     }
 
     private boolean isPrimitive(Object obj) {
