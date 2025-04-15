@@ -183,6 +183,39 @@ public class Z3Sorts {
     }
 
     /**
+     * Determine the SootUp type for the given Z3 sort.
+     * 
+     * @param sort The Z3 sort
+     * @return The SootUp type
+     * @see Type
+     */
+    public Type determineType(Sort sort) {
+        if (sort instanceof BitVecSort bvSort) {
+            switch (bvSort.getSize()) {
+                case 64:
+                    return PrimitiveType.getLong();
+                default:
+                    return PrimitiveType.getInt();
+            }
+        } else if (sort instanceof FPSort fpSort) {
+            switch (fpSort.getSBits()) {
+                case 64:
+                    return PrimitiveType.getDouble();
+                default:
+                    return PrimitiveType.getFloat();
+            }
+        } else if (sort.equals(refSort)) {
+            return new JavaClassType(Object.class.getName(), new PackageName(Object.class.getPackageName()));
+        } else if (sort.equals(voidSort)) {
+            return VoidType.getInstance();
+        } else if (sort.equals(stringSort)) {
+            return new JavaClassType(String.class.getName(), new PackageName(String.class.getPackageName()));
+        } else {
+            throw new UnsupportedOperationException("Unsupported sort: " + sort);
+        }
+    }
+
+    /**
      * Get the bit size of the given Soot type.
      * 
      * @param sootType The Soot type

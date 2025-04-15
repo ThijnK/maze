@@ -649,6 +649,17 @@ public class SymbolicHeap {
             return;
         }
 
+        // Check if we need to box the value (primitive value into Object[])
+        if (arrObj.getType() instanceof ArrayType
+                && ((ArrayType) arrObj.getType()).getBaseType() instanceof ClassType ct) {
+            Expr<?> valueSymRef = newSymRef();
+            Expr<?> valueConRef = newConRef();
+            HeapObject obj = new HeapObject(ct);
+            allocateHeapObject(valueSymRef, valueConRef, obj);
+            obj.setField("value", value, sorts.determineType(value.getSort()));
+            value = (Expr<E>) valueSymRef;
+        }
+
         if (arrObj instanceof MultiArrayObject multiArrObj) {
             if (sorts.isRef(value)) {
                 // Reassigning part of a multidimensional array to another array not supported
