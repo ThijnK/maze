@@ -1,6 +1,5 @@
 package nl.uu.maze.execution.symbolic;
 
-import java.io.File;
 import java.lang.reflect.*;
 import java.util.List;
 import java.util.Map.Entry;

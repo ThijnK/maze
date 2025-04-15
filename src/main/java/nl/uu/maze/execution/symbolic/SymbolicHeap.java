@@ -8,6 +8,7 @@ import com.microsoft.z3.*;
 import nl.uu.maze.execution.symbolic.HeapObjects.*;
 import nl.uu.maze.util.Z3ContextProvider;
 import nl.uu.maze.util.Z3Sorts;
+import nl.uu.maze.util.Z3Utils;
 import sootup.core.types.ArrayType;
 import sootup.core.types.ClassType;
 import sootup.core.types.Type;
@@ -421,6 +422,9 @@ public class SymbolicHeap {
      * the original object (including alias map entries).
      */
     public void linkHeapObject(Expr<?> symRef, SymbolicHeap otherHeap) {
+        if (sorts.isString(symRef) || sorts.isNull(symRef))
+            return;
+
         Set<Expr<?>> aliases = otherHeap.getAliases(symRef);
         aliasMap.put(symRef, aliases);
         for (Expr<?> conRef : aliases) {
@@ -439,22 +443,13 @@ public class SymbolicHeap {
                 }
                 // If the field is an array, link the elements as well
                 else if (value.getSort() instanceof ArraySort arrSort && sorts.isRef(arrSort.getRange())) {
-                    recursiveLinkElements(value, otherHeap);
+                    Z3Utils.traverseExpr(value, (e) -> {
+                        if (sorts.isRef(e)) {
+                            linkHeapObject(e, otherHeap);
+                        }
+                    });
                 }
             }
-        }
-    }
-
-    /**
-     * Recursively links elements of the given expression to the other heap.
-     * Used for linking array elements.
-     */
-    private void recursiveLinkElements(Expr<?> expr, SymbolicHeap otherHeap) {
-        for (Expr<?> arg : expr.getArgs()) {
-            if (sorts.isRef(arg)) {
-                linkHeapObject(arg, otherHeap);
-            }
-            recursiveLinkElements(arg, otherHeap);
         }
     }
     // #endregion
@@ -598,13 +593,14 @@ public class SymbolicHeap {
             return null;
         }
 
+        Expr<?> value;
         if (arrObj instanceof MultiArrayObject multiArrObj) {
             int dim = multiArrObj.getDim();
             BitVecExpr[] indices = getArrayIndices(var, dim, index);
 
-            // When enough indices collected, return the element
+            // If enough indices collected, return the element
             if (dim == indices.length) {
-                return multiArrObj.getElem(indices);
+                value = multiArrObj.getElem(indices);
             } else {
                 // Otherwise, store new indices for the lhs of the assignment this is part of
                 if (lhs != null) {
@@ -612,9 +608,25 @@ public class SymbolicHeap {
                 }
                 return state.lookup(var);
             }
+        } else {
+            value = arrObj.getElem(index);
         }
 
-        return arrObj.getElem(index);
+        // If it's an array of references, need to find potential aliases for the
+        // selected element
+        if (sorts.isRef(value)) {
+            Set<Expr<?>> aliases = new HashSet<>();
+            // For now, only consider references currently stored in the array as
+            // potential aliases
+            Z3Utils.traverseExpr(value, (e) -> {
+                if (sorts.isRef(e)) {
+                    aliases.add(e);
+                }
+            });
+            aliasMap.put(value, aliases);
+        }
+
+        return value;
     }
 
     /**

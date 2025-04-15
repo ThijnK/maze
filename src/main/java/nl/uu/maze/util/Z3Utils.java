@@ -1,6 +1,7 @@
 package nl.uu.maze.util;
 
 import java.util.Arrays;
+import java.util.function.Consumer;
 
 import com.microsoft.z3.ArraySort;
 import com.microsoft.z3.BoolExpr;
@@ -56,6 +57,20 @@ public class Z3Utils {
             } else {
                 return 1;
             }
+        }
+    }
+
+    /**
+     * Traverses the expression tree and applies the given consumer to each leaf
+     * expression.
+     */
+    public static void traverseExpr(Expr<?> expr, Consumer<Expr<?>> consumer) {
+        if (expr.getNumArgs() > 0) {
+            for (Expr<?> arg : expr.getArgs()) {
+                traverseExpr(arg, consumer);
+            }
+        } else {
+            consumer.accept(expr);
         }
     }
 }
