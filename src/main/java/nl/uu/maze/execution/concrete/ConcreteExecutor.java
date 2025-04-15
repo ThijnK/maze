@@ -22,7 +22,9 @@ public class ConcreteExecutor {
      * @param method The method to invoke
      * @param argMap {@link ArgMap} containing the arguments to pass to the
      *               constructor and method invocation
-     * @return The return value of the method or the exception thrown during
+     * @return The return value of the method, or an instance of
+     *         {@link ConstructorException} if the constructor throws an exception
+     *         or {@link MethodException} if the method throws an exception during
      *         execution
      */
     public Object execute(Constructor<?> ctor, Method method, ArgMap argMap) {
@@ -39,18 +41,66 @@ public class ConcreteExecutor {
     }
 
     /**
+     * Run concrete execution on the given method, using the given constructor to
+     * create an instance of the class containing the method if necessary.
+     * 
+     * @param ctor   The constructor to use to create an instance of the class
+     * @param method The method to invoke
+     * @param argMap {@link ArgMap} containing the arguments to pass to the
+     *               constructor (but not the method invocation)
+     * @param args   The arguments to pass to the method
+     * @return The return value of the method, or an instance of
+     *         {@link ConstructorException} if the constructor throws an exception
+     *         or {@link MethodException} if the method throws an exception during
+     *         execution
+     */
+    public Object execute(Constructor<?> ctor, Method method, ArgMap argMap, Object[] args) {
+        // If not static, create an instance of the class
+        Object instance = null;
+        if (!Modifier.isStatic(method.getModifiers())) {
+            instance = ObjectInstantiation.createInstance(ctor, argMap);
+            // If constructor throws an exception, return it
+            if (instance == null) {
+                return new ConstructorException();
+            }
+        }
+        return execute(instance, method, args);
+    }
+
+    /**
      * Run concrete execution on the given method, using the given instance to
      * invoke the method with the given arguments.
      * 
      * @param instance The instance to invoke the method on
      * @param method   The method to invoke
      * @param argMap   {@link ArgMap} containing the arguments to pass to the method
-     * @return The return value of the method, or the exception thrown during
-     *         execution
+     * @return The return value of the method, or an instance of
+     *         {@link MethodException} if the
+     *         method throws an exception during execution
      */
     public Object execute(Object instance, Method method, ArgMap argMap) {
         try {
             Object[] args = ObjectInstantiation.generateArgs(method.getParameters(), MethodType.METHOD, argMap);
+            return execute(instance, method, args);
+        } catch (Exception e) {
+            logger.warn("Failed to generate args for method {}: {}", method.getName(), e.getMessage());
+            return new MethodException();
+        }
+    }
+
+    /**
+     * Run concrete execution on the given method, using the given instance to
+     * invoke the method with the given arguments.
+     * 
+     * @param instance The instance to invoke the method on
+     * @param method   The method to invoke
+     * @param args     The arguments to pass to the method
+     * @return The return value of the method, or an instance of
+     *         {@link MethodException} if the
+     *         method throws an exception during execution
+     */
+    public Object execute(Object instance, Method method, Object[] args) {
+        try {
             logger.debug("Executing method {} with args: {}", method.getName(), args);
             method.setAccessible(true);
             Object result = method.invoke(instance, args);

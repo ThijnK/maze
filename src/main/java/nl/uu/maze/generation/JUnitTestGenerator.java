@@ -32,6 +32,7 @@ import nl.uu.maze.analysis.JavaAnalyzer;
 import nl.uu.maze.execution.ArgMap;
 import nl.uu.maze.execution.ArgMap.*;
 import nl.uu.maze.execution.concrete.ConcreteExecutor;
+import nl.uu.maze.execution.concrete.ObjectInstantiation;
 import nl.uu.maze.execution.concrete.ConcreteExecutor.ConstructorException;
 import nl.uu.maze.execution.MethodType;
 
@@ -119,10 +120,12 @@ public class JUnitTestGenerator {
         }
 
         Object retval;
+        Object[] args;
         try {
             Constructor<?> _ctor = ctor != null ? analyzer.getJavaConstructor(ctor, clazz) : null;
             Method _method = analyzer.getJavaMethod(method, clazz);
-            retval = executor.execute(_ctor, _method, argMap);
+            args = ObjectInstantiation.generateArgs(_method.getParameters(), MethodType.METHOD, argMap);
+            retval = executor.execute(_ctor, _method, argMap, args);
         } catch (Exception e) {
             logger.warn("Failed to generate execute test case for {}", method.getName());
             return;
@@ -171,11 +174,26 @@ public class JUnitTestGenerator {
             if (retval == null) {
                 methodBuilder.addStatement("$T.assertNull(retval)", Assertions.class);
             } else {
-                if (isPrimitive(retval) || retval.getClass().isArray()) {
-                    methodBuilder.addStatement("$T expected = $L", retval.getClass(), valueToString(retval));
-                } else {
-                    buildObject(methodBuilder, "expected", retval);
+                // Check if return value is a reference to an input parameter
+                boolean isReference = false;
+                for (int i = 0; i < args.length; i++) {
+                    if (args[i] == retval) {
+                        isReference = true;
+                        // Retval is a reference to argument i
+                        methodBuilder.addStatement("$T expected = $L", retval.getClass(),
+                                ArgMap.getSymbolicName(MethodType.METHOD, i));
+                        break;
+                    }
                 }
+                // If not a reference, create a new value for the retval
+                if (!isReference) {
+                    if (isPrimitive(retval) || retval.getClass().isArray()) {
+                        methodBuilder.addStatement("$T expected = $L", retval.getClass(), valueToString(retval));
+                    } else {
+                        buildObject(methodBuilder, "expected", retval);
+                    }
+                }
+
                 methodBuilder.addStatement("$T.assertEquals(expected, retval)", Assertions.class);
             }
         }
