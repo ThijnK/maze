@@ -210,6 +210,10 @@ public class MethodInvoker {
         }
     }
 
+    /**
+     * Set concrete method arguments in the given ArgMap and add concretization
+     * constraints if applicable.
+     */
     private void setMethodArguments(SymbolicState state, List<Immediate> args, boolean isCtor, ArgMap argMap) {
         for (int i = 0; i < args.size(); i++) {
             Immediate arg = args.get(i);
@@ -217,6 +221,13 @@ public class MethodInvoker {
             String name = ArgMap.getSymbolicName(isCtor ? MethodType.CTOR : MethodType.METHOD, i);
             if (sorts.isRef(argExpr)) {
                 try {
+                    Expr<?> alias = state.heap.getSingleAlias(argExpr);
+                    if (sorts.isNull(alias)) {
+                        // If the alias is null, we need to set the argument to null
+                        argMap.set(name, null);
+                        continue;
+                    }
+                    // If the argument is a reference, we need to concretize it
                     HeapObject argObj = state.heap.getHeapObject(argExpr);
                     Class<?> argClazz = analyzer.getJavaClass(argObj.getType());
                     addConcretizationConstraints(state, argObj, argMap.toJava(argExpr.toString(), argClazz));
