@@ -146,7 +146,7 @@ public class DSEController {
 
         logger.debug("Max depth: {}", maxDepth);
         logger.debug("Output path: {}", outPath);
-        logger.debug("Time budget: {} ms", timeBudget);
+        logger.debug("Time budget: {}", timeBudget > 0 ? timeBudget : "unlimited");
 
         // Write test cases regardless of whether the execution was successful or not,
         // so that intermediate results are not lost
@@ -164,9 +164,15 @@ public class DSEController {
         Set<JavaSootMethod> methods = sootClass.getMethods();
         // Regex pattern to match non-standard method names (e.g., <init>, <clinit>)
         Pattern pattern = Pattern.compile("<[^>]+>");
+        JavaSootMethod[] muts = methods.stream().filter(m -> !pattern.matcher(m.getName()).matches())
+                .toArray(JavaSootMethod[]::new);
+        if (muts.length == 0) {
+            logger.info("No public testable methods found in class: {}", clazz.getName());
+            return;
+        }
 
         // If class includes non-static methods, need to execute constructor first
-        if (!methods.stream().allMatch(JavaSootMethod::isStatic)) {
+        if (!Arrays.stream(muts).allMatch(JavaSootMethod::isStatic)) {
             ctor = analyzer.getJavaConstructor(instrumented != null ? instrumented : clazz).getFirst();
             if (ctor == null) {
                 throw new Exception("No constructor found for class: " + clazz.getName());
@@ -180,15 +186,10 @@ public class DSEController {
         }
 
         // Sort methods by name to ensure consistent ordering
-        JavaSootMethod[] methodsArray = methods.toArray(JavaSootMethod[]::new);
-        Arrays.sort(methodsArray, (m1, m2) -> m1.getName().compareTo(m2.getName()));
-        for (JavaSootMethod method : methodsArray) {
+        Arrays.sort(muts, (m1, m2) -> m1.getName().compareTo(m2.getName()));
+        for (JavaSootMethod method : muts) {
             if (deadlineReached) {
                 break;
-            }
-            // Skip non-public and non-standard methods (e.g., <init>, <clinit>)
-            if (!method.isPublic() || pattern.matcher(method.getName()).matches()) {
-                continue;
             }
 
             logger.info("Processing method: {}", method.getName());
