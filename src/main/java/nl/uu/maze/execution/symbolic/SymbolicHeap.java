@@ -1,18 +1,9 @@
 package nl.uu.maze.execution.symbolic;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.Map.Entry;
 
-import com.microsoft.z3.ArrayExpr;
-import com.microsoft.z3.BitVecExpr;
-import com.microsoft.z3.BitVecSort;
-import com.microsoft.z3.Context;
-import com.microsoft.z3.Expr;
-import com.microsoft.z3.Sort;
+import com.microsoft.z3.*;
 
 import nl.uu.maze.execution.symbolic.HeapObjects.*;
 import nl.uu.maze.util.Z3ContextProvider;
@@ -446,7 +437,24 @@ public class SymbolicHeap {
                 if (sorts.isRef(value)) {
                     linkHeapObject(value, otherHeap);
                 }
+                // If the field is an array, link the elements as well
+                else if (value.getSort() instanceof ArraySort arrSort && sorts.isRef(arrSort.getRange())) {
+                    recursiveLinkElements(value, otherHeap);
+                }
             }
+        }
+    }
+
+    /**
+     * Recursively links elements of the given expression to the other heap.
+     * Used for linking array elements.
+     */
+    private void recursiveLinkElements(Expr<?> expr, SymbolicHeap otherHeap) {
+        for (Expr<?> arg : expr.getArgs()) {
+            if (sorts.isRef(arg)) {
+                linkHeapObject(arg, otherHeap);
+            }
+            recursiveLinkElements(arg, otherHeap);
         }
     }
     // #endregion
