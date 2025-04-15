@@ -52,6 +52,7 @@ public class ConcreteExecutor {
         try {
             Object[] args = ObjectInstantiation.generateArgs(method.getParameters(), MethodType.METHOD, argMap);
             logger.debug("Executing method {} with args: {}", method.getName(), args);
+            method.setAccessible(true);
             Object result = method.invoke(instance, args);
             logger.debug("Retval: {}", result == null ? "null" : result.toString());
 
