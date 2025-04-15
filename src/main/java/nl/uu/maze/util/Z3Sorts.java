@@ -103,6 +103,13 @@ public class Z3Sorts {
     }
 
     /**
+     * Check if the given Z3 expression is a string.
+     */
+    public boolean isString(Expr<?> expr) {
+        return expr.getSort().equals(stringSort);
+    }
+
+    /**
      * Determine the Z3 sort for the given Soot type.
      * 
      * @param sootType The Soot type

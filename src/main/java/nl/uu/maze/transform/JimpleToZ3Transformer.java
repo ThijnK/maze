@@ -84,9 +84,14 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
         }
 
         // Handle reference and null comparisons, and string comparisons
-        Sort refSort = sorts.getRefSort();
-        if (l.getSort().equals(refSort) || r.getSort().equals(refSort) || l.getSort().equals(sorts.getStringSort())
-                || r.getSort().equals(sorts.getStringSort())) {
+        if (sorts.isRef(l) || sorts.isRef(r) || sorts.isString(l) || sorts.isString(r)) {
+            // Comparing string to null is a special case, as Z3 does not support null
+            // strings, so instead strings are never null
+            if ((sorts.isString(r) && sorts.isNull(l)) || (sorts.isString(l) && sorts.isNull(r))) {
+                // Return dummy equality that evaluates to false
+                return ctx.mkEq(ctx.mkBV(0, 1), ctx.mkBV(1, 1));
+            }
+
             return ctx.mkEq(l, r);
         }
 
