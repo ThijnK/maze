@@ -619,20 +619,26 @@ public class SymbolicHeap {
         // selected element
         if (sorts.isRef(value) && !isResolved(value)) {
             Set<Expr<?>> aliases = new HashSet<>();
-            aliases.add(sorts.getNullConst());
-            // For now, only consider references currently stored in the array as
-            // potential aliases
-            Z3Utils.traverseExpr(value, (e) -> {
-                if (sorts.isRef(e)) {
-                    aliases.add(e);
-                }
-            });
-            // If array is symbolic, also allocate a new object on the heap
+
+            // If array is symbolic: any object on the heap with the right type is a
+            // potential alias, and we allocate a new object on the heap
             if (arrObj.isSymbolic) {
-                // Create a new symbolic reference for the array element
+                aliases.add(sorts.getNullConst());
+                // The selected array element could be an object not seen before, so allocate a
+                // fresh object for that possibility
                 Expr<?> elemRef = allocateObject(arrObj.getType().getBaseType());
                 Expr<?> conRef = getSingleAlias(elemRef);
                 aliases.add(conRef);
+                findAliases(arrObj.getType().getBaseType(), aliases);
+            }
+            // Otherwise, only consider references already stored in the array (which
+            // automatically includes null reference)
+            else {
+                Z3Utils.traverseExpr(value, (e) -> {
+                    if (sorts.isRef(e)) {
+                        aliases.add(e);
+                    }
+                });
             }
 
             aliasMap.put(value, aliases);
