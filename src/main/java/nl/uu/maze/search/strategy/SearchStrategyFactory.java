@@ -39,7 +39,7 @@ public class SearchStrategyFactory {
      * @return A search strategy
      */
     public static <T extends SearchTarget> SearchStrategy<T> createStrategy(List<String> names,
-            List<String> heuristicNames, List<Double> heuristicWeights) {
+            List<String> heuristicNames, List<Double> heuristicWeights, long totalTimeBudget) {
         if (names.isEmpty()) {
             logger.warn("No search strategy provided, defaulting to DFS");
             return createStrategy("DFS", heuristicNames, heuristicWeights);
@@ -61,7 +61,7 @@ public class SearchStrategyFactory {
             }
 
             return strategies.size() == 1 ? strategies.getFirst()
-                    : new InterleavedSearch<>(strategies);
+                    : new InterleavedSearch<>(strategies, totalTimeBudget);
         }
 
         return createStrategy(names.getFirst(), heuristicNames, heuristicWeights);

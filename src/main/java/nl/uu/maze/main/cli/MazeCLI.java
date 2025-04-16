@@ -79,18 +79,19 @@ public class MazeCLI implements Callable<Integer> {
             // Set logging level
             Logger rootLogger = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
             rootLogger.setLevel(logLevel);
+            timeBudget *= 1000L; // Convert to milliseconds
+            testTimeout *= 1000L; // Convert to milliseconds
 
             List<String> searchStrategies = this.searchStrategies.stream().map(ValidSearchStrategy::name)
                     .toList();
             List<String> searchHeuristics = this.searchHeuristics.stream().map(ValidSearchHeuristic::name)
                     .toList();
             SearchStrategy<?> strategy = SearchStrategyFactory.createStrategy(searchStrategies,
-                    searchHeuristics,
-                    heuristicWeights);
+                    searchHeuristics, heuristicWeights, timeBudget);
 
             DSEController controller = new DSEController(classPath, concreteDriven, strategy, outPath,
-                    maxDepth, testTimeout * 1000L, packageName);
-            controller.run(className, timeBudget * 1000L);
+                    maxDepth, testTimeout, packageName);
+            controller.run(className, timeBudget);
             return 0;
         } catch (Exception e) {
             logger.error("An error occurred: {}: {}", e.getClass().getName(), e.getMessage());

@@ -12,17 +12,22 @@ import nl.uu.maze.search.SearchTarget;
  * of the search space.
  */
 public class InterleavedSearch<T extends SearchTarget> extends SearchStrategy<T> {
-    private static final long STRATEGY_TIMEOUT = 1000;
-
     private final List<SearchStrategy<T>> strategies;
+    /**
+     * Time slice in ms before switching strategies.
+     * Calculated as 5% of the total time budget.
+     * Defaults to 1000ms if no time budget is set.
+     */
+    private final long timeSlice;
     private int currentStrategyIndex = 0;
     private long currentStrategyStartTime = 0;
 
-    public InterleavedSearch(List<SearchStrategy<T>> strategies) {
+    public InterleavedSearch(List<SearchStrategy<T>> strategies, long totalTimeBudget) {
         if (strategies.isEmpty()) {
             throw new IllegalArgumentException("At least one strategy must be provided");
         }
         this.strategies = strategies;
+        this.timeSlice = totalTimeBudget > 0 ? totalTimeBudget / 20 : 1000;
     }
 
     public String getName() {
@@ -67,7 +72,7 @@ public class InterleavedSearch<T extends SearchTarget> extends SearchStrategy<T>
         }
 
         long currentTime = System.currentTimeMillis();
-        if (currentTime - currentStrategyStartTime > STRATEGY_TIMEOUT) {
+        if (currentTime - currentStrategyStartTime > timeSlice) {
             currentStrategyIndex = (currentStrategyIndex + 1) % strategies.size();
             currentStrategyStartTime = currentTime;
         }

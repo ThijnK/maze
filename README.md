@@ -178,14 +178,15 @@ Maze supports the following search strategies:
 - **Interleaved Search (IS)**:
   Alternates between multiple search strategies using a round-robin approach.
   This can help to prevent any single strategy from getting stuck in unproductive regions of the search space.
-  When Maze is run with multiple search strategies, it will automatically use interleaved search.
+  Note, however, that using multiple search strategies may introduce some overhead, as each strategy will keep track of its own state.
+  When Maze is instructed to run with multiple search strategies, it will automatically use interleaved search.
 
 Each of these strategies can be used for both symbolic-driven and concrete-driven DSE, though some are more suited for one than the other (e.g., RPS is only really useful for symbolic-driven DSE).
 The engine also provides some predefined search strategies for probabilistic search based on specific heuristics, such as coverage optimized search and random search (uniform distribution), the names for which can be found in the help message of the CLI.
 
 #### Search Heuristics
 
-Search heuristics are used to determine the probability distrbution for probabilistic search.
+Search heuristics are used to determine the probability distribution for probabilistic search.
 Maze supports the following search heuristics:
 
 - **Uniform**:
@@ -196,6 +197,7 @@ Maze supports the following search heuristics:
   Less effective for concrete-driven DSE since target depths aren't known at the time of negating a path constraint.
 - **Call Depth**:
   Assigns weights based on the call depth of a target, allowing a preference for deeply nested function calls (or the opposite, to prefer states which have not called a function).
+  This may be useful to prevent the search from being dominated by recursive-heavy code, potentially leading to broader coverage of the program because recursion is unlikely to cover new code and is often expensive to solve.
 - **Distance To Uncovered**:
   Assigns weights based on how close a state is to reaching uncovered code.
   Targets that are fewer steps away from uncovered statements receive higher priority, guiding the search toward unexplored regions of the program.
