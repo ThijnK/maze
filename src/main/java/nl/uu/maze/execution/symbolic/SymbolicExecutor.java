@@ -11,6 +11,8 @@ import com.microsoft.z3.*;
 import nl.uu.maze.analysis.JavaAnalyzer;
 import nl.uu.maze.execution.ArgMap;
 import nl.uu.maze.execution.concrete.ConcreteExecutor;
+import nl.uu.maze.execution.symbolic.HeapObjects.ArrayObject;
+import nl.uu.maze.execution.symbolic.HeapObjects.HeapObject;
 import nl.uu.maze.execution.symbolic.PathConstraint.*;
 import nl.uu.maze.instrument.TraceManager;
 import nl.uu.maze.instrument.TraceManager.TraceEntry;
@@ -537,6 +539,19 @@ public class SymbolicExecutor {
                 }
                 Expr<?> alias = aliasArr[i];
                 state.heap.setSingleAlias(symRef, alias);
+
+                // If symRef here is a select expression on an array which is symbolic, we need
+                // to add as path constraint instead of engine constraint
+                Expr<?> elemsExpr = Z3Utils.findExpr(symRef, (e) -> e.getSort() instanceof ArraySort);
+                if (elemsExpr != null) {
+                    String arrRef = elemsExpr.toString().substring(0, elemsExpr.toString().indexOf("_"));
+                    HeapObject heapObj = state.heap.get(arrRef);
+                    if (heapObj instanceof ArrayObject arrObj && arrObj.isSymbolic) {
+                        state.addPathConstraint(ctx.mkEq(symRef, alias));
+                        return Optional.empty();
+                    }
+                }
+
                 state.addEngineConstraint(ctx.mkEq(symRef, alias));
                 return Optional.empty();
             }

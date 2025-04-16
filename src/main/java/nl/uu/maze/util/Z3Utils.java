@@ -2,6 +2,7 @@ package nl.uu.maze.util;
 
 import java.util.Arrays;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import com.microsoft.z3.ArraySort;
 import com.microsoft.z3.BoolExpr;
@@ -72,5 +73,23 @@ public class Z3Utils {
         } else {
             consumer.accept(expr);
         }
+    }
+
+    /**
+     * Finds the first expression in the tree that matches the given predicate.
+     * Returns null if no such expression is found.
+     */
+    public static Expr<?> findExpr(Expr<?> expr, Function<Expr<?>, Boolean> predicate) {
+        if (predicate.apply(expr)) {
+            return expr;
+        } else if (expr.getNumArgs() > 0) {
+            for (Expr<?> arg : expr.getArgs()) {
+                Expr<?> found = findExpr(arg, predicate);
+                if (found != null) {
+                    return found;
+                }
+            }
+        }
+        return null;
     }
 }

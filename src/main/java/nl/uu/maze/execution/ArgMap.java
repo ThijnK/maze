@@ -220,7 +220,7 @@ public class ArgMap {
                 Array.set(typedArray, j, castArray(element, type.getComponentType()));
             } else {
                 // Copy elements
-                Array.set(typedArray, j, element);
+                Array.set(typedArray, j, toJava("temp", element, type.getComponentType()));
             }
         }
         return typedArray;

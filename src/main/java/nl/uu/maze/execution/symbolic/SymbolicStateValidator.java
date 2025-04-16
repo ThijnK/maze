@@ -16,6 +16,7 @@ import nl.uu.maze.execution.ArgMap;
 import nl.uu.maze.execution.ArgMap.*;
 import nl.uu.maze.execution.symbolic.HeapObjects.*;
 import nl.uu.maze.transform.Z3ToJavaTransformer;
+import nl.uu.maze.util.Pair;
 import nl.uu.maze.util.Z3ContextProvider;
 import nl.uu.maze.util.Z3Sorts;
 import sootup.core.types.ClassType;
@@ -92,6 +93,11 @@ public class SymbolicStateValidator {
         // arguments to the same object when they are interpreted to be equal
         Map<Expr<?>, ObjectRef> refValues = new HashMap<>();
 
+        // Keep track of array objects, to evaluate those last
+        // This is necessary for arrays of objects to ensure that all objects are
+        // already evaluated
+        List<Pair<String, ArrayObject>> arrayObjects = new ArrayList<>();
+
         for (FuncDecl<?> decl : model.getConstDecls()) {
             String var = decl.getName().toString();
             if (var.equals("null")) {
@@ -133,13 +139,7 @@ public class SymbolicStateValidator {
             if (heapObj != null) {
                 // Arrays
                 if (heapObj instanceof ArrayObject arrObj) {
-                    // There can be multiple declarations for the same array (elems and len)
-                    if (argMap.containsKey(varBase)) {
-                        continue;
-                    }
-                    Type elemType = arrObj.getType().getBaseType();
-                    Object arr = transformer.transformArray(arrObj, model, elemType);
-                    argMap.set(varBase, arr);
+                    arrayObjects.add(new Pair<>(varBase, arrObj));
                 }
                 // Objects
                 else {
@@ -179,6 +179,17 @@ public class SymbolicStateValidator {
             }
             Object value = transformer.transformExpr(expr, state.getParamType(var));
             argMap.set(var, value);
+        }
+
+        // Handle arrays last, since they may contain references to other objects
+        for (Pair<String, ArrayObject> pair : arrayObjects) {
+            // There can be multiple declarations for the same array (elems and len)
+            if (argMap.containsKey(pair.getFirst())) {
+                continue;
+            }
+            Type elemType = pair.getSecond().getType().getBaseType();
+            Object arr = transformer.transformArray(pair.getSecond(), model, elemType, refValues);
+            argMap.set(pair.getFirst(), arr);
         }
 
         if (fillObjectFields) {

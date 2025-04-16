@@ -1,5 +1,7 @@
 package nl.uu.maze.transform;
 
+import java.util.Map;
+
 import com.microsoft.z3.BitVecExpr;
 import com.microsoft.z3.BitVecNum;
 import com.microsoft.z3.BitVecSort;
@@ -8,6 +10,7 @@ import com.microsoft.z3.Expr;
 import com.microsoft.z3.FPNum;
 import com.microsoft.z3.Model;
 
+import nl.uu.maze.execution.ArgMap.ObjectRef;
 import nl.uu.maze.execution.symbolic.HeapObjects.*;
 import nl.uu.maze.util.Z3ContextProvider;
 import nl.uu.maze.util.Z3Sorts;
@@ -107,16 +110,17 @@ public class Z3ToJavaTransformer {
     }
 
     /** Transform a Z3 array to a Java array with the given element type. */
-    public Object transformArray(ArrayObject arrObj, Model model, Type elemType) {
+    public Object transformArray(ArrayObject arrObj, Model model, Type elemType, Map<Expr<?>, ObjectRef> refValues) {
         if (arrObj instanceof MultiArrayObject) {
-            return transformMultiArray((MultiArrayObject) arrObj, model, elemType);
+            return transformMultiArray((MultiArrayObject) arrObj, model, elemType, refValues);
         } else {
-            return transformSingleArray(arrObj, model, elemType);
+            return transformSingleArray(arrObj, model, elemType, refValues);
         }
     }
 
     /** Transform a Z3 multi-dimensional array to a Java multi-dimensional array. */
-    private Object transformMultiArray(MultiArrayObject arrObj, Model model, Type elemType) {
+    private Object transformMultiArray(MultiArrayObject arrObj, Model model, Type elemType,
+            Map<Expr<?>, ObjectRef> refValues) {
         int dim = arrObj.getDim();
         int[] lengths = new int[dim];
         for (int i = 0; i < dim; i++) {
@@ -130,7 +134,7 @@ public class Z3ToJavaTransformer {
         }
 
         // Recursively build the multidimensional array
-        return buildMultiArray(arrObj, model, elemType, lengths, 0, new int[dim]);
+        return buildMultiArray(arrObj, model, elemType, lengths, 0, new int[dim], refValues);
     }
 
     /**
@@ -146,7 +150,7 @@ public class Z3ToJavaTransformer {
      * @return A Java Object representing the multidimensional array.
      */
     private Object buildMultiArray(MultiArrayObject arrObj, Model model, Type elemType, int[] lengths, int currentDim,
-            int[] indices) {
+            int[] indices, Map<Expr<?>, ObjectRef> refValues) {
         if (currentDim == lengths.length) {
             // All dimensions filled, evaluate element at flattened index
             BitVecExpr[] idxExprs = new BitVecExpr[lengths.length];
@@ -154,20 +158,25 @@ public class Z3ToJavaTransformer {
                 idxExprs[i] = ctx.mkBV(indices[i], sorts.getIntBitSize());
             }
             Expr<?> element = model.eval(arrObj.getElem(idxExprs), true);
+            // Check if the element is a reference to another object
+            if (refValues.containsKey(element)) {
+                return refValues.get(element);
+            }
             return transformExpr(element, elemType);
         } else {
             // Fill the current dimension
             Object[] arr = new Object[lengths[currentDim]];
             for (int i = 0; i < lengths[currentDim]; i++) {
                 indices[currentDim] = i;
-                arr[i] = buildMultiArray(arrObj, model, elemType, lengths, currentDim + 1, indices);
+                arr[i] = buildMultiArray(arrObj, model, elemType, lengths, currentDim + 1, indices, refValues);
             }
             return arr;
         }
     }
 
     /** Transform a Z3 single-dimensional array to a Java array */
-    private Object transformSingleArray(ArrayObject arrObj, Model model, Type elemType) {
+    private Object transformSingleArray(ArrayObject arrObj, Model model, Type elemType,
+            Map<Expr<?>, ObjectRef> refValues) {
         Expr<?> lenExpr = arrObj.getLength();
         int length = (int) transformExpr(model.eval(lenExpr, true), PrimitiveType.getInt());
         if (length < 0) {
@@ -178,6 +187,11 @@ public class Z3ToJavaTransformer {
         for (int i = 0; i < length; i++) {
             // Select element at the index
             Expr<?> element = model.eval(arrObj.getElem(i), true);
+            // Check if the element is a reference to another object
+            if (refValues.containsKey(element)) {
+                arr[i] = refValues.get(element);
+                continue;
+            }
             arr[i] = transformExpr(element, elemType);
         }
         return arr;

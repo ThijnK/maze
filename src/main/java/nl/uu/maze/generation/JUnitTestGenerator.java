@@ -1,11 +1,13 @@
 package nl.uu.maze.generation;
 
+import sootup.core.types.ArrayType;
 import sootup.core.types.ClassType;
 import sootup.core.types.Type;
 import sootup.java.core.JavaSootMethod;
 
 import javax.lang.model.element.Modifier;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -269,7 +271,7 @@ public class JUnitTestGenerator {
                     buildFromReference(methodBuilder, argMap, builtObjects, (ObjectRef) value, type, var);
                 }
             }
-            // Other parameters (non-object) can be defined immediately
+            // Other parameters (primitives) can be defined immediately
             else {
                 // If the ArgMap contains no value, use a default value
                 String valueStr = !argMap.containsKey(var) ? JavaLiteralFormatter.getDefaultValue(paramTypes.get(i))
@@ -328,6 +330,15 @@ public class JUnitTestGenerator {
         } else if (value.getClass().isArray()) {
             // For arrays, need to reference the array variable
             if (!builtObjects.contains(ref.getVar())) {
+                // For arrays of objects, first define the objects that appear in the array
+                Type elemType = ((ArrayType) type).getBaseType();
+                if (elemType instanceof ClassType && !elemType.toString().equals("java.lang.String")) {
+                    for (int j = 0; j < Array.getLength(value); j++) {
+                        ObjectRef elem = (ObjectRef) Array.get(value, j);
+                        if (elem != null)
+                            buildFromReference(methodBuilder, argMap, builtObjects, elem, elemType);
+                    }
+                }
                 addStatementTriple(methodBuilder, type, ref.getVar(), JavaLiteralFormatter.arrayToString(value));
             }
             if (var != null) {

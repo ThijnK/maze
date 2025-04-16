@@ -160,18 +160,21 @@ public class SymbolicHeap {
             return;
         }
 
-        // Add null reference as a potential alias
-        aliases.add(sorts.getNullConst());
-        for (Map.Entry<Expr<?>, Set<Expr<?>>> entry : aliasMap.entrySet()) {
-            Set<Expr<?>> otherAliases = entry.getValue();
-            if (entry.getKey().equals(symRef)) {
-                continue;
-            }
+        findAliases(obj.type, aliases);
+    }
 
-            // Check if this other ref has the same type
-            HeapObject other = heap.get(getSingleAlias(otherAliases));
-            if (other != null && obj.type.equals(other.type)) {
-                aliases.addAll(otherAliases);
+    /**
+     * Finds potential aliases for the given type and adds them to the alias set.
+     */
+    private void findAliases(Type type, Set<Expr<?>> aliases) {
+        // Null reference is always a potential alias
+        aliases.add(sorts.getNullConst());
+
+        // Go through heap objects and find potential aliases
+        for (Entry<Expr<?>, HeapObject> entry : heap.entrySet()) {
+            Expr<?> otherRef = entry.getKey();
+            if (type.equals(entry.getValue().type)) {
+                aliases.add(otherRef);
             }
         }
     }
@@ -614,8 +617,9 @@ public class SymbolicHeap {
 
         // If it's an array of references, need to find potential aliases for the
         // selected element
-        if (sorts.isRef(value)) {
+        if (sorts.isRef(value) && !isResolved(value)) {
             Set<Expr<?>> aliases = new HashSet<>();
+            aliases.add(sorts.getNullConst());
             // For now, only consider references currently stored in the array as
             // potential aliases
             Z3Utils.traverseExpr(value, (e) -> {
@@ -623,6 +627,14 @@ public class SymbolicHeap {
                     aliases.add(e);
                 }
             });
+            // If array is symbolic, also allocate a new object on the heap
+            if (arrObj.isSymbolic) {
+                // Create a new symbolic reference for the array element
+                Expr<?> elemRef = allocateObject(arrObj.getType().getBaseType());
+                Expr<?> conRef = getSingleAlias(elemRef);
+                aliases.add(conRef);
+            }
+
             aliasMap.put(value, aliases);
         }
 
@@ -670,10 +682,10 @@ public class SymbolicHeap {
         }
 
         // Check if we need to box the value (primitive value into Object[])
-        if (arrObj.getType() instanceof ArrayType
-                && ((ArrayType) arrObj.getType()).getBaseType() instanceof ClassType ct) {
+        if (!sorts.isRef(value) && ((ArrayType) arrObj.getType()).getBaseType() instanceof ClassType ct) {
             Expr<?> valueSymRef = newSymRef();
             Expr<?> valueConRef = newConRef();
+            // TODO: use special heap object for boxed primitives?
             HeapObject obj = new HeapObject(ct);
             allocateHeapObject(valueSymRef, valueConRef, obj);
             obj.setField("value", value, sorts.determineType(value.getSort()));
