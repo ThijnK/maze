@@ -26,10 +26,7 @@ import nl.uu.maze.util.Z3ContextProvider;
 import nl.uu.maze.util.Z3Sorts;
 import sootup.core.jimple.basic.Immediate;
 import sootup.core.jimple.basic.Local;
-import sootup.core.jimple.common.expr.AbstractInstanceInvokeExpr;
-import sootup.core.jimple.common.expr.AbstractInvokeExpr;
-import sootup.core.jimple.common.expr.JDynamicInvokeExpr;
-import sootup.core.jimple.common.expr.JInterfaceInvokeExpr;
+import sootup.core.jimple.common.expr.*;
 import sootup.core.signatures.MethodSignature;
 import sootup.core.types.ClassType;
 import sootup.core.types.Type;
@@ -65,18 +62,27 @@ public class MethodInvoker {
      * @param storeResult Whether to store the result of the method call in the
      *                    return value of the state (i.e., for definition
      *                    statements)
+     * @param replay      Whether we are replaying a symbolic trace
      * 
      * @return A new symbolic state if the method was executed symbolically, or
      *         an empty optional if the method was executed concretely (meaning
      *         execution should continue with whatever state this method was called
      *         with)
      */
-    public Optional<SymbolicState> executeMethod(SymbolicState state, AbstractInvokeExpr expr, boolean storeResult) {
+    public Optional<SymbolicState> executeMethod(SymbolicState state, AbstractInvokeExpr expr, boolean storeResult,
+            boolean replay) {
         if (expr instanceof JDynamicInvokeExpr) {
             throw new UnsupportedOperationException(expr.getClass().getSimpleName() + " is not supported");
         }
         Local base = expr instanceof AbstractInstanceInvokeExpr ? ((AbstractInstanceInvokeExpr) expr).getBase() : null;
         MethodSignature methodSig = expr.getMethodSignature();
+
+        // If replaying a trace, do not symbolically execute java standard library
+        // methods, because we do not have trace entries for those (not instrumented)
+        if (replay && isStandardLibraryMethod(methodSig)) {
+            executeConcrete(state, expr, base, storeResult);
+            return Optional.empty();
+        }
 
         // For interface invoke expressions, try to resolve the method call to a
         // concrete class
@@ -95,6 +101,12 @@ public class MethodInvoker {
             executeConcrete(state, expr, base, storeResult);
             return Optional.empty();
         }
+    }
+
+    /** Check if a method is part of the Java standard library. */
+    private boolean isStandardLibraryMethod(MethodSignature methodSig) {
+        return methodSig.getDeclClassType().getFullyQualifiedName().startsWith("java.") ||
+                methodSig.getDeclClassType().getFullyQualifiedName().startsWith("javax.");
     }
 
     /** Execute a method call symbolically. */
@@ -247,6 +259,7 @@ public class MethodInvoker {
             } else {
                 Object argVal = validator.evaluate(argExpr, arg.getType());
                 argMap.set(name, argVal);
+                addConcretizationConstraints(state, argExpr, argVal);
             }
         }
     }
@@ -258,6 +271,17 @@ public class MethodInvoker {
             Expr<?> fieldExpr = javaToZ3.transform(newValue, state, fieldType);
             state.heap.setField(base.getName(), fieldName, fieldExpr, fieldType);
         });
+    }
+
+    /**
+     * Add constraints to the symbolic state to ensure that the given argument
+     * variable equals the given value
+     */
+    private void addConcretizationConstraints(SymbolicState state, Expr<?> arg, Object value) {
+        Expr<?> valueExpr = javaToZ3.transform(value, state);
+        if (valueExpr != null) {
+            state.addEngineConstraint(ctx.mkEq(arg, valueExpr));
+        }
     }
 
     /**
