@@ -62,7 +62,7 @@ public class JavaAnalyzerTest {
         JavaClassType classType = analyzer.getClassType(className);
         Set<JavaSootMethod> methods = analyzer.getSootClass(classType).getMethods();
         JavaSootMethod method = methods.stream().filter(m -> m.getName().equals("checkSign")).findFirst().get();
-        Method javaMethod = analyzer.getJavaMethod(method);
+        Method javaMethod = analyzer.getJavaMethod(method.getSignature());
         assertNotNull(javaMethod);
         assertEquals(TestClass.class.getMethod("checkSign", int.class), javaMethod);
     }

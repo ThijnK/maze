@@ -114,7 +114,7 @@ public class JUnitTestGenerator {
         Object[] args;
         try {
             Constructor<?> _ctor = ctor != null ? analyzer.getJavaConstructor(ctor, clazz) : null;
-            Method _method = analyzer.getJavaMethod(method, clazz);
+            Method _method = analyzer.getJavaMethod(method.getSignature(), clazz);
             args = ObjectInstantiation.generateArgs(_method.getParameters(), MethodType.METHOD, argMap);
             retval = executor.execute(_ctor, _method, argMap, args);
         } catch (Exception e) {

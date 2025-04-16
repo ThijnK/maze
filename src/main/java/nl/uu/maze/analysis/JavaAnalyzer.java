@@ -136,42 +136,39 @@ public class JavaAnalyzer {
     }
 
     /**
-     * Returns the Java method of a given SootUp method.
+     * Returns the Java method of a given SootUp method signature.
+     * If you already have the class the method is defined in, use the
+     * {@link #getJavaMethod(JavaSootMethod, Class)} method instead.
      * 
-     * @param method The method for which to return the Java method
-     * @param clazz  The Java class in which the method is defined
+     * @param methodSig The method signature for which to return the Java
+     *                  method
      * @return The Java method
      */
-    public Method getJavaMethod(JavaSootMethod method, Class<?> clazz)
-            throws ClassNotFoundException, NoSuchMethodException {
-        return clazz.getDeclaredMethod(method.getName(), getParameterClasses(method.getParameterTypes()));
+    public Method getJavaMethod(MethodSignature methodSig) throws ClassNotFoundException, NoSuchMethodException {
+        Class<?> clazz = getJavaClass(methodSig.getDeclClassType());
+        return getJavaMethod(methodSig, clazz);
     }
 
     /**
      * Returns the Java method of a given SootUp method signature.
      * 
-     * @param methodSignature The method signature for which to return the Java
-     *                        method
+     * @param methodSig The method signature for which to return the Java
+     *                  method
+     * @param clazz     The Java class in which the method is defined
      * @return The Java method
      */
-    public Method getJavaMethod(MethodSignature methodSignature) throws ClassNotFoundException, NoSuchMethodException {
-        Class<?> clazz = getJavaClass(methodSignature.getDeclClassType());
-        return clazz.getDeclaredMethod(methodSignature.getName(),
-                getParameterClasses(methodSignature.getParameterTypes()));
-    }
-
-    /**
-     * Returns the Java method of a given SootUp method.
-     * If you already have the Java class of the method, use the other
-     * {@link #getJavaMethod(JavaSootMethod, Class)} method instead.
-     * 
-     * @param method The method for which to return the Java method
-     * @return The Java method
-     */
-    public Method getJavaMethod(JavaSootMethod method) throws ClassNotFoundException, NoSuchMethodException {
-        ClassType classType = method.getDeclaringClassType();
-        Class<?> clazz = getJavaClass(classType);
-        return getJavaMethod(method, clazz);
+    public Method getJavaMethod(MethodSignature methodSig, Class<?> clazz)
+            throws ClassNotFoundException, NoSuchMethodException {
+        try {
+            return clazz.getDeclaredMethod(methodSig.getName(), getParameterClasses(methodSig.getParameterTypes()));
+        } catch (NoSuchMethodException e) {
+            // Try to find the method in the super class
+            Class<?> superClass = clazz.getSuperclass();
+            if (superClass == null) {
+                throw e; // No super class found, rethrow the exception
+            }
+            return getJavaMethod(methodSig, superClass);
+        }
     }
 
     /**
@@ -272,7 +269,19 @@ public class JavaAnalyzer {
      * Will only work if the class is available in the class path.
      */
     public Optional<JavaSootMethod> tryGetSootMethod(MethodSignature methodSig) {
-        return view.getClass(methodSig.getDeclClassType()).flatMap(c -> c.getMethod(methodSig.getSubSignature()));
+        Optional<JavaSootClass> clazz = view.getClass(methodSig.getDeclClassType());
+        if (clazz.isEmpty()) {
+            return Optional.empty();
+        }
+
+        Optional<JavaSootMethod> method = clazz.get().getMethod(methodSig.getSubSignature());
+        // If the method does not exist, try to find it in the parent of this class
+        if (method.isEmpty() && clazz.get().hasSuperclass()) {
+            MethodSignature parentSig = new MethodSignature(clazz.get().getSuperclass().get(),
+                    methodSig.getSubSignature());
+            return tryGetSootMethod(parentSig);
+        }
+        return method;
     }
 
     /**

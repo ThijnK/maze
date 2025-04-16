@@ -338,7 +338,7 @@ public class DSEController {
 
     /** Run concrete-driven DSE on the given method. */
     private void runConcreteDriven(JavaSootMethod method, ConcreteSearchStrategy searchStrategy) throws Exception {
-        Method javaMethod = analyzer.getJavaMethod(method, instrumented);
+        Method javaMethod = analyzer.getJavaMethod(method.getSignature(), instrumented);
         ArgMap argMap = new ArgMap();
 
         while (true) {
