@@ -331,14 +331,7 @@ public class JUnitTestGenerator {
             // For arrays, need to reference the array variable
             if (!builtObjects.contains(ref.getVar())) {
                 // For arrays of objects, first define the objects that appear in the array
-                Type elemType = ((ArrayType) type).getBaseType();
-                if (elemType instanceof ClassType && !elemType.toString().equals("java.lang.String")) {
-                    for (int j = 0; j < Array.getLength(value); j++) {
-                        ObjectRef elem = (ObjectRef) Array.get(value, j);
-                        if (elem != null)
-                            buildFromReference(methodBuilder, argMap, builtObjects, elem, elemType);
-                    }
-                }
+                buildArrayElements(methodBuilder, argMap, builtObjects, value, ((ArrayType) type).getBaseType());
                 addStatementTriple(methodBuilder, type, ref.getVar(), JavaLiteralFormatter.arrayToString(value));
             }
             if (var != null) {
@@ -350,6 +343,21 @@ public class JUnitTestGenerator {
             addStatementTriple(methodBuilder, type, var, (String) value);
         } else {
             addStatementTriple(methodBuilder, type, var, JavaLiteralFormatter.valueToString(value));
+        }
+    }
+
+    private void buildArrayElements(MethodSpec.Builder methodBuilder, ArgMap argMap, Set<String> builtObjects,
+            Object value, Type elemType) {
+        if (elemType instanceof ClassType && !elemType.toString().equals("java.lang.String")) {
+            for (int j = 0; j < Array.getLength(value); j++) {
+                Object elem = Array.get(value, j);
+                if (elem instanceof ObjectRef ref) {
+                    buildFromReference(methodBuilder, argMap, builtObjects, ref, elemType);
+                } else if (elem != null && elem.getClass().isArray()) {
+                    // Multi-dimensional array
+                    buildArrayElements(methodBuilder, argMap, builtObjects, elem, elemType);
+                }
+            }
         }
     }
 
