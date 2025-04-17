@@ -144,7 +144,7 @@ public class JUnitTestGenerator {
                 .builder(targetJUnit4 ? org.junit.Test.class : Test.class);
         // For JUnit 4, add expected exception to the @Test annotation
         if (result.isException() && targetJUnit4) {
-            testAnnotation.addMember("expected", "$T.class", Exception.class);
+            testAnnotation.addMember("expected", "$T.class", result.getTargetExceptionClass());
         }
 
         // The method name TEMP will be replaced with the actual test name later
@@ -176,7 +176,7 @@ public class JUnitTestGenerator {
                 // For JUnit 5, use assertThrows to check for exceptions
                 if (!targetJUnit4) {
                     methodBuilder.addStatement("$T.assertThrows($T.class, () -> new $T($L))", Assertions.class,
-                            Exception.class, clazz, String.join(", ", ctorParams));
+                            result.getTargetExceptionClass(), clazz, String.join(", ", ctorParams));
                 }
             } else {
                 methodBuilder.addStatement("$T cut = new $T($L)", clazz, clazz, String.join(", ", ctorParams));
@@ -249,10 +249,10 @@ public class JUnitTestGenerator {
         if (result.isException() && !targetJUnit4) {
             if (method.isStatic())
                 methodBuilder.addStatement("$T.assertThrows($T.class, () -> $T.$L($L))", Assertions.class,
-                        Exception.class, clazz, method.getName(), String.join(", ", params));
+                        result.getTargetExceptionClass(), clazz, method.getName(), String.join(", ", params));
             else
                 methodBuilder.addStatement("$T.assertThrows($T.class, () -> cut.$L($L))", Assertions.class,
-                        Exception.class, method.getName(), String.join(", ", params));
+                        result.getTargetExceptionClass(), method.getName(), String.join(", ", params));
         } else if (isVoid || (targetJUnit4 && result.isException())) {
             if (method.isStatic())
                 methodBuilder.addStatement("$T.$L($L)", clazz, method.getName(), String.join(", ", params));
