@@ -69,6 +69,10 @@ public class MazeCLI implements Callable<Integer> {
             "--test-timeout" }, description = "Timeout to apply to generated test cases in seconds (default: ${DEFAULT-VALUE})", defaultValue = "no timeout", paramLabel = "<long>", converter = TestTimeoutConverter.class)
     private long testTimeout;
 
+    @Option(names = { "-j",
+            "--junit-version" }, description = "JUnit version to target for generated test cases (default: ${DEFAULT-VALUE}, options: ${COMPLETION-CANDIDATES})", defaultValue = "JUnit5", paramLabel = "<version>")
+    private JUnitVersion junitVersion;
+
     @Option(names = { "-C",
             "--concrete-driven" }, description = "Use concrete-driven DSE instead of symbolic-driven DSE (default: ${DEFAULT-VALUE})", defaultValue = "false", paramLabel = "<true|false>")
     private boolean concreteDriven;
@@ -90,7 +94,7 @@ public class MazeCLI implements Callable<Integer> {
                     searchHeuristics, heuristicWeights, timeBudget);
 
             DSEController controller = new DSEController(classPath, concreteDriven, strategy, outPath,
-                    maxDepth, testTimeout, packageName);
+                    maxDepth, testTimeout, packageName, junitVersion.isJUnit4());
             controller.run(className, timeBudget);
             return 0;
         } catch (Exception e) {

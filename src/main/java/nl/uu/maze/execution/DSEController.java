@@ -90,7 +90,7 @@ public class DSEController {
      * @param packageName    The package name for the generated test files
      */
     public DSEController(String classPath, boolean concreteDriven, SearchStrategy<?> searchStrategy,
-            String outPath, int maxDepth, long testTimeout, String packageName)
+            String outPath, int maxDepth, long testTimeout, String packageName, boolean targetJUnit4)
             throws Exception {
         instrumenter = new BytecodeInstrumenter(classPath);
         if (concreteDriven) {
@@ -115,7 +115,7 @@ public class DSEController {
         this.validator = new SymbolicStateValidator();
         this.symbolic = new SymbolicExecutor(concrete, validator, analyzer, searchStrategy.requiresCoverageData(),
                 searchStrategy.requiresBranchHistoryData());
-        this.generator = new JUnitTestGenerator(analyzer, concrete, testTimeout, packageName);
+        this.generator = new JUnitTestGenerator(targetJUnit4, analyzer, concrete, testTimeout, packageName);
     }
 
     /**
@@ -192,13 +192,24 @@ public class DSEController {
                 break;
             }
 
-            logger.info("Processing method: {}", method.getName());
-            if (concreteDriven) {
-                runConcreteDriven(method, searchStrategy.toConcrete());
-            } else {
-                runSymbolicDriven(method, searchStrategy.toSymbolic());
+            try {
+                logger.info("Processing method: {}", method.getName());
+                if (concreteDriven) {
+                    runConcreteDriven(method, searchStrategy.toConcrete());
+                } else {
+                    runSymbolicDriven(method, searchStrategy.toSymbolic());
+                }
+            } catch (Exception e) {
+                logger.error("Error processing method {}: {}", method.getName(), e.getMessage());
+                for (StackTraceElement element : e.getStackTrace()) {
+                    logger.error('\t' + element.toString());
+                }
+                // Continue with the next method even if an error occurs
+                continue;
+            } finally {
+                searchStrategy.reset();
+                replayStrategy.reset();
             }
-            searchStrategy.reset();
         }
     }
 

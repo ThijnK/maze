@@ -112,6 +112,7 @@ Maze provides the following command-line options:
 | `--max-depth`       | `-d`  | Maximum depth of the search                                                | No       | `50`       |
 | `--time-budget`     | `-b`  | Time budget for the engine (in seconds)                                    | No       | No budget  |
 | `--test-timeout`    | `-t`  | Timeout to apply to generated test cases (in seconds)                      | No       | No timeout |
+| `--junit-version`   | `-t`  | JUnit version to target for generated test cases (JUnit4, JUnit5)          | No       | `JUnit5`   |
 | `--concrete-driven` | `-C`  | Use concrete-driven DSE instead of symbolic-driven                         | No       | `false`    |
 
 ## Project Structure

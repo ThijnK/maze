@@ -33,11 +33,16 @@ import nl.uu.maze.execution.MethodType;
  */
 public class JUnitTestGenerator {
     private static final Logger logger = LoggerFactory.getLogger(JUnitTestGenerator.class);
+
+    /**
+     * By default, target JUnit 5, but can be set to JUnit 4 if needed.
+     */
+    private final boolean targetJUnit4;
     private final JavaAnalyzer analyzer;
     private final ConcreteExecutor executor;
-
     private final String testPackageName;
     private final long testTimeout;
+
     private TypeSpec.Builder classBuilder;
     private Class<?> clazz;
     private String testClassName;
@@ -50,7 +55,9 @@ public class JUnitTestGenerator {
     private final Set<Class<?>> primitiveWrappers = Set.of(Boolean.class, Byte.class, Short.class, Integer.class,
             Long.class, Float.class, Double.class, Character.class);
 
-    public JUnitTestGenerator(JavaAnalyzer analyzer, ConcreteExecutor executor, long testTimeout, String packageName) {
+    public JUnitTestGenerator(boolean targetJUnit4, JavaAnalyzer analyzer, ConcreteExecutor executor, long testTimeout,
+            String packageName) {
+        this.targetJUnit4 = targetJUnit4;
         this.testPackageName = packageName;
         this.analyzer = analyzer;
         this.executor = executor;
@@ -72,9 +79,20 @@ public class JUnitTestGenerator {
                 .addModifiers(Modifier.PUBLIC);
 
         if (testTimeout > 0) {
-            AnnotationSpec.Builder timeoutAnnotation = AnnotationSpec.builder(Timeout.class);
-            timeoutAnnotation.addMember("value", "$L", testTimeout);
-            classBuilder.addAnnotation(timeoutAnnotation.build());
+            if (targetJUnit4) {
+                // JUnit 4: add timeout as a rule
+                FieldSpec timeoutField = FieldSpec.builder(org.junit.rules.Timeout.class, "globalTimeout")
+                        .addModifiers(Modifier.PUBLIC)
+                        .addAnnotation(org.junit.Rule.class)
+                        .initializer("new $T($L)", org.junit.rules.Timeout.class, testTimeout)
+                        .build();
+                classBuilder.addField(timeoutField);
+            } else {
+                // JUnit 5: add timeout as annotation
+                AnnotationSpec.Builder timeoutAnnotation = AnnotationSpec.builder(Timeout.class);
+                timeoutAnnotation.addMember("value", "$L", testTimeout);
+                classBuilder.addAnnotation(timeoutAnnotation.build());
+            }
         }
         methodCount.clear();
         builtTestCases.clear();
@@ -124,18 +142,27 @@ public class JUnitTestGenerator {
         boolean isVoid = method.getReturnType().toString().equals("void");
         boolean isException = retval instanceof Exception;
 
+        AnnotationSpec.Builder testAnnotation = AnnotationSpec
+                .builder(targetJUnit4 ? org.junit.Test.class : Test.class);
+        // For JUnit 4, add expected exception to the @Test annotation
+        if (isException && targetJUnit4) {
+            testAnnotation.addMember("expected", "$T.class", Exception.class);
+        }
+
         // The method name TEMP will be replaced with the actual test name later
         MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder("TEMP")
                 .addModifiers(Modifier.PUBLIC)
-                .addAnnotation(Test.class)
+                .addAnnotation(testAnnotation.build())
                 .addException(Exception.class)
                 .returns(void.class);
+
+        Class<?> returnType = analyzer.tryGetJavaClass(method.getReturnType()).orElse(Object.class);
 
         // For static methods, just call the method without an instance
         if (method.isStatic()) {
             List<String> params = addParamDefinitions(methodBuilder, method.getParameterTypes(), argMap,
                     MethodType.METHOD);
-            addMethodCall(methodBuilder, clazz, method, params, isException, isVoid);
+            addMethodCall(methodBuilder, clazz, returnType, method, params, isException, isVoid);
         }
         // For instance methods, create an instance of the class and call the method
         else {
@@ -148,14 +175,17 @@ public class JUnitTestGenerator {
                     MethodType.CTOR);
             // Assert throws for constructor call if it threw an exception
             if (retval instanceof ConstructorException) {
-                methodBuilder.addStatement("$T.assertThrows($T.class, () -> new $T($L))", Assertions.class,
-                        Exception.class, clazz, String.join(", ", ctorParams));
+                // For JUnit 5, use assertThrows to check for exceptions
+                if (!targetJUnit4) {
+                    methodBuilder.addStatement("$T.assertThrows($T.class, () -> new $T($L))", Assertions.class,
+                            Exception.class, clazz, String.join(", ", ctorParams));
+                }
             } else {
                 methodBuilder.addStatement("$T cut = new $T($L)", clazz, clazz, String.join(", ", ctorParams));
                 methodBuilder.addCode("\n"); // White space between ctor and method call
                 List<String> params = addParamDefinitions(methodBuilder, method.getParameterTypes(), argMap,
                         MethodType.METHOD);
-                addMethodCall(methodBuilder, clazz, method, params, isException, isVoid);
+                addMethodCall(methodBuilder, clazz, returnType, method, params, isException, isVoid);
             }
         }
 
@@ -163,7 +193,8 @@ public class JUnitTestGenerator {
         if (!isException && !isVoid) {
             methodBuilder.addCode("\n"); // White space between method call and assert
             if (retval == null) {
-                methodBuilder.addStatement("$T.assertNull(retval)", Assertions.class);
+                methodBuilder.addStatement("$T.assertNull(retval)",
+                        targetJUnit4 ? org.junit.Assert.class : Assertions.class);
             } else {
                 // Check if return value is a reference to an input parameter
                 boolean isReference = false;
@@ -171,7 +202,7 @@ public class JUnitTestGenerator {
                     if (args[i] == retval) {
                         isReference = true;
                         // Retval is a reference to argument i
-                        methodBuilder.addStatement("$T expected = $L", retval.getClass(),
+                        methodBuilder.addStatement("$T expected = $L", returnType,
                                 ArgMap.getSymbolicName(MethodType.METHOD, i));
                         break;
                     }
@@ -179,14 +210,15 @@ public class JUnitTestGenerator {
                 // If not a reference, create a new value for the retval
                 if (!isReference) {
                     if (isPrimitive(retval) || retval.getClass().isArray()) {
-                        methodBuilder.addStatement("$T expected = $L", retval.getClass(),
+                        methodBuilder.addStatement("$T expected = $L", returnType,
                                 JavaLiteralFormatter.valueToString(retval));
                     } else {
                         buildObject(methodBuilder, "expected", retval);
                     }
                 }
 
-                methodBuilder.addStatement("$T.assertEquals(expected, retval)", Assertions.class);
+                methodBuilder.addStatement("$T.assertEquals(expected, retval)",
+                        targetJUnit4 ? org.junit.Assert.class : Assertions.class);
             }
         }
 
@@ -211,9 +243,12 @@ public class JUnitTestGenerator {
      * If the method is void, it will be called without an assignment. Otherwise,
      * the return value will be assigned to a variable of the appropriate type.
      */
-    private void addMethodCall(MethodSpec.Builder methodBuilder, Class<?> clazz, JavaSootMethod method,
+    private void addMethodCall(MethodSpec.Builder methodBuilder, Class<?> clazz, Class<?> returnType,
+            JavaSootMethod method,
             List<String> params, boolean isException, boolean isVoid) {
-        if (isException) {
+        // For JUnit 5, use assertThrows to check for exceptions
+        // For JUnit 4, the expected exception is added to the @Test annotation earlier
+        if (isException && !targetJUnit4) {
             if (method.isStatic())
                 methodBuilder.addStatement("$T.assertThrows($T.class, () -> $T.$L($L))", Assertions.class,
                         Exception.class,
@@ -222,13 +257,12 @@ public class JUnitTestGenerator {
                 methodBuilder.addStatement("$T.assertThrows($T.class, () -> cut.$L($L))", Assertions.class,
                         Exception.class,
                         method.getName(), String.join(", ", params));
-        } else if (isVoid) {
+        } else if (isVoid || (targetJUnit4 && isException)) {
             if (method.isStatic())
                 methodBuilder.addStatement("$T.$L($L)", clazz, method.getName(), String.join(", ", params));
             else
                 methodBuilder.addStatement("cut.$L($L)", method.getName(), String.join(", ", params));
         } else {
-            Class<?> returnType = analyzer.tryGetJavaClass(method.getReturnType()).orElse(Object.class);
             if (method.isStatic())
                 methodBuilder.addStatement("$T retval = $T.$L($L)", returnType, clazz, method.getName(),
                         String.join(", ", params));
