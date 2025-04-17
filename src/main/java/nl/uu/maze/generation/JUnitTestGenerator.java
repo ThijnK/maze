@@ -172,7 +172,7 @@ public class JUnitTestGenerator {
             List<String> ctorParams = addParamDefinitions(methodBuilder, ctor.getParameterTypes(), argMap,
                     MethodType.CTOR);
             // Assert throws for constructor call if it threw an exception
-            if (result.isCtorException()) {
+            if (result.thrownByCtor()) {
                 // For JUnit 5, use assertThrows to check for exceptions
                 if (!targetJUnit4) {
                     methodBuilder.addStatement("$T.assertThrows($T.class, () -> new $T($L))", Assertions.class,
@@ -188,7 +188,7 @@ public class JUnitTestGenerator {
         }
 
         // Add an assert statement for the return value if the method is not void
-        Object retval = result.getReturnValue();
+        Object retval = result.retval();
         if (!result.isException() && !isVoid) {
             methodBuilder.addCode("\n"); // White space between method call and assert
             if (retval == null) {

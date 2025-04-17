@@ -32,7 +32,7 @@ public class ConcreteExecutor {
             instance = ObjectInstantiation.createInstance(ctor, argMap);
             // If constructor throws an exception, return it
             if (instance instanceof Exception e) {
-                return ExecutionResult.fromException(e, true);
+                return new ExecutionResult(null, e, true);
             }
         }
         return execute(instance, method, argMap);
@@ -57,7 +57,7 @@ public class ConcreteExecutor {
             instance = ObjectInstantiation.createInstance(ctor, argMap);
             // If constructor throws an exception, return it
             if (instance instanceof Exception e) {
-                return ExecutionResult.fromException(e, true);
+                return new ExecutionResult(null, e, true);
             }
         }
         return execute(instance, method, args);
@@ -79,7 +79,7 @@ public class ConcreteExecutor {
             return execute(instance, method, args);
         } catch (Exception e) {
             logger.warn("Failed to generate args for method {}: {}", method.getName(), e.getMessage());
-            return ExecutionResult.fromException(e, false);
+            return new ExecutionResult(null, e, false);
         }
     }
 
@@ -99,10 +99,10 @@ public class ConcreteExecutor {
             method.setAccessible(true);
             Object result = method.invoke(instance, args);
             logger.debug("Retval: {}", result == null ? "null" : result.toString());
-            return ExecutionResult.fromReturnValue(result);
+            return new ExecutionResult(result, null, false);
         } catch (Exception e) {
             logger.warn("Execution of method {} threw an exception: {}", method.getName(), e.getMessage());
-            return ExecutionResult.fromException(e, false);
+            return new ExecutionResult(null, e, false);
         }
     }
 }
