@@ -24,7 +24,6 @@ import nl.uu.maze.analysis.JavaAnalyzer;
 import nl.uu.maze.execution.ArgMap;
 import nl.uu.maze.execution.ArgMap.*;
 import nl.uu.maze.execution.concrete.*;
-import nl.uu.maze.execution.concrete.ConcreteExecutor.ConstructorException;
 import nl.uu.maze.execution.MethodType;
 
 /**
@@ -128,24 +127,23 @@ public class JUnitTestGenerator {
             throw new IllegalStateException("Test class not initialized. Call initializeForClass() first.");
         }
 
-        Object retval;
+        ExecutionResult result;
         Object[] args;
         try {
             Constructor<?> _ctor = ctor != null ? analyzer.getJavaConstructor(ctor, clazz) : null;
             Method _method = analyzer.getJavaMethod(method.getSignature(), clazz);
             args = ObjectInstantiation.generateArgs(_method.getParameters(), MethodType.METHOD, argMap);
-            retval = executor.execute(_ctor, _method, argMap, args);
+            result = executor.execute(_ctor, _method, argMap, args);
         } catch (Exception e) {
             logger.warn("Failed to generate execute test case for {}", method.getName());
             return;
         }
         boolean isVoid = method.getReturnType().toString().equals("void");
-        boolean isException = retval instanceof Exception;
 
         AnnotationSpec.Builder testAnnotation = AnnotationSpec
                 .builder(targetJUnit4 ? org.junit.Test.class : Test.class);
         // For JUnit 4, add expected exception to the @Test annotation
-        if (isException && targetJUnit4) {
+        if (result.isException() && targetJUnit4) {
             testAnnotation.addMember("expected", "$T.class", Exception.class);
         }
 
@@ -162,7 +160,7 @@ public class JUnitTestGenerator {
         if (method.isStatic()) {
             List<String> params = addParamDefinitions(methodBuilder, method.getParameterTypes(), argMap,
                     MethodType.METHOD);
-            addMethodCall(methodBuilder, clazz, returnType, method, params, isException, isVoid);
+            addMethodCall(methodBuilder, clazz, returnType, method, params, result, isVoid);
         }
         // For instance methods, create an instance of the class and call the method
         else {
@@ -174,7 +172,7 @@ public class JUnitTestGenerator {
             List<String> ctorParams = addParamDefinitions(methodBuilder, ctor.getParameterTypes(), argMap,
                     MethodType.CTOR);
             // Assert throws for constructor call if it threw an exception
-            if (retval instanceof ConstructorException) {
+            if (result.isCtorException()) {
                 // For JUnit 5, use assertThrows to check for exceptions
                 if (!targetJUnit4) {
                     methodBuilder.addStatement("$T.assertThrows($T.class, () -> new $T($L))", Assertions.class,
@@ -185,12 +183,13 @@ public class JUnitTestGenerator {
                 methodBuilder.addCode("\n"); // White space between ctor and method call
                 List<String> params = addParamDefinitions(methodBuilder, method.getParameterTypes(), argMap,
                         MethodType.METHOD);
-                addMethodCall(methodBuilder, clazz, returnType, method, params, isException, isVoid);
+                addMethodCall(methodBuilder, clazz, returnType, method, params, result, isVoid);
             }
         }
 
         // Add an assert statement for the return value if the method is not void
-        if (!isException && !isVoid) {
+        Object retval = result.getReturnValue();
+        if (!result.isException() && !isVoid) {
             methodBuilder.addCode("\n"); // White space between method call and assert
             if (retval == null) {
                 methodBuilder.addStatement("$T.assertNull(retval)",
@@ -244,20 +243,17 @@ public class JUnitTestGenerator {
      * the return value will be assigned to a variable of the appropriate type.
      */
     private void addMethodCall(MethodSpec.Builder methodBuilder, Class<?> clazz, Class<?> returnType,
-            JavaSootMethod method,
-            List<String> params, boolean isException, boolean isVoid) {
+            JavaSootMethod method, List<String> params, ExecutionResult result, boolean isVoid) {
         // For JUnit 5, use assertThrows to check for exceptions
         // For JUnit 4, the expected exception is added to the @Test annotation earlier
-        if (isException && !targetJUnit4) {
+        if (result.isException() && !targetJUnit4) {
             if (method.isStatic())
                 methodBuilder.addStatement("$T.assertThrows($T.class, () -> $T.$L($L))", Assertions.class,
-                        Exception.class,
-                        clazz, method.getName(), String.join(", ", params));
+                        Exception.class, clazz, method.getName(), String.join(", ", params));
             else
                 methodBuilder.addStatement("$T.assertThrows($T.class, () -> cut.$L($L))", Assertions.class,
-                        Exception.class,
-                        method.getName(), String.join(", ", params));
-        } else if (isVoid || (targetJUnit4 && isException)) {
+                        Exception.class, method.getName(), String.join(", ", params));
+        } else if (isVoid || (targetJUnit4 && result.isException())) {
             if (method.isStatic())
                 methodBuilder.addStatement("$T.$L($L)", clazz, method.getName(), String.join(", ", params));
             else

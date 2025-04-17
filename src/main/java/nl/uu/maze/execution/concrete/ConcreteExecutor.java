@@ -22,19 +22,17 @@ public class ConcreteExecutor {
      * @param method The method to invoke
      * @param argMap {@link ArgMap} containing the arguments to pass to the
      *               constructor and method invocation
-     * @return The return value of the method, or an instance of
-     *         {@link ConstructorException} if the constructor throws an exception
-     *         or {@link MethodException} if the method throws an exception during
-     *         execution
+     * @return An instance of {@link ExecutionResult} containing the return value
+     *         and the exception if one was thrown
      */
-    public Object execute(Constructor<?> ctor, Method method, ArgMap argMap) {
+    public ExecutionResult execute(Constructor<?> ctor, Method method, ArgMap argMap) {
         // If not static, create an instance of the class
         Object instance = null;
         if (!Modifier.isStatic(method.getModifiers())) {
             instance = ObjectInstantiation.createInstance(ctor, argMap);
             // If constructor throws an exception, return it
-            if (instance == null) {
-                return new ConstructorException();
+            if (instance instanceof Exception e) {
+                return ExecutionResult.fromException(e, true);
             }
         }
         return execute(instance, method, argMap);
@@ -49,19 +47,17 @@ public class ConcreteExecutor {
      * @param argMap {@link ArgMap} containing the arguments to pass to the
      *               constructor (but not the method invocation)
      * @param args   The arguments to pass to the method
-     * @return The return value of the method, or an instance of
-     *         {@link ConstructorException} if the constructor throws an exception
-     *         or {@link MethodException} if the method throws an exception during
-     *         execution
+     * @return An instance of {@link ExecutionResult} containing the return value
+     *         and the exception if one was thrown
      */
-    public Object execute(Constructor<?> ctor, Method method, ArgMap argMap, Object[] args) {
+    public ExecutionResult execute(Constructor<?> ctor, Method method, ArgMap argMap, Object[] args) {
         // If not static, create an instance of the class
         Object instance = null;
         if (!Modifier.isStatic(method.getModifiers())) {
             instance = ObjectInstantiation.createInstance(ctor, argMap);
             // If constructor throws an exception, return it
-            if (instance == null) {
-                return new ConstructorException();
+            if (instance instanceof Exception e) {
+                return ExecutionResult.fromException(e, true);
             }
         }
         return execute(instance, method, args);
@@ -74,17 +70,16 @@ public class ConcreteExecutor {
      * @param instance The instance to invoke the method on
      * @param method   The method to invoke
      * @param argMap   {@link ArgMap} containing the arguments to pass to the method
-     * @return The return value of the method, or an instance of
-     *         {@link MethodException} if the
-     *         method throws an exception during execution
+     * @return An instance of {@link ExecutionResult} containing the return value
+     *         and the exception if one was thrown
      */
-    public Object execute(Object instance, Method method, ArgMap argMap) {
+    public ExecutionResult execute(Object instance, Method method, ArgMap argMap) {
         try {
             Object[] args = ObjectInstantiation.generateArgs(method.getParameters(), MethodType.METHOD, argMap);
             return execute(instance, method, args);
         } catch (Exception e) {
             logger.warn("Failed to generate args for method {}: {}", method.getName(), e.getMessage());
-            return new MethodException();
+            return ExecutionResult.fromException(e, false);
         }
     }
 
@@ -95,35 +90,19 @@ public class ConcreteExecutor {
      * @param instance The instance to invoke the method on
      * @param method   The method to invoke
      * @param args     The arguments to pass to the method
-     * @return The return value of the method, or an instance of
-     *         {@link MethodException} if the
-     *         method throws an exception during execution
+     * @return An instance of {@link ExecutionResult} containing the return value
+     *         and the exception if one was thrown
      */
-    public Object execute(Object instance, Method method, Object[] args) {
+    private ExecutionResult execute(Object instance, Method method, Object[] args) {
         try {
             logger.debug("Executing method {} with args: {}", method.getName(), args);
             method.setAccessible(true);
             Object result = method.invoke(instance, args);
             logger.debug("Retval: {}", result == null ? "null" : result.toString());
-
-            return result;
+            return ExecutionResult.fromReturnValue(result);
         } catch (Exception e) {
             logger.warn("Execution of method {} threw an exception: {}", method.getName(), e.getMessage());
-            return new MethodException();
+            return ExecutionResult.fromException(e, false);
         }
-    }
-
-    /**
-     * Exception returned to indicate that the constructor of the class containing
-     * the method threw an exception.
-     */
-    public static class ConstructorException extends Exception {
-    }
-
-    /**
-     * Exception returned to indicate that the method threw an exception during
-     * execution.
-     */
-    public static class MethodException extends Exception {
     }
 }

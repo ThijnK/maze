@@ -34,7 +34,7 @@ public class ObjectInstantiation {
         // Try to create an instance using one of the constructors
         for (Constructor<?> ctor : clazz.getDeclaredConstructors()) {
             Object instance = createInstance(ctor, generateArgs(ctor.getParameters(), MethodType.CTOR, null));
-            if (instance != null) {
+            if (!(instance instanceof Exception)) {
                 return instance;
             }
         }
@@ -50,7 +50,8 @@ public class ObjectInstantiation {
      * @param ctor   The constructor to use to create the instance
      * @param argMap {@link ArgMap} containing the arguments to pass to the
      *               constructor
-     * @return An instance of the class or null if the instance could not be created
+     * @return An instance of the class or the exception thrown by the constructor
+     *         if the instance could not be created
      */
     public static Object createInstance(Constructor<?> ctor, ArgMap argMap) {
         return createInstance(ctor, generateArgs(ctor.getParameters(), MethodType.CTOR, argMap));
@@ -61,9 +62,10 @@ public class ObjectInstantiation {
      * 
      * @param ctor The constructor to use to create the instance
      * @param args The arguments to pass to the constructor
-     * @return An instance of the class or null if the instance could not be created
+     * @return An instance of the class or the exception thrown by the constructor
+     *         if the instance could not be created
      */
-    public static Object createInstance(Constructor<?> ctor, Object[] args) {
+    private static Object createInstance(Constructor<?> ctor, Object[] args) {
         try {
             logger.debug("Creating instance of class {} with args: {}", ctor.getDeclaringClass().getSimpleName(),
                     args);
@@ -72,7 +74,7 @@ public class ObjectInstantiation {
         } catch (Exception e) {
             logger.warn("Constructor of {} threw an exception: {}", ctor.getDeclaringClass().getSimpleName(),
                     e.getMessage());
-            return null;
+            return e;
         }
     }
 

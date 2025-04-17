@@ -16,8 +16,7 @@ import nl.uu.maze.analysis.JavaAnalyzer;
 import nl.uu.maze.execution.ArgMap;
 import nl.uu.maze.execution.ArgMap.ObjectRef;
 import nl.uu.maze.execution.MethodType;
-import nl.uu.maze.execution.concrete.ConcreteExecutor;
-import nl.uu.maze.execution.concrete.ObjectInstantiation;
+import nl.uu.maze.execution.concrete.*;
 import nl.uu.maze.execution.symbolic.HeapObjects.*;
 import nl.uu.maze.transform.JavaToZ3Transformer;
 import nl.uu.maze.transform.JimpleToZ3Transformer;
@@ -206,11 +205,20 @@ public class MethodInvoker {
             setMethodArguments(state, expr.getArgs(), isCtor, argMap);
         }
 
-        Object retval = isCtor ? ObjectInstantiation.createInstance((Constructor<?>) executable, argMap)
-                : executor.execute(instance, (Method) executable, argMap);
-        if (retval instanceof Exception) {
-            state.setExceptionThrown();
-            return;
+        Object retval;
+        if (isCtor) {
+            retval = ObjectInstantiation.createInstance((Constructor<?>) executable, argMap);
+            if (retval instanceof Exception) {
+                state.setExceptionThrown();
+                return;
+            }
+        } else {
+            ExecutionResult result = executor.execute(instance, (Method) executable, argMap);
+            if (result.isException()) {
+                state.setExceptionThrown();
+                return;
+            }
+            retval = result.getReturnValue();
         }
 
         Type retType = methodSig.getType();
