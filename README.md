@@ -2,7 +2,7 @@
 
 Maze is a **dynamic symbolic execution (DSE)** engine for **automated test generation** of Java programs.
 
-The engine analyzes JVM bytecode and uses a combination of symbolic and concrete execution to explore program paths and generate JUnit 5 test cases that maximize code coverage.
+The engine analyzes JVM bytecode and uses a combination of symbolic and concrete execution to explore program paths and generate JUnit 5 (or JUnit 4) test cases that aim to maximize code coverage.
 It supports various search strategies and can handle complex data structures, including arrays and objects.
 Constraint solving is powered by the Z3 theorem prover.
 
@@ -112,7 +112,7 @@ Maze provides the following command-line options:
 | `--max-depth`       | `-d`  | Maximum depth of the search                                                | No       | `50`       |
 | `--time-budget`     | `-b`  | Time budget for the engine (in seconds)                                    | No       | No budget  |
 | `--test-timeout`    | `-t`  | Timeout to apply to generated test cases (in seconds)                      | No       | No timeout |
-| `--junit-version`   | `-t`  | JUnit version to target for generated test cases (JUnit4, JUnit5)          | No       | `JUnit5`   |
+| `--junit-version`   | `-j`  | JUnit version to target for generated test cases (JUnit4, JUnit5)          | No       | `JUnit5`   |
 | `--concrete-driven` | `-C`  | Use concrete-driven DSE instead of symbolic-driven                         | No       | `false`    |
 
 ## Project Structure
@@ -215,6 +215,12 @@ Maze supports the following search heuristics:
   This heuristic can be configured to prefer either long-waiting targets or short-waiting targets, depending on the desired behavior.
   Preferring long-waiting targets would result in behavior similar to a breadth-first search, while preferring short-waiting targets would result in behavior similar to a depth-first search.
 
+## Benchmarking
+
+Maze was benchmarked using the [JUGE](https://github.com/JUnitContest/JUGE) benchmarking framework, which is designed for evaluating test generation tools for the SBFT tool competitions.
+A fork of JUGE that is specifically set up to benchmark Maze is available [here](https://github.com/ThijnK/JUGE).
+Further instructions and details on the benchmarks can be found there.
+
 ## Troubleshooting
 
 ### Build Failure
@@ -239,7 +245,7 @@ Some Java language constructs are not supported by Maze, including:
 - Static fields and static initializers.
 - Enums (which are basically static fields).
 
-If running Maze on a class takes too long due, consider reducing the maximum depth of the search with the `--maxDepth` option.
+If running Maze on a class takes too long, consider reducing the maximum depth of the search with the `--max-depth` option or setting a time budget with the `--time-budget` option.
 
 ## Dependencies
 
