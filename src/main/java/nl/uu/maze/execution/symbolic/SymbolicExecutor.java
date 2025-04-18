@@ -432,6 +432,13 @@ public class SymbolicExecutor {
      * @return A list of successor symbolic states after executing the return
      */
     private List<SymbolicState> handleReturnStmt(JReturnStmt stmt, SymbolicState state, boolean replay) {
+        // Resolve potential aliasing
+        Expr<?> symRef = refExtractor.extract(stmt.getOp(), state);
+        Optional<List<SymbolicState>> splitStates = splitOnAliases(state, symRef, replay);
+        if (splitStates.isPresent()) {
+            return splitStates.get();
+        }
+
         Immediate op = stmt.getOp();
         // If the op is a local referring to (part of) a multidimensional array, we need
         // to know the arrayIndices entry for the return value
