@@ -47,8 +47,7 @@ public class ObjectInstantiation {
             }
         }
 
-        logger.warn("Failed to create instance of class: {}", clazz.getName());
-        return null;
+        return new ExecutionResult(null, new UnsupportedOperationException("No suitable constructor found"), true);
     }
 
     /**

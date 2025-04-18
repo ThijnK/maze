@@ -1,5 +1,8 @@
 package nl.uu.maze.execution.symbolic;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import javax.annotation.Nonnull;
 
 import com.microsoft.z3.Expr;
@@ -15,54 +18,39 @@ import sootup.core.jimple.visitor.AbstractValueVisitor;
 /**
  * Extracts unresolved symbolic references from a Jimple value ({@link Value}).
  */
-public class SymbolicRefExtractor extends AbstractValueVisitor<Expr<?>> {
+public class SymbolicRefExtractor extends AbstractValueVisitor<Set<Expr<?>>> {
     private SymbolicState state;
+    private Set<Expr<?>> result;
 
     /**
      * Extracts symbolic references from a Jimple value.
      * 
      * @param value the Jimple value to extract symbolic references from
      * @param state the symbolic state to use
-     * @return the first symbolic reference encountered which has multiple potential
-     *         aliases and has not been resolved yet or null if no
-     *         symbolic references occur in the value
+     * @return a set of symbolic references which have not been resolved yet and
+     *         have multiple aliases defined
      */
-    public Expr<?> extract(Value value, SymbolicState state) {
+    public Set<Expr<?>> extract(Value value, SymbolicState state) {
         this.state = state;
+        result = new HashSet<>();
         value.accept(this);
-        Expr<?> res = getResult();
-        setResult(null);
-        return res;
+        return result;
     }
 
-    private Expr<?> extract(Value value) {
-        return extract(value, state);
+    private void extract(Value value) {
+        extract(value, state);
     }
 
-    private Expr<?> extract(String name) {
+    private void extract(String name) {
         Expr<?> var = state.lookup(name);
         if (!state.heap.isResolved(var) && state.heap.isAliased(var)) {
-            return var;
+            result.add(var);
         }
-        return null;
-    }
-
-    private void extractMultiple(Local value, Value... values) {
-        Expr<?> res = extract(value);
-        if (res != null) {
-            setResult(res);
-            return;
-        }
-        extractMultiple(values);
     }
 
     private void extractMultiple(Value... values) {
         for (Value value : values) {
-            Expr<?> res = extract(value);
-            if (res != null) {
-                setResult(res);
-                return;
-            }
+            extract(value);
         }
     }
 
@@ -78,47 +66,50 @@ public class SymbolicRefExtractor extends AbstractValueVisitor<Expr<?>> {
 
     @Override
     public void caseLocal(@Nonnull Local local) {
-        setResult(extract(local.getName()));
+        extract(local.getName());
     }
 
     @Override
     public void caseCastExpr(@Nonnull JCastExpr expr) {
-        setResult(extract(expr.getOp().toString()));
+        extract(expr.getOp().toString());
     }
 
     @Override
     public void caseInstanceFieldRef(@Nonnull JInstanceFieldRef ref) {
-        setResult(extract(ref.getBase().getName()));
+        extract(ref.getBase().getName());
     }
 
     @Override
     public void caseLengthExpr(@Nonnull JLengthExpr expr) {
-        setResult(extract(expr.getOp().toString()));
+        extract(expr.getOp().toString());
     }
 
     @Override
     public void caseArrayRef(@Nonnull JArrayRef ref) {
-        setResult(extract(ref.getBase().getName()));
+        extract(ref.getBase().getName());
     }
 
     @Override
     public void caseInstanceOfExpr(@Nonnull JInstanceOfExpr expr) {
-        setResult(extract(expr.getOp().toString()));
+        extract(expr.getOp().toString());
     }
 
     @Override
     public void caseInterfaceInvokeExpr(@Nonnull JInterfaceInvokeExpr expr) {
-        extractMultiple(expr.getBase(), expr.getArgs().toArray(Immediate[]::new));
+        extract(expr.getBase());
+        extractMultiple(expr.getArgs().toArray(Immediate[]::new));
     }
 
     @Override
     public void caseSpecialInvokeExpr(@Nonnull JSpecialInvokeExpr expr) {
-        extractMultiple(expr.getBase(), expr.getArgs().toArray(Immediate[]::new));
+        extract(expr.getBase());
+        extractMultiple(expr.getArgs().toArray(Immediate[]::new));
     }
 
     @Override
     public void caseVirtualInvokeExpr(@Nonnull JVirtualInvokeExpr expr) {
-        extractMultiple(expr.getBase(), expr.getArgs().toArray(Immediate[]::new));
+        extract(expr.getBase());
+        extractMultiple(expr.getArgs().toArray(Immediate[]::new));
     }
 
     @Override

@@ -201,9 +201,7 @@ public class DSEController {
                 }
             } catch (Exception e) {
                 logger.error("Error processing method {}: {}", method.getName(), e.getMessage());
-                for (StackTraceElement element : e.getStackTrace()) {
-                    logger.error('\t' + element.toString());
-                }
+                logger.debug("Error stack trace: ", e);
                 // Continue with the next method even if an error occurs
                 continue;
             } finally {

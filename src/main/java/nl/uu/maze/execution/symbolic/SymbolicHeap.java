@@ -419,8 +419,7 @@ public class SymbolicHeap {
     /**
      * Link a heap object from another symbolic heap to this heap.
      * This will perform a deep linking, meaning any objects referenced by the
-     * object's
-     * fields are also linked.
+     * object's fields are also linked.
      * The objects are NOT cloned, so any changes to the copied object will affect
      * the original object (including alias map entries).
      */
@@ -701,7 +700,7 @@ public class SymbolicHeap {
             // type of heap object, because methods from the Integer class executed on this
             // heap object would correctly find the primitive value
             obj.setField("value", value, sorts.determineType(value.getSort()));
-            value = (Expr<E>) valueConRef;
+            value = (Expr<E>) valueSymRef;
         }
 
         if (arrObj instanceof MultiArrayObject multiArrObj) {

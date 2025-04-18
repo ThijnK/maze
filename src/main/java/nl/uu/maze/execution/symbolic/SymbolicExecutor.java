@@ -110,10 +110,10 @@ public class SymbolicExecutor {
     private List<SymbolicState> handleIfStmt(JIfStmt stmt, SymbolicState state, boolean replay) {
         // Split the state if the condition contains a symbolic reference with multiple
         // aliases (i.e. reference comparisons)
-        Expr<?> symRef = refExtractor.extract(stmt.getCondition(), state);
-        Optional<List<SymbolicState>> splitStates = splitOnAliases(state, symRef, replay);
-        if (splitStates.isPresent()) {
-            return splitStates.get();
+        Set<Expr<?>> unresolvedRefs = refExtractor.extract(stmt.getCondition(), state);
+        List<SymbolicState> splitStates = splitOnAliases(state, unresolvedRefs, replay);
+        if (!splitStates.isEmpty()) {
+            return splitStates;
         }
 
         if (trackCoverage)
@@ -246,11 +246,11 @@ public class SymbolicExecutor {
         // corresponding alias in each state
         // But only for assignments, not for identity statements
         if (stmt instanceof JAssignStmt) {
-            Expr<?> symRef = refExtractor.extract(stmt.getLeftOp(), state);
-            symRef = symRef == null ? refExtractor.extract(stmt.getRightOp(), state) : symRef;
-            Optional<List<SymbolicState>> splitStates = splitOnAliases(state, symRef, replay);
-            if (splitStates.isPresent()) {
-                return splitStates.get();
+            Set<Expr<?>> unresolvedRefs = refExtractor.extract(stmt.getLeftOp(), state);
+            unresolvedRefs.addAll(refExtractor.extract(stmt.getRightOp(), state));
+            List<SymbolicState> splitStates = splitOnAliases(state, unresolvedRefs, replay);
+            if (!splitStates.isEmpty()) {
+                return splitStates;
             }
         }
 
@@ -424,10 +424,10 @@ public class SymbolicExecutor {
      */
     private List<SymbolicState> handleInvokeStmt(AbstractInvokeExpr expr, SymbolicState state, boolean replay) {
         // Resolve aliases
-        Expr<?> symRef = refExtractor.extract(expr, state);
-        Optional<List<SymbolicState>> splitStates = splitOnAliases(state, symRef, replay);
-        if (splitStates.isPresent()) {
-            return splitStates.get();
+        Set<Expr<?>> unresolvedRefs = refExtractor.extract(expr, state);
+        List<SymbolicState> splitStates = splitOnAliases(state, unresolvedRefs, replay);
+        if (!splitStates.isEmpty()) {
+            return splitStates;
         }
 
         // Handle method invocation
@@ -447,10 +447,10 @@ public class SymbolicExecutor {
      */
     private List<SymbolicState> handleReturnStmt(JReturnStmt stmt, SymbolicState state, boolean replay) {
         // Resolve potential aliasing
-        Expr<?> symRef = refExtractor.extract(stmt.getOp(), state);
-        Optional<List<SymbolicState>> splitStates = splitOnAliases(state, symRef, replay);
-        if (splitStates.isPresent()) {
-            return splitStates.get();
+        Set<Expr<?>> unresolvedRefs = refExtractor.extract(stmt.getOp(), state);
+        List<SymbolicState> splitStates = splitOnAliases(state, unresolvedRefs, replay);
+        if (!splitStates.isEmpty()) {
+            return splitStates;
         }
 
         Immediate op = stmt.getOp();
@@ -534,16 +534,24 @@ public class SymbolicExecutor {
 
     /**
      * Split the current symbolic state into multiple states based if the given
-     * symbolic reference has multiple aliases.
+     * unresolved references have multiple aliases.
+     * If no splitting is needed, the original state is modified and an empty list
+     * is returned.
      */
-    private Optional<List<SymbolicState>> splitOnAliases(SymbolicState state, Expr<?> symRef, boolean replay) {
-        if (symRef == null || state.heap.isResolved(symRef)) {
-            return Optional.empty();
-        }
-        Set<Expr<?>> aliases = state.heap.getAliases(symRef);
-        if (aliases != null) {
+    private List<SymbolicState> splitOnAliases(SymbolicState state, Set<Expr<?>> unresolvedRefs, boolean replay) {
+        List<SymbolicState> newStates = new ArrayList<>();
+        Expr<?>[] unresolvedRefsArr = unresolvedRefs.toArray(Expr<?>[]::new);
+        for (int i = 0; i < unresolvedRefsArr.length; i++) {
+            Expr<?> ref = unresolvedRefsArr[i];
+            if (ref == null || state.heap.isResolved(ref)) {
+                continue;
+            }
+
+            Set<Expr<?>> aliases = state.heap.getAliases(ref);
+            if (aliases == null) {
+                continue;
+            }
             Expr<?>[] aliasArr = aliases.toArray(Expr<?>[]::new);
-            List<SymbolicState> newStates = new ArrayList<>(aliasArr.length);
 
             // When replaying a trace, we pick any non-null alias arbitrarily and ignore the
             // others, so we only follow one path
@@ -552,50 +560,50 @@ public class SymbolicExecutor {
             // Here, for non-argument aliasing, we use a heuristic and hope for the best
             if (replay) {
                 // Find first non-null alias
-                int i = 0;
-                for (; i < aliasArr.length; i++) {
-                    if (!sorts.isNull(aliasArr[i])) {
+                int j = 0;
+                for (; j < aliasArr.length; j++) {
+                    if (!sorts.isNull(aliasArr[j])) {
                         break;
                     }
                 }
-                Expr<?> alias = aliasArr[i];
-                state.heap.setSingleAlias(symRef, alias);
+                Expr<?> alias = aliasArr[j];
+                state.heap.setSingleAlias(ref, alias);
 
                 // If symRef here is a select expression on an array which is symbolic, we need
                 // to add as path constraint instead of engine constraint
-                Expr<?> elemsExpr = Z3Utils.findExpr(symRef, (e) -> e.getSort() instanceof ArraySort);
+                Expr<?> elemsExpr = Z3Utils.findExpr(ref, (e) -> e.getSort() instanceof ArraySort);
                 if (elemsExpr != null) {
                     String arrRef = elemsExpr.toString().substring(0, elemsExpr.toString().indexOf("_"));
                     HeapObject heapObj = state.heap.get(arrRef);
                     if (heapObj instanceof ArrayObject arrObj && arrObj.isSymbolic) {
-                        state.addPathConstraint(ctx.mkEq(symRef, alias));
-                        return Optional.empty();
+                        state.addPathConstraint(ctx.mkEq(ref, alias));
+                        continue;
                     }
                 }
 
-                state.addEngineConstraint(ctx.mkEq(symRef, alias));
-                return Optional.empty();
+                state.addEngineConstraint(ctx.mkEq(ref, alias));
+                continue;
             }
 
-            for (int i = 0; i < aliasArr.length; i++) {
-                SymbolicState newState = i == aliasArr.length - 1 ? state : state.clone();
-                newState.heap.setSingleAlias(symRef, aliasArr[i]);
-                AliasConstraint constraint = new AliasConstraint(state, symRef, aliasArr, i);
+            for (int j = 0; j < aliasArr.length; j++) {
+                // Reuse state only for the very last possible state that we need
+                SymbolicState newState = (j == aliasArr.length - 1 && i == unresolvedRefsArr.length - 1) ? state
+                        : state.clone();
+                newState.heap.setSingleAlias(ref, aliasArr[j]);
+                AliasConstraint constraint = new AliasConstraint(state, ref, aliasArr, j);
                 // For parameters, we add alias constraints to the path constraints, so they can
                 // be used in the search space for concrete-driven DSE
                 // For non-parameters, we add them to the engine constraints, so they are not
                 // considered in the search space
-                if (state.getParamType(symRef.toString()) != null) {
+                if (state.getParamType(ref.toString()) != null) {
                     newState.addPathConstraint(constraint);
                 } else {
                     newState.addEngineConstraint(constraint);
                 }
                 newStates.add(newState);
             }
-            if (newStates.size() > 1) {
-                return Optional.of(newStates);
-            }
         }
-        return Optional.empty();
+
+        return newStates.size() > 1 ? newStates : List.of();
     }
 }
