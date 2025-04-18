@@ -218,7 +218,7 @@ public class MethodInvoker {
                 state.setExceptionThrown();
                 return;
             }
-            retval = result.getReturnValue();
+            retval = result.retval();
         }
 
         Type retType = methodSig.getType();

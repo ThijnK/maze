@@ -437,11 +437,11 @@ public class SymbolicHeap {
             }
             heap.put(conRef, obj);
 
-            // Copy reference fields recursively
+            // Link reference fields recursively
             for (Entry<String, HeapObjectField> entry : obj.getFields()) {
                 HeapObjectField field = entry.getValue();
                 Expr<?> value = field.getValue();
-                if (sorts.isRef(value)) {
+                if (!symRef.equals(value) && sorts.isRef(value)) {
                     linkHeapObject(value, otherHeap);
                 }
                 // If the field is an array, link the elements as well
