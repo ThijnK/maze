@@ -159,7 +159,7 @@ public class ArgMap {
      */
     private Object toJava(String key, Object value, Class<?> type) {
         // If already defined from resolving a reference, skip
-        if (converted.containsKey(key)) {
+        if (converted.containsKey(key) && !key.equals("temp")) {
             return converted.get(key);
         }
 

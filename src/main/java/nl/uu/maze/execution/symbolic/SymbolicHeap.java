@@ -701,7 +701,7 @@ public class SymbolicHeap {
             // type of heap object, because methods from the Integer class executed on this
             // heap object would correctly find the primitive value
             obj.setField("value", value, sorts.determineType(value.getSort()));
-            value = (Expr<E>) valueSymRef;
+            value = (Expr<E>) valueConRef;
         }
 
         if (arrObj instanceof MultiArrayObject multiArrObj) {
