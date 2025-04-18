@@ -6,6 +6,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.microsoft.z3.*;
 
 import nl.uu.maze.analysis.JavaAnalyzer;
@@ -32,6 +35,7 @@ import sootup.core.jimple.javabytecode.stmt.JSwitchStmt;
  * Provides symbolic execution capabilities.
  */
 public class SymbolicExecutor {
+    private static final Logger logger = LoggerFactory.getLogger(SymbolicExecutor.class);
     private static final Z3Sorts sorts = Z3Sorts.getInstance();
     private static final Context ctx = Z3ContextProvider.getContext();
 
@@ -59,29 +63,39 @@ public class SymbolicExecutor {
     public List<SymbolicState> step(SymbolicState state, boolean replay) {
         Stmt stmt = state.getStmt();
 
-        switch (stmt) {
-            case JIfStmt jIfStmt -> {
-                return handleIfStmt(jIfStmt, state, replay);
+        try {
+            switch (stmt) {
+                case JIfStmt jIfStmt -> {
+                    return handleIfStmt(jIfStmt, state, replay);
+                }
+                case JSwitchStmt jSwitchStmt -> {
+                    return handleSwitchStmt(jSwitchStmt, state, replay);
+                }
+                case AbstractDefinitionStmt abstractDefinitionStmt -> {
+                    return handleDefStmt(abstractDefinitionStmt, state, replay);
+                }
+                case JInvokeStmt ignored -> {
+                    return handleInvokeStmt(stmt.getInvokeExpr(), state, replay);
+                }
+                case JThrowStmt ignored -> {
+                    state.setExceptionThrown();
+                    return handleOtherStmts(state, replay);
+                }
+                case JReturnStmt jReturnStmt -> {
+                    return handleReturnStmt(jReturnStmt, state, replay);
+                }
+                default -> {
+                    return handleOtherStmts(state, replay);
+                }
             }
-            case JSwitchStmt jSwitchStmt -> {
-                return handleSwitchStmt(jSwitchStmt, state, replay);
-            }
-            case AbstractDefinitionStmt abstractDefinitionStmt -> {
-                return handleDefStmt(abstractDefinitionStmt, state, replay);
-            }
-            case JInvokeStmt ignored -> {
-                return handleInvokeStmt(stmt.getInvokeExpr(), state, replay);
-            }
-            case JThrowStmt ignored -> {
-                state.setExceptionThrown();
-                return handleOtherStmts(state, replay);
-            }
-            case JReturnStmt jReturnStmt -> {
-                return handleReturnStmt(jReturnStmt, state, replay);
-            }
-            default -> {
-                return handleOtherStmts(state, replay);
-            }
+        } catch (Exception e) {
+            // If an exception is thrown, set the state as exceptional and return it
+            // That way, a test case is generated for the path up to this point, even if we
+            // didn't finish exploring the path
+            logger.error("Exception thrown during symbolic execution: {}", e.getMessage());
+            logger.debug("Exception stack trace: ", e);
+            state.setExceptionThrown();
+            return List.of(state);
         }
     }
 

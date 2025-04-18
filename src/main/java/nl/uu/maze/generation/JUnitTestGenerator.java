@@ -24,6 +24,7 @@ import nl.uu.maze.analysis.JavaAnalyzer;
 import nl.uu.maze.execution.ArgMap;
 import nl.uu.maze.execution.ArgMap.*;
 import nl.uu.maze.execution.concrete.*;
+import nl.uu.maze.util.Pair;
 import nl.uu.maze.execution.MethodType;
 
 /**
@@ -438,7 +439,11 @@ public class JUnitTestGenerator {
      * constructor arguments.
      */
     private void buildObjectInstance(MethodSpec.Builder methodBuilder, String var, Class<?> clazz) {
-        Object[] arguments = analyzer.getJavaConstructor(clazz).getSecond();
+        Pair<Constructor<?>, Object[]> pair = analyzer.getJavaConstructor(clazz);
+        if (pair == null) {
+            throw new IllegalArgumentException("No constructor found for class " + clazz.getName());
+        }
+        Object[] arguments = pair.getSecond();
         String[] argNames = new String[arguments.length];
         for (int i = 0; i < arguments.length; i++) {
             Object arg = arguments[i];
