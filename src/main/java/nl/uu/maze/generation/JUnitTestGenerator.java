@@ -290,16 +290,16 @@ public class JUnitTestGenerator {
                                 : new ObjectInstance((ClassType) type));
             }
             // If the value is a reference to another object
-            else if (value instanceof ObjectRef) {
+            else if (value instanceof ObjectRef ref) {
                 // If this reference, and any subsequent ones in the chain are used only
                 // once, then we can skip the chain and define the value directly on this var
                 Optional<Object> finalValue = argMap.followRef(var, true);
                 if (finalValue.isPresent()) {
                     argMap.set(var, finalValue.get());
-                    buildFromReference(methodBuilder, argMap, builtObjects, new ObjectRef(var),
-                            type);
+                    buildFromReference(methodBuilder, argMap, builtObjects, new ObjectRef(var), type);
                 } else {
-                    buildFromReference(methodBuilder, argMap, builtObjects, (ObjectRef) value, type, var);
+                    String refVar = buildFromReference(methodBuilder, argMap, builtObjects, ref, type);
+                    addStatementTriple(methodBuilder, type, var, refVar);
                 }
             }
             // Other parameters (primitives) can be defined immediately
@@ -329,35 +329,26 @@ public class JUnitTestGenerator {
         }
     }
 
-    private void buildFromReference(MethodSpec.Builder methodBuilder, ArgMap argMap, Set<String> builtObjects,
-            ObjectRef ref, Type type) {
-        buildFromReference(methodBuilder, argMap, builtObjects, ref, type, null);
-    }
-
     /**
      * Builds an object instance for the given ObjectRef, defining the referenced
-     * value recursively first.
+     * value recursively first, and returns the variable name of the referenced
+     * value (or the value itself for primitive values).
      */
-    private void buildFromReference(MethodSpec.Builder methodBuilder, ArgMap argMap, Set<String> builtObjects,
-            ObjectRef ref, Type type, String var) {
+    private String buildFromReference(MethodSpec.Builder methodBuilder, ArgMap argMap, Set<String> builtObjects,
+            ObjectRef ref, Type type) {
         Object value = argMap.getOrDefault(ref.getVar(),
                 type instanceof ClassType ? new ObjectInstance((ClassType) type)
                         : JavaLiteralFormatter.getDefaultValue(type));
         if (value == null) {
-            // If the reference is null, just define the variable itself as null without
-            // referencing
-            addStatementTriple(methodBuilder, type, var, "null");
-        } else if (value instanceof ObjectInstance) {
-            buildObjectInstance(methodBuilder, argMap, builtObjects, ref.getVar(), (ObjectInstance) value);
-            if (var != null) {
-                addStatementTriple(methodBuilder, type, var, ref.getVar());
-            }
+            return "null";
+        } else if (value instanceof ObjectInstance objInstance) {
+            buildObjectInstance(methodBuilder, argMap, builtObjects, ref.getVar(), objInstance);
+            return ref.getVar();
         } else if (value instanceof ObjectRef refValue) {
-            buildFromReference(methodBuilder, argMap, builtObjects, refValue, type, ref.getVar());
-            if (var != null) {
-                addStatementTriple(methodBuilder, type, var, ref.getVar());
-            }
+            buildFromReference(methodBuilder, argMap, builtObjects, refValue, type);
+            addStatementTriple(methodBuilder, type, ref.getVar(), refValue.getVar());
             builtObjects.add(ref.getVar());
+            return ref.getVar();
         } else if (value.getClass().isArray()) {
             // For arrays, need to reference the array variable
             if (!builtObjects.contains(ref.getVar())) {
@@ -365,15 +356,13 @@ public class JUnitTestGenerator {
                 buildArrayElements(methodBuilder, argMap, builtObjects, value, ((ArrayType) type).getBaseType());
                 addStatementTriple(methodBuilder, type, ref.getVar(), JavaLiteralFormatter.arrayToString(value));
             }
-            if (var != null) {
-                addStatementTriple(methodBuilder, type, var, ref.getVar());
-            }
             builtObjects.add(ref.getVar());
-        } else if (value instanceof String) {
-            // Other primitive values can be directly defined on the variable itself
-            addStatementTriple(methodBuilder, type, var, (String) value);
+            return ref.getVar();
+        } else if (value instanceof String valueStr) {
+            return valueStr;
         } else {
-            addStatementTriple(methodBuilder, type, var, JavaLiteralFormatter.valueToString(value));
+            // Primitive values: convert to string and return directly
+            return JavaLiteralFormatter.valueToString(value);
         }
     }
 
@@ -382,8 +371,13 @@ public class JUnitTestGenerator {
         if (elemType instanceof ClassType && !elemType.toString().equals("java.lang.String")) {
             for (int j = 0; j < Array.getLength(value); j++) {
                 Object elem = Array.get(value, j);
-                if (elem instanceof ObjectRef ref) {
-                    buildFromReference(methodBuilder, argMap, builtObjects, ref, elemType);
+                if (elem instanceof ObjectRef ref && !builtObjects.contains(ref.getVar())) {
+                    String refVar = buildFromReference(methodBuilder, argMap, builtObjects, ref, elemType);
+                    builtObjects.add(ref.getVar());
+                    if (ref.getVar() != refVar && !builtObjects.add(ref.getVar())) {
+                        // If referenced value is a primitive, still need to define it
+                        addStatementTriple(methodBuilder, elemType, ref.getVar(), refVar);
+                    }
                 } else if (elem != null && elem.getClass().isArray()) {
                     // Multi-dimensional array
                     buildArrayElements(methodBuilder, argMap, builtObjects, elem, elemType);
