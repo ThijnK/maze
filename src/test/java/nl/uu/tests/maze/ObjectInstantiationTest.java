@@ -2,6 +2,7 @@ package nl.uu.tests.maze;
 
 import nl.uu.maze.execution.ArgMap;
 import nl.uu.maze.execution.MethodType;
+import nl.uu.maze.execution.concrete.ExecutionResult;
 import nl.uu.maze.execution.concrete.ObjectInstantiation;
 
 import org.junit.jupiter.api.Test;
@@ -12,23 +13,23 @@ import java.lang.reflect.Parameter;
 class ObjectInstantiationTest {
     @Test
     public void testCreateInstance_NoArgs() {
-        Object instance = ObjectInstantiation.createInstance(TestClassNoArgs.class);
-        assertNotNull(instance);
-        assertInstanceOf(TestClassNoArgs.class, instance);
+        ExecutionResult result = ObjectInstantiation.createInstance(TestClassNoArgs.class);
+        assertNotNull(result.retval());
+        assertInstanceOf(TestClassNoArgs.class, result.retval());
     }
 
     @Test
     public void testCreateInstance_WithArgs() {
-        Object instance = ObjectInstantiation.createInstance(TestClassWithArgs.class);
-        assertNotNull(instance);
-        assertInstanceOf(TestClassWithArgs.class, instance);
+        ExecutionResult result = ObjectInstantiation.createInstance(TestClassWithArgs.class);
+        assertNotNull(result.retval());
+        assertInstanceOf(TestClassWithArgs.class, result.retval());
     }
 
     @Test
     public void testCreateInstance_NoConstructors() {
-        Object instance = ObjectInstantiation.createInstance(TestClassNoConstructors.class);
-        assertNotNull(instance);
-        assertInstanceOf(TestClassNoConstructors.class, instance);
+        ExecutionResult result = ObjectInstantiation.createInstance(TestClassNoConstructors.class);
+        assertNotNull(result.retval());
+        assertInstanceOf(TestClassNoConstructors.class, result.retval());
     }
 
     @Test

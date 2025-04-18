@@ -196,7 +196,7 @@ public class MethodInvoker {
                                 "Failed to create instance for base: " + base.getName());
                     }
                     original = ObjectUtils.shallowCopy(instance, instance.getClass());
-                    addConcretizationConstraints(state, heapObj, instance);
+                    addConcretizationConstraints(state, heapObj, instance, symRef);
                 } catch (ClassNotFoundException | NoSuchMethodException e) {
                     throw new UnsupportedOperationException(
                             "Failed to find class or method for base: " + base.getName());
@@ -205,21 +205,13 @@ public class MethodInvoker {
             setMethodArguments(state, expr.getArgs(), isCtor, argMap);
         }
 
-        Object retval;
-        if (isCtor) {
-            retval = ObjectInstantiation.createInstance((Constructor<?>) executable, argMap);
-            if (retval instanceof Exception) {
-                state.setExceptionThrown();
-                return;
-            }
-        } else {
-            ExecutionResult result = executor.execute(instance, (Method) executable, argMap);
-            if (result.isException()) {
-                state.setExceptionThrown();
-                return;
-            }
-            retval = result.retval();
+        ExecutionResult result = isCtor ? ObjectInstantiation.createInstance((Constructor<?>) executable, argMap)
+                : executor.execute(instance, (Method) executable, argMap);
+        if (result.isException()) {
+            state.setExceptionThrown();
+            return;
         }
+        Object retval = result.retval();
 
         Type retType = methodSig.getType();
         // Store the return value in the state
@@ -259,7 +251,7 @@ public class MethodInvoker {
                     // If the argument is a reference, we need to concretize it
                     HeapObject argObj = state.heap.getHeapObject(argExpr);
                     Class<?> argClazz = analyzer.getJavaClass(argObj.getType());
-                    addConcretizationConstraints(state, argObj, argMap.toJava(argExpr.toString(), argClazz));
+                    addConcretizationConstraints(state, argObj, argMap.toJava(argExpr.toString(), argClazz), argExpr);
                 } catch (ClassNotFoundException e) {
                     logger.warn("Failed to find class for reference: {}", argExpr);
                 }
@@ -296,7 +288,13 @@ public class MethodInvoker {
      * Go through the fields of the heap object, and add constraints for symbolic
      * field values to equal the concretized field values for the given object.
      */
-    private void addConcretizationConstraints(SymbolicState state, HeapObject heapObj, Object object) {
+    private void addConcretizationConstraints(SymbolicState state, HeapObject heapObj, Object object, Expr<?> symRef) {
+        if (object == null) {
+            // If the object is null, we need to set the symbolic reference to null
+            state.addEngineConstraint(ctx.mkEq(symRef, sorts.getNullConst()));
+            return;
+        }
+
         // For arrays, we need to concretize the array elements
         if (heapObj instanceof ArrayObject arrObj) {
             // Traverse the array, select corresponding element from arrObj's symbolic
@@ -320,15 +318,18 @@ public class MethodInvoker {
             String fieldName = field.getKey();
             HeapObjectField heapField = field.getValue();
             Expr<?> fieldValue = heapField.getValue();
-            if (sorts.isRef(fieldValue)) {
-                HeapObject fieldObj = state.heap.getHeapObject(fieldValue);
-                addConcretizationConstraints(state, fieldObj, ObjectUtils.getField(object, fieldName));
-            } else {
-                // Get the field value from the object
-                Object objField = ObjectUtils.getField(object, fieldName);
-                if (objField != null) {
+            if (symRef.equals(fieldValue)) {
+                continue;
+            }
+
+            Optional<Object> fieldOpt = ObjectUtils.getField(object, fieldName);
+            if (fieldOpt.isPresent()) {
+                if (sorts.isRef(fieldValue)) {
+                    HeapObject fieldObj = state.heap.getHeapObject(fieldValue);
+                    addConcretizationConstraints(state, fieldObj, fieldOpt.get(), fieldValue);
+                } else {
                     // Convert the field value to a symbolic expression
-                    Expr<?> fieldExpr = javaToZ3.transform(objField, state);
+                    Expr<?> fieldExpr = javaToZ3.transform(fieldOpt.get(), state);
                     // Add a constraint that the field value must equal the symbolic value
                     state.addEngineConstraint(ctx.mkEq(fieldValue, fieldExpr));
                 }

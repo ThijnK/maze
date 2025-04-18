@@ -3,7 +3,9 @@ package nl.uu.maze.util;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.util.Arrays;
+import java.util.Optional;
 
+import nl.uu.maze.execution.concrete.ExecutionResult;
 import nl.uu.maze.execution.concrete.ObjectInstantiation;
 
 /**
@@ -39,7 +41,11 @@ public class ObjectUtils {
         }
 
         // Dummy instance which we'll copy fields into
-        Object copy = ObjectInstantiation.createInstance(clazz);
+        ExecutionResult result = ObjectInstantiation.createInstance(clazz);
+        if (result.isException()) {
+            throw new RuntimeException("Failed to create instance of class: " + clazz.getName(), result.exception());
+        }
+        Object copy = result.retval();
 
         for (Field field : clazz.getDeclaredFields()) {
             try {
@@ -109,13 +115,43 @@ public class ObjectUtils {
         }
     }
 
-    public static Object getField(Object obj, String fieldName) {
+    /**
+     * Get the value of a field of the given name in the given object.
+     * This method will search the class hierarchy for the field, including private
+     * fields.
+     */
+    public static Optional<Object> getField(Object obj, String name) {
         try {
-            Field field = obj.getClass().getDeclaredField(fieldName);
-            field.setAccessible(true);
-            return field.get(obj);
+            Field field = findField(obj.getClass(), name);
+            return Optional.of(field.get(obj));
         } catch (Exception e) {
-            return null;
+            return Optional.empty();
         }
+    }
+
+    /**
+     * Find a field of the given name anywhere in the class‐hierarchy or its
+     * interfaces, including private fields.
+     * Also sets the field to accessible, if possible.
+     */
+    public static Field findField(Class<?> clazz, String name) throws NoSuchFieldException {
+        Class<?> current = clazz;
+        while (current != null) {
+            try {
+                Field f = current.getDeclaredField(name);
+                f.setAccessible(true);
+                return f;
+            } catch (NoSuchFieldException e) {
+                // try all interfaces
+                for (Class<?> iface : current.getInterfaces()) {
+                    try {
+                        return findField(iface, name);
+                    } catch (NoSuchFieldException ignored) {
+                    }
+                }
+                current = current.getSuperclass();
+            }
+        }
+        throw new NoSuchFieldException("Field '" + name + "' not found in " + clazz);
     }
 }

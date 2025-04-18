@@ -23,17 +23,18 @@ public class ConcreteExecutor {
      * @param argMap {@link ArgMap} containing the arguments to pass to the
      *               constructor and method invocation
      * @return An instance of {@link ExecutionResult} containing the return value
-     *         and the exception if one was thrown
+     *         or the exception thrown by the constructor or method
      */
     public ExecutionResult execute(Constructor<?> ctor, Method method, ArgMap argMap) {
         // If not static, create an instance of the class
         Object instance = null;
         if (!Modifier.isStatic(method.getModifiers())) {
-            instance = ObjectInstantiation.createInstance(ctor, argMap);
+            ExecutionResult result = ObjectInstantiation.createInstance(ctor, argMap);
             // If constructor throws an exception, return it
-            if (instance instanceof Exception e) {
-                return new ExecutionResult(null, e, true);
+            if (result.isException()) {
+                return result;
             }
+            instance = result.retval();
         }
         return execute(instance, method, argMap);
     }
@@ -48,17 +49,18 @@ public class ConcreteExecutor {
      *               constructor (but not the method invocation)
      * @param args   The arguments to pass to the method
      * @return An instance of {@link ExecutionResult} containing the return value
-     *         and the exception if one was thrown
+     *         or the exception thrown by the constructor or method
      */
     public ExecutionResult execute(Constructor<?> ctor, Method method, ArgMap argMap, Object[] args) {
         // If not static, create an instance of the class
         Object instance = null;
         if (!Modifier.isStatic(method.getModifiers())) {
-            instance = ObjectInstantiation.createInstance(ctor, argMap);
+            ExecutionResult result = ObjectInstantiation.createInstance(ctor, argMap);
             // If constructor throws an exception, return it
-            if (instance instanceof Exception e) {
-                return new ExecutionResult(null, e, true);
+            if (result.isException()) {
+                return result;
             }
+            instance = result.retval();
         }
         return execute(instance, method, args);
     }
@@ -71,7 +73,7 @@ public class ConcreteExecutor {
      * @param method   The method to invoke
      * @param argMap   {@link ArgMap} containing the arguments to pass to the method
      * @return An instance of {@link ExecutionResult} containing the return value
-     *         and the exception if one was thrown
+     *         or the exception thrown by the constructor or method
      */
     public ExecutionResult execute(Object instance, Method method, ArgMap argMap) {
         try {
@@ -91,7 +93,7 @@ public class ConcreteExecutor {
      * @param method   The method to invoke
      * @param args     The arguments to pass to the method
      * @return An instance of {@link ExecutionResult} containing the return value
-     *         and the exception if one was thrown
+     *         or the exception thrown by the constructor or method
      */
     private ExecutionResult execute(Object instance, Method method, Object[] args) {
         try {

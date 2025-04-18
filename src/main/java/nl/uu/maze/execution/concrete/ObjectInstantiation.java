@@ -2,6 +2,7 @@ package nl.uu.maze.execution.concrete;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
+import java.util.Arrays;
 import java.util.Random;
 import java.lang.reflect.Parameter;
 
@@ -24,18 +25,25 @@ public class ObjectInstantiation {
      * Attempt to create an instance of the given class.
      * 
      * @param clazz The class to instantiate
-     * @return An instance of the class or null if the instance could not be created
+     * @return An instance of {@link ExecutionResult} containing the instance
+     *         created or the exception thrown if the instance could not be created
      */
-    public static Object createInstance(Class<?> clazz) {
+    public static ExecutionResult createInstance(Class<?> clazz) {
         if (clazz.isInterface()) {
-            throw new IllegalArgumentException("Cannot create instance of an interface: " + clazz.getSimpleName());
+            return new ExecutionResult(null,
+                    new IllegalArgumentException("Cannot instantiate an interface: " + clazz.getName()),
+                    true);
         }
 
         // Try to create an instance using one of the constructors
-        for (Constructor<?> ctor : clazz.getDeclaredConstructors()) {
-            Object instance = createInstance(ctor, generateArgs(ctor.getParameters(), MethodType.CTOR, null));
-            if (!(instance instanceof Exception)) {
-                return instance;
+        Constructor<?>[] ctors = clazz.getDeclaredConstructors();
+        // Sort the constructors by the number of parameters to try the easiest first
+        Arrays.sort(ctors, (a, b) -> Integer.compare(a.getParameterCount(), b.getParameterCount()));
+        for (Constructor<?> ctor : ctors) {
+            Object[] args = generateArgs(ctor.getParameters(), MethodType.CTOR, null);
+            ExecutionResult result = createInstance(ctor, args);
+            if (!result.isException()) {
+                return result;
             }
         }
 
@@ -50,10 +58,10 @@ public class ObjectInstantiation {
      * @param ctor   The constructor to use to create the instance
      * @param argMap {@link ArgMap} containing the arguments to pass to the
      *               constructor
-     * @return An instance of the class or the exception thrown by the constructor
-     *         if the instance could not be created
+     * @return An instance of {@link ExecutionResult} containing the instance
+     *         created or the exception thrown if the instance could not be created
      */
-    public static Object createInstance(Constructor<?> ctor, ArgMap argMap) {
+    public static ExecutionResult createInstance(Constructor<?> ctor, ArgMap argMap) {
         return createInstance(ctor, generateArgs(ctor.getParameters(), MethodType.CTOR, argMap));
     }
 
@@ -62,19 +70,20 @@ public class ObjectInstantiation {
      * 
      * @param ctor The constructor to use to create the instance
      * @param args The arguments to pass to the constructor
-     * @return An instance of the class or the exception thrown by the constructor
-     *         if the instance could not be created
+     * @return An instance of {@link ExecutionResult} containing the instance
+     *         created or the exception thrown if the instance could not be created
      */
-    private static Object createInstance(Constructor<?> ctor, Object[] args) {
+    private static ExecutionResult createInstance(Constructor<?> ctor, Object[] args) {
         try {
             logger.debug("Creating instance of class {} with args: {}", ctor.getDeclaringClass().getSimpleName(),
                     args);
             ctor.setAccessible(true);
-            return ctor.newInstance(args);
+            Object instance = ctor.newInstance(args);
+            return new ExecutionResult(instance, null, false);
         } catch (Exception e) {
             logger.warn("Constructor of {} threw an exception: {}", ctor.getDeclaringClass().getSimpleName(),
                     e.getMessage());
-            return e;
+            return new ExecutionResult(null, e, true);
         }
     }
 

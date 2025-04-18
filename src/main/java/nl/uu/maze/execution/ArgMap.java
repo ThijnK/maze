@@ -9,8 +9,10 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import nl.uu.maze.execution.concrete.ExecutionResult;
 import nl.uu.maze.execution.concrete.ObjectInstantiation;
 import nl.uu.maze.execution.symbolic.SymbolicStateValidator;
+import nl.uu.maze.util.ObjectUtils;
 import nl.uu.maze.util.Z3Sorts;
 import sootup.core.types.ClassType;
 import sootup.core.types.Type;
@@ -175,13 +177,16 @@ public class ArgMap {
         } else if (value instanceof ObjectInstance instance) {
             // Convert ObjectInstance to Object
             // Create a dummy instance that will be filled with the correct values
-            Object obj = ObjectInstantiation.createInstance(type);
+            ExecutionResult result = ObjectInstantiation.createInstance(type);
+            if (result.isException()) {
+                logger.error("Failed to create instance of class: {}", type.getName());
+                return null;
+            }
+            Object obj = result.retval();
 
             for (Map.Entry<String, ObjectField> entry : instance.getFields().entrySet()) {
                 try {
-                    Field field = type.getDeclaredField(entry.getKey());
-                    field.setAccessible(true);
-
+                    Field field = ObjectUtils.findField(type, entry.getKey());
                     Object fieldValue = entry.getValue().getValue();
                     Object convertedValue = toJava(key + "_" + entry.getKey(), fieldValue, field.getType());
                     field.set(obj, convertedValue);

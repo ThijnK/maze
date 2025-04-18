@@ -3,10 +3,14 @@ package nl.uu.maze.execution.concrete;
 import java.lang.reflect.InvocationTargetException;
 
 /**
- * ExecutionResult is a wrapper for the result of a method invocation. It
- * contains the result of the method, an exception if one was
- * thrown, and a flag indicating whether the exception was thrown by the
- * constructor of the class containing the method or the method itself.
+ * ExecutionResult is a wrapper for the result of a method or constructor
+ * invocation. It contains the result of the method or constructor, an exception
+ * if one was thrown, and a flag indicating whether the exception was thrown by
+ * the constructor of the class containing the method or the method itself.
+ * <p>
+ * This class is used to store the result of a method invocation in
+ * {@link ConcreteExecutor} and the result of creating an instance of a class
+ * with {@link ObjectInstantiation}.
  */
 public record ExecutionResult(Object retval, Exception exception, boolean thrownByCtor) {
     public boolean isException() {
