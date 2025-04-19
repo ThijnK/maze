@@ -1,6 +1,6 @@
-# Maze
+# MAZE
 
-Maze is a **dynamic symbolic execution (DSE)** engine for **automated test generation** of Java programs.
+MAZE (Multi-strategy Automated Symbolic Execution) is a **dynamic symbolic execution (DSE)** engine for **automated test generation** of Java programs.
 
 The engine analyzes JVM bytecode and uses a combination of symbolic and concrete execution to explore program paths and generate JUnit 5 (or JUnit 4) test cases that aim to maximize code coverage.
 It supports various search strategies and can handle complex data structures, including arrays and objects.
@@ -95,7 +95,7 @@ Set the environment variables and install into your local maven repository as de
 
 ## Command-Line Options
 
-Maze provides the following command-line options:
+MAZE provides the following command-line options:
 
 | Option              | Alias | Description                                                                | Required | Default    |
 | ------------------- | ----- | -------------------------------------------------------------------------- | -------- | ---------- |
@@ -135,7 +135,7 @@ The project is organized into the following main packages:
 ### Dynamic Symbolic Execution (DSE)
 
 Over time, the concept of dynamic symoblic execution (DSE) and concolic execution has evolved, but these terms are often used interchangeably.
-Maze uses the term DSE to refer to the combination of symbolic and concrete execution.
+MAZE uses the term DSE to refer to the combination of symbolic and concrete execution.
 We distinguish between two types of DSE, symbolic-driven and concrete-driven:
 
 - **Concrete-driven DSE**:
@@ -155,7 +155,7 @@ By default, the engine will use symbolic-driven DSE, but you can switch to concr
 
 ### Search Strategies
 
-Maze supports the following search strategies:
+MAZE supports the following search strategies:
 
 - **Depth-First Search (DFS)**:
   Explores paths by going as deep as possible before backtracking.
@@ -180,7 +180,7 @@ Maze supports the following search strategies:
   Alternates between multiple search strategies using a round-robin approach.
   This can help to prevent any single strategy from getting stuck in unproductive regions of the search space.
   Note, however, that using multiple search strategies may introduce some overhead, as each strategy will keep track of its own state.
-  When Maze is instructed to run with multiple search strategies, it will automatically use interleaved search.
+  When MAZE is instructed to run with multiple search strategies, it will automatically use interleaved search.
 
 Each of these strategies can be used for both symbolic-driven and concrete-driven DSE, though some are more suited for one than the other (e.g., RPS is only really useful for symbolic-driven DSE).
 The engine also provides some predefined search strategies for probabilistic search based on specific heuristics, such as coverage optimized search and random search (uniform distribution), the names for which can be found in the help message of the CLI.
@@ -188,7 +188,7 @@ The engine also provides some predefined search strategies for probabilistic sea
 #### Search Heuristics
 
 Search heuristics are used to determine the probability distribution for probabilistic search.
-Maze supports the following search heuristics:
+MAZE supports the following search heuristics:
 
 - **Uniform**:
   Assigns the same weight to every target, effectively creating a random search when used in isolation (no other heuristics).
@@ -217,15 +217,15 @@ Maze supports the following search heuristics:
 
 ## Benchmarking
 
-Maze was benchmarked using the [JUGE](https://github.com/JUnitContest/JUGE) benchmarking framework, which is designed for evaluating test generation tools for the SBFT tool competitions.
-A fork of JUGE that is specifically set up to benchmark Maze is available [here](https://github.com/ThijnK/JUGE).
+MAZE was benchmarked using the [JUGE](https://github.com/JUnitContest/JUGE) benchmarking framework, which is designed for evaluating test generation tools for the SBFT tool competitions.
+A fork of JUGE that is specifically set up to benchmark MAZE is available [here](https://github.com/ThijnK/JUGE).
 Further instructions and details on the benchmarks can be found there.
 
 ## Troubleshooting
 
 ### Build Failure
 
-If your build of the Maze project fails with the following error:
+If your build of the MAZE project fails with the following error:
 
 ```bash
 Error:  Failed to execute goal on project maze: Could not resolve dependencies for project nl.uu:maze:jar:1.0
@@ -239,17 +239,17 @@ If you have Z3 installed, but the build still fails, check that the version numb
 
 ### Test Generation
 
-Some Java language constructs are not supported by Maze, including:
+Some Java language constructs are not supported by MAZE, including:
 
 - Dynamic invoke (`invokedynamic`), which is used for lambda expressions and method references.
 - Static fields and static initializers.
 - Enums (which are basically static fields).
 
-If running Maze on a class takes too long, consider reducing the maximum depth of the search with the `--max-depth` option or setting a time budget with the `--time-budget` option.
+If running MAZE on a class takes too long, consider reducing the maximum depth of the search with the `--max-depth` option or setting a time budget with the `--time-budget` option.
 
 ## Dependencies
 
-Maze relies on the following libraries and frameworks to function effectively:
+MAZE relies on the following libraries and frameworks to function effectively:
 
 - [SootUp](https://soot-oss.github.io/SootUp/latest/) for Java bytecode analysis and transformation.
 - [Z3 Theorem Prover](https://github.com/Z3Prover/z3) for constraint solving.

@@ -18,7 +18,7 @@ import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
 /**
- * Main class for the Maze application that provides a command-line interface
+ * Main class for the MAZE application that provides a command-line interface
  * (CLI) for generating tests using dynamic symbolic execution (DSE).
  */
 @Command(name = "maze", mixinStandardHelpOptions = true, version = "maze 1.0", descriptionHeading = "%nDescription:%n", description = "Generate tests for the specified Java class using dynamic symbolic execution (DSE).", optionListHeading = "%nOptions:%n", sortOptions = false)
