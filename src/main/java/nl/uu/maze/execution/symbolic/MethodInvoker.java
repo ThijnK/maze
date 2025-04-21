@@ -186,14 +186,14 @@ public class MethodInvoker {
             if (!isCtor && base != null) {
                 try {
                     Class<?> clazz = analyzer.getJavaClass(heapObj.getType());
-                    if (Modifier.isAbstract(((Method) executable).getModifiers())) {
-                        executable = clazz.getDeclaredMethod(methodSig.getName(),
-                                ((Method) executable).getParameterTypes());
-                    }
                     instance = argMap.toJava(base.getName(), clazz);
                     if (instance == null) {
                         throw new UnsupportedOperationException(
                                 "Failed to create instance for base: " + base.getName());
+                    }
+                    if (Modifier.isAbstract(((Method) executable).getModifiers())) {
+                        executable = clazz.getDeclaredMethod(methodSig.getName(),
+                                ((Method) executable).getParameterTypes());
                     }
                     original = ObjectUtils.shallowCopy(instance, instance.getClass());
                     addConcretizationConstraints(state, heapObj, instance, symRef);

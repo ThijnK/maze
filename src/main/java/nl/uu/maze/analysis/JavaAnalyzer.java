@@ -310,23 +310,24 @@ public class JavaAnalyzer {
      * @return A concrete implementation class or null if no default is defined
      */
     public static Class<?> getDefaultImplementation(Class<?> interfaceClass) {
-        if (java.util.List.class.isAssignableFrom(interfaceClass)) {
-            return java.util.ArrayList.class;
-        } else if (java.util.Set.class.isAssignableFrom(interfaceClass)) {
-            return java.util.HashSet.class;
-        } else if (java.util.Map.class.isAssignableFrom(interfaceClass)) {
-            return java.util.HashMap.class;
-        } else if (java.util.Queue.class.isAssignableFrom(interfaceClass)) {
-            return java.util.LinkedList.class;
-        } else if (java.util.Deque.class.isAssignableFrom(interfaceClass)) {
-            return java.util.ArrayDeque.class;
-        } else if (java.util.Collection.class.isAssignableFrom(interfaceClass)) {
-            return java.util.ArrayList.class;
-        } else if (java.lang.Iterable.class.isAssignableFrom(interfaceClass)) {
-            return java.util.ArrayList.class;
-        } else if (java.util.concurrent.Executor.class.isAssignableFrom(interfaceClass)) {
-            return java.util.concurrent.Executors.class.equals(interfaceClass) ? java.util.concurrent.Executors.class
-                    : java.util.concurrent.ThreadPoolExecutor.class;
+        if (List.class.isAssignableFrom(interfaceClass)) {
+            return ArrayList.class;
+        } else if (Set.class.isAssignableFrom(interfaceClass)) {
+            return HashSet.class;
+        } else if (Map.class.isAssignableFrom(interfaceClass)) {
+            return HashMap.class;
+        } else if (Queue.class.isAssignableFrom(interfaceClass)) {
+            return LinkedList.class;
+        } else if (Deque.class.isAssignableFrom(interfaceClass)) {
+            return ArrayDeque.class;
+        } else if (Collection.class.isAssignableFrom(interfaceClass)) {
+            return ArrayList.class;
+        } else if (Iterable.class.isAssignableFrom(interfaceClass)) {
+            return ArrayList.class;
+        } else if (Iterator.class.isAssignableFrom(interfaceClass)) {
+            return ArrayList.class.getDeclaredClasses()[0]; // ArrayList$Itr
+        } else if (Enumeration.class.isAssignableFrom(interfaceClass)) {
+            return Vector.class;
         }
         return null;
     }
