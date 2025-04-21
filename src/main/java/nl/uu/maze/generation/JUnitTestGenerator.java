@@ -433,6 +433,13 @@ public class JUnitTestGenerator {
      * constructor arguments.
      */
     private void buildObjectInstance(MethodSpec.Builder methodBuilder, String var, Class<?> clazz) {
+        // If the class is an enum, use the valueOf method to create an instance
+        if (clazz.isEnum()) {
+            methodBuilder.addStatement("$T $L = $T.valueOf($L)", clazz, var, clazz,
+                    JavaLiteralFormatter.valueToString(clazz.getEnumConstants()[0].toString()));
+            return;
+        }
+
         Pair<Constructor<?>, Object[]> pair = analyzer.getJavaConstructor(clazz);
         if (pair == null) {
             throw new IllegalArgumentException("No constructor found for class " + clazz.getName());
