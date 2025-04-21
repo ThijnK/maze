@@ -13,107 +13,129 @@ import sootup.core.jimple.basic.Value;
 import sootup.core.jimple.common.expr.*;
 import sootup.core.jimple.common.ref.JArrayRef;
 import sootup.core.jimple.common.ref.JInstanceFieldRef;
+import sootup.core.jimple.common.stmt.*;
+import sootup.core.jimple.visitor.AbstractStmtVisitor;
 import sootup.core.jimple.visitor.AbstractValueVisitor;
 
 /**
- * Extracts unresolved symbolic references from a Jimple value ({@link Value}).
+ * Extracts unresolved symbolic references from a Jimple statement
+ * ({@link Stmt}).
  */
-public class SymbolicRefExtractor extends AbstractValueVisitor<Set<Expr<?>>> {
+public class SymbolicRefExtractor {
     private SymbolicState state;
     private Set<Expr<?>> result;
 
     /**
-     * Extracts symbolic references from a Jimple value.
+     * Extracts symbolic references from a Jimple statement.
      * 
-     * @param value the Jimple value to extract symbolic references from
+     * @param stmt  the Jimple statement to extract symbolic references from
      * @param state the symbolic state to use
      * @return a set of symbolic references which have not been resolved yet and
      *         have multiple aliases defined
      */
-    public Set<Expr<?>> extract(Value value, SymbolicState state) {
+    public Set<Expr<?>> extract(Stmt stmt, SymbolicState state) {
         this.state = state;
         result = new HashSet<>();
-        value.accept(this);
+        stmt.accept(stmtVisitor);
         return result;
     }
 
-    private void extract(Value value) {
-        extract(value, state);
-    }
-
-    private void extract(String name) {
+    private void extractVar(String name) {
         Expr<?> var = state.lookup(name);
         if (!state.heap.isResolved(var) && state.heap.isAliased(var)) {
             result.add(var);
         }
     }
 
-    private void extractMultiple(Value... values) {
-        for (Value value : values) {
-            extract(value);
+    private final AbstractStmtVisitor<Void> stmtVisitor = new AbstractStmtVisitor<Void>() {
+        public void caseIfStmt(@Nonnull JIfStmt stmt) {
+            stmt.getCondition().accept(valueVisitor);
+        };
+
+        public void caseAssignStmt(@Nonnull JAssignStmt stmt) {
+            stmt.getLeftOp().accept(valueVisitor);
+            stmt.getRightOp().accept(valueVisitor);
+        };
+
+        public void caseInvokeStmt(@Nonnull JInvokeStmt stmt) {
+            stmt.getInvokeExpr().accept(valueVisitor);
         }
-    }
 
-    @Override
-    public void caseEqExpr(@Nonnull JEqExpr expr) {
-        extractMultiple(expr.getOp1(), expr.getOp2());
-    }
+        public void caseReturnStmt(@Nonnull JReturnStmt stmt) {
+            if (stmt.getOp() != null) {
+                stmt.getOp().accept(valueVisitor);
+            }
+        };
+    };
 
-    @Override
-    public void caseNeExpr(@Nonnull JNeExpr expr) {
-        extractMultiple(expr.getOp1(), expr.getOp2());
-    }
+    private final AbstractValueVisitor<Void> valueVisitor = new AbstractValueVisitor<Void>() {
+        private void extractMultiple(Value... values) {
+            for (Value value : values) {
+                value.accept(this);
+            }
+        }
 
-    @Override
-    public void caseLocal(@Nonnull Local local) {
-        extract(local.getName());
-    }
+        @Override
+        public void caseEqExpr(@Nonnull JEqExpr expr) {
+            extractMultiple(expr.getOp1(), expr.getOp2());
+        }
 
-    @Override
-    public void caseCastExpr(@Nonnull JCastExpr expr) {
-        extract(expr.getOp().toString());
-    }
+        @Override
+        public void caseNeExpr(@Nonnull JNeExpr expr) {
+            extractMultiple(expr.getOp1(), expr.getOp2());
+        }
 
-    @Override
-    public void caseInstanceFieldRef(@Nonnull JInstanceFieldRef ref) {
-        extract(ref.getBase().getName());
-    }
+        @Override
+        public void caseLocal(@Nonnull Local local) {
+            extractVar(local.getName());
+        }
 
-    @Override
-    public void caseLengthExpr(@Nonnull JLengthExpr expr) {
-        extract(expr.getOp().toString());
-    }
+        @Override
+        public void caseCastExpr(@Nonnull JCastExpr expr) {
+            extractVar(expr.getOp().toString());
+        }
 
-    @Override
-    public void caseArrayRef(@Nonnull JArrayRef ref) {
-        extract(ref.getBase().getName());
-    }
+        @Override
+        public void caseInstanceFieldRef(@Nonnull JInstanceFieldRef ref) {
+            extractVar(ref.getBase().getName());
+        }
 
-    @Override
-    public void caseInstanceOfExpr(@Nonnull JInstanceOfExpr expr) {
-        extract(expr.getOp().toString());
-    }
+        @Override
+        public void caseLengthExpr(@Nonnull JLengthExpr expr) {
+            extractVar(expr.getOp().toString());
+        }
 
-    @Override
-    public void caseInterfaceInvokeExpr(@Nonnull JInterfaceInvokeExpr expr) {
-        extract(expr.getBase());
-        extractMultiple(expr.getArgs().toArray(Immediate[]::new));
-    }
+        @Override
+        public void caseArrayRef(@Nonnull JArrayRef ref) {
+            extractVar(ref.getBase().getName());
+        }
 
-    @Override
-    public void caseSpecialInvokeExpr(@Nonnull JSpecialInvokeExpr expr) {
-        extract(expr.getBase());
-        extractMultiple(expr.getArgs().toArray(Immediate[]::new));
-    }
+        @Override
+        public void caseInstanceOfExpr(@Nonnull JInstanceOfExpr expr) {
+            extractVar(expr.getOp().toString());
+        }
 
-    @Override
-    public void caseVirtualInvokeExpr(@Nonnull JVirtualInvokeExpr expr) {
-        extract(expr.getBase());
-        extractMultiple(expr.getArgs().toArray(Immediate[]::new));
-    }
+        @Override
+        public void caseInterfaceInvokeExpr(@Nonnull JInterfaceInvokeExpr expr) {
+            expr.getBase().accept(this);
+            extractMultiple(expr.getArgs().toArray(Immediate[]::new));
+        }
 
-    @Override
-    public void caseStaticInvokeExpr(@Nonnull JStaticInvokeExpr expr) {
-        extractMultiple(expr.getArgs().toArray(Immediate[]::new));
-    }
+        @Override
+        public void caseSpecialInvokeExpr(@Nonnull JSpecialInvokeExpr expr) {
+            expr.getBase().accept(this);
+            extractMultiple(expr.getArgs().toArray(Immediate[]::new));
+        }
+
+        @Override
+        public void caseVirtualInvokeExpr(@Nonnull JVirtualInvokeExpr expr) {
+            expr.getBase().accept(this);
+            extractMultiple(expr.getArgs().toArray(Immediate[]::new));
+        }
+
+        @Override
+        public void caseStaticInvokeExpr(@Nonnull JStaticInvokeExpr expr) {
+            extractMultiple(expr.getArgs().toArray(Immediate[]::new));
+        }
+    };
 }

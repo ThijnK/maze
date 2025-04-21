@@ -227,9 +227,14 @@ public class DSEController {
      * Generate a test case for the given method and symbolic state.
      */
     private void generateTestCase(JavaSootMethod method, SymbolicState state) {
-        Optional<ArgMap> argMap = validator.evaluate(state);
-        if (argMap.isPresent()) {
-            generator.addMethodTestCase(method, ctorSoot, argMap.get());
+        try {
+            Optional<ArgMap> argMap = validator.evaluate(state);
+            if (argMap.isPresent()) {
+                generator.addMethodTestCase(method, ctorSoot, argMap.get());
+            }
+        } catch (Exception e) {
+            logger.error("Error generating test case for method {}: {}", method.getName(), e.getMessage());
+            logger.debug("Error stack trace: ", e);
         }
     }
 

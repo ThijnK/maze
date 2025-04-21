@@ -2,7 +2,6 @@ package nl.uu.maze.execution.symbolic;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import java.util.Optional;
 import java.util.Set;
 
@@ -14,17 +13,12 @@ import com.microsoft.z3.*;
 import nl.uu.maze.analysis.JavaAnalyzer;
 import nl.uu.maze.execution.ArgMap;
 import nl.uu.maze.execution.concrete.ConcreteExecutor;
-import nl.uu.maze.execution.symbolic.HeapObjects.ArrayObject;
-import nl.uu.maze.execution.symbolic.HeapObjects.HeapObject;
 import nl.uu.maze.execution.symbolic.PathConstraint.*;
 import nl.uu.maze.instrument.TraceManager;
 import nl.uu.maze.instrument.TraceManager.TraceEntry;
 import nl.uu.maze.transform.JimpleToZ3Transformer;
 import nl.uu.maze.util.*;
-import sootup.core.jimple.basic.Immediate;
-import sootup.core.jimple.basic.LValue;
-import sootup.core.jimple.basic.Local;
-import sootup.core.jimple.basic.Value;
+import sootup.core.jimple.basic.*;
 import sootup.core.jimple.common.constant.IntConstant;
 import sootup.core.jimple.common.expr.AbstractInvokeExpr;
 import sootup.core.jimple.common.ref.*;
@@ -41,7 +35,6 @@ public class SymbolicExecutor {
 
     private final MethodInvoker methodInvoker;
     private final JimpleToZ3Transformer jimpleToZ3 = new JimpleToZ3Transformer();
-    private final SymbolicRefExtractor refExtractor = new SymbolicRefExtractor();
     private final boolean trackCoverage;
     private final boolean trackBranchHistory;
 
@@ -62,6 +55,16 @@ public class SymbolicExecutor {
      */
     public List<SymbolicState> step(SymbolicState state, boolean replay) {
         Stmt stmt = state.getStmt();
+
+        // Check if there's unresolved symbolic references being dereferenced in the
+        // statement (meaning we need to split the state, one state for each potential
+        // alias)
+        // This isn't needed for all statements, the SymbolicAliasResolver
+        // determines whether a split will happen
+        List<SymbolicState> splitStates = SymbolicAliasResolver.splitOnAliases(state, stmt, replay);
+        if (!splitStates.isEmpty()) {
+            return splitStates;
+        }
 
         try {
             switch (stmt) {
@@ -108,14 +111,6 @@ public class SymbolicExecutor {
      * @return A list of successor symbolic states after executing the if statement
      */
     private List<SymbolicState> handleIfStmt(JIfStmt stmt, SymbolicState state, boolean replay) {
-        // Split the state if the condition contains a symbolic reference with multiple
-        // aliases (i.e. reference comparisons)
-        Set<Expr<?>> unresolvedRefs = refExtractor.extract(stmt.getCondition(), state);
-        List<SymbolicState> splitStates = splitOnAliases(state, unresolvedRefs, replay);
-        if (!splitStates.isEmpty()) {
-            return splitStates;
-        }
-
         if (trackCoverage)
             state.recordCoverage();
 
@@ -240,20 +235,6 @@ public class SymbolicExecutor {
      *         statement
      */
     private List<SymbolicState> handleDefStmt(AbstractDefinitionStmt stmt, SymbolicState state, boolean replay) {
-        // If either the lhs or the rhs contains a symbolic reference (e.g., an object
-        // or array reference) with more than one potential alias, then we split the
-        // state into one state for each alias, and set the symbolic reference to the
-        // corresponding alias in each state
-        // But only for assignments, not for identity statements
-        if (stmt instanceof JAssignStmt) {
-            Set<Expr<?>> unresolvedRefs = refExtractor.extract(stmt.getLeftOp(), state);
-            unresolvedRefs.addAll(refExtractor.extract(stmt.getRightOp(), state));
-            List<SymbolicState> splitStates = splitOnAliases(state, unresolvedRefs, replay);
-            if (!splitStates.isEmpty()) {
-                return splitStates;
-            }
-        }
-
         LValue leftOp = stmt.getLeftOp();
         Value rightOp = stmt.getRightOp();
 
@@ -423,13 +404,6 @@ public class SymbolicExecutor {
      * @return A list of successor symbolic states after executing the invocation
      */
     private List<SymbolicState> handleInvokeStmt(AbstractInvokeExpr expr, SymbolicState state, boolean replay) {
-        // Resolve aliases
-        Set<Expr<?>> unresolvedRefs = refExtractor.extract(expr, state);
-        List<SymbolicState> splitStates = splitOnAliases(state, unresolvedRefs, replay);
-        if (!splitStates.isEmpty()) {
-            return splitStates;
-        }
-
         // Handle method invocation
         Optional<SymbolicState> callee = methodInvoker.executeMethod(state, expr, false, replay);
         // If executed concretely, immediately continue with the next statement
@@ -446,13 +420,6 @@ public class SymbolicExecutor {
      * @return A list of successor symbolic states after executing the return
      */
     private List<SymbolicState> handleReturnStmt(JReturnStmt stmt, SymbolicState state, boolean replay) {
-        // Resolve potential aliasing
-        Set<Expr<?>> unresolvedRefs = refExtractor.extract(stmt.getOp(), state);
-        List<SymbolicState> splitStates = splitOnAliases(state, unresolvedRefs, replay);
-        if (!splitStates.isEmpty()) {
-            return splitStates;
-        }
-
         Immediate op = stmt.getOp();
         // If the op is a local referring to (part of) a multidimensional array, we need
         // to know the arrayIndices entry for the return value
@@ -530,80 +497,5 @@ public class SymbolicExecutor {
     /** Check whether a statement represents that start of a catch block. */
     private boolean isCatchBlock(Stmt stmt) {
         return stmt instanceof JIdentityStmt && ((JIdentityStmt) stmt).getRightOp() instanceof JCaughtExceptionRef;
-    }
-
-    /**
-     * Split the current symbolic state into multiple states based if the given
-     * unresolved references have multiple aliases.
-     * If no splitting is needed, the original state is modified and an empty list
-     * is returned.
-     */
-    private List<SymbolicState> splitOnAliases(SymbolicState state, Set<Expr<?>> unresolvedRefs, boolean replay) {
-        List<SymbolicState> newStates = new ArrayList<>();
-        Expr<?>[] unresolvedRefsArr = unresolvedRefs.toArray(Expr<?>[]::new);
-        for (int i = 0; i < unresolvedRefsArr.length; i++) {
-            Expr<?> ref = unresolvedRefsArr[i];
-            if (ref == null || state.heap.isResolved(ref)) {
-                continue;
-            }
-
-            Set<Expr<?>> aliases = state.heap.getAliases(ref);
-            if (aliases == null) {
-                continue;
-            }
-            Expr<?>[] aliasArr = aliases.toArray(Expr<?>[]::new);
-
-            // When replaying a trace, we pick any non-null alias arbitrarily and ignore the
-            // others, so we only follow one path
-            // Note: for method arguments, aliasing is detected through instrumentation, so
-            // those are guaranteed to be correctly resolved
-            // Here, for non-argument aliasing, we use a heuristic and hope for the best
-            if (replay) {
-                // Find first non-null alias
-                int j = 0;
-                for (; j < aliasArr.length; j++) {
-                    if (!sorts.isNull(aliasArr[j])) {
-                        break;
-                    }
-                }
-                Expr<?> alias = aliasArr[j];
-                state.heap.setSingleAlias(ref, alias);
-
-                // If symRef here is a select expression on an array which is symbolic, we need
-                // to add as path constraint instead of engine constraint
-                Expr<?> elemsExpr = Z3Utils.findExpr(ref, (e) -> e.getSort() instanceof ArraySort);
-                if (elemsExpr != null) {
-                    String arrRef = elemsExpr.toString().substring(0, elemsExpr.toString().indexOf("_"));
-                    HeapObject heapObj = state.heap.get(arrRef);
-                    if (heapObj instanceof ArrayObject arrObj && arrObj.isSymbolic) {
-                        state.addPathConstraint(ctx.mkEq(ref, alias));
-                        continue;
-                    }
-                }
-
-                state.addEngineConstraint(ctx.mkEq(ref, alias));
-                continue;
-            }
-
-            for (int j = 0; j < aliasArr.length; j++) {
-                // Reuse state only for the very last possible state that we need
-                SymbolicState newState = (j == aliasArr.length - 1 && i == unresolvedRefsArr.length - 1) ? state
-                        : state.clone();
-                newState.heap.setSingleAlias(ref, aliasArr[j]);
-                AliasConstraint constraint = new AliasConstraint(state, ref, aliasArr, j);
-                // For parameters, we add alias constraints to the path constraints, so they can
-                // be used in the search space for concrete-driven DSE
-                // For non-parameters, we add them to the engine constraints, so they are not
-                // considered in the search space
-                if (state.getParamType(ref.toString()) != null) {
-                    newState.addPathConstraint(constraint);
-                } else {
-                    newState.addEngineConstraint(constraint);
-                }
-                newStates.add(newState);
-            }
-        }
-
-        return newStates.size() > 1 ? newStates : List.of();
     }
 }
