@@ -47,6 +47,7 @@ public class DSEController {
     private final int maxDepth;
     private final boolean concreteDriven;
     private final Path outPath;
+    private final String methodName;
     private final SearchStrategy<?> searchStrategy;
     /** Search strategy used for symbolic replay of a trace (DFS). */
     private final SymbolicSearchStrategy replayStrategy;
@@ -85,12 +86,14 @@ public class DSEController {
      * @param concreteDriven Whether to use concrete-driven DSE (otherwise symbolic)
      * @param searchStrategy The search strategy to use
      * @param outPath        The output path for the generated test cases
+     * @param methodName     The name of the method to generate tests for (or "all"
+     *                       for all methods)
      * @param maxDepth       The maximum depth for symbolic execution
      * @param testTimeout    The timeout to apply to generated test cases in ms
      * @param packageName    The package name for the generated test files
      */
     public DSEController(String classPath, boolean concreteDriven, SearchStrategy<?> searchStrategy,
-            String outPath, int maxDepth, long testTimeout, String packageName, boolean targetJUnit4)
+            String outPath, String methodName, int maxDepth, long testTimeout, String packageName, boolean targetJUnit4)
             throws Exception {
         instrumenter = new BytecodeInstrumenter(classPath);
         if (concreteDriven) {
@@ -104,6 +107,7 @@ public class DSEController {
             this.classLoader = new URLClassLoader(urls);
         }
         this.outPath = Path.of(outPath);
+        this.methodName = methodName;
         this.maxDepth = maxDepth;
         this.concreteDriven = concreteDriven;
         this.searchStrategy = searchStrategy;
@@ -164,10 +168,18 @@ public class DSEController {
         Set<JavaSootMethod> methods = sootClass.getMethods();
         // Regex pattern to match non-standard method names (e.g., <init>, <clinit>)
         Pattern pattern = Pattern.compile("<[^>]+>");
-        JavaSootMethod[] muts = methods.stream().filter(m -> !pattern.matcher(m.getName()).matches())
+        // Filter out non-standard methods and methods that do not match the
+        // specified method name (unless method name is "all")
+        JavaSootMethod[] muts = methods.stream()
+                .filter(m -> !pattern.matcher(m.getName()).matches()
+                        && (methodName.equals("all") || m.getName().equals(methodName)))
                 .toArray(JavaSootMethod[]::new);
         if (muts.length == 0) {
-            logger.info("No public testable methods found in class: {}", clazz.getName());
+            if (!methodName.equals("all")) {
+                logger.info("No public testable methods found with name: {}", methodName);
+            } else {
+                logger.info("No public testable methods found in class: {}", clazz.getName());
+            }
             return;
         }
 

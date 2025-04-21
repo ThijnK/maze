@@ -37,6 +37,10 @@ public class MazeCLI implements Callable<Integer> {
             "--output-path" }, description = "Output path to write generated test files to", required = true, paramLabel = "<path>")
     private String outPath;
 
+    @Option(names = { "-m",
+            "--method-name" }, description = "Name of the method to generate tests for (default: ${DEFAULT-VALUE})", defaultValue = "all", paramLabel = "<name>")
+    private String methodName;
+
     @Option(names = { "-p",
             "--package-name" }, description = "Package name to use for generated test files (default: ${DEFAULT-VALUE})", defaultValue = "no package", paramLabel = "<name>", converter = PackageNameConverter.class)
     private String packageName;
@@ -94,6 +98,7 @@ public class MazeCLI implements Callable<Integer> {
                     searchHeuristics, heuristicWeights, timeBudget);
 
             DSEController controller = new DSEController(classPath, concreteDriven, strategy, outPath,
+                    methodName,
                     maxDepth, testTimeout, packageName, junitVersion.isJUnit4());
             controller.run(className, timeBudget);
             return 0;
