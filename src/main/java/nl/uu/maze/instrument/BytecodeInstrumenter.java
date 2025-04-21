@@ -29,9 +29,9 @@ import java.util.jar.JarFile;
 public class BytecodeInstrumenter {
     private static final Logger logger = LoggerFactory.getLogger(BytecodeInstrumenter.class);
 
-    private String[] classPaths;
-    private BytecodeClassLoader classLoader = new BytecodeClassLoader();
-    private Set<String> processedClasses = new HashSet<>();
+    private final String[] classPaths;
+    private final BytecodeClassLoader classLoader = new BytecodeClassLoader();
+    private final Set<String> processedClasses = new HashSet<>();
 
     /**
      * Constructor for the BytecodeInstrumenter.
@@ -152,12 +152,12 @@ public class BytecodeInstrumenter {
                                 classFiles.add(new ClassFileEntry(name, packageName + '.' + name,
                                         resourcePath + '/' + name, classBytes));
                             } catch (IOException e) {
-                                logger.error("Error reading class from JAR: " + entryName, e);
+                                logger.error("Error reading class from JAR: {}", entryName, e);
                             }
                         }
                     }
                 } catch (IOException e) {
-                    logger.error("Error opening JAR file: " + path, e);
+                    logger.error("Error opening JAR file: {}", path, e);
                 }
             }
             // Handle directories (existing code)
@@ -178,7 +178,7 @@ public class BytecodeInstrumenter {
                                             resourcePath + '/' + name, classBytes));
                                     // Found class file
                                 } catch (IOException e) {
-                                    logger.error("Error reading class file: " + f.getAbsolutePath(), e);
+                                    logger.error("Error reading class file: {}", f.getAbsolutePath(), e);
                                 }
                             }
                         }
@@ -206,6 +206,6 @@ public class BytecodeInstrumenter {
     /**
      * Helper class to store class names and bytecode together.
      */
-    private static record ClassFileEntry(String simpleName, String fullName, String resourcePath, byte[] bytes) {
+    private record ClassFileEntry(String simpleName, String fullName, String resourcePath, byte[] bytes) {
     }
 }

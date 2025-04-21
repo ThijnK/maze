@@ -205,19 +205,15 @@ public class Z3Sorts {
      */
     public Type determineType(Sort sort) {
         if (sort instanceof BitVecSort bvSort) {
-            switch (bvSort.getSize()) {
-                case 64:
-                    return PrimitiveType.getLong();
-                default:
-                    return PrimitiveType.getInt();
+            if (bvSort.getSize() == 64) {
+                return PrimitiveType.getLong();
             }
+            return PrimitiveType.getInt();
         } else if (sort instanceof FPSort fpSort) {
-            switch (fpSort.getSBits()) {
-                case 64:
-                    return PrimitiveType.getDouble();
-                default:
-                    return PrimitiveType.getFloat();
+            if (fpSort.getSBits() == 64) {
+                return PrimitiveType.getDouble();
             }
+            return PrimitiveType.getFloat();
         } else if (sort.equals(refSort)) {
             return new JavaClassType(Object.class.getName(), new PackageName(Object.class.getPackageName()));
         } else if (sort.equals(voidSort)) {

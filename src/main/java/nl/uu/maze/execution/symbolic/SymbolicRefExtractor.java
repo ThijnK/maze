@@ -50,12 +50,12 @@ public class SymbolicRefExtractor {
     private final AbstractStmtVisitor<Void> stmtVisitor = new AbstractStmtVisitor<Void>() {
         public void caseIfStmt(@Nonnull JIfStmt stmt) {
             stmt.getCondition().accept(valueVisitor);
-        };
+        }
 
         public void caseAssignStmt(@Nonnull JAssignStmt stmt) {
             stmt.getLeftOp().accept(valueVisitor);
             stmt.getRightOp().accept(valueVisitor);
-        };
+        }
 
         public void caseInvokeStmt(@Nonnull JInvokeStmt stmt) {
             stmt.getInvokeExpr().accept(valueVisitor);
@@ -65,7 +65,7 @@ public class SymbolicRefExtractor {
             if (stmt.getOp() != null) {
                 stmt.getOp().accept(valueVisitor);
             }
-        };
+        }
     };
 
     private final AbstractValueVisitor<Void> valueVisitor = new AbstractValueVisitor<Void>() {

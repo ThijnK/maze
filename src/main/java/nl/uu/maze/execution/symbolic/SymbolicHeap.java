@@ -689,7 +689,7 @@ public class SymbolicHeap {
         // Check if we need to box the value (primitive value into Object[])
         // This is necessary because we cannot store, say, a BitVecNum inside a Z3 array
         // whose range sort is defined as the reference sort
-        if (!sorts.isRef(value) && ((ArrayType) arrObj.getType()).getBaseType() instanceof ClassType ct) {
+        if (!sorts.isRef(value) && arrObj.getType().getBaseType() instanceof ClassType ct) {
             Expr<?> valueSymRef = newSymRef();
             Expr<?> valueConRef = newConRef();
             HeapObject obj = new HeapObject(ct);

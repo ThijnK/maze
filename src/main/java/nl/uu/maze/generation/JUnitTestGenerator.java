@@ -100,22 +100,6 @@ public class JUnitTestGenerator {
     }
 
     /**
-     * Generates JUnit test cases for the method under test, passing the given
-     * parameter values as arguments to the method invocations. One test case is
-     * generated for each set of known parameter values.
-     * 
-     * @param method  The {@link JavaSootMethod} to generate test cases for
-     * @param argMaps List of {@link ArgMap} containing the arguments to pass to the
-     *                method invocations
-     */
-    public void addMethodTestCases(JavaSootMethod method, JavaSootMethod ctor, List<ArgMap> argMaps) {
-        logger.info("Generating JUnit test cases...");
-        for (ArgMap argMap : argMaps) {
-            addMethodTestCase(method, ctor, argMap);
-        }
-    }
-
-    /**
      * Generates a single JUnit test case for a method under test, passing the given
      * parameter values as arguments to the method invocation.
      * 
@@ -374,7 +358,7 @@ public class JUnitTestGenerator {
                 if (elem instanceof ObjectRef ref && !builtObjects.contains(ref.getVar())) {
                     String refVar = buildFromReference(methodBuilder, argMap, builtObjects, ref, elemType);
                     builtObjects.add(ref.getVar());
-                    if (ref.getVar() != refVar && !builtObjects.add(ref.getVar())) {
+                    if (!ref.getVar().equals(refVar) && !builtObjects.add(ref.getVar())) {
                         // If referenced value is a primitive, still need to define it
                         addStatementTriple(methodBuilder, elemType, ref.getVar(), refVar);
                     }
@@ -557,7 +541,7 @@ public class JUnitTestGenerator {
             javaFile.writeToPath(path);
             String currentDir = System.getProperty("user.dir");
             logger.info("JUnit test cases written to {}/{}{}{}/{}.java", currentDir, path,
-                    testPackageName.length() > 0 ? "/" : "", testPackageName.replace(".", "/"), testClassName);
+                    !testPackageName.isEmpty() ? "/" : "", testPackageName.replace(".", "/"), testClassName);
         } catch (Exception e) {
             logger.error("Failed to generate JUnit test cases: {}", e.getMessage());
         }

@@ -225,23 +225,6 @@ public class SymbolicStateValidator {
     }
 
     /**
-     * Validates and evaluates the given list of symbolic states.
-     * 
-     * @param states The symbolic states to validate and evaluate
-     * @return A list of maps of values extracted from the model if the path
-     *         condition is
-     *         satisfiable
-     */
-    public List<ArgMap> evaluate(List<SymbolicState> states) {
-        List<ArgMap> result = new ArrayList<>();
-        for (SymbolicState state : states) {
-            Optional<ArgMap> params = evaluate(state);
-            params.ifPresent(result::add);
-        }
-        return result;
-    }
-
-    /**
      * Evaluates the given expression with the given type.
      * 
      * @param expr The expression to evaluate

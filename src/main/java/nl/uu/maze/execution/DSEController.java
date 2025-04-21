@@ -42,7 +42,6 @@ import sootup.java.core.types.JavaClassType;
 public class DSEController {
     private static final Logger logger = LoggerFactory.getLogger(DSEController.class);
 
-    private final ClassLoader classLoader;
     /** Max path length for symbolic execution */
     private final int maxDepth;
     private final boolean concreteDriven;
@@ -96,15 +95,16 @@ public class DSEController {
             String outPath, String methodName, int maxDepth, long testTimeout, String packageName, boolean targetJUnit4)
             throws Exception {
         instrumenter = new BytecodeInstrumenter(classPath);
+        ClassLoader classLoader;
         if (concreteDriven) {
-            this.classLoader = instrumenter.getClassLoader();
+            classLoader = instrumenter.getClassLoader();
         } else {
             String[] paths = classPath.split(File.pathSeparator);
             URL[] urls = new URL[paths.length];
             for (int i = 0; i < paths.length; i++) {
                 urls[i] = Paths.get(paths[i]).toUri().toURL();
             }
-            this.classLoader = new URLClassLoader(urls);
+            classLoader = new URLClassLoader(urls);
         }
         this.outPath = Path.of(outPath);
         this.methodName = methodName;
@@ -215,7 +215,6 @@ public class DSEController {
                 logger.error("Error processing method {}: {}", method.getName(), e.getMessage());
                 logger.debug("Error stack trace: ", e);
                 // Continue with the next method even if an error occurs
-                continue;
             } finally {
                 searchStrategy.reset();
                 replayStrategy.reset();
@@ -229,9 +228,7 @@ public class DSEController {
     private void generateTestCase(JavaSootMethod method, SymbolicState state) {
         try {
             Optional<ArgMap> argMap = validator.evaluate(state);
-            if (argMap.isPresent()) {
-                generator.addMethodTestCase(method, ctorSoot, argMap.get());
-            }
+            argMap.ifPresent(map -> generator.addMethodTestCase(method, ctorSoot, map));
         } catch (Exception e) {
             logger.error("Error generating test case for method {}: {}", method.getName(), e.getMessage());
             logger.debug("Error stack trace: ", e);
@@ -296,7 +293,7 @@ public class DSEController {
         while ((current = searchStrategy.next()) != null) {
             // Check if we are over the time budget
             if (System.currentTimeMillis() >= deadline) {
-                logger.info("Time budget exceeded, stopping execution");
+                logger.info("Time budget exceeded during symbolic-driven, stopping execution");
                 deadlineReached = true;
                 return concreteDriven ? Optional.of(current) : Optional.empty();
             }
@@ -370,7 +367,7 @@ public class DSEController {
         while (true) {
             // Check time budget
             if (System.currentTimeMillis() >= deadline) {
-                logger.info("Time budget exceeded, stopping execution");
+                logger.info("Time budget exceeded during concrete-driven, stopping execution");
                 deadlineReached = true;
                 break;
             }

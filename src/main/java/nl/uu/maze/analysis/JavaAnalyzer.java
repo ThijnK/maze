@@ -138,7 +138,7 @@ public class JavaAnalyzer {
     /**
      * Returns the Java method of a given SootUp method signature.
      * If you already have the class the method is defined in, use the
-     * {@link #getJavaMethod(JavaSootMethod, Class)} method instead.
+     * {@link #getJavaMethod(MethodSignature, Class)} method instead.
      * 
      * @param methodSig The method signature for which to return the Java
      *                  method
