@@ -185,7 +185,7 @@ public class DSEController {
 
         // If class includes non-static methods, need to execute constructor first
         if (!Arrays.stream(muts).allMatch(JavaSootMethod::isStatic)) {
-            ctor = analyzer.getJavaConstructor(instrumented != null ? instrumented : clazz).getFirst();
+            ctor = analyzer.getJavaConstructor(instrumented != null ? instrumented : clazz);
             if (ctor == null) {
                 throw new Exception("No constructor found for class: " + clazz.getName());
             }

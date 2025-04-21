@@ -31,6 +31,9 @@ public class JavaToZ3Transformer {
      * @return the corresponding Z3 expression
      */
     public Expr<?> transform(Object value, SymbolicState state) {
+        if (value == null) {
+            return sorts.getNullConst();
+        }
         return transform(value, state, sorts.determineType(value.getClass()));
     }
 

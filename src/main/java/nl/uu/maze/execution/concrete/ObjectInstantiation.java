@@ -9,6 +9,7 @@ import java.lang.reflect.Parameter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import nl.uu.maze.analysis.JavaAnalyzer;
 import nl.uu.maze.execution.ArgMap;
 import nl.uu.maze.execution.MethodType;
 
@@ -30,9 +31,20 @@ public class ObjectInstantiation {
      */
     public static ExecutionResult createInstance(Class<?> clazz) {
         if (clazz.isInterface()) {
-            return new ExecutionResult(null,
-                    new IllegalArgumentException("Cannot instantiate an interface: " + clazz.getName()),
-                    true);
+            // Try to find an implementation of the interface
+            // If the interface has a default implementation, use that
+            Class<?> implClass = JavaAnalyzer.getDefaultImplementation(clazz);
+            if (implClass != null) {
+                logger.debug("Using default implementation for interface {} to create an instance: {}", clazz.getName(),
+                        implClass.getName());
+                return createInstance(implClass);
+            } else {
+                logger.warn("Cannot create instance of an interface without default implementation: {}",
+                        clazz.getName());
+                return new ExecutionResult(null,
+                        new IllegalArgumentException("Cannot instantiate an interface: " + clazz.getName()),
+                        true);
+            }
         }
 
         // Try to create an instance using one of the constructors
@@ -108,7 +120,7 @@ public class ObjectInstantiation {
                 continue;
             }
 
-            // Generate random value for the parameter
+            // Get a default value for the parameter type
             arguments[i] = getDefault(params[i].getType());
 
             // Add new argument to argMap

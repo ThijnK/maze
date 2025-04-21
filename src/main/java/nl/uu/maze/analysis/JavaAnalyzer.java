@@ -9,9 +9,6 @@ import java.util.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import nl.uu.maze.execution.MethodType;
-import nl.uu.maze.execution.concrete.ObjectInstantiation;
-import nl.uu.maze.util.Pair;
 import sootup.core.graph.StmtGraph;
 import sootup.core.inputlocation.AnalysisInputLocation;
 import sootup.core.signatures.MethodSignature;
@@ -208,23 +205,30 @@ public class JavaAnalyzer {
      * @implNote This will fail if the class has a single constructor which requires
      *           an instance of an inner class as an argument.
      */
-    public Pair<Constructor<?>, Object[]> getJavaConstructor(Class<?> clazz) {
+    public Constructor<?> getJavaConstructor(Class<?> clazz) {
+        if (clazz.isInterface()) {
+            Class<?> implClass = getDefaultImplementation(clazz);
+            if (implClass != null) {
+                logger.debug("Using default implementation for interface {}: {}", clazz.getName(), implClass.getName());
+                return getJavaConstructor(implClass);
+            } else {
+                logger.warn("Cannot find constructor for an interface without default implementation: {}",
+                        clazz.getName());
+                return null;
+            }
+        }
+
         // Get all constructors of the class and sort them on number of parameters
         Constructor<?>[] ctors = clazz.getDeclaredConstructors();
         Arrays.sort(ctors, Comparator.comparingInt(Constructor::getParameterCount));
 
-        // Find a constructor for which arguments can be generated
-        for (Constructor<?> ctor : ctors) {
-            try {
-                Object[] args = ObjectInstantiation.generateArgs(ctor.getParameters(), MethodType.CTOR, null);
-                return Pair.of(ctor, args);
-            } catch (Exception e) {
-                logger.warn(e.getMessage());
-            }
+        // Return the constructor with the fewest parameters (which is likely to be the
+        // easiest one to use)
+        if (ctors.length == 0) {
+            logger.warn("No constructors found for class {}", clazz.getName());
+            return null;
         }
-
-        logger.warn("Failed to find suitable constructor for class {}", clazz.getName());
-        return null;
+        return ctors[0];
     }
 
     /**
@@ -297,5 +301,33 @@ public class JavaAnalyzer {
             logger.debug("CFG: {}", DotExporter.createUrlToWebeditor(cfg));
         }
         return cfg;
+    }
+
+    /**
+     * Returns a default implementation class for common Java interfaces.
+     * 
+     * @param interfaceClass The interface class
+     * @return A concrete implementation class or null if no default is defined
+     */
+    public static Class<?> getDefaultImplementation(Class<?> interfaceClass) {
+        if (java.util.List.class.isAssignableFrom(interfaceClass)) {
+            return java.util.ArrayList.class;
+        } else if (java.util.Set.class.isAssignableFrom(interfaceClass)) {
+            return java.util.HashSet.class;
+        } else if (java.util.Map.class.isAssignableFrom(interfaceClass)) {
+            return java.util.HashMap.class;
+        } else if (java.util.Queue.class.isAssignableFrom(interfaceClass)) {
+            return java.util.LinkedList.class;
+        } else if (java.util.Deque.class.isAssignableFrom(interfaceClass)) {
+            return java.util.ArrayDeque.class;
+        } else if (java.util.Collection.class.isAssignableFrom(interfaceClass)) {
+            return java.util.ArrayList.class;
+        } else if (java.lang.Iterable.class.isAssignableFrom(interfaceClass)) {
+            return java.util.ArrayList.class;
+        } else if (java.util.concurrent.Executor.class.isAssignableFrom(interfaceClass)) {
+            return java.util.concurrent.Executors.class.equals(interfaceClass) ? java.util.concurrent.Executors.class
+                    : java.util.concurrent.ThreadPoolExecutor.class;
+        }
+        return null;
     }
 }
