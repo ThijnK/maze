@@ -115,7 +115,7 @@ public class SymbolicStateValidator {
                 }
                 // If interpreted equal to another reference, set it to the same
                 // value
-                if (refValues.containsKey(expr)) {
+                else if (refValues.containsKey(expr)) {
                     ObjectRef ref = refValues.get(expr);
                     // If this var is a concrete ref, then the ObjectRef here is a symbolic ref, so
                     // we need to switch them
