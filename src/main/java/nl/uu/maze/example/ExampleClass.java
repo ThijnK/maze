@@ -5,15 +5,11 @@ package nl.uu.maze.example;
  */
 public class ExampleClass {
 
-    public static int exampleMethod(int[] arr) {
-        if (arr[0] == 77) {
-            return 1;
-        } else if (arr[1] == 88) {
-            return 2;
-        } else if (arr[2] == 99) {
-            return 3;
+    public static int exampleMethod(double x) {
+        if (x == Double.POSITIVE_INFINITY) {
+            return 0;
         } else {
-            return 4;
+            return 1;
         }
     }
 }
