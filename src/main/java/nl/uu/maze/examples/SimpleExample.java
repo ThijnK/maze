@@ -1,4 +1,4 @@
-package nl.uu.maze.example;
+package nl.uu.maze.examples;
 
 public class SimpleExample {
     public int foobar(int x, int y) {

@@ -130,6 +130,8 @@ The project is organized into the following main packages:
 - `nl.uu.maze.search`: Search strategies and heuristics
 - `nl.uu.maze.transform`: Transformers between Java, Z3, and Jimple (SootUp IR)
 - `nl.uu.maze.util`: Utility classes
+- `nl.uu.maze.examples`: Example classes for testing and demonstration purposes
+- `nl.uu.maze.benchmarks`: Benchmark classes for evaluating and comparing search strategies
 
 ## Architecture
 
