@@ -172,6 +172,7 @@ public class DSEController {
         // specified method name (unless method name is "all")
         JavaSootMethod[] muts = methods.stream()
                 .filter(m -> !pattern.matcher(m.getName()).matches()
+                        && m.isPublic()
                         && (methodName.equals("all") || m.getName().equals(methodName)))
                 .toArray(JavaSootMethod[]::new);
         if (muts.length == 0) {
