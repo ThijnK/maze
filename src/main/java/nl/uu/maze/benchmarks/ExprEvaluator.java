@@ -5,7 +5,11 @@ package nl.uu.maze.benchmarks;
  * using recursive descent parsing.
  * <p>
  * This class tests the search strategy's ability to handle complex branching
- * and exception-throwing paths.
+ * and exception-throwing paths. A challenge for search strategies is to cover
+ * as much of the private methods as possible, while being able to generate
+ * tests only for the entry method parse().
+ * A comprehensive, manual test suite for this expression evaluator is provided
+ * in nl.uu.tests.maze.ExprEvaluatorTest.
  */
 public class ExprEvaluator {
     private final char[] input;
@@ -19,7 +23,7 @@ public class ExprEvaluator {
     public int parse() {
         int value = parseExpression();
         if (pos < input.length) {
-            throw new IllegalArgumentException("Unexpected char at " + pos + ": " + input[pos]);
+            throw new IllegalArgumentException(String.format("Unexpected char at %d: %c", pos, input[pos]));
         }
         return value;
     }
@@ -28,6 +32,10 @@ public class ExprEvaluator {
     private int parseExpression() {
         int value = parseTerm();
         while (pos < input.length) {
+            skipWhitespace();
+            if (pos >= input.length) {
+                break;
+            }
             char op = input[pos];
             if (op == '+' || op == '-') {
                 pos++;
@@ -44,6 +52,10 @@ public class ExprEvaluator {
     private int parseTerm() {
         int value = parseFactor();
         while (pos < input.length) {
+            skipWhitespace();
+            if (pos >= input.length) {
+                break;
+            }
             char op = input[pos];
             if (op == '*' || op == '/') {
                 pos++;
@@ -63,7 +75,7 @@ public class ExprEvaluator {
             pos++;
             int value = parseExpression();
             if (pos >= input.length || input[pos] != ')') {
-                throw new IllegalArgumentException("Missing closing parenthesis at " + pos);
+                throw new IllegalArgumentException(String.format("Expected ')' at %d", pos));
             }
             pos++;
             return value;
@@ -78,7 +90,7 @@ public class ExprEvaluator {
             pos++;
         }
         if (start == pos) {
-            throw new IllegalArgumentException("Expected number at " + pos);
+            throw new IllegalArgumentException(String.format("Expected number at %d", pos));
         }
         return parseIntFromChars(start, pos);
     }
