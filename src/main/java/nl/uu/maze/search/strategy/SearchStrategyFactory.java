@@ -18,9 +18,6 @@ import nl.uu.maze.search.heuristic.UniformHeuristic;
 public class SearchStrategyFactory {
     private final static Logger logger = LoggerFactory.getLogger(SearchStrategyFactory.class);
 
-    private final static List<String> coverageOptimizedHeuristics = List.of("RecentCoverage", "DistanceToUncovered");
-    private final static List<Double> coverageOptimizedWeights = List.of(0.5, 0.5);
-
     /**
      * Creates a search strategy based on the given list of names and heuristics.
      * If multiple names are provided, they are used in interleaved search.
@@ -96,8 +93,15 @@ public class SearchStrategyFactory {
                     List.of(new UniformHeuristic(1.0)));
             // Special case for coverage-optimized search, which uses predefined heuristics
             case "CoverageOptimized", "CoverageOptimizedSearch", "COS" -> new ProbabilisticSearch<>(
-                    SearchHeuristicFactory.createHeuristics(coverageOptimizedHeuristics,
-                            coverageOptimizedWeights));
+                    SearchHeuristicFactory.createHeuristics(
+                            List.of("RecentCoverage", "DistanceToUncovered", "SmallestCallDepth"),
+                            List.of(0.35, 0.45, 0.2)));
+            // Special case for feasibility-optimized search, which uses predefined
+            // heuristics
+            case "FeasibilityOptimized", "FeasibilityOptimizedSearch", "FOS" -> new ProbabilisticSearch<>(
+                    SearchHeuristicFactory.createHeuristics(
+                            List.of("QueryCost", "WaitingTime", "DistanceToUncovered"),
+                            List.of(0.4, 0.3, 0.3)));
             default -> {
                 logger.warn("Unknown symbolic search strategy: {}, defaulting to DFS", name);
                 yield new DFS<>();
@@ -116,6 +120,7 @@ public class SearchStrategyFactory {
         SubpathGuided, SubpathGuidedSearch, SGS,
         UniformRandom, UniformRandomSearch, URS,
         CoverageOptimized, CoverageOptimizedSearch, COS,
+        FeasibilityOptimized, FeasibilityOptimizedSearch, FOS,
         RandomPath, RandomPathSearch, RPS
     }
 }
