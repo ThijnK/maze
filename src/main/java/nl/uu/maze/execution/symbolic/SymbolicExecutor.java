@@ -303,7 +303,7 @@ public class SymbolicExecutor {
             // (i.e., the method was already executed)
             if (state.getReturnValue() != null) {
                 value = state.getReturnValue();
-                state.setReturnValue(null);
+                state.clearReturnValue();
                 // If array indices required for the return value, set them
                 if (state.heap.getArrayIndices("return") != null) {
                     // TODO: does not support instance field ref
@@ -314,12 +314,13 @@ public class SymbolicExecutor {
             else {
                 Optional<SymbolicState> callee = methodInvoker.executeMethod(state, stmt.getInvokeExpr(), true, replay);
                 // If callee is not empty, the method will be executed symbolically by
-                // {@link DSEController}, so relinquish control here
+                // DSEController, so relinquish control here
                 if (callee.isPresent()) {
                     return List.of(callee.get());
                 }
                 // If executed concretely, the return value is stored in the state
                 value = state.getReturnValue();
+                state.clearReturnValue();
             }
         } else {
             value = jimpleToZ3.transform(rightOp, state, leftOp.toString());
