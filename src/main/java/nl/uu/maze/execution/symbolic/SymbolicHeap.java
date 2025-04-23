@@ -6,6 +6,7 @@ import java.util.Map.Entry;
 import com.microsoft.z3.*;
 
 import nl.uu.maze.execution.symbolic.HeapObjects.*;
+import nl.uu.maze.execution.symbolic.PathConstraint.AliasConstraint;
 import nl.uu.maze.util.Z3ContextProvider;
 import nl.uu.maze.util.Z3Sorts;
 import nl.uu.maze.util.Z3Utils;
@@ -689,17 +690,14 @@ public class SymbolicHeap {
         // Check if we need to box the value (primitive value into Object[])
         // This is necessary because we cannot store, say, a BitVecNum inside a Z3 array
         // whose range sort is defined as the reference sort
-        if (!sorts.isRef(value) && arrObj.getType().getBaseType() instanceof ClassType ct) {
+        if (!sorts.isRef(value) && arrObj.getType().getBaseType() instanceof ClassType) {
             Expr<?> valueSymRef = newSymRef();
             Expr<?> valueConRef = newConRef();
-            HeapObject obj = new HeapObject(ct);
+            BoxedPrimitiveObject obj = new BoxedPrimitiveObject(sorts.determineType(value.getSort()), value);
+            // Immediately resolve aliasing for the boxed object
             allocateHeapObject(valueSymRef, valueConRef, obj);
-            // In box classes like Integer, the "value" field is what contains the actual
-            // primitive value
-            // By setting that field here, we don't need additional special handling of this
-            // type of heap object, because methods from the Integer class executed on this
-            // heap object would correctly find the primitive value
-            obj.setField("value", value, sorts.determineType(value.getSort()));
+            state.addEngineConstraint(new AliasConstraint(state, valueSymRef, new Expr<?>[] { valueConRef }, 0));
+            resolvedRefs.add(valueSymRef);
             value = (Expr<E>) valueSymRef;
         }
 

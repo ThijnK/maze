@@ -27,7 +27,6 @@ import nl.uu.maze.util.Z3Sorts;
 import sootup.core.jimple.basic.Immediate;
 import sootup.core.jimple.basic.Local;
 import sootup.core.jimple.common.constant.Constant;
-import sootup.core.jimple.common.constant.StringConstant;
 import sootup.core.jimple.common.expr.*;
 import sootup.core.signatures.MethodSignature;
 import sootup.core.types.ClassType;
@@ -333,9 +332,13 @@ public class MethodInvoker {
             } else {
                 // Regular arrays
                 for (int i = 0; i < Array.getLength(object); i++) {
+                    // TODO: this conversion probably does not work for object arrays
                     Object arrElem = Array.get(object, i);
                     Expr<?> arrElemExpr = javaToZ3.transform(arrElem, state);
-                    state.addEngineConstraint(ctx.mkEq(arrObj.getElem(i), arrElemExpr));
+                    Expr<?> arrSelectExpr = arrObj.getElem(i);
+                    if (arrElemExpr.getSort().equals(arrSelectExpr.getSort())) {
+                        state.addEngineConstraint(ctx.mkEq(arrSelectExpr, arrElemExpr));
+                    }
                 }
             }
 
@@ -374,7 +377,10 @@ public class MethodInvoker {
         if (currrentDim == multiArrObj.getDim()) {
             // We have reached the end of the array, add the constraint
             Expr<?> arrElemExpr = javaToZ3.transform(object, state);
-            state.addEngineConstraint(ctx.mkEq(multiArrObj.getElem(indices), arrElemExpr));
+            Expr<?> arrSelectExpr = multiArrObj.getElem(indices);
+            if (arrElemExpr.getSort().equals(arrSelectExpr.getSort())) {
+                state.addEngineConstraint(ctx.mkEq(arrSelectExpr, arrElemExpr));
+            }
         } else {
             // Recursively traverse the array
             for (int i = 0; i < Array.getLength(object); i++) {

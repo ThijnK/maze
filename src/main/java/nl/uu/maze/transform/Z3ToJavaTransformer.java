@@ -186,7 +186,8 @@ public class Z3ToJavaTransformer {
         Object[] arr = new Object[length];
         for (int i = 0; i < length; i++) {
             // Select element at the index
-            Expr<?> element = model.eval(arrObj.getElem(i), true);
+            Expr<?> elemExpr = arrObj.getElem(i);
+            Expr<?> element = model.eval(elemExpr, true);
             // Check if the element is a reference to another object
             if (refValues.containsKey(element)) {
                 arr[i] = refValues.get(element);

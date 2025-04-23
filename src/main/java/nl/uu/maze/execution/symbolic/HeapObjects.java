@@ -14,9 +14,12 @@ import com.microsoft.z3.Sort;
 
 import nl.uu.maze.util.Z3ContextProvider;
 import nl.uu.maze.util.Z3Sorts;
+import sootup.core.signatures.PackageName;
 import sootup.core.types.ArrayType;
+import sootup.core.types.ClassType;
 import sootup.core.types.PrimitiveType;
 import sootup.core.types.Type;
+import sootup.java.core.types.JavaClassType;
 
 public class HeapObjects {
     public static final Z3Sorts sorts = Z3Sorts.getInstance();
@@ -166,7 +169,6 @@ public class HeapObjects {
         /**
          * Returns the length of the array at the given dimension.
          */
-        @SuppressWarnings("unchecked")
         public Expr<BitVecSort> getLength(int index) {
             BitVecExpr indexExpr = ctx.mkBV(index, sorts.getIntBitSize());
             return ctx.mkSelect((ArrayExpr<BitVecSort, BitVecSort>) getLength(), indexExpr);
@@ -216,10 +218,52 @@ public class HeapObjects {
             super.setElem(calcIndex(indices), value);
         }
 
-        @SuppressWarnings("unchecked")
         @Override
         public MultiArrayObject clone() {
             return new MultiArrayObject((ArrayType) type, getElems(), (ArrayExpr<BitVecSort, BitVecSort>) getLength());
+        }
+    }
+
+    public static class BoxedPrimitiveObject extends HeapObject {
+        public BoxedPrimitiveObject(Type type, Expr<?> value) {
+            super(wrappedType(type));
+            setField("value", value, type);
+        }
+
+        private static ClassType wrappedType(Type type) {
+            if (type instanceof ClassType ct) {
+                return ct;
+            }
+            Class<?> clazz = switch (type.toString()) {
+                case "int" -> Integer.class;
+                case "double" -> Double.class;
+                case "float" -> Float.class;
+                case "long" -> Long.class;
+                case "short" -> Short.class;
+                case "byte" -> Byte.class;
+                case "char" -> Character.class;
+                case "boolean" -> Boolean.class;
+                default -> throw new IllegalArgumentException("Unsupported primitive type: " + type.toString());
+            };
+
+            return new JavaClassType(clazz.getName(), new PackageName(clazz.getPackageName()));
+        }
+
+        public <E extends Sort> Expr<E> getValue() {
+            return (Expr<E>) getField("value").getValue();
+        }
+
+        public Type getValueType() {
+            return getField("value").getType();
+        }
+
+        public void setValue(Expr<?> value) {
+            setField("value", value, type);
+        }
+
+        @Override
+        public BoxedPrimitiveObject clone() {
+            return new BoxedPrimitiveObject(type, getValue());
         }
     }
 }

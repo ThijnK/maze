@@ -143,6 +143,13 @@ public class SymbolicStateValidator {
                 }
                 // Objects
                 else {
+                    // Convert boxed primitives back to primitive types
+                    if (heapObj instanceof BoxedPrimitiveObject boxedObj) {
+                        Object value = transformer.transformExpr(model.eval(boxedObj.getValue(), true),
+                                boxedObj.getValueType());
+                        argMap.set(varBase, value);
+                        continue;
+                    }
                     if (!var.contains("_")) {
                         continue;
                     }
@@ -250,7 +257,7 @@ public class SymbolicStateValidator {
         for (Entry<Expr<?>, HeapObject> entry : state.heap.entrySet()) {
             String var = entry.getKey().toString();
             HeapObject heapObj = entry.getValue();
-            if (heapObj instanceof ArrayObject) {
+            if (heapObj instanceof ArrayObject || heapObj instanceof BoxedPrimitiveObject) {
                 // Arrays will already be defined in the argument map
                 continue;
             }
