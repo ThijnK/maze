@@ -1,6 +1,7 @@
 package nl.uu.maze.execution.concrete;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
@@ -103,7 +104,11 @@ public class ConcreteExecutor {
             logger.debug("Retval: {}", result == null ? "null" : result.toString());
             return new ExecutionResult(result, null, false);
         } catch (Exception e) {
-            logger.warn("Execution of method {} threw an exception: {}", method.getName(), e.getMessage());
+            if (logger.isWarnEnabled()) {
+                String msg = e instanceof InvocationTargetException ? e.getCause().getMessage()
+                        : e.getMessage();
+                logger.warn("Execution of method {} threw an exception: {}", method.getName(), msg);
+            }
             return new ExecutionResult(null, e, false);
         }
     }

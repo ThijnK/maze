@@ -215,6 +215,10 @@ public class ArgMap {
      * @return A typed array
      */
     private Object castArray(Object value, Class<?> type) {
+        if (type.equals(Object.class)) {
+            return value;
+        }
+
         int length = Array.getLength(value);
         Object typedArray = Array.newInstance(type.getComponentType(), length);
 
