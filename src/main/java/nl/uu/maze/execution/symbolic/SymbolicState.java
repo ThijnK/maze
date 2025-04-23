@@ -292,6 +292,10 @@ public class SymbolicState implements SearchTarget {
         this.retval = retval;
     }
 
+    public void clearReturnValue() {
+        this.retval = null;
+    }
+
     public void setParamType(String var, Type type) {
         paramTypes.put(var, type);
     }
@@ -459,7 +463,7 @@ public class SymbolicState implements SearchTarget {
     @Override
     public String toString() {
         return "Store: " + store + ", Heap: " + heap + ", PC: " + pathConstraints + ", EC: "
-                + engineConstraints + ", Caller: " + (caller == null ? "0" : "1");
+                + engineConstraints + ", CD: " + getCallDepth() + ", Retval: " + retval;
     }
 
     @Override
