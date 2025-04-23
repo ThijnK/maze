@@ -225,7 +225,8 @@ public class SymbolicStateValidator {
     }
 
     /**
-     * Evaluates the given expression with the given type.
+     * Evaluates the given expression with the given type on the most recently
+     * created model.
      * 
      * @param expr The expression to evaluate
      * @param type The type of the expression
@@ -239,8 +240,10 @@ public class SymbolicStateValidator {
     }
 
     /**
-     * Fills object fields in the given symbolic state with their current
-     * values on the heap, if not already set in the argument map.
+     * Fills fields of objects in the current state's heap into the argMap, if not
+     * already set.
+     * This is necessary if an object field may not appear as a declaration in the
+     * model, but still needs to be evaluated to get a concrete value.
      */
     private void fillObjectFields(SymbolicState state, ArgMap argMap, Model model) {
         // Go through the heap and set fields of objects that are not in the model

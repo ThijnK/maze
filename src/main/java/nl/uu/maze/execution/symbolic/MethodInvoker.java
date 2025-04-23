@@ -19,12 +19,15 @@ import nl.uu.maze.execution.MethodType;
 import nl.uu.maze.execution.concrete.*;
 import nl.uu.maze.execution.symbolic.HeapObjects.*;
 import nl.uu.maze.transform.JavaToZ3Transformer;
+import nl.uu.maze.transform.JimpleToJavaTransformer;
 import nl.uu.maze.transform.JimpleToZ3Transformer;
 import nl.uu.maze.util.ObjectUtils;
 import nl.uu.maze.util.Z3ContextProvider;
 import nl.uu.maze.util.Z3Sorts;
 import sootup.core.jimple.basic.Immediate;
 import sootup.core.jimple.basic.Local;
+import sootup.core.jimple.common.constant.Constant;
+import sootup.core.jimple.common.constant.StringConstant;
 import sootup.core.jimple.common.expr.*;
 import sootup.core.signatures.MethodSignature;
 import sootup.core.types.ClassType;
@@ -46,6 +49,7 @@ public class MethodInvoker {
     private final JavaAnalyzer analyzer;
     private final JimpleToZ3Transformer jimpleToZ3 = new JimpleToZ3Transformer();
     private final JavaToZ3Transformer javaToZ3 = new JavaToZ3Transformer();
+    private final JimpleToJavaTransformer jimpleToJava = new JimpleToJavaTransformer();
 
     public MethodInvoker(ConcreteExecutor executor, SymbolicStateValidator validator, JavaAnalyzer analyzer) {
         this.executor = executor;
@@ -238,9 +242,26 @@ public class MethodInvoker {
     private void setMethodArguments(SymbolicState state, List<Immediate> args, boolean isCtor, ArgMap argMap) {
         for (int i = 0; i < args.size(); i++) {
             Immediate arg = args.get(i);
-            Expr<?> argExpr = jimpleToZ3.transform(arg, state);
             String name = ArgMap.getSymbolicName(isCtor ? MethodType.CTOR : MethodType.METHOD, i);
+
+            // Constants can be immediately defined
+            if (arg instanceof Constant constant) {
+                constant.accept(jimpleToJava);
+                Optional<Object> valueOpt = jimpleToJava.getResult();
+                if (valueOpt.isPresent()) {
+                    argMap.set(name, valueOpt.get());
+                } else {
+                    logger.warn("Failed to convert constant: {}", constant);
+                }
+                continue;
+            }
+
+            Expr<?> argExpr = jimpleToZ3.transform(arg, state);
             if (sorts.isRef(argExpr)) {
+                // Try to concretize the object being referenced
+                // I.e., if it has symbolic fields, those are converted to concrete values and
+                // constraints are added to constrain the symbolic value to the concrete values
+                // created (to preserve correctness of the path we are exploring)
                 try {
                     Expr<?> alias = state.heap.getSingleAlias(argExpr);
                     if (sorts.isNull(alias)) {
@@ -251,10 +272,17 @@ public class MethodInvoker {
                     // If the argument is a reference, we need to concretize it
                     HeapObject argObj = state.heap.getHeapObject(argExpr);
                     Class<?> argClazz = analyzer.getJavaClass(argObj.getType());
-                    addConcretizationConstraints(state, argObj, argMap.toJava(argExpr.toString(), argClazz), argExpr);
+                    // Concretize the object
+                    // Note: the value created from this is stored in the argMap and will be reused
+                    // when invoking the method
+                    Object argVal = argMap.toJava(argExpr.toString(), argClazz);
+                    addConcretizationConstraints(state, argObj, argVal, argExpr);
                 } catch (ClassNotFoundException e) {
                     logger.warn("Failed to find class for reference: {}", argExpr);
                 }
+                // Set the argument to reference the symbolic reference
+                // This will be resolved to the actual value later on
+                // when the method is executed
                 argMap.set(name, new ObjectRef(argExpr.toString()));
             } else {
                 Object argVal = validator.evaluate(argExpr, arg.getType());
