@@ -49,6 +49,7 @@ public class JUnitTestGenerator {
     /** Map of method names to the number of test cases generated for each method */
     private final Map<String, Integer> methodCount = new HashMap<>();
     private final Set<Integer> builtTestCases = new HashSet<>();
+    private final Set<String> builtObjects = new HashSet<>();
     private boolean setFieldAdded = false;
 
     private final Set<Class<?>> primitiveWrappers = Set.of(Boolean.class, Byte.class, Short.class, Integer.class,
@@ -110,6 +111,7 @@ public class JUnitTestGenerator {
         if (classBuilder == null) {
             throw new IllegalStateException("Test class not initialized. Call initializeForClass() first.");
         }
+        builtObjects.clear();
 
         ExecutionResult result;
         Object[] args;
@@ -255,7 +257,6 @@ public class JUnitTestGenerator {
     private List<String> addParamDefinitions(MethodSpec.Builder methodBuilder, List<Type> paramTypes, ArgMap argMap,
             MethodType methodType) {
         List<String> params = new ArrayList<>();
-        Set<String> builtObjects = new HashSet<>();
         for (int i = 0; i < paramTypes.size(); i++) {
             String var = ArgMap.getSymbolicName(methodType, i);
             params.add(var);
@@ -356,7 +357,6 @@ public class JUnitTestGenerator {
                 Object elem = Array.get(value, j);
                 if (elem instanceof ObjectRef ref && !builtObjects.contains(ref.getVar())) {
                     String refVar = buildFromReference(methodBuilder, argMap, builtObjects, ref, elemType);
-                    builtObjects.add(ref.getVar());
                     if (!ref.getVar().equals(refVar) && !builtObjects.add(ref.getVar())) {
                         // If referenced value is a primitive, still need to define it
                         addStatementTriple(methodBuilder, elemType, ref.getVar(), refVar);
