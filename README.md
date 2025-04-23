@@ -186,7 +186,20 @@ MAZE supports the following search strategies:
   When MAZE is instructed to run with multiple search strategies, it will automatically use interleaved search.
 
 Each of these strategies can be used for both symbolic-driven and concrete-driven DSE, though some are more suited for one than the other (e.g., RPS is only really useful for symbolic-driven DSE).
-The engine also provides some predefined search strategies for probabilistic search based on specific heuristics, such as coverage optimized search and random search (uniform distribution), the names for which can be found in the help message of the CLI.
+
+The engine also provides some predefined search strategies for probabilistic search based on specific heuristics:
+
+- **Uniform Random Search (URS)**:
+  Probabilistic search with uniform distribution, effectively creating a random search.
+  This is useful as a baseline or interleaved with other strategies to introduce some randomness.
+- **Coverage Optimized Search (COS)**:
+  Based on KLEE's coverage-optimized search strategy, which is based on the distance to an uncovered instruction, the call stack of the state, and whether it recently covered new code.
+  In MAZE, this is translated to probabilistic search with the `DistanceToUnocovered`, `RecentCoverage`, and `SmallestCallDepth` heuristics.
+  The strategy is designed to maximize code coverage by focusing on unexplored regions of the program.
+- **Feasibility Optimized Search (FOS)**:
+  Strategy designed to prioritize states that are most feasible to solve (in reasonable time).
+  This is achieved by using the `QueryCost` and `WaitingTime` heuristics, the former to prefer states with simpler path constraints and the latter to prefer states that have been waiting in the queue for a long time (similar to a breadth-first search, thus avoiding deep states, which are more likely to be harder to solve and are thus less feasible).
+  Additionally, it incorporates the `DistanceToUncovered` heuristic to guide the search toward unexplored regions of the program.
 
 #### Search Heuristics
 
