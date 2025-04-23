@@ -17,9 +17,15 @@ public class SinglyLinkedList<T> {
         }
     }
 
+    public SinglyLinkedList(T[] values) {
+        for (T value : values) {
+            add(value);
+        }
+    }
+
     private Node<T> head;
 
-    public void insertFront(T value) {
+    public void add(T value) {
         Node<T> node = new Node<>(value);
         node.next = head;
         head = node;
