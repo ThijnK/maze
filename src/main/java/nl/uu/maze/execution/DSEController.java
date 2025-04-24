@@ -145,9 +145,9 @@ public class DSEController {
         generator.initializeForClass(clazz);
 
         // Set deadlines
-        // We reserve 10% of the total time budget for evaluating unfinished paths once
+        // We reserve 20% of the total time budget for evaluating unfinished paths once
         // the deadline for execution is reached (unless concrete-driven)
-        long reservedTime = !concreteDriven ? (long) (timeBudget * 0.1) : 0;
+        long reservedTime = !concreteDriven ? (long) (timeBudget * 0.2) : 0;
         executionDeadline = timeBudget > 0 ? System.currentTimeMillis() + (timeBudget - reservedTime) : Long.MAX_VALUE;
         overallDeadline = timeBudget > 0 ? System.currentTimeMillis() + timeBudget : Long.MAX_VALUE;
         deadlineReached = false;
