@@ -169,9 +169,22 @@ public class ArgMap {
             String var = ((ObjectRef) value).getVar();
             // If an object does not exist in the map, but is referenced, it's simply an
             // unconstrained object, so we don't much care about its fields
-            // So, create an empty ObjectInstance
-            Object refValue = args.containsKey(var) ? args.get(var)
-                    : new ObjectInstance((ClassType) Z3Sorts.getInstance().determineType(type));
+            // Thus, create an empty ObjectInstance (or array)
+            // So, create an empty ObjectInstance or array
+            Object refValue;
+            if (!args.containsKey(var)) {
+                if (type.isArray()) {
+                    Class<?> componentType = type.getComponentType();
+                    Object array = Array.newInstance(componentType, 0);
+                    converted.put(key, array);
+                    return array;
+                } else {
+                    refValue = new ObjectInstance((ClassType) Z3Sorts.getInstance().determineType(type));
+                }
+            } else {
+                refValue = args.get(var);
+            }
+
             Object obj = toJava(var, refValue, type);
             converted.put(key, obj);
         } else if (value instanceof ObjectInstance instance) {
