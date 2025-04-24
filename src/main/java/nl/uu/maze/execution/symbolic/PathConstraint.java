@@ -95,6 +95,22 @@ public abstract class PathConstraint {
 
     public abstract BoolExpr getConstraint();
 
+    /**
+     * Check if this constraint is conflicting with another path constraint.
+     * For regular constraints, this means the other constraint is exactly eqaul to
+     * this constraint (without negation).
+     * Keeping both constraints would result in a contradiction, and thus
+     * unsatisfiable path condition.
+     * Subclasses (like the AliasConstraint) may override this method to provide
+     * more specific behavior.
+     */
+    public boolean isConflicting(PathConstraint other) {
+        if (getConstraint().equals(other.getConstraint())) {
+            return true;
+        }
+        return false;
+    }
+
     @Override
     public String toString() {
         return getConstraint().toString();
@@ -278,6 +294,7 @@ public abstract class PathConstraint {
          * expressions is equal to the expression of this alias constraint, then it
          * conflicts.
          */
+        @Override
         public boolean isConflicting(PathConstraint other) {
             BoolExpr otherConstraint = other.getConstraint();
             if (otherConstraint.isNot()) {

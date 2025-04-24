@@ -3,6 +3,9 @@ package nl.uu.maze.execution.concrete;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import nl.uu.maze.execution.symbolic.PathConstraint;
 import nl.uu.maze.execution.symbolic.SymbolicState;
 import nl.uu.maze.execution.symbolic.PathConstraint.*;
@@ -20,6 +23,8 @@ import sootup.core.jimple.common.stmt.Stmt;
  *           (i.e., only when the candidate is selected for exploration).
  */
 public class PathConditionCandidate implements SearchTarget {
+    private static final Logger logger = LoggerFactory.getLogger(PathConditionCandidate.class);
+
     /**
      * Reference to the (final) state at the time of creating this candidate.
      * This is NOT the state at the time the constraint this candidate will negate
@@ -113,7 +118,7 @@ public class PathConditionCandidate implements SearchTarget {
      */
     public void applyNegation() {
         PathConstraint constraint = constraints.get(index);
-        AliasConstraint alias = constraint instanceof AliasConstraint ? (AliasConstraint) constraint : null;
+        logger.debug("Negating constraint: {}", constraint);
 
         // Only keep constraints up to the index we're negating
         List<PathConstraint> newConstraints = new ArrayList<>(index + 1);
@@ -121,7 +126,7 @@ public class PathConditionCandidate implements SearchTarget {
         for (int i = 0; i < index; i++) {
             PathConstraint other = constraints.get(i);
             // Skip conflicting constraint when negating alias constraints
-            if (alias == null || !alias.isConflicting(other)) {
+            if (!constraint.isConflicting(other)) {
                 newConstraints.add(other);
             }
         }
