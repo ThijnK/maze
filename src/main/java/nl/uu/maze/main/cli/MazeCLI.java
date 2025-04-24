@@ -98,8 +98,7 @@ public class MazeCLI implements Callable<Integer> {
                     searchHeuristics, heuristicWeights, timeBudget);
 
             DSEController controller = new DSEController(classPath, concreteDriven, strategy, outPath,
-                    methodName,
-                    maxDepth, testTimeout, packageName, junitVersion.isJUnit4());
+                    methodName, maxDepth, testTimeout, packageName, junitVersion.isJUnit4());
             controller.run(className, timeBudget);
             return 0;
         } catch (Exception e) {

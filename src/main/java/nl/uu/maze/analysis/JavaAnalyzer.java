@@ -31,16 +31,42 @@ import sootup.java.core.views.JavaView;
  */
 public class JavaAnalyzer {
     private static final Logger logger = LoggerFactory.getLogger(JavaAnalyzer.class);
+    private static JavaAnalyzer instance;
 
     private final ClassLoader classLoader;
     private final JavaView view;
     private final JavaIdentifierFactory identifierFactory;
 
-    public JavaAnalyzer(String classPath, ClassLoader classLoader) throws MalformedURLException {
+    private JavaAnalyzer(String classPath, ClassLoader classLoader) throws MalformedURLException {
         AnalysisInputLocation inputLocation = new JavaClassPathAnalysisInputLocation(classPath);
         this.classLoader = classLoader;
         view = new JavaView(inputLocation);
         identifierFactory = view.getIdentifierFactory();
+    }
+
+    /**
+     * Intializes the JavaAnalyzer with the given class path and class loader.
+     * 
+     * @return The initialized JavaAnalyzer instance
+     */
+    public static JavaAnalyzer initialize(String classPath, ClassLoader classLoader) throws MalformedURLException {
+        if (instance == null) {
+            instance = new JavaAnalyzer(classPath, classLoader);
+            return instance;
+        }
+        throw new IllegalStateException(
+                "JavaAnalyzer already initialized. Use getInstance() to access the existing instance.");
+    }
+
+    /**
+     * Returns the singleton instance of the JavaAnalyzer.
+     */
+    public static JavaAnalyzer getInstance() {
+        if (instance == null) {
+            throw new IllegalStateException(
+                    "JavaAnalyzer not initialized. Call initialize() first.");
+        }
+        return instance;
     }
 
     /**

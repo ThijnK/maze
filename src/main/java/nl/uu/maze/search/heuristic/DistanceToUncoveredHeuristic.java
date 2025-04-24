@@ -4,11 +4,13 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Set;
 
+import nl.uu.maze.analysis.JavaAnalyzer;
 import nl.uu.maze.execution.symbolic.CoverageTracker;
 import nl.uu.maze.search.SearchTarget;
-import nl.uu.maze.util.Pair;
 import sootup.core.graph.StmtGraph;
+import sootup.core.jimple.common.expr.AbstractInvokeExpr;
 import sootup.core.jimple.common.stmt.Stmt;
+import sootup.core.signatures.MethodSignature;
 
 /**
  * Distance To Uncovered Heuristic (DTUH)
@@ -48,38 +50,58 @@ public class DistanceToUncoveredHeuristic extends SearchHeuristic {
         Stmt stmt = target.getStmt();
         StmtGraph<?> cfg = target.getCFG();
 
-        // Prioritize final targets
+        // Prioritize final statements (usually return statements)
+        // Because we want to finish the path (or return to caller) asap
         if (cfg.outDegree(stmt) == 0) {
             return 0;
         }
 
-        Queue<Pair<Stmt, Integer>> worklist = new LinkedList<>();
+        Queue<StmtDistance> worklist = new LinkedList<>();
         Set<Stmt> visited = new java.util.HashSet<>();
-        int dist = 0;
-        worklist.offer(Pair.of(stmt, dist));
+        // int dist = 0;
+        worklist.offer(new StmtDistance(stmt, 0, cfg));
 
         while (!worklist.isEmpty()) {
-            Pair<Stmt, Integer> item = worklist.poll();
-            stmt = item.getFirst();
-            dist = item.getSecond();
+            StmtDistance item = worklist.poll();
 
             // If a statement has been visited before, we're dealing with a loop, so we can
             // skip it because the first iteration of the loop would have been the shortest
             // path
-            boolean isNew = visited.add(stmt);
+            boolean isNew = visited.add(item.stmt);
             if (!isNew) {
                 continue;
             }
 
-            if (!coverageTracker.isCovered(stmt)) {
-                return dist;
+            // If we reach an uncovered statement, return the distance
+            // Because the worklist is FIFO, the first uncovered statement we reach is the
+            // closest one
+            if (!coverageTracker.isCovered(item.stmt)) {
+                return item.dist;
             }
 
-            for (Stmt succ : cfg.getAllSuccessors(stmt)) {
-                worklist.offer(Pair.of(succ, dist + 1));
+            for (Stmt succ : item.cfg.getAllSuccessors(item.stmt)) {
+                worklist.offer(new StmtDistance(succ, item.dist + 1, item.cfg));
+            }
+
+            // For invoke expressions, also try to enter the methods being invoked
+            if (item.stmt.containsInvokeExpr()) {
+                AbstractInvokeExpr invoke = item.stmt.getInvokeExpr();
+                MethodSignature sig = invoke.getMethodSignature();
+                JavaAnalyzer analyzer = JavaAnalyzer.getInstance();
+                analyzer.tryGetSootMethod(sig).ifPresent(m -> {
+                    if (!m.hasBody()) {
+                        return;
+                    }
+
+                    StmtGraph<?> calleeCFG = analyzer.getCFG(m);
+                    worklist.offer(new StmtDistance(calleeCFG.getStartingStmt(), item.dist + 1, calleeCFG));
+                });
             }
         }
 
         return MAX_WEIGHT;
+    }
+
+    private record StmtDistance(Stmt stmt, int dist, StmtGraph<?> cfg) {
     }
 }

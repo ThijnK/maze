@@ -115,7 +115,7 @@ public class DSEController {
         this.searchStrategy = searchStrategy;
         this.replayStrategy = new SymbolicSearchStrategy(new DFS<SymbolicState>());
 
-        this.analyzer = new JavaAnalyzer(classPath, classLoader);
+        this.analyzer = JavaAnalyzer.initialize(classPath, classLoader);
 
         this.concrete = new ConcreteExecutor();
         this.validator = new SymbolicStateValidator();
