@@ -468,7 +468,7 @@ public class SymbolicState implements SearchTarget {
     @Override
     public String toString() {
         return "Store: " + store + ", Heap: " + heap + ", PC: " + pathConstraints + ", EC: "
-                + engineConstraints + ", CD: " + getCallDepth() + ", Retval: " + retval;
+                + engineConstraints + ", Depth: " + depth + ", CD: " + getCallDepth() + ", Retval: " + retval;
     }
 
     @Override

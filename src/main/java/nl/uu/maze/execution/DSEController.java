@@ -340,7 +340,6 @@ public class DSEController {
                     else
                         generateTestCase(current.returnToRootCaller());
                 }
-                searchStrategy.remove(current);
                 continue;
             }
 
@@ -366,7 +365,6 @@ public class DSEController {
                                 else
                                     generateTestCase(state);
                             }
-                            searchStrategy.remove(state);
                             continue;
                         }
 

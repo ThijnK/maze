@@ -7,7 +7,9 @@ package nl.uu.maze.benchmarks;
  * This class tests the search strategy's ability to handle complex branching
  * and exception-throwing paths. A challenge for search strategies is to cover
  * as much of the private methods as possible, while being able to generate
- * tests only for the entry method parse().
+ * tests only for the entry method parse(). This is especially hard because to
+ * cover some of the code, you need to search very deep into the tree of
+ * recursive calls.
  * A comprehensive, manual test suite for this expression evaluator is provided
  * in nl.uu.tests.maze.ExprEvaluatorTest.
  */
@@ -84,7 +86,6 @@ public class ExprEvaluator {
     }
 
     private int parseNumber() {
-        skipWhitespace();
         int start = pos;
         while (pos < input.length && isDigit(input[pos])) {
             pos++;

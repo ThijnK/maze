@@ -143,11 +143,12 @@ public class SymbolicExecutor {
             SymbolicState newState = state.clone();
             newState.setStmt(succs.getFirst());
             newState.addPathConstraint(Z3Utils.negate(cond));
-            newStates.add(newState);
 
             // True branch
             state.addPathConstraint(cond);
             state.setStmt(succs.get(1));
+
+            newStates.add(newState);
             newStates.add(state);
 
             if (trackBranchHistory) {
