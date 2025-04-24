@@ -7,6 +7,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -66,17 +67,17 @@ public class DSEController {
     private final ConcreteExecutor concrete;
     private final JUnitTestGenerator generator;
 
+    private List<JavaSootMethod> staticMuts = new ArrayList<>();
+    private List<JavaSootMethod> nonStaticMuts = new ArrayList<>();
     private Constructor<?> ctor;
     private JavaSootMethod ctorSoot;
     private StmtGraph<?> ctorCfg;
     /**
-     * Map of init states, indexed by their hash code (in case of
-     * symbolic-driven) or the hash code of the path encoding (in case of
-     * concrete-driven).
-     * This is used to keep track of (active) states in init methods (e.g.,
-     * constructors, and other methods executed before the target method). This way,
-     * these states can be reused as initial states in symbolic execution to avoid
-     * re-executing the init methods for each target method.
+     * Map of init states used in concrete-driven execution, indexed by the hash
+     * code of the path encoding.
+     * That is, they are the final states of the constructor execution, which can
+     * then be reused when a concrete execution traversed the constructor the same
+     * as a previous execution.
      */
     private Map<Integer, SymbolicState> initStates;
 
@@ -174,16 +175,24 @@ public class DSEController {
      */
     private void run() throws Exception {
         Set<JavaSootMethod> methods = sootClass.getMethods();
-        // Regex pattern to match non-standard method names (e.g., <init>, <clinit>)
+
+        // Organize mehtods under test into static and non-static, and filter out any
+        // non-standard methods
         Pattern pattern = Pattern.compile("<[^>]+>");
-        // Filter out non-standard methods and methods that do not match the
-        // specified method name (unless method name is "all")
-        JavaSootMethod[] muts = methods.stream()
-                .filter(m -> !pattern.matcher(m.getName()).matches()
-                        && m.isPublic()
-                        && (methodName.equals("all") || m.getName().equals(methodName)))
-                .toArray(JavaSootMethod[]::new);
-        if (muts.length == 0) {
+        for (JavaSootMethod method : methods) {
+            if (!method.isPublic() || pattern.matcher(method.getName()).matches()
+                    || (!methodName.equals("all") && !method.getName().equals(methodName))) {
+                continue;
+            }
+
+            if (method.isStatic()) {
+                staticMuts.add(method);
+            } else {
+                nonStaticMuts.add(method);
+            }
+        }
+
+        if (staticMuts.isEmpty() && nonStaticMuts.isEmpty()) {
             if (!methodName.equals("all")) {
                 logger.info("No public testable methods found with name: {}", methodName);
             } else {
@@ -193,7 +202,7 @@ public class DSEController {
         }
 
         // If class includes non-static methods, need to execute constructor first
-        if (!Arrays.stream(muts).allMatch(JavaSootMethod::isStatic)) {
+        if (!nonStaticMuts.isEmpty()) {
             ctor = analyzer.getJavaConstructor(instrumented != null ? instrumented : clazz);
             if (ctor == null) {
                 throw new Exception("No constructor found for class: " + clazz.getName());
@@ -206,33 +215,40 @@ public class DSEController {
             logger.info("Using constructor: {}", ctorSoot.getSignature());
         }
 
-        SymbolicSearchStrategy symbolicSearch = !concreteDriven ? searchStrategy.toSymbolic() : null;
-
-        // Sort methods by name to ensure consistent ordering
-        Arrays.sort(muts, (m1, m2) -> m1.getName().compareTo(m2.getName()));
-        for (JavaSootMethod method : muts) {
-            if (deadlineReached) {
-                break;
+        // Concrete-driven is run one method at a time, while symbolic-driven is run on
+        // all methods at once
+        if (concreteDriven) {
+            // Sort methods by name to ensure consistent ordering
+            JavaSootMethod[] muts = new JavaSootMethod[staticMuts.size() + nonStaticMuts.size()];
+            int i = 0;
+            for (JavaSootMethod method : staticMuts) {
+                muts[i++] = method;
             }
-
-            try {
-                logger.info("Processing method: {}", method.getName());
-                if (concreteDriven) {
-                    runConcreteDriven(method, searchStrategy.toConcrete());
-                } else {
-                    runSymbolicDriven(method, symbolicSearch);
+            for (JavaSootMethod method : nonStaticMuts) {
+                muts[i++] = method;
+            }
+            Arrays.sort(muts, (m1, m2) -> m1.getName().compareTo(m2.getName()));
+            for (JavaSootMethod method : muts) {
+                if (deadlineReached) {
+                    break;
                 }
-            } catch (Exception e) {
-                logger.error("Error processing method {}: {}", method.getName(), e.getMessage());
-                logger.debug("Error stack trace: ", e);
-                // Continue with the next method even if an error occurs
-            }
-        }
 
-        // For symbolic-driven, we can generate test cases for any states remaining in
-        // the search strategy (which are still there if the deadline was reached)
-        if (!concreteDriven && symbolicSearch != null) {
-            Collection<SymbolicState> states = symbolicSearch.getAll();
+                try {
+                    logger.info("Processing method: {}", method.getName());
+                    runConcreteDriven(method, searchStrategy.toConcrete());
+                } catch (Exception e) {
+                    logger.error("Error processing method {}: {}", method.getName(), e.getMessage());
+                    logger.debug("Error stack trace: ", e);
+                    // Continue with the next method even if an error occurs
+                }
+            }
+        } else {
+            SymbolicSearchStrategy strategy = searchStrategy.toSymbolic();
+            initializeSymbolic(strategy);
+            runSymbolicDriven(strategy, ctorSoot);
+
+            // If any unfinished states are still in the strategy, generate test cases
+            Collection<SymbolicState> states = strategy.getAll();
             if (states.isEmpty()) {
                 return;
             }
@@ -248,9 +264,6 @@ public class DSEController {
                 }
             }
         }
-
-        searchStrategy.reset();
-        replayStrategy.reset();
     }
 
     /**
@@ -267,64 +280,41 @@ public class DSEController {
     }
 
     /**
-     * Run symbolic-driven DSE on the given method.
-     * Returns the final state if this is a symbolic replay for concrete-driven DSE.
+     * Initialize the symbolic search strategy with the right initial states.
      */
-    private Optional<SymbolicState> runSymbolicDriven(JavaSootMethod method, SymbolicSearchStrategy searchStrategy) {
-        StmtGraph<?> cfg = analyzer.getCFG(method);
-
-        // If static, start with target method, otherwise start with constructor
-        if (method.isStatic()) {
-            logger.debug("Executing target method: {}", method.getName());
-            SymbolicState state = new SymbolicState(method, cfg);
-            state.switchToMethodState();
-            searchStrategy.add(state);
-        } else {
-            logger.debug("Executing constructor: {}", ctorSoot.getName());
-            // For concrete-driven, we'll be replaying a trace, so if the ctor has been
-            // explored along this path before, we can reuse, otherwise we start from
-            // scratch
-            if (concreteDriven) {
-                int pathHash = TraceManager.hashCode(ctorSoot.getSignature());
-                // In this case, if the initStates has a state for this path hash, it means it
-                // was the final state in the ctor, so immediately switch to the target method
-                SymbolicState state;
-                if (initStates.containsKey(pathHash)) {
-                    state = initStates.get(pathHash).clone();
-                    state.setMethod(method, cfg);
-                } else {
-                    state = new SymbolicState(ctorSoot, ctorCfg);
-                }
-                searchStrategy.add(state);
-            }
-            // For symbolic-driven, we start with the entire front of states from the ctor,
-            // if available
-            // If not available, simply start at the beginning of the ctor
-            else {
-                if (initStates.isEmpty()) {
-                    SymbolicState state = new SymbolicState(ctorSoot, ctorCfg);
-                    searchStrategy.add(state);
-                } else {
-                    for (SymbolicState state : initStates.values()) {
-                        // Clone the state to avoid modifying the original, so that those can be reused
-                        // for other methods
-                        SymbolicState newState = state.clone();
-                        // Only if the state was the final constructor state, set the current statement
-                        // to the starting statement of the target method
-                        if (!state.isCtorState()) {
-                            newState.setMethod(method, cfg);
-                        }
-                        searchStrategy.add(newState);
-                    }
-                }
-            }
+    public void initializeSymbolic(SymbolicSearchStrategy searchStrategy) {
+        // If methods under test include non-static methods, need to execute constructor
+        // as well
+        if (!nonStaticMuts.isEmpty()) {
+            searchStrategy.add(new SymbolicState(ctorSoot, ctorCfg));
         }
 
+        // For static methods, we can start directly with the target method
+        for (JavaSootMethod method : staticMuts) {
+            // If the method is static, we can start directly with the target method
+            SymbolicState state = new SymbolicState(method, analyzer.getCFG(method));
+            state.switchToMethodState();
+            searchStrategy.add(state);
+        }
+    }
+
+    /**
+     * Run symbolic-driven DSE on the given method.
+     * Returns the final state if this is a symbolic replay for concrete-driven DSE.
+     * 
+     * @param searchStrategy The search strategy to use
+     * @param targetMethod   The method to switch to after the constructor (only
+     *                       used if running concrete-driven)
+     * @return The (first) final state found if running concrete-driven, emtpy
+     *         optional otherwise
+     */
+    private Optional<SymbolicState> runSymbolicDriven(SymbolicSearchStrategy searchStrategy,
+            JavaSootMethod targetMethod) {
         SymbolicState current;
         while ((current = searchStrategy.next()) != null) {
             // Check if we are over the time budget
             if (System.currentTimeMillis() >= executionDeadline) {
-                logger.info("Time budget exceeded during symbolic-driven, stopping execution");
+                logger.info("Time budget exceeded during symbolic-driven execution, stopping...");
                 deadlineReached = true;
                 return concreteDriven ? Optional.of(current) : Optional.empty();
             }
@@ -343,18 +333,13 @@ public class DSEController {
                 continue;
             }
 
-            // Symbolically execute the current statement of the selected symbolic state to
-            // be processed
-            int currHash = concreteDriven ? TraceManager.hashCode(current.getMethodSignature()) : current.hashCode();
+            // Symbolically execute the statement of the current symbolic state
             List<SymbolicState> newStates = symbolic.step(current, concreteDriven);
-            // Unless it's the ctor, we can simply add the new states and continue
+
+            // For ctor states, check for final states from which we can switch to the
+            // target method(s)
             if (current.isCtorState()) {
-                initStates.remove(currHash);
-                // If any of the new ctor states are final states, set their current
-                // statement to the starting statement of the target method
                 for (SymbolicState state : newStates) {
-                    int hashCode = concreteDriven ? TraceManager.hashCode(state.getMethodSignature())
-                            : state.hashCode();
                     if (state.isFinalState()) {
                         // If the state is an exception-throwing state, generate test case and stop
                         // exploring (i.e., don't go into the target method)
@@ -368,24 +353,68 @@ public class DSEController {
                             continue;
                         }
 
+                        // Since ctor is now done, we can switch to the target method
                         state.switchToMethodState();
-                        // Clone the state to avoid modifying the original in subsequent execution (want
-                        // to reuse this final ctor state for multiple methods)
-                        initStates.put(hashCode, state.clone());
-                        logger.debug("Switching to target method: {}", method.getName());
-                        state.setMethod(method, cfg);
-                        searchStrategy.add(state);
-                    } else {
-                        initStates.put(hashCode, state);
-                        searchStrategy.add(state);
+
+                        // For concrete-driven, store this final ctor state for reuse and switch to the
+                        // single target method being replayed right now
+                        if (concreteDriven) {
+                            initStates.put(TraceManager.hashCode(state.getMethodSignature()), state.clone());
+                            state.setMethod(targetMethod, analyzer.getCFG(targetMethod));
+                        }
+                        // For symbolic-driven, we can switch to any of the target methods
+                        else {
+                            for (int i = 0; i < nonStaticMuts.size(); i++) {
+                                JavaSootMethod target = nonStaticMuts.get(i);
+                                // Clone state, except for the last one
+                                SymbolicState newState = i == nonStaticMuts.size() - 1 ? state : state.clone();
+                                newState.setMethod(target, analyzer.getCFG(target));
+                                searchStrategy.add(newState);
+
+                            }
+                            continue;
+                        }
                     }
+
+                    searchStrategy.add(state);
                 }
-            } else {
+            }
+            // For non-ctor states, we can simply add the new states to the search strategy
+            else {
                 searchStrategy.add(newStates);
             }
         }
 
         return Optional.empty();
+    }
+
+    /** Run symbolic-driven DSE to replay a concrete execution. */
+    public Optional<SymbolicState> runSymbolicReplay(JavaSootMethod method) {
+        SymbolicState initState;
+
+        // For static methods, start at the target method
+        if (method.isStatic()) {
+            initState = new SymbolicState(method, analyzer.getCFG(method));
+            initState.switchToMethodState();
+        }
+        // Otherwise, start with constructor
+        else {
+            // If the ctor has been explored along this path before, we can reuse, otherwise
+            // we start from scratch
+            int pathHash = TraceManager.hashCode(ctorSoot.getSignature());
+            if (initStates.containsKey(pathHash)) {
+                initState = initStates.get(pathHash).clone();
+                initState.setMethod(method, analyzer.getCFG(method));
+            } else {
+                initState = new SymbolicState(ctorSoot, ctorCfg);
+            }
+        }
+
+        replayStrategy.add(initState);
+        // Run symbolic execution
+        Optional<SymbolicState> finalState = runSymbolicDriven(replayStrategy, method);
+        replayStrategy.reset();
+        return finalState;
     }
 
     /** Run concrete-driven DSE on the given method. */
@@ -396,7 +425,7 @@ public class DSEController {
         while (true) {
             // Check time budget
             if (System.currentTimeMillis() >= executionDeadline) {
-                logger.info("Time budget exceeded during concrete-driven, stopping execution");
+                logger.info("Time budget exceeded during concrete-driven execution, stopping...");
                 deadlineReached = true;
                 break;
             }
@@ -404,7 +433,7 @@ public class DSEController {
             // Concrete execution followed by symbolic replay
             TraceManager.clearEntries();
             concrete.execute(ctor, javaMethod, argMap);
-            Optional<SymbolicState> finalState = runSymbolicDriven(method, replayStrategy);
+            Optional<SymbolicState> finalState = runSymbolicReplay(method);
             logger.debug("Replayed state: {}", finalState.isPresent() ? finalState.get() : "none");
 
             if (finalState.isPresent()) {
