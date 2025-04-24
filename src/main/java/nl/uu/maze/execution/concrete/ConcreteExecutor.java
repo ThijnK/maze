@@ -44,19 +44,18 @@ public class ConcreteExecutor {
      * Run concrete execution on the given method, using the given constructor to
      * create an instance of the class containing the method if necessary.
      * 
-     * @param ctor   The constructor to use to create an instance of the class
-     * @param method The method to invoke
-     * @param argMap {@link ArgMap} containing the arguments to pass to the
-     *               constructor (but not the method invocation)
-     * @param args   The arguments to pass to the method
+     * @param ctor     The constructor to use to create an instance of the class
+     * @param method   The method to invoke
+     * @param ctorArgs The arguments to pass to the constructor
+     * @param args     The arguments to pass to the method
      * @return An instance of {@link ExecutionResult} containing the return value
      *         or the exception thrown by the constructor or method
      */
-    public ExecutionResult execute(Constructor<?> ctor, Method method, ArgMap argMap, Object[] args) {
+    public ExecutionResult execute(Constructor<?> ctor, Method method, Object[] ctorArgs, Object[] args) {
         // If not static, create an instance of the class
         Object instance = null;
         if (!Modifier.isStatic(method.getModifiers())) {
-            ExecutionResult result = ObjectInstantiation.createInstance(ctor, argMap);
+            ExecutionResult result = ObjectInstantiation.createInstance(ctor, ctorArgs);
             // If constructor throws an exception, return it
             if (result.isException()) {
                 return result;

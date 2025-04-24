@@ -84,7 +84,7 @@ public class ObjectInstantiation {
      * @return An instance of {@link ExecutionResult} containing the instance
      *         created or the exception thrown if the instance could not be created
      */
-    private static ExecutionResult createInstance(Constructor<?> ctor, Object[] args) {
+    public static ExecutionResult createInstance(Constructor<?> ctor, Object[] args) {
         try {
             logger.debug("Creating instance of class {} with args: {}", ctor.getDeclaringClass().getSimpleName(),
                     args);

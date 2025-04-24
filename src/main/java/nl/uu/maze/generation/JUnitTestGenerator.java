@@ -113,15 +113,30 @@ public class JUnitTestGenerator {
         }
         builtObjects.clear();
 
+        // Test case for ctor: don't need to execute target method
+        boolean forCtor = method.getName().equals("<init>");
+        if (forCtor) {
+            ctor = method;
+        }
+
         ExecutionResult result;
+        Object[] ctorArgs;
         Object[] args;
         try {
             Constructor<?> _ctor = ctor != null ? analyzer.getJavaConstructor(ctor, clazz) : null;
-            Method _method = analyzer.getJavaMethod(method.getSignature(), clazz);
-            args = ObjectInstantiation.generateArgs(_method.getParameters(), MethodType.METHOD, argMap);
-            result = executor.execute(_ctor, _method, argMap, args);
+            ctorArgs = _ctor != null
+                    ? ObjectInstantiation.generateArgs(_ctor.getParameters(), MethodType.CTOR, argMap)
+                    : null;
+            if (forCtor) {
+                result = ObjectInstantiation.createInstance(_ctor, ctorArgs);
+                args = new Object[0];
+            } else {
+                Method _method = analyzer.getJavaMethod(method.getSignature(), clazz);
+                args = ObjectInstantiation.generateArgs(_method.getParameters(), MethodType.METHOD, argMap);
+                result = executor.execute(_ctor, _method, ctorArgs, args);
+            }
         } catch (Exception e) {
-            logger.warn("Failed to generate execute test case for {}", method.getName());
+            logger.warn("Failed to execute test case for {}", method.getName());
             return;
         }
         boolean isVoid = method.getReturnType().toString().equals("void");
@@ -165,11 +180,15 @@ public class JUnitTestGenerator {
                             result.getTargetExceptionClass(), clazz, String.join(", ", ctorParams));
                 }
             } else {
-                methodBuilder.addStatement("$T cut = new $T($L)", clazz, clazz, String.join(", ", ctorParams));
-                methodBuilder.addCode("\n"); // White space between ctor and method call
-                List<String> params = addParamDefinitions(methodBuilder, method.getParameterTypes(), argMap,
-                        MethodType.METHOD);
-                addMethodCall(methodBuilder, clazz, returnType, method, params, result, isVoid);
+                if (forCtor) {
+                    methodBuilder.addStatement("new $T($L)", clazz, clazz, String.join(", ", ctorParams));
+                } else {
+                    methodBuilder.addStatement("$T cut = new $T($L)", clazz, clazz, String.join(", ", ctorParams));
+                    methodBuilder.addCode("\n"); // White space between ctor and method call
+                    List<String> params = addParamDefinitions(methodBuilder, method.getParameterTypes(), argMap,
+                            MethodType.METHOD);
+                    addMethodCall(methodBuilder, clazz, returnType, method, params, result, isVoid);
+                }
             }
         }
 
@@ -183,6 +202,16 @@ public class JUnitTestGenerator {
             } else {
                 // Check if return value is a reference to an input parameter
                 boolean isReference = false;
+                if (ctorArgs != null) {
+                    for (int i = 0; i < ctorArgs.length; i++) {
+                        if (ctorArgs[i] == retval) {
+                            isReference = true;
+                            methodBuilder.addStatement("$T expected = $L", returnType,
+                                    ArgMap.getSymbolicName(MethodType.CTOR, i));
+                            break;
+                        }
+                    }
+                }
                 for (int i = 0; i < args.length; i++) {
                     if (args[i] == retval) {
                         isReference = true;
@@ -217,9 +246,18 @@ public class JUnitTestGenerator {
         builtTestCases.add(hash);
 
         methodCount.compute(method.getName(), (k, v) -> v == null ? 1 : v + 1);
-        String testMethodName = "test" + capitalizeFirstLetter(method.getName()) + methodCount.get(method.getName());
-        methodBuilder.setName(testMethodName);
+
+        methodBuilder.setName(createTestName(method.getName()));
         classBuilder.addMethod(methodBuilder.build());
+    }
+
+    /**
+     * Creates an appropriate name for a test case based on the method name.
+     */
+    private String createTestName(String methodName) {
+        // Remove brackets (< and >) from the method name (in case of ctor)
+        methodName = methodName.replace("<", "").replace(">", "");
+        return "test" + capitalizeFirstLetter(methodName) + methodCount.get(methodName);
     }
 
     /**
