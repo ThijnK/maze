@@ -90,7 +90,7 @@ public class ProbabilisticSearch<T extends SearchTarget> extends SearchStrategy<
                 T target = targets.get(j);
                 target.setWaitingTime(iteration - target.getIteration());
                 double weight = heuristics.get(i).calculateWeight(target);
-                targetWeights[i][j] = weight;// heuristics.get(i).calculateWeight(targets.get(j));
+                targetWeights[i][j] = weight;
             }
         }
 

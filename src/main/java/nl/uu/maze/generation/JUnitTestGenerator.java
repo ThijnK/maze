@@ -181,7 +181,7 @@ public class JUnitTestGenerator {
                 }
             } else {
                 if (forCtor) {
-                    methodBuilder.addStatement("new $T($L)", clazz, clazz, String.join(", ", ctorParams));
+                    methodBuilder.addStatement("new $T($L)", clazz, String.join(", ", ctorParams));
                 } else {
                     methodBuilder.addStatement("$T cut = new $T($L)", clazz, clazz, String.join(", ", ctorParams));
                     methodBuilder.addCode("\n"); // White space between ctor and method call

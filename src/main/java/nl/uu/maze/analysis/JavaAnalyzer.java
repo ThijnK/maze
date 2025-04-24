@@ -296,6 +296,7 @@ public class JavaAnalyzer {
      * @return The control flow graph of the method
      */
     public StmtGraph<?> getCFG(JavaSootMethod method) {
+        // Note: CFGs are cached by SootUp
         StmtGraph<?> cfg = method.getBody().getStmtGraph();
         if (logger.isDebugEnabled()) {
             logger.debug("CFG: {}", DotExporter.createUrlToWebeditor(cfg));

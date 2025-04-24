@@ -140,20 +140,20 @@ public class SymbolicExecutor {
         // Otherwise, follow both branches
         else {
             // False branch
-            SymbolicState newState = state.clone();
-            newState.setStmt(succs.getFirst());
-            newState.addPathConstraint(Z3Utils.negate(cond));
+            SymbolicState falseState = state.clone();
+            falseState.setStmt(succs.getFirst());
+            falseState.addPathConstraint(Z3Utils.negate(cond));
 
             // True branch
             state.addPathConstraint(cond);
             state.setStmt(succs.get(1));
 
-            newStates.add(newState);
             newStates.add(state);
+            newStates.add(falseState);
 
             if (trackBranchHistory) {
                 // Record the branch taken for both states
-                newState.recordBranch(stmt, 0);
+                falseState.recordBranch(stmt, 0);
                 state.recordBranch(stmt, 1);
             }
         }
