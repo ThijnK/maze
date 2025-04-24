@@ -1,5 +1,6 @@
 package nl.uu.maze.search.strategy;
 
+import java.util.Collection;
 import java.util.Stack;
 
 import nl.uu.maze.search.SearchTarget;
@@ -37,5 +38,10 @@ public class DFS<T extends SearchTarget> extends SearchStrategy<T> {
     @Override
     public void reset() {
         targets.clear();
+    }
+
+    @Override
+    public Collection<T> getAll() {
+        return targets;
     }
 }

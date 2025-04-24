@@ -1,5 +1,6 @@
 package nl.uu.maze.search.strategy;
 
+import java.util.Collection;
 import java.util.List;
 
 import nl.uu.maze.search.SearchTarget;
@@ -85,6 +86,11 @@ public class InterleavedSearch<T extends SearchTarget> extends SearchStrategy<T>
         for (SearchStrategy<T> strategy : strategies) {
             strategy.reset();
         }
+    }
+
+    @Override
+    public Collection<T> getAll() {
+        return strategies.getFirst().getAll();
     }
 
     @Override

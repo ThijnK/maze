@@ -72,6 +72,11 @@ public abstract class SearchStrategy<T extends SearchTarget> {
      */
     public abstract void reset();
 
+    /**
+     * Get all search targets in the search strategy.
+     */
+    public abstract Collection<T> getAll();
+
     /** Whether this search strategy requires data about statement coverage. */
     public boolean requiresCoverageData() {
         return false;

@@ -8,6 +8,7 @@ import java.net.URLClassLoader;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -56,7 +57,8 @@ public class DSEController {
     private Class<?> clazz;
     private Class<?> instrumented;
     /** After this time, stop the process as soon as possible. */
-    private long deadline;
+    private long executionDeadline;
+    private long overallDeadline;
     private boolean deadlineReached = false;
 
     private final SymbolicExecutor symbolic;
@@ -141,7 +143,13 @@ public class DSEController {
         this.sootClass = analyzer.getSootClass(classType);
         this.clazz = analyzer.getJavaClass(classType);
         generator.initializeForClass(clazz);
-        deadline = timeBudget > 0 ? System.currentTimeMillis() + timeBudget : Long.MAX_VALUE;
+
+        // Set deadlines
+        // We reserve 10% of the total time budget for evaluating unfinished paths once
+        // the deadline for execution is reached
+        long reservedTime = (long) (timeBudget * 0.1);
+        executionDeadline = timeBudget > 0 ? System.currentTimeMillis() + (timeBudget - reservedTime) : Long.MAX_VALUE;
+        overallDeadline = timeBudget > 0 ? System.currentTimeMillis() + timeBudget : Long.MAX_VALUE;
         deadlineReached = false;
 
         logger.info("Running {} DSE on class: {}", concreteDriven ? "concrete-driven" : "symbolic-driven",
@@ -198,6 +206,8 @@ public class DSEController {
             logger.info("Using constructor: {}", ctorSoot.getSignature());
         }
 
+        SymbolicSearchStrategy symbolicSearch = !concreteDriven ? searchStrategy.toSymbolic() : null;
+
         // Sort methods by name to ensure consistent ordering
         Arrays.sort(muts, (m1, m2) -> m1.getName().compareTo(m2.getName()));
         for (JavaSootMethod method : muts) {
@@ -210,28 +220,48 @@ public class DSEController {
                 if (concreteDriven) {
                     runConcreteDriven(method, searchStrategy.toConcrete());
                 } else {
-                    runSymbolicDriven(method, searchStrategy.toSymbolic());
+                    runSymbolicDriven(method, symbolicSearch);
                 }
             } catch (Exception e) {
                 logger.error("Error processing method {}: {}", method.getName(), e.getMessage());
                 logger.debug("Error stack trace: ", e);
                 // Continue with the next method even if an error occurs
-            } finally {
-                searchStrategy.reset();
-                replayStrategy.reset();
             }
         }
+
+        // For symbolic-driven, we can generate test cases for any states remaining in
+        // the search strategy (which are still there if the deadline was reached)
+        if (!concreteDriven && symbolicSearch != null) {
+            Collection<SymbolicState> states = symbolicSearch.getAll();
+            if (states.isEmpty()) {
+                return;
+            }
+            logger.info("Generating test cases for remaining states in search strategy");
+            for (SymbolicState state : states) {
+                // Check if we are over the time budget
+                if (System.currentTimeMillis() >= overallDeadline) {
+                    logger.info("Time budget exceeded while evaluating unifinished paths, stopping...");
+                    break;
+                }
+                if (!state.isInfeasible()) {
+                    generateTestCase(state.returnToRootCaller());
+                }
+            }
+        }
+
+        searchStrategy.reset();
+        replayStrategy.reset();
     }
 
     /**
      * Generate a test case for the given method and symbolic state.
      */
-    private void generateTestCase(JavaSootMethod method, SymbolicState state) {
+    private void generateTestCase(SymbolicState state) {
         try {
             Optional<ArgMap> argMap = validator.evaluate(state);
-            argMap.ifPresent(map -> generator.addMethodTestCase(method, ctorSoot, map));
+            argMap.ifPresent(map -> generator.addMethodTestCase(state.getMethod(), ctorSoot, map));
         } catch (Exception e) {
-            logger.error("Error generating test case for method {}: {}", method.getName(), e.getMessage());
+            logger.error("Error generating test case for method {}: {}", state.getMethod().getName(), e.getMessage());
             logger.debug("Error stack trace: ", e);
         }
     }
@@ -246,7 +276,7 @@ public class DSEController {
         // If static, start with target method, otherwise start with constructor
         if (method.isStatic()) {
             logger.debug("Executing target method: {}", method.getName());
-            SymbolicState state = new SymbolicState(method.getSignature(), cfg);
+            SymbolicState state = new SymbolicState(method, cfg);
             state.switchToMethodState();
             searchStrategy.add(state);
         } else {
@@ -261,9 +291,9 @@ public class DSEController {
                 SymbolicState state;
                 if (initStates.containsKey(pathHash)) {
                     state = initStates.get(pathHash).clone();
-                    state.setMethod(method.getSignature(), cfg);
+                    state.setMethod(method, cfg);
                 } else {
-                    state = new SymbolicState(ctorSoot.getSignature(), ctorCfg);
+                    state = new SymbolicState(ctorSoot, ctorCfg);
                 }
                 searchStrategy.add(state);
             }
@@ -272,7 +302,7 @@ public class DSEController {
             // If not available, simply start at the beginning of the ctor
             else {
                 if (initStates.isEmpty()) {
-                    SymbolicState state = new SymbolicState(ctorSoot.getSignature(), ctorCfg);
+                    SymbolicState state = new SymbolicState(ctorSoot, ctorCfg);
                     searchStrategy.add(state);
                 } else {
                     for (SymbolicState state : initStates.values()) {
@@ -282,7 +312,7 @@ public class DSEController {
                         // Only if the state was the final constructor state, set the current statement
                         // to the starting statement of the target method
                         if (!state.isCtorState()) {
-                            newState.setMethod(method.getSignature(), cfg);
+                            newState.setMethod(method, cfg);
                         }
                         searchStrategy.add(newState);
                     }
@@ -293,7 +323,7 @@ public class DSEController {
         SymbolicState current;
         while ((current = searchStrategy.next()) != null) {
             // Check if we are over the time budget
-            if (System.currentTimeMillis() >= deadline) {
+            if (System.currentTimeMillis() >= executionDeadline) {
                 logger.info("Time budget exceeded during symbolic-driven, stopping execution");
                 deadlineReached = true;
                 return concreteDriven ? Optional.of(current) : Optional.empty();
@@ -308,7 +338,7 @@ public class DSEController {
                         return Optional.of(current);
                     // For symblic-driven, generate test case
                     else
-                        generateTestCase(method, current.returnToRootCaller());
+                        generateTestCase(current.returnToRootCaller());
                 }
                 searchStrategy.remove(current);
                 continue;
@@ -334,7 +364,7 @@ public class DSEController {
                                 if (concreteDriven)
                                     return Optional.of(state);
                                 else
-                                    generateTestCase(method, state);
+                                    generateTestCase(state);
                             }
                             searchStrategy.remove(state);
                             continue;
@@ -345,7 +375,7 @@ public class DSEController {
                         // to reuse this final ctor state for multiple methods)
                         initStates.put(hashCode, state.clone());
                         logger.debug("Switching to target method: {}", method.getName());
-                        state.setMethod(method.getSignature(), cfg);
+                        state.setMethod(method, cfg);
                         searchStrategy.add(state);
                     } else {
                         initStates.put(hashCode, state);
@@ -367,7 +397,7 @@ public class DSEController {
 
         while (true) {
             // Check time budget
-            if (System.currentTimeMillis() >= deadline) {
+            if (System.currentTimeMillis() >= executionDeadline) {
                 logger.info("Time budget exceeded during concrete-driven, stopping execution");
                 deadlineReached = true;
                 break;
@@ -376,7 +406,6 @@ public class DSEController {
             // Concrete execution followed by symbolic replay
             TraceManager.clearEntries();
             concrete.execute(ctor, javaMethod, argMap);
-            // Assume symbolic replay will produce a single final state
             Optional<SymbolicState> finalState = runSymbolicDriven(method, replayStrategy);
             logger.debug("Replayed state: {}", finalState.isPresent() ? finalState.get() : "none");
 

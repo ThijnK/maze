@@ -1,6 +1,7 @@
 package nl.uu.maze.search.strategy;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -91,6 +92,11 @@ public class SubpathGuidedSearch<T extends SearchTarget> extends SearchStrategy<
     public void reset() {
         targets.clear();
         subpathCounts.clear();
+    }
+
+    @Override
+    public Collection<T> getAll() {
+        return targets;
     }
 
     @Override

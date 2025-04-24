@@ -2,6 +2,7 @@ package nl.uu.maze.search.strategy;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import nl.uu.maze.search.SearchTarget;
@@ -58,6 +59,11 @@ public class ProbabilisticSearch<T extends SearchTarget> extends SearchStrategy<
     @Override
     public void reset() {
         targets.clear();
+    }
+
+    @Override
+    public Collection<T> getAll() {
+        return targets;
     }
 
     @Override

@@ -72,4 +72,9 @@ public class RandomPathSearch<T extends SearchTarget> extends SearchStrategy<T> 
         tree = null;
         current = null;
     }
+
+    @Override
+    public List<T> getAll() {
+        return tree.getLeafNodes().stream().map(TreeNode::getValue).toList();
+    }
 }

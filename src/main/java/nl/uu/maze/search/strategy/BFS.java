@@ -1,5 +1,6 @@
 package nl.uu.maze.search.strategy;
 
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -38,5 +39,10 @@ public class BFS<T extends SearchTarget> extends SearchStrategy<T> {
     @Override
     public void reset() {
         targets.clear();
+    }
+
+    @Override
+    public Collection<T> getAll() {
+        return targets;
     }
 }

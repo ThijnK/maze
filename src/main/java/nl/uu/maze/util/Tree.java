@@ -139,4 +139,23 @@ public class Tree<T> {
             root = null;
         }
     }
+
+    /**
+     * Get all leaf nodes in the tree.
+     */
+    public List<TreeNode<T>> getLeafNodes() {
+        List<TreeNode<T>> leafNodes = new ArrayList<>();
+        collectLeafNodes(root, leafNodes);
+        return leafNodes;
+    }
+
+    private void collectLeafNodes(TreeNode<T> node, List<TreeNode<T>> leafNodes) {
+        if (node.isLeaf()) {
+            leafNodes.add(node);
+        } else {
+            for (TreeNode<T> child : node.getChildren()) {
+                collectLeafNodes(child, leafNodes);
+            }
+        }
+    }
 }

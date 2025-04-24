@@ -20,6 +20,7 @@ import sootup.core.jimple.common.expr.AbstractInvokeExpr;
 import sootup.core.jimple.common.stmt.Stmt;
 import sootup.core.signatures.MethodSignature;
 import sootup.core.types.Type;
+import sootup.java.core.JavaSootMethod;
 
 /**
  * Represents a symbolic state in the symbolic execution engine.
@@ -41,7 +42,7 @@ import sootup.core.types.Type;
 public class SymbolicState implements SearchTarget {
     private static final Context ctx = Z3ContextProvider.getContext();
 
-    private MethodSignature methodSig;
+    private JavaSootMethod method;
     private StmtGraph<?> cfg;
     private Stmt stmt;
     private Stmt prevStmt = null;
@@ -106,8 +107,8 @@ public class SymbolicState implements SearchTarget {
     /** Indicates whether the state's constraints were found to be unsatisfiable. */
     private boolean isInfeasible = false;
 
-    public SymbolicState(MethodSignature methodSig, StmtGraph<?> cfg) {
-        this.methodSig = methodSig;
+    public SymbolicState(JavaSootMethod method, StmtGraph<?> cfg) {
+        this.method = method;
         this.cfg = cfg;
         this.stmt = cfg.getStartingStmt();
         this.store = new HashMap<>();
@@ -124,7 +125,7 @@ public class SymbolicState implements SearchTarget {
      * state given.
      */
     private SymbolicState(SymbolicState state) {
-        this.methodSig = state.methodSig;
+        this.method = state.method;
         this.cfg = state.cfg;
         this.stmt = state.stmt;
         this.prevStmt = state.prevStmt;
@@ -182,8 +183,8 @@ public class SymbolicState implements SearchTarget {
      * method signature.
      * Note: also sets the current statement to the starting statement of the CFG.
      */
-    public void setMethod(MethodSignature methodSig, StmtGraph<?> cfg) {
-        this.methodSig = methodSig;
+    public void setMethod(JavaSootMethod method, StmtGraph<?> cfg) {
+        this.method = method;
         this.cfg = cfg;
         setStmt(cfg.getStartingStmt());
     }
@@ -192,8 +193,12 @@ public class SymbolicState implements SearchTarget {
         return cfg;
     }
 
+    public JavaSootMethod getMethod() {
+        return method;
+    }
+
     public MethodSignature getMethodSignature() {
-        return methodSig;
+        return method.getSignature();
     }
 
     public void setCaller(SymbolicState caller) {

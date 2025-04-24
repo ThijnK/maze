@@ -1,5 +1,7 @@
 package nl.uu.maze.search.strategy;
 
+import java.util.Collection;
+
 import nl.uu.maze.execution.symbolic.SymbolicState;
 
 /**
@@ -39,6 +41,11 @@ public class SymbolicSearchStrategy extends SearchStrategy<SymbolicState> {
     @Override
     public void reset() {
         strategy.reset();
+    }
+
+    @Override
+    public Collection<SymbolicState> getAll() {
+        return strategy.getAll();
     }
 
     @Override

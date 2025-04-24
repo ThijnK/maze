@@ -1,6 +1,7 @@
 package nl.uu.maze.search.strategy;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -141,6 +142,11 @@ public class ConcreteSearchStrategy extends SearchStrategy<PathConditionCandidat
     public void reset() {
         strategy.reset();
         exploredPaths.clear();
+    }
+
+    @Override
+    public Collection<PathConditionCandidate> getAll() {
+        return strategy.getAll();
     }
 
     @Override
