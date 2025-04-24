@@ -30,7 +30,10 @@ public class CallDepthHeuristic extends SearchHeuristic {
 
     @Override
     public String getName() {
-        return "CallDepthHeuristic";
+        if (preferDeepest) {
+            return "GreatestCallDepthHeuristic";
+        }
+        return "SmallestCallDepthHeuristic";
     }
 
     @Override
