@@ -208,8 +208,6 @@ public class DSEController {
      * Run the dynamic symbolic execution engine on the current class.
      */
     private void run() throws Exception {
-        // Set deadline
-
         long overallDeadline = timeBudget > 0 ? System.currentTimeMillis() + timeBudget : Long.MAX_VALUE;
 
         // Concrete-driven is run one method at a time, while symbolic-driven is run on

@@ -245,8 +245,6 @@ public class JUnitTestGenerator {
         }
         builtTestCases.add(hash);
 
-        methodCount.compute(method.getName(), (k, v) -> v == null ? 1 : v + 1);
-
         methodBuilder.setName(createTestName(method.getName()));
         classBuilder.addMethod(methodBuilder.build());
     }
@@ -257,7 +255,8 @@ public class JUnitTestGenerator {
     private String createTestName(String methodName) {
         // Remove brackets (< and >) from the method name (in case of ctor)
         methodName = methodName.replace("<", "").replace(">", "");
-        return "test" + capitalizeFirstLetter(methodName) + methodCount.get(methodName);
+        int count = methodCount.compute(methodName, (k, v) -> v == null ? 1 : v + 1);
+        return "test" + capitalizeFirstLetter(methodName) + count;
     }
 
     /**
