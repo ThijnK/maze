@@ -46,8 +46,17 @@ public class Z3Utils {
             return Arrays.stream(expr.getArgs()).mapToInt(Z3Utils::estimateCostInternal).sum();
         } else {
             Sort sort = expr.getSort();
-            // Float and sequence sorts (strings) are more expensive than integer sorts
-            if (sort instanceof FPSort || sort instanceof SeqSort) {
+            // Doubles and floats most expensive
+            if (sort instanceof FPSort fpSort) {
+                int bitSize = fpSort.getEBits() + fpSort.getSBits();
+                if (bitSize == 64) { // double
+                    return 5;
+                } else { // float
+                    return 4;
+                }
+            }
+            // Sequence sorts (strings) are more expensive than integer sorts
+            if (sort instanceof SeqSort) {
                 return 3;
             }
             // Reals are more optimized than arbitrary floating points, but still more
