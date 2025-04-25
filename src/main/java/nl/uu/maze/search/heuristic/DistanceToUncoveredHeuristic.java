@@ -1,5 +1,6 @@
 package nl.uu.maze.search.heuristic;
 
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Set;
@@ -57,8 +58,7 @@ public class DistanceToUncoveredHeuristic extends SearchHeuristic {
         }
 
         Queue<StmtDistance> worklist = new LinkedList<>();
-        Set<Stmt> visited = new java.util.HashSet<>();
-        // int dist = 0;
+        Set<Stmt> visited = new HashSet<>();
         worklist.offer(new StmtDistance(stmt, 0, cfg));
 
         while (!worklist.isEmpty()) {

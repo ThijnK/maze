@@ -57,10 +57,6 @@ public class DSEController {
     private JavaSootClass sootClass;
     private Class<?> clazz;
     private Class<?> instrumented;
-    /** After this time, stop the process as soon as possible. */
-    private long executionDeadline;
-    private long overallDeadline;
-    private boolean deadlineReached = false;
 
     private final SymbolicExecutor symbolic;
     private final SymbolicStateValidator validator;
@@ -72,6 +68,8 @@ public class DSEController {
     private Constructor<?> ctor;
     private JavaSootMethod ctorSoot;
     private StmtGraph<?> ctorCfg;
+    private long timeBudget;
+    private long executionDeadline;
     /**
      * Map of init states used in concrete-driven execution, indexed by the hash
      * code of the path encoding.
@@ -132,8 +130,11 @@ public class DSEController {
      * @param timeBudget The time budget for the search in ms (0 for no timeout)
      * @throws Exception If an error occurs during execution, or if the class cannot
      *                   be found in the class path
+     * @implNote This method prepares the class for execution, while the
+     *           {@link #run()} method actually runs the execution.
      */
     public void run(String className, long timeBudget) throws Exception {
+        this.timeBudget = timeBudget;
         // Instrument the class if concrete-driven
         // If this class was instrumented before, it will reuse previous results
         this.instrumented = concreteDriven
@@ -145,35 +146,6 @@ public class DSEController {
         this.clazz = analyzer.getJavaClass(classType);
         generator.initializeForClass(clazz);
 
-        // Set deadlines
-        // We reserve 20% of the total time budget for evaluating unfinished paths once
-        // the deadline for execution is reached (unless concrete-driven)
-        long reservedTime = !concreteDriven ? (long) (timeBudget * 0.2) : 0;
-        executionDeadline = timeBudget > 0 ? System.currentTimeMillis() + (timeBudget - reservedTime) : Long.MAX_VALUE;
-        overallDeadline = timeBudget > 0 ? System.currentTimeMillis() + timeBudget : Long.MAX_VALUE;
-        deadlineReached = false;
-
-        logger.info("Running {} DSE on class: {}", concreteDriven ? "concrete-driven" : "symbolic-driven",
-                clazz.getSimpleName());
-        logger.info("Using search strategy: {}", searchStrategy.getName());
-
-        logger.debug("Max depth: {}", maxDepth);
-        logger.debug("Output path: {}", outPath);
-        logger.debug("Time budget: {}", timeBudget > 0 ? timeBudget : "unlimited");
-
-        // Write test cases regardless of whether the execution was successful or not,
-        // so that intermediate results are not lost
-        try {
-            run();
-        } finally {
-            generator.writeToFile(outPath);
-        }
-    }
-
-    /**
-     * Run the dynamic symbolic execution engine on the current class.
-     */
-    private void run() throws Exception {
         Set<JavaSootMethod> methods = sootClass.getMethods();
 
         // Organize mehtods under test into static and non-static, and filter out any
@@ -215,6 +187,31 @@ public class DSEController {
             logger.info("Using constructor: {}", ctorSoot.getSignature());
         }
 
+        logger.info("Running {} DSE on class: {}", concreteDriven ? "concrete-driven" : "symbolic-driven",
+                clazz.getSimpleName());
+        logger.info("Using search strategy: {}", searchStrategy.getName());
+
+        logger.debug("Max depth: {}", maxDepth);
+        logger.debug("Output path: {}", outPath);
+        logger.debug("Time budget: {}", timeBudget > 0 ? timeBudget : "unlimited");
+
+        // Write test cases regardless of whether the execution was successful or not,
+        // so that intermediate results are not lost
+        try {
+            run();
+        } finally {
+            generator.writeToFile(outPath);
+        }
+    }
+
+    /**
+     * Run the dynamic symbolic execution engine on the current class.
+     */
+    private void run() throws Exception {
+        // Set deadline
+
+        long overallDeadline = timeBudget > 0 ? System.currentTimeMillis() + timeBudget : Long.MAX_VALUE;
+
         // Concrete-driven is run one method at a time, while symbolic-driven is run on
         // all methods at once
         if (concreteDriven) {
@@ -227,10 +224,23 @@ public class DSEController {
             for (JavaSootMethod method : nonStaticMuts) {
                 muts[i++] = method;
             }
+
+            executionDeadline = overallDeadline;
             Arrays.sort(muts, (m1, m2) -> m1.getName().compareTo(m2.getName()));
-            for (JavaSootMethod method : muts) {
-                if (deadlineReached) {
+            for (i = 0; i < muts.length; i++) {
+                JavaSootMethod method = muts[i];
+                if (System.currentTimeMillis() >= overallDeadline) {
+                    logger.info("Time budget exceeded while iterating methods under test, stopping...");
                     break;
+                }
+
+                // Set execution deadline for this method
+                if (timeBudget > 0) {
+                    // Divide remaining time budget by the number of remaining methods
+                    long remainingBudget = overallDeadline - System.currentTimeMillis();
+                    long methodBudget = (long) (remainingBudget * 1.2 / (muts.length - i));
+                    executionDeadline = System.currentTimeMillis() + methodBudget;
+                    logger.info("Time budget for method {}: {}", method.getName(), methodBudget);
                 }
 
                 try {
@@ -243,6 +253,11 @@ public class DSEController {
                 }
             }
         } else {
+            // Reserve 20% of the time budget for generating test cases for unfinished paths
+            long reservedTime = (long) (timeBudget * 0.2);
+            executionDeadline = timeBudget > 0 ? System.currentTimeMillis() + (timeBudget - reservedTime)
+                    : Long.MAX_VALUE;
+
             SymbolicSearchStrategy strategy = searchStrategy.toSymbolic();
             initializeSymbolic(strategy);
             runSymbolicDriven(strategy, ctorSoot);
@@ -315,7 +330,6 @@ public class DSEController {
             // Check if we are over the time budget
             if (System.currentTimeMillis() >= executionDeadline) {
                 logger.info("Time budget exceeded during symbolic-driven execution, stopping...");
-                deadlineReached = true;
                 return concreteDriven ? Optional.of(current) : Optional.empty();
             }
 
@@ -421,6 +435,7 @@ public class DSEController {
     private void runConcreteDriven(JavaSootMethod method, ConcreteSearchStrategy searchStrategy) throws Exception {
         Method javaMethod = analyzer.getJavaMethod(method.getSignature(), instrumented);
         ArgMap argMap = new ArgMap();
+        boolean deadlineReached = false;
 
         while (true) {
             // Check time budget
