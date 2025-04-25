@@ -25,7 +25,7 @@ public abstract class PathConstraint {
     protected final List<Integer> newCoverageDepths;
     protected final List<Integer> branchHistory;
     /** Estimated cost to solve this constraint. */
-    protected int estimatedCost = -1;
+    protected double estimatedCost = -1.0;
     protected int callDepth;
 
     /**
@@ -81,9 +81,9 @@ public abstract class PathConstraint {
     /**
      * Get the estimated cost to solve this constraint.
      */
-    public int getEstimatedCost() {
+    public double getEstimatedCost() {
         // Lazily initialize estimated cost
-        if (estimatedCost == -1) {
+        if (estimatedCost == -1.0) {
             estimatedCost = Z3Utils.estimateCost(getConstraint());
         }
         return estimatedCost;

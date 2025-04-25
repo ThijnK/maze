@@ -1,5 +1,6 @@
 package nl.uu.maze.search.heuristic;
 
+import nl.uu.maze.execution.symbolic.PathConstraint;
 import nl.uu.maze.search.SearchTarget;
 
 /**
@@ -23,8 +24,8 @@ public class QueryCostHeuristic extends SearchHeuristic {
 
     @Override
     public <T extends SearchTarget> double calculateWeight(T target) {
-        int queryCost = target.getConstraints().stream()
-                .mapToInt(constraint -> constraint.getEstimatedCost())
+        double queryCost = target.getConstraints().stream()
+                .mapToDouble(PathConstraint::getEstimatedCost)
                 .sum();
         return applyExponentialScaling(queryCost, 0.3, false);
     }

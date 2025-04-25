@@ -251,8 +251,8 @@ public class DSEController {
                 }
             }
         } else {
-            // Reserve 20% of the time budget for generating test cases for unfinished paths
-            long reservedTime = (long) (timeBudget * 0.2);
+            // Reserve 30% of the time budget for generating test cases for unfinished paths
+            long reservedTime = (long) (timeBudget * 0.3);
             executionDeadline = timeBudget > 0 ? System.currentTimeMillis() + (timeBudget - reservedTime)
                     : Long.MAX_VALUE;
 
