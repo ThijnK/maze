@@ -332,8 +332,12 @@ public class MethodInvoker {
             } else {
                 // Regular arrays
                 for (int i = 0; i < Array.getLength(object); i++) {
-                    // TODO: this conversion probably does not work for object arrays
                     Object arrElem = Array.get(object, i);
+                    if (!arrElem.getClass().isPrimitive()) {
+                        // Note: concreitization of object arrays not supported
+                        continue;
+                    }
+
                     Expr<?> arrElemExpr = javaToZ3.transform(arrElem, state);
                     Expr<?> arrSelectExpr = arrObj.getElem(i);
                     if (arrElemExpr.getSort().equals(arrSelectExpr.getSort())) {

@@ -307,7 +307,6 @@ public class SymbolicExecutor {
                 state.clearReturnValue();
                 // If array indices required for the return value, set them
                 if (state.heap.getArrayIndices("return") != null) {
-                    // TODO: does not support instance field ref
                     state.heap.copyArrayIndices("return", leftOp.toString());
                 }
             }
