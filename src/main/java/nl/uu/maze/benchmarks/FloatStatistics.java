@@ -39,7 +39,7 @@ public class FloatStatistics {
         if (value < 0) {
             throw new IllegalArgumentException("Cannot calculate square root of a negative number.");
         }
-        float epsilon = 1e-10f; // Precision
+        float epsilon = 1e-6f; // Precision
         float guess = value / 2f;
         while (abs(guess * guess - value) > epsilon) {
             guess = (guess + value / guess) / 2f;
