@@ -285,7 +285,9 @@ public class DSEController {
     private void generateTestCase(SymbolicState state) {
         try {
             Optional<ArgMap> argMap = validator.evaluate(state);
-            argMap.ifPresent(map -> generator.addMethodTestCase(state.getMethod(), ctorSoot, map));
+            if (argMap.isPresent()) {
+                generator.addMethodTestCase(state.getMethod(), ctorSoot, argMap.get());
+            }
         } catch (Exception e) {
             logger.error("Error generating test case for method {}: {}", state.getMethod().getName(), e.getMessage());
             logger.debug("Error stack trace: ", e);

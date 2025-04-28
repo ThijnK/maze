@@ -33,6 +33,7 @@ import sootup.core.types.Type;
  */
 public class ArgMap {
     private static final Logger logger = LoggerFactory.getLogger(ArgMap.class);
+    private static final Z3Sorts sorts = Z3Sorts.getInstance();
 
     /**
      * Map of "arguments" (though it can contain any variable or object reference
@@ -179,7 +180,7 @@ public class ArgMap {
                     converted.put(key, array);
                     return array;
                 } else {
-                    refValue = new ObjectInstance((ClassType) Z3Sorts.getInstance().determineType(type));
+                    refValue = new ObjectInstance((ClassType) sorts.determineType(type));
                 }
             } else {
                 refValue = args.get(var);
@@ -237,13 +238,8 @@ public class ArgMap {
 
         for (int j = 0; j < length; j++) {
             Object element = Array.get(value, j);
-            if (type.getComponentType().isArray()) {
-                // Recursively copy sub arrays
-                Array.set(typedArray, j, castArray(element, type.getComponentType()));
-            } else {
-                // Copy elements
-                Array.set(typedArray, j, toJava("temp", element, type.getComponentType()));
-            }
+            // Copy elements
+            Array.set(typedArray, j, toJava("temp", element, type.getComponentType()));
         }
         return typedArray;
     }

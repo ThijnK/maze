@@ -191,11 +191,12 @@ public class SymbolicStateValidator {
         // Handle arrays last, since they may contain references to other objects
         for (Pair<String, ArrayObject> pair : arrayObjects) {
             // There can be multiple declarations for the same array (elems and len)
-            if (argMap.containsKey(pair.getFirst())) {
+            String arrRef = pair.getFirst();
+            if (argMap.containsKey(arrRef)) {
                 continue;
             }
             Type elemType = pair.getSecond().getType().getBaseType();
-            Object arr = transformer.transformArray(pair.getSecond(), model, elemType, refValues);
+            Object arr = transformer.transformArray(pair.getSecond(), model, elemType, arrRef, refValues);
             argMap.set(pair.getFirst(), arr);
         }
 
