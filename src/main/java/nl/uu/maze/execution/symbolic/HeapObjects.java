@@ -127,7 +127,6 @@ public class HeapObjects {
             return (ArrayType) type;
         }
 
-        @SuppressWarnings("unchecked")
         public <E extends Sort> ArrayExpr<BitVecSort, E> getElems() {
             return (ArrayExpr<BitVecSort, E>) getField("elems").getValue();
         }
