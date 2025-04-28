@@ -450,8 +450,6 @@ public class SymbolicHeap {
                     Expr<?> value = field.getValue();
                     if (sorts.isRef(value) && visited.add(value)) {
                         worklist.offer(value);
-                    } else if (sorts.isRef(value)) {
-                        System.out.println("hi");
                     }
                     // If the field is an array of references, link the elements
                     else if (value.getSort() instanceof ArraySort arrSort && sorts.isRef(arrSort.getRange())) {
