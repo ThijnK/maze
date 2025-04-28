@@ -425,32 +425,42 @@ public class SymbolicHeap {
      * the original object (including alias map entries).
      */
     public void linkHeapObject(Expr<?> symRef, SymbolicHeap otherHeap) {
-        if (sorts.isString(symRef) || sorts.isNull(symRef))
-            return;
+        Queue<Expr<?>> worklist = new LinkedList<>();
+        Set<Expr<?>> visited = new HashSet<>();
+        worklist.offer(symRef);
+        visited.add(symRef);
 
-        Set<Expr<?>> aliases = otherHeap.getAliases(symRef);
-        aliasMap.put(symRef, aliases);
-        for (Expr<?> conRef : aliases) {
-            HeapObject obj = otherHeap.get(conRef);
-            if (obj == null) {
-                continue;
-            }
-            heap.put(conRef, obj);
+        while (!worklist.isEmpty()) {
+            Expr<?> ref = worklist.poll();
+            if (sorts.isString(ref) || sorts.isNull(ref))
+                return;
 
-            // Link reference fields recursively
-            for (Entry<String, HeapObjectField> entry : obj.getFields()) {
-                HeapObjectField field = entry.getValue();
-                Expr<?> value = field.getValue();
-                if (!symRef.equals(value) && sorts.isRef(value)) {
-                    linkHeapObject(value, otherHeap);
+            Set<Expr<?>> aliases = otherHeap.getAliases(ref);
+            aliasMap.put(ref, aliases);
+            for (Expr<?> conRef : aliases) {
+                HeapObject obj = otherHeap.get(conRef);
+                if (obj == null) {
+                    continue;
                 }
-                // If the field is an array, link the elements as well
-                else if (value.getSort() instanceof ArraySort arrSort && sorts.isRef(arrSort.getRange())) {
-                    Z3Utils.traverseExpr(value, (e) -> {
-                        if (sorts.isRef(e)) {
-                            linkHeapObject(e, otherHeap);
-                        }
-                    });
+                heap.put(conRef, obj);
+
+                // Link reference-type fields
+                for (Entry<String, HeapObjectField> entry : obj.getFields()) {
+                    HeapObjectField field = entry.getValue();
+                    Expr<?> value = field.getValue();
+                    if (sorts.isRef(value) && visited.add(value)) {
+                        worklist.offer(value);
+                    } else if (sorts.isRef(value)) {
+                        System.out.println("hi");
+                    }
+                    // If the field is an array of references, link the elements
+                    else if (value.getSort() instanceof ArraySort arrSort && sorts.isRef(arrSort.getRange())) {
+                        Z3Utils.traverseExpr(value, (e) -> {
+                            if (sorts.isRef(e) && visited.add(e)) {
+                                worklist.offer(e);
+                            }
+                        });
+                    }
                 }
             }
         }
