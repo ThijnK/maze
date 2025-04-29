@@ -2,6 +2,7 @@ package nl.uu.maze.search.heuristic;
 
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.Optional;
 import java.util.Queue;
 import java.util.Set;
 
@@ -10,8 +11,10 @@ import nl.uu.maze.execution.symbolic.CoverageTracker;
 import nl.uu.maze.search.SearchTarget;
 import sootup.core.graph.StmtGraph;
 import sootup.core.jimple.common.expr.AbstractInvokeExpr;
+import sootup.core.jimple.common.stmt.JReturnStmt;
 import sootup.core.jimple.common.stmt.Stmt;
 import sootup.core.signatures.MethodSignature;
+import sootup.java.core.JavaSootMethod;
 
 /**
  * Distance To Uncovered Heuristic (DTUH)
@@ -59,7 +62,7 @@ public class DistanceToUncoveredHeuristic extends SearchHeuristic {
 
         Queue<StmtDistance> worklist = new LinkedList<>();
         Set<Stmt> visited = new HashSet<>();
-        worklist.offer(new StmtDistance(stmt, 0, cfg));
+        worklist.offer(StmtDistance.create(stmt, 0, cfg));
 
         while (!worklist.isEmpty()) {
             StmtDistance item = worklist.poll();
@@ -67,8 +70,7 @@ public class DistanceToUncoveredHeuristic extends SearchHeuristic {
             // If a statement has been visited before, we're dealing with a loop, so we can
             // skip it because the first iteration of the loop would have been the shortest
             // path
-            boolean isNew = visited.add(item.stmt);
-            if (!isNew) {
+            if (!visited.add(item.stmt)) {
                 continue;
             }
 
@@ -79,29 +81,82 @@ public class DistanceToUncoveredHeuristic extends SearchHeuristic {
                 return item.dist;
             }
 
-            for (Stmt succ : item.cfg.getAllSuccessors(item.stmt)) {
-                worklist.offer(new StmtDistance(succ, item.dist + 1, item.cfg));
-            }
-
-            // For invoke expressions, also try to enter the methods being invoked
-            if (item.stmt.containsInvokeExpr()) {
+            // For invoke expressions, need to enter the callee method
+            if (!item.skipInvoke && item.stmt.containsInvokeExpr()) {
                 AbstractInvokeExpr invoke = item.stmt.getInvokeExpr();
                 MethodSignature sig = invoke.getMethodSignature();
                 JavaAnalyzer analyzer = JavaAnalyzer.getInstance();
-                analyzer.tryGetSootMethod(sig).ifPresent(m -> {
-                    if (!m.hasBody()) {
-                        return;
-                    }
+                Optional<JavaSootMethod> method = analyzer.tryGetSootMethod(sig);
+                if (method.isPresent() && method.get().hasBody()) {
+                    StmtGraph<?> calleeCFG = analyzer.getCFG(method.get());
+                    worklist.offer(item.callee(calleeCFG));
+                    continue; // Go to successors only after this invoke returns
+                }
+            }
 
-                    StmtGraph<?> calleeCFG = analyzer.getCFG(m);
-                    worklist.offer(new StmtDistance(calleeCFG.getStartingStmt(), item.dist + 1, calleeCFG));
-                });
+            if (item.stmt instanceof JReturnStmt) {
+                // If we reach a return statement, we need to return to the caller
+                StmtDistance caller = item.returnToCaller();
+                if (caller != null) {
+                    worklist.offer(caller);
+                }
+                continue;
+            }
+
+            for (Stmt succ : item.cfg.getAllSuccessors(item.stmt)) {
+                worklist.offer(item.successor(succ));
             }
         }
 
         return MAX_WEIGHT;
     }
 
-    private record StmtDistance(Stmt stmt, int dist, StmtGraph<?> cfg) {
+    private static class StmtDistance {
+        private final Stmt stmt;
+        private final StmtGraph<?> cfg;
+        private final StmtDistance caller;
+        private int dist;
+        private boolean skipInvoke;
+
+        private StmtDistance(Stmt stmt, int dist, StmtGraph<?> cfg, StmtDistance caller) {
+            this.stmt = stmt;
+            this.dist = dist;
+            this.cfg = cfg;
+            this.skipInvoke = false;
+            this.caller = caller;
+        }
+
+        public static StmtDistance create(Stmt stmt, int dist, StmtGraph<?> cfg) {
+            return new StmtDistance(stmt, dist, cfg, null);
+        }
+
+        /**
+         * Create a new StmtDistance instance from a successor statement.
+         */
+        public StmtDistance successor(Stmt stmt) {
+            return new StmtDistance(stmt, dist + 1, cfg, this.caller);
+        }
+
+        /**
+         * Create a new StmtDistance instance for when the current one invokes another
+         * method.
+         */
+        public StmtDistance callee(StmtGraph<?> cfg) {
+            return new StmtDistance(cfg.getStartingStmt(), dist + 1, cfg, this);
+        }
+
+        /**
+         * Create a new StmtDistance instance for when the current one returns to the
+         * caller (if any).
+         */
+        public StmtDistance returnToCaller() {
+            if (caller == null) {
+                return null;
+            }
+
+            caller.skipInvoke = true;
+            caller.dist = dist + 1;
+            return caller;
+        }
     }
 }
