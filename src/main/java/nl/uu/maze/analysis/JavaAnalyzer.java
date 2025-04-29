@@ -31,6 +31,7 @@ import sootup.java.core.views.JavaView;
  */
 public class JavaAnalyzer {
     private static final Logger logger = LoggerFactory.getLogger(JavaAnalyzer.class);
+    private final Map<MethodSignature, Optional<JavaSootMethod>> methodCache = new HashMap<>();
     private static JavaAnalyzer instance;
 
     private final ClassLoader classLoader;
@@ -297,8 +298,18 @@ public class JavaAnalyzer {
     /**
      * Attempt to find a method in a given class type.
      * Will only work if the class is available in the class path.
+     * Results are cached to improve performance on repeated lookups.
      */
     public Optional<JavaSootMethod> tryGetSootMethod(MethodSignature methodSig) {
+        // Check cache first
+        return methodCache.computeIfAbsent(methodSig, this::lookupMethod);
+    }
+
+    /**
+     * Internal method to look up a method without using the cache.
+     * Used by tryGetSootMethod when a method signature isn't in the cache.
+     */
+    private Optional<JavaSootMethod> lookupMethod(MethodSignature methodSig) {
         Optional<JavaSootClass> clazz = view.getClass(methodSig.getDeclClassType());
         if (clazz.isEmpty()) {
             return Optional.empty();
