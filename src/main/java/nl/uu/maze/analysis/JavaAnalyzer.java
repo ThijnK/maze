@@ -34,8 +34,8 @@ public class JavaAnalyzer {
     private static final Logger logger = LoggerFactory.getLogger(JavaAnalyzer.class);
     private static JavaAnalyzer instance;
 
-    private final Map<MethodSignature, Optional<JavaSootMethod>> methodCache = new HashMap<>();
-    private final Map<Stmt, List<Stmt>> successorCache = new HashMap<>();
+    private final Map<MethodSignature, Optional<JavaSootMethod>> methodCache = new IdentityHashMap<>();
+    private final Map<Stmt, List<Stmt>> successorCache = new IdentityHashMap<>();
 
     private final ClassLoader classLoader;
     private final JavaView view;

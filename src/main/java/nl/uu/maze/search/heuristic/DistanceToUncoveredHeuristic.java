@@ -1,6 +1,7 @@
 package nl.uu.maze.search.heuristic;
 
-import java.util.HashSet;
+import java.util.Collections;
+import java.util.IdentityHashMap;
 import java.util.LinkedList;
 import java.util.Optional;
 import java.util.Queue;
@@ -59,7 +60,7 @@ public class DistanceToUncoveredHeuristic extends SearchHeuristic {
         }
 
         Queue<StmtDistance> worklist = new LinkedList<>();
-        Set<Stmt> visited = new HashSet<>();
+        Set<Stmt> visited = Collections.newSetFromMap(new IdentityHashMap<>());
 
         // If target is in a method, called by another method, need to also be able to
         // return to the caller, so build the first item based on the call stack

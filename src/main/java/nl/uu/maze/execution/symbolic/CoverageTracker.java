@@ -1,7 +1,8 @@
 package nl.uu.maze.execution.symbolic;
 
 import java.util.Set;
-import java.util.HashSet;
+import java.util.Collections;
+import java.util.IdentityHashMap;
 
 import sootup.core.jimple.common.stmt.Stmt;
 
@@ -18,10 +19,12 @@ public class CoverageTracker {
         return instance;
     }
 
-    private final Set<Integer> coveredStmts;
+    private final Set<Stmt> coveredStmts;
 
     private CoverageTracker() {
-        coveredStmts = new HashSet<>();
+        // Use identity hash map to avoid potentially expensive equals() calls on
+        // statements (which are unique by reference, so reference equality suffices)
+        coveredStmts = Collections.newSetFromMap(new IdentityHashMap<>());
     }
 
     /**
@@ -31,14 +34,14 @@ public class CoverageTracker {
      *         otherwise
      */
     public boolean setCovered(Stmt stmt) {
-        return coveredStmts.add(stmt.hashCode());
+        return coveredStmts.add(stmt);
     }
 
     /**
      * Checks whether a statement is covered.
      */
     public boolean isCovered(Stmt stmt) {
-        return coveredStmts.contains(stmt.hashCode());
+        return coveredStmts.contains(stmt);
     }
 
     /**
