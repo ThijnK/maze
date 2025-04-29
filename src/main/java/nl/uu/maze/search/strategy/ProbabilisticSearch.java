@@ -3,6 +3,7 @@ package nl.uu.maze.search.strategy;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Random;
 
 import nl.uu.maze.search.SearchTarget;
 import nl.uu.maze.search.heuristic.SearchHeuristic;
@@ -17,11 +18,15 @@ import nl.uu.maze.search.heuristic.SearchHeuristic;
  * for a more nuanced evaluation of states.
  */
 public class ProbabilisticSearch<T extends SearchTarget> extends SearchStrategy<T> {
+    private static final Random rand = new Random();
+
     /**
      * Maximum number of targets to select from.
      * For performance reasons, it may be worthwhile to limit the number of
      * targets to consider for selection, because the heuristic calculations
      * can be expensive.
+     * If the number of targets exceeds this limit, a the targets are systematically
+     * sampled from the list of targets.
      */
     private static final int MAX_TARGETS_TO_CONSIDER = 1000;
     private final List<T> targets = new ArrayList<>();
@@ -90,8 +95,26 @@ public class ProbabilisticSearch<T extends SearchTarget> extends SearchStrategy<
         }
 
         // Cap the number of targets to consider for efficiency
-        boolean useSubset = targets.size() > MAX_TARGETS_TO_CONSIDER;
-        int effectiveSize = useSubset ? MAX_TARGETS_TO_CONSIDER : targets.size();
+        int totalSize = targets.size();
+        boolean useSubset = totalSize > MAX_TARGETS_TO_CONSIDER;
+        int effectiveSize = useSubset ? MAX_TARGETS_TO_CONSIDER : totalSize;
+
+        // Maps sampled indices to original indices in the targets list
+        int[] originalIndices = new int[effectiveSize];
+
+        if (useSubset) {
+            // Systematic sampling - take evenly spaced targets
+            double step = (double) totalSize / MAX_TARGETS_TO_CONSIDER;
+            for (int i = 0; i < MAX_TARGETS_TO_CONSIDER; i++) {
+                int index = (int) (i * step);
+                originalIndices[i] = index;
+            }
+        } else {
+            // When using all targets, indices map 1:1
+            for (int i = 0; i < totalSize; i++) {
+                originalIndices[i] = i;
+            }
+        }
 
         double[] compositeWeights = new double[effectiveSize];
         double totalWeight = 0;
@@ -103,7 +126,7 @@ public class ProbabilisticSearch<T extends SearchTarget> extends SearchStrategy<
             for (int i = 0; i < heuristics.size(); i++) {
                 double sumWeights = 0;
                 for (int j = 0; j < effectiveSize; j++) {
-                    T target = targets.get(j);
+                    T target = targets.get(originalIndices[j]);
                     target.setWaitingTime(iteration - target.getIteration());
                     targetWeights[i][j] = heuristics.get(i).calculateWeight(target);
                     sumWeights += targetWeights[i][j];
@@ -128,7 +151,7 @@ public class ProbabilisticSearch<T extends SearchTarget> extends SearchStrategy<
             // Single heuristic case
             SearchHeuristic heuristic = heuristics.getFirst();
             for (int j = 0; j < effectiveSize; j++) {
-                T target = targets.get(j);
+                T target = targets.get(originalIndices[j]);
                 target.setWaitingTime(iteration - target.getIteration());
                 compositeWeights[j] = heuristic.calculateWeight(target);
                 totalWeight += compositeWeights[j];
@@ -137,19 +160,21 @@ public class ProbabilisticSearch<T extends SearchTarget> extends SearchStrategy<
 
         // Randomly select a target based on the composite weights
         int selectedIndex = selectWeightedIndex(compositeWeights, totalWeight);
+        int actualIndex = originalIndices[selectedIndex];
 
-        // Remove and return the selected target efficiently (order does not matter)
-        T selected = targets.get(selectedIndex);
-        int lastIndex = targets.size() - 1;
-        if (selectedIndex != lastIndex) {
-            targets.set(selectedIndex, targets.get(lastIndex));
+        // Since the order of targets does not matter, we can more efficiently remove
+        // the selected target from the list by first swapping it with the last element
+        T selected = targets.get(actualIndex);
+        int lastIndex = totalSize - 1;
+        if (actualIndex != lastIndex) {
+            targets.set(actualIndex, targets.get(lastIndex));
         }
         targets.removeLast();
         return selected;
     }
 
     private int selectWeightedIndex(double[] weights, double totalWeight) {
-        double randomValue = Math.random() * totalWeight;
+        double randomValue = rand.nextDouble() * totalWeight;
         double sum = 0;
         for (int i = 0; i < weights.length; i++) {
             sum += weights[i];
