@@ -97,9 +97,12 @@ public class MazeCLI implements Callable<Integer> {
             SearchStrategy<?> strategy = SearchStrategyFactory.createStrategy(searchStrategies,
                     searchHeuristics, heuristicWeights, timeBudget);
 
+            Long start = System.currentTimeMillis();
             DSEController controller = new DSEController(classPath, concreteDriven, strategy, outPath,
                     methodName, maxDepth, testTimeout, packageName, junitVersion.isJUnit4());
             controller.run(className, timeBudget);
+            Long end = System.currentTimeMillis();
+            logger.info("Execution time: {} ms", end - start);
             return 0;
         } catch (Exception e) {
             logger.error("An error occurred: {}: {}", e.getClass().getName(), e.getMessage());
