@@ -1,7 +1,6 @@
 package nl.uu.maze.search.strategy;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -18,6 +17,13 @@ import nl.uu.maze.search.heuristic.SearchHeuristic;
  * for a more nuanced evaluation of states.
  */
 public class ProbabilisticSearch<T extends SearchTarget> extends SearchStrategy<T> {
+    /**
+     * Maximum number of targets to select from.
+     * For performance reasons, it may be worthwhile to limit the number of
+     * targets to consider for selection, because the heuristic calculations
+     * can be expensive.
+     */
+    private static final int MAX_TARGETS_TO_CONSIDER = 1000;
     private final List<T> targets = new ArrayList<>();
     private final List<SearchHeuristic> heuristics;
     private int iteration = 0;
@@ -83,59 +89,75 @@ public class ProbabilisticSearch<T extends SearchTarget> extends SearchStrategy<
             return targets.isEmpty() ? null : targets.removeFirst();
         }
 
-        // Calculate weights for each heuristic, for each item
-        double[][] targetWeights = new double[heuristics.size()][targets.size()];
-        for (int i = 0; i < heuristics.size(); i++) {
-            for (int j = 0; j < targets.size(); j++) {
-                T target = targets.get(j);
-                target.setWaitingTime(iteration - target.getIteration());
-                double weight = heuristics.get(i).calculateWeight(target);
-                targetWeights[i][j] = weight;
-            }
-        }
+        // Cap the number of targets to consider for efficiency
+        boolean useSubset = targets.size() > MAX_TARGETS_TO_CONSIDER;
+        int effectiveSize = useSubset ? MAX_TARGETS_TO_CONSIDER : targets.size();
 
-        // Normalize weights per heuristic to ensure each heuristic contributes
-        // proportionally to the composite score
+        double[] compositeWeights = new double[effectiveSize];
+        double totalWeight = 0;
+
         if (heuristics.size() > 1) {
+            // Calculate weights only for the subset we care about
+            double[][] targetWeights = new double[heuristics.size()][effectiveSize];
+
             for (int i = 0; i < heuristics.size(); i++) {
-                // Shift all weights to be non-negative (if necessary)
-                double minWeight = Arrays.stream(targetWeights[i]).min().getAsDouble();
-                if (minWeight < 0) {
-                    for (int j = 0; j < targets.size(); j++) {
-                        targetWeights[i][j] = targetWeights[i][j] - minWeight + 1e-10; // Small epsilon to avoid zeros
-                    }
+                double sumWeights = 0;
+                for (int j = 0; j < effectiveSize; j++) {
+                    T target = targets.get(j);
+                    target.setWaitingTime(iteration - target.getIteration());
+                    targetWeights[i][j] = heuristics.get(i).calculateWeight(target);
+                    sumWeights += targetWeights[i][j];
                 }
 
                 // Normalize weights
-                double totalWeight = Arrays.stream(targetWeights[i]).sum();
-                if (totalWeight != 0)
-                    for (int j = 0; j < targets.size(); j++) {
-                        targetWeights[i][j] /= totalWeight;
+                if (sumWeights > 0) {
+                    for (int j = 0; j < effectiveSize; j++) {
+                        targetWeights[i][j] /= sumWeights;
                     }
+                }
             }
-        }
 
-        // Calculate composite weights for each target
-        double[] compositeWeights = new double[targets.size()];
-        for (int i = 0; i < heuristics.size(); i++) {
-            for (int j = 0; j < targets.size(); j++) {
-                compositeWeights[j] += targetWeights[i][j] * heuristics.get(i).weight;
+            // Calculate composite weights
+            for (int i = 0; i < heuristics.size(); i++) {
+                for (int j = 0; j < effectiveSize; j++) {
+                    compositeWeights[j] += targetWeights[i][j] * heuristics.get(i).weight;
+                    totalWeight += compositeWeights[j];
+                }
+            }
+        } else {
+            // Single heuristic case
+            SearchHeuristic heuristic = heuristics.getFirst();
+            for (int j = 0; j < effectiveSize; j++) {
+                T target = targets.get(j);
+                target.setWaitingTime(iteration - target.getIteration());
+                compositeWeights[j] = heuristic.calculateWeight(target);
+                totalWeight += compositeWeights[j];
             }
         }
 
         // Randomly select a target based on the composite weights
-        double totalWeight = Arrays.stream(compositeWeights).sum();
-        double randomWeight = Math.random() * totalWeight;
-        int selectedIndex = 0;
-        for (int i = 0; i < targets.size(); i++) {
-            randomWeight -= compositeWeights[i];
-            if (randomWeight <= 0) {
-                selectedIndex = i;
-                break;
+        int selectedIndex = selectWeightedIndex(compositeWeights, totalWeight);
+
+        // Remove and return the selected target efficiently (order does not matter)
+        T selected = targets.get(selectedIndex);
+        int lastIndex = targets.size() - 1;
+        if (selectedIndex != lastIndex) {
+            targets.set(selectedIndex, targets.get(lastIndex));
+        }
+        targets.removeLast();
+        return selected;
+    }
+
+    private int selectWeightedIndex(double[] weights, double totalWeight) {
+        double randomValue = Math.random() * totalWeight;
+        double sum = 0;
+        for (int i = 0; i < weights.length; i++) {
+            sum += weights[i];
+            if (sum >= randomValue) {
+                return i;
             }
         }
-
-        // Remove and return the selected target
-        return targets.remove(selectedIndex);
+        // Fallback in case of rounding errors
+        return weights.length - 1;
     }
 }
