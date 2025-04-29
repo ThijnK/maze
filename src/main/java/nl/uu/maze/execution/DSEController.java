@@ -69,6 +69,7 @@ public class DSEController {
     private JavaSootMethod ctorSoot;
     private StmtGraph<?> ctorCfg;
     private long timeBudget;
+    private long overallDeadline;
     private long executionDeadline;
     /**
      * Map of init states used in concrete-driven execution, indexed by the hash
@@ -208,7 +209,7 @@ public class DSEController {
      * Run the dynamic symbolic execution engine on the current class.
      */
     private void run() throws Exception {
-        long overallDeadline = timeBudget > 0 ? System.currentTimeMillis() + timeBudget : Long.MAX_VALUE;
+        overallDeadline = timeBudget > 0 ? System.currentTimeMillis() + timeBudget : Long.MAX_VALUE;
 
         // Concrete-driven is run one method at a time, while symbolic-driven is run on
         // all methods at once
@@ -329,8 +330,21 @@ public class DSEController {
         while ((current = searchStrategy.next()) != null) {
             // Check if we are over the time budget
             if (System.currentTimeMillis() >= executionDeadline) {
-                logger.info("Time budget exceeded during symbolic-driven execution, stopping...");
-                return concreteDriven ? Optional.of(current) : Optional.empty();
+                if (concreteDriven) {
+                    return Optional.of(current);
+                }
+
+                // Check if number of states in search strategy is small compared to the time
+                // left before overall deadline
+                // If so, we can keep going for a bit longer
+                long remainingTime = overallDeadline - System.currentTimeMillis();
+                if (searchStrategy.size() * 5L > remainingTime) {
+                    logger.info("Time budget exceeded during symbolic-driven execution, stopping...");
+                    return concreteDriven ? Optional.of(current) : Optional.empty();
+                }
+
+                logger.info("Extending time budget for symbolic-driven execution...");
+                executionDeadline = System.currentTimeMillis() + remainingTime / 2;
             }
 
             logger.debug("Current state: {}", current);

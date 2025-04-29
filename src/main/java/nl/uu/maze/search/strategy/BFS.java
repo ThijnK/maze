@@ -37,6 +37,11 @@ public class BFS<T extends SearchTarget> extends SearchStrategy<T> {
     }
 
     @Override
+    public int size() {
+        return targets.size();
+    }
+
+    @Override
     public void reset() {
         targets.clear();
     }

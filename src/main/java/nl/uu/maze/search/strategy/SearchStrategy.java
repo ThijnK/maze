@@ -68,6 +68,13 @@ public abstract class SearchStrategy<T extends SearchTarget> {
     }
 
     /**
+     * Get the number of search targets in the search strategy.
+     * 
+     * @return The number of targets in the search strategy
+     */
+    public abstract int size();
+
+    /**
      * Reset the search strategy to its initial state.
      */
     public abstract void reset();

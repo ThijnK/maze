@@ -89,6 +89,11 @@ public class SubpathGuidedSearch<T extends SearchTarget> extends SearchStrategy<
     }
 
     @Override
+    public int size() {
+        return targets.size();
+    }
+
+    @Override
     public void reset() {
         targets.clear();
         subpathCounts.clear();

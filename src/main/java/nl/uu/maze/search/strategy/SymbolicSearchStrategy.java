@@ -39,6 +39,11 @@ public class SymbolicSearchStrategy extends SearchStrategy<SymbolicState> {
     }
 
     @Override
+    public int size() {
+        return strategy.size();
+    }
+
+    @Override
     public void reset() {
         strategy.reset();
     }

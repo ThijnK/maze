@@ -68,6 +68,11 @@ public class RandomPathSearch<T extends SearchTarget> extends SearchStrategy<T> 
     }
 
     @Override
+    public int size() {
+        return tree != null ? tree.getLeafNodes().size() : 0;
+    }
+
+    @Override
     public void reset() {
         tree = null;
         current = null;

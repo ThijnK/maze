@@ -139,6 +139,11 @@ public class ConcreteSearchStrategy extends SearchStrategy<PathConditionCandidat
     }
 
     @Override
+    public int size() {
+        return strategy.size();
+    }
+
+    @Override
     public void reset() {
         strategy.reset();
         exploredPaths.clear();

@@ -82,6 +82,11 @@ public class InterleavedSearch<T extends SearchTarget> extends SearchStrategy<T>
     }
 
     @Override
+    public int size() {
+        return strategies.getFirst().size();
+    }
+
+    @Override
     public void reset() {
         for (SearchStrategy<T> strategy : strategies) {
             strategy.reset();
