@@ -8,6 +8,7 @@ import java.util.stream.Stream;
 
 import com.microsoft.z3.*;
 
+import nl.uu.maze.analysis.JavaAnalyzer;
 import nl.uu.maze.execution.MethodType;
 import nl.uu.maze.util.Pair;
 import nl.uu.maze.util.Z3ContextProvider;
@@ -289,7 +290,7 @@ public class SymbolicState implements SearchTarget {
 
     /** Get the successor statements for the current statement. */
     public List<Stmt> getSuccessors() {
-        return stmt == null ? List.of() : cfg.getAllSuccessors(stmt);
+        return stmt == null ? List.of() : JavaAnalyzer.getInstance().getSuccessors(cfg, stmt);
     }
 
     public void assign(String var, Expr<?> expression) {

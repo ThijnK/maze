@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import sootup.core.graph.StmtGraph;
 import sootup.core.inputlocation.AnalysisInputLocation;
+import sootup.core.jimple.common.stmt.Stmt;
 import sootup.core.signatures.MethodSignature;
 import sootup.core.types.*;
 import sootup.core.util.DotExporter;
@@ -31,8 +32,10 @@ import sootup.java.core.views.JavaView;
  */
 public class JavaAnalyzer {
     private static final Logger logger = LoggerFactory.getLogger(JavaAnalyzer.class);
-    private final Map<MethodSignature, Optional<JavaSootMethod>> methodCache = new HashMap<>();
     private static JavaAnalyzer instance;
+
+    private final Map<MethodSignature, Optional<JavaSootMethod>> methodCache = new HashMap<>();
+    private final Map<Stmt, List<Stmt>> successorCache = new HashMap<>();
 
     private final ClassLoader classLoader;
     private final JavaView view;
@@ -323,6 +326,14 @@ public class JavaAnalyzer {
             return tryGetSootMethod(parentSig);
         }
         return method;
+    }
+
+    /**
+     * Get the successors of a given statement in the control flow graph.
+     */
+    public List<Stmt> getSuccessors(StmtGraph<?> cfg, Stmt stmt) {
+        // Check cache first
+        return successorCache.computeIfAbsent(stmt, s -> cfg.getAllSuccessors(s));
     }
 
     /**

@@ -76,6 +76,7 @@ public class DistanceToUncoveredHeuristic extends SearchHeuristic {
         }
         worklist.offer(current);
 
+        JavaAnalyzer analyzer = JavaAnalyzer.getInstance();
         while (!worklist.isEmpty()) {
             StmtDistance item = worklist.poll();
 
@@ -97,7 +98,7 @@ public class DistanceToUncoveredHeuristic extends SearchHeuristic {
             if (!item.skipInvoke && item.stmt.containsInvokeExpr()) {
                 AbstractInvokeExpr invoke = item.stmt.getInvokeExpr();
                 MethodSignature sig = invoke.getMethodSignature();
-                JavaAnalyzer analyzer = JavaAnalyzer.getInstance();
+
                 Optional<JavaSootMethod> method = analyzer.tryGetSootMethod(sig);
                 if (method.isPresent() && method.get().hasBody()) {
                     StmtGraph<?> calleeCFG = analyzer.getCFG(method.get());
@@ -115,7 +116,7 @@ public class DistanceToUncoveredHeuristic extends SearchHeuristic {
                 continue;
             }
 
-            for (Stmt succ : item.cfg.getAllSuccessors(item.stmt)) {
+            for (Stmt succ : analyzer.getSuccessors(item.cfg, item.stmt)) {
                 worklist.offer(item.successor(succ));
             }
         }
