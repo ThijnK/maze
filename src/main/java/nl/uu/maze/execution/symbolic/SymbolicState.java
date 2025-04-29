@@ -9,6 +9,7 @@ import java.util.stream.Stream;
 import com.microsoft.z3.*;
 
 import nl.uu.maze.execution.MethodType;
+import nl.uu.maze.util.Pair;
 import nl.uu.maze.util.Z3ContextProvider;
 import nl.uu.maze.util.Z3Sorts;
 import nl.uu.maze.execution.symbolic.PathConstraint.SingleConstraint;
@@ -210,6 +211,20 @@ public class SymbolicState implements SearchTarget {
 
     public boolean hasCaller() {
         return caller != null;
+    }
+
+    public Pair<Stmt, StmtGraph<?>>[] getCallStack() {
+        int depth = getCallDepth();
+        Pair<Stmt, StmtGraph<?>>[] callStack = new Pair[depth + 1];
+
+        SymbolicState state = this;
+        int index = depth;
+        while (state != null) {
+            callStack[index--] = Pair.of(state.stmt, state.cfg);
+            state = state.caller;
+        }
+
+        return callStack;
     }
 
     /**

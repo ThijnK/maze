@@ -3,6 +3,7 @@ package nl.uu.maze.search;
 import java.util.List;
 
 import nl.uu.maze.execution.symbolic.PathConstraint;
+import nl.uu.maze.util.Pair;
 import sootup.core.graph.StmtGraph;
 import sootup.core.jimple.common.stmt.Stmt;
 
@@ -53,6 +54,12 @@ public interface SearchTarget {
      * Returns the call depth (number of nested function calls) of the target.
      */
     int getCallDepth();
+
+    /**
+     * Returns the call stack of the target, which is a list of pairs where each
+     * pair contains a statement and its corresponding control flow graph.
+     */
+    Pair<Stmt, StmtGraph<?>>[] getCallStack();
 
     /**
      * Sets the iteration at which the target was added to the search strategy.

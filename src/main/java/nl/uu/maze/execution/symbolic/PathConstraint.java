@@ -7,6 +7,7 @@ import com.microsoft.z3.BoolExpr;
 import com.microsoft.z3.Context;
 import com.microsoft.z3.Expr;
 
+import nl.uu.maze.util.Pair;
 import nl.uu.maze.util.Z3ContextProvider;
 import nl.uu.maze.util.Z3Utils;
 import sootup.core.graph.StmtGraph;
@@ -22,11 +23,11 @@ public abstract class PathConstraint {
     protected final Stmt prevStmt;
     protected final StmtGraph<?> cfg;
     protected final int depth;
+    protected final Pair<Stmt, StmtGraph<?>>[] callStack;
     protected final List<Integer> newCoverageDepths;
     protected final List<Integer> branchHistory;
     /** Estimated cost to solve this constraint. */
     protected double estimatedCost = -1.0;
-    protected int callDepth;
 
     /**
      * Create a new path constraint for the given symbolic state.
@@ -38,20 +39,23 @@ public abstract class PathConstraint {
         this.prevStmt = state.getPrevStmt();
         this.cfg = state.getCFG();
         this.depth = state.getDepth();
+        // getCallStack() returns a fresh array
+        this.callStack = state.getCallStack();
+        // getNewCoverageDepths() and getBranchHistory() returns the same lists used by
+        // the SymbolicState itself, so copy them
         this.newCoverageDepths = new ArrayList<>(state.getNewCoverageDepths());
         this.branchHistory = new ArrayList<>(state.getBranchHistory());
-        this.callDepth = state.getCallDepth();
     }
 
     protected PathConstraint(Stmt stmt, Stmt prevStmt, StmtGraph<?> cfg, int depth, List<Integer> newCoverageDepths,
-            List<Integer> branchHistory, int callDepth) {
+            List<Integer> branchHistory, Pair<Stmt, StmtGraph<?>>[] callStack) {
         this.stmt = stmt;
         this.prevStmt = prevStmt;
         this.cfg = cfg;
         this.depth = depth;
-        this.newCoverageDepths = new ArrayList<>(newCoverageDepths);
-        this.branchHistory = new ArrayList<>(branchHistory);
-        this.callDepth = callDepth;
+        this.callStack = callStack;
+        this.newCoverageDepths = newCoverageDepths;
+        this.branchHistory = branchHistory;
     }
 
     public Stmt getStmt() {
@@ -90,7 +94,11 @@ public abstract class PathConstraint {
     }
 
     public int getCallDepth() {
-        return callDepth;
+        return callStack.length;
+    }
+
+    public Pair<Stmt, StmtGraph<?>>[] getCallStack() {
+        return callStack;
     }
 
     public abstract BoolExpr getConstraint();
@@ -134,8 +142,9 @@ public abstract class PathConstraint {
         }
 
         protected SingleConstraint(Stmt stmt, Stmt prevStmt, StmtGraph<?> cfg, int depth,
-                List<Integer> newCoverageDepths, List<Integer> branchHistory, int callDepth, BoolExpr constraint) {
-            super(stmt, prevStmt, cfg, depth, newCoverageDepths, branchHistory, callDepth);
+                List<Integer> newCoverageDepths, List<Integer> branchHistory, Pair<Stmt, StmtGraph<?>>[] callStack,
+                BoolExpr constraint) {
+            super(stmt, prevStmt, cfg, depth, newCoverageDepths, branchHistory, callStack);
             this.constraint = constraint;
         }
 
@@ -144,7 +153,7 @@ public abstract class PathConstraint {
         }
 
         public SingleConstraint negate() {
-            return new SingleConstraint(stmt, prevStmt, cfg, depth, newCoverageDepths, branchHistory, callDepth,
+            return new SingleConstraint(stmt, prevStmt, cfg, depth, newCoverageDepths, branchHistory, callStack,
                     Z3Utils.negate(constraint));
         }
     }
@@ -202,9 +211,9 @@ public abstract class PathConstraint {
         }
 
         protected CompositeConstraint(Stmt stmt, Stmt prevStmt, StmtGraph<?> cfg, int depth,
-                List<Integer> newCoverageDepths, List<Integer> branchHistory, int callDepth, Expr<?> expr,
-                Expr<?>[] values, int index, boolean allowDefault) {
-            super(stmt, prevStmt, cfg, depth, newCoverageDepths, branchHistory, callDepth);
+                List<Integer> newCoverageDepths, List<Integer> branchHistory, Pair<Stmt, StmtGraph<?>>[] callStack,
+                Expr<?> expr, Expr<?>[] values, int index, boolean allowDefault) {
+            super(stmt, prevStmt, cfg, depth, newCoverageDepths, branchHistory, callStack);
             this.expr = expr;
             this.values = values;
             this.allowDefault = allowDefault;
@@ -263,7 +272,7 @@ public abstract class PathConstraint {
             if (newIndex < minIndex || newIndex >= values.length) {
                 throw new IllegalArgumentException("Invalid index for composite constraint");
             }
-            return new CompositeConstraint(stmt, prevStmt, cfg, depth, newCoverageDepths, branchHistory, callDepth,
+            return new CompositeConstraint(stmt, prevStmt, cfg, depth, newCoverageDepths, branchHistory, callStack,
                     expr, values, newIndex, allowDefault);
         }
     }

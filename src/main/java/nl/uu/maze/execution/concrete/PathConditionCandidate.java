@@ -10,6 +10,7 @@ import nl.uu.maze.execution.symbolic.PathConstraint;
 import nl.uu.maze.execution.symbolic.SymbolicState;
 import nl.uu.maze.execution.symbolic.PathConstraint.*;
 import nl.uu.maze.search.SearchTarget;
+import nl.uu.maze.util.Pair;
 import sootup.core.graph.StmtGraph;
 import sootup.core.jimple.common.stmt.Stmt;
 
@@ -95,6 +96,10 @@ public class PathConditionCandidate implements SearchTarget {
 
     public int getCallDepth() {
         return constraints.get(index).getCallDepth();
+    }
+
+    public Pair<Stmt, StmtGraph<?>>[] getCallStack() {
+        return constraints.get(index).getCallStack();
     }
 
     public void setIteration(int iteration) {

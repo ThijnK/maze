@@ -9,6 +9,7 @@ import java.util.Set;
 import nl.uu.maze.analysis.JavaAnalyzer;
 import nl.uu.maze.execution.symbolic.CoverageTracker;
 import nl.uu.maze.search.SearchTarget;
+import nl.uu.maze.util.Pair;
 import sootup.core.graph.StmtGraph;
 import sootup.core.jimple.common.expr.AbstractInvokeExpr;
 import sootup.core.jimple.common.stmt.JReturnStmt;
@@ -51,18 +52,29 @@ public class DistanceToUncoveredHeuristic extends SearchHeuristic {
     }
 
     private <T extends SearchTarget> int calculateDistance(T target) {
-        Stmt stmt = target.getStmt();
-        StmtGraph<?> cfg = target.getCFG();
-
         // Prioritize final statements (usually return statements)
         // Because we want to finish the path (or return to caller) asap
-        if (cfg.outDegree(stmt) == 0) {
+        if (target.getCFG().outDegree(target.getStmt()) == 0) {
             return 0;
         }
 
         Queue<StmtDistance> worklist = new LinkedList<>();
         Set<Stmt> visited = new HashSet<>();
-        worklist.offer(StmtDistance.create(stmt, 0, cfg));
+
+        // If target is in a method, called by another method, need to also be able to
+        // return to the caller, so build the first item based on the call stack
+        Pair<Stmt, StmtGraph<?>>[] callStack = target.getCallStack();
+        StmtDistance current = null;
+        for (int i = 0; i < callStack.length; i++) {
+            Pair<Stmt, StmtGraph<?>> frame = callStack[i];
+            if (current == null) {
+                current = StmtDistance.create(frame.first(), 0, frame.second());
+            } else {
+                // Create callee that points back to caller at the specific stmt
+                current = new StmtDistance(frame.first(), 0, frame.second(), current);
+            }
+        }
+        worklist.offer(current);
 
         while (!worklist.isEmpty()) {
             StmtDistance item = worklist.poll();
