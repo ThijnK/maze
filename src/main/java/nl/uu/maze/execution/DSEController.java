@@ -338,7 +338,7 @@ public class DSEController {
                 // left before overall deadline
                 // If so, we can keep going for a bit longer
                 long remainingTime = overallDeadline - System.currentTimeMillis();
-                if (searchStrategy.size() * 5L > remainingTime) {
+                if (searchStrategy.size() * 8L > remainingTime) {
                     logger.info("Time budget exceeded during symbolic-driven execution, stopping...");
                     return concreteDriven ? Optional.of(current) : Optional.empty();
                 }
