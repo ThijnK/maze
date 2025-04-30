@@ -11,8 +11,9 @@ package nl.uu.maze.benchmarks;
  * This can be useful for testing search strategies.
  */
 public class QuickSort {
-    public static void sort(int[] arr) {
+    public static int[] sort(int[] arr) {
         sort(arr, 0, arr.length - 1);
+        return arr;
     }
 
     private static void sort(int[] arr, int low, int high) {
