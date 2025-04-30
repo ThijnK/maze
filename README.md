@@ -52,6 +52,16 @@ For example, to run the application on a specific Java class located in the `./t
 java -jar target/maze-1.0-jar-with-dependencies.jar --classPath target/classes --className com.example.MyClass --outPath tests --strategy BFS
 ```
 
+### Java Standard Library Access
+
+It's possible to give the tool access to Java standard library classes by adding the path to the `rt.jar` file of your JDK to the classpath.
+Note, however, that that file is only available up to JDK 8.
+In JDK 9 and later, the standard library is modularized and the classes are no longer in a single jar file.
+By providing this jar file in the classpath, the engine will be able to symbolically execute standard library classes.
+However, this does not necessarily lead to better test generation, since the standard library code can be quite complex, so it may just end up causing the engine to run into an issue and not being able to complete a path.
+Therefore, it is generally _not_ recommended to do this.
+By default, the tool will execute standard library classes with concrete inputs.
+
 ### Installing Z3
 
 Z3 is a theorem prover developed by Microsoft, which is used in this project to solve constraints in the symbolic execution engine.
