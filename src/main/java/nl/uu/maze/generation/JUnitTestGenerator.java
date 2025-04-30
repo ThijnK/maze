@@ -202,28 +202,34 @@ public class JUnitTestGenerator {
             } else {
                 // Check if return value is a reference to an input parameter
                 boolean isReference = false;
-                if (ctorArgs != null) {
-                    for (int i = 0; i < ctorArgs.length; i++) {
-                        if (ctorArgs[i] == retval) {
+                boolean isPrimitive = isPrimitive(retval);
+                boolean isArray = retval.getClass().isArray();
+                // Only relevant for non-primitive values (and we handle arrays differently)
+                if (!isPrimitive && !isArray) {
+                    if (ctorArgs != null) {
+                        for (int i = 0; i < ctorArgs.length; i++) {
+                            if (ctorArgs[i] == retval) {
+                                isReference = true;
+                                methodBuilder.addStatement("$T expected = $L", returnType,
+                                        ArgMap.getSymbolicName(MethodType.CTOR, i));
+                                break;
+                            }
+                        }
+                    }
+                    for (int i = 0; i < args.length; i++) {
+                        if (args[i] == retval) {
                             isReference = true;
+                            // Retval is a reference to argument i
                             methodBuilder.addStatement("$T expected = $L", returnType,
-                                    ArgMap.getSymbolicName(MethodType.CTOR, i));
+                                    ArgMap.getSymbolicName(MethodType.METHOD, i));
                             break;
                         }
                     }
                 }
-                for (int i = 0; i < args.length; i++) {
-                    if (args[i] == retval) {
-                        isReference = true;
-                        // Retval is a reference to argument i
-                        methodBuilder.addStatement("$T expected = $L", returnType,
-                                ArgMap.getSymbolicName(MethodType.METHOD, i));
-                        break;
-                    }
-                }
+
                 // If not a reference, create a new value for the retval
                 if (!isReference) {
-                    if (isPrimitive(retval) || retval.getClass().isArray()) {
+                    if (isPrimitive(retval) || isArray) {
                         methodBuilder.addStatement("$T expected = $L", returnType,
                                 JavaLiteralFormatter.valueToString(retval));
                     } else {
@@ -231,8 +237,14 @@ public class JUnitTestGenerator {
                     }
                 }
 
-                methodBuilder.addStatement("$T.assertEquals(expected, retval)",
-                        targetJUnit4 ? org.junit.Assert.class : Assertions.class);
+                // Use assertArrayEquals for arrays, otherwise use assertEquals
+                if (isArray) {
+                    methodBuilder.addStatement("$T.assertArrayEquals(expected, retval)",
+                            targetJUnit4 ? org.junit.Assert.class : Assertions.class);
+                } else {
+                    methodBuilder.addStatement("$T.assertEquals(expected, retval)",
+                            targetJUnit4 ? org.junit.Assert.class : Assertions.class);
+                }
             }
         }
 
