@@ -100,8 +100,8 @@ public class SearchStrategyFactory {
             // heuristics
             case "FeasibilityOptimized", "FeasibilityOptimizedSearch", "FOS" -> new ProbabilisticSearch<>(
                     SearchHeuristicFactory.createHeuristics(
-                            List.of("QueryCost", "SmallestDepth", "DistanceToUncovered"),
-                            List.of(0.4, 0.4, 0.2)));
+                            List.of("QueryCost", "SmallestDepth"),
+                            List.of(0.55, 0.45)));
             default -> {
                 logger.warn("Unknown symbolic search strategy: {}, defaulting to DFS", name);
                 yield new DFS<>();
