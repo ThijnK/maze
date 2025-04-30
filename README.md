@@ -133,6 +133,38 @@ The project is organized into the following main packages:
 - `nl.uu.maze.examples`: Example classes for testing and demonstration purposes
 - `nl.uu.maze.benchmarks`: Benchmark classes for evaluating and comparing search strategies
 
+## Benchmarking
+
+MAZE was benchmarked using the [JUGE](https://github.com/JUnitContest/JUGE) benchmarking framework, which is designed for evaluating test generation tools for the SBFT tool competitions.
+A fork of JUGE that is specifically set up to benchmark MAZE is available [here](https://github.com/ThijnK/JUGE).
+Further instructions and details on the benchmarks can be found there.
+
+### Benchmark Set
+
+The synthetic benchmark classes used to compare different search strategies are available in the [`nl.uu.maze.benchmarks`](/src/main/java/nl/uu/maze/benchmarks/) package.
+These classes are designed to test the engine's capabilities and performance across various scenarios.
+
+The following benchmark subjects are included:
+
+- [`AckermannPeter`](/src/main/java/nl/uu/maze/benchmarks/AckermannPeter.java): Implementation of the Ackermann-Peter function.
+- [`BinarySearch`](/src/main/java/nl/uu/maze/benchmarks/BinarySearch.java): Implementation of a binary search algorithm on an int array.
+- [`ConvergingPaths`](/src/main/java/nl/uu/maze/benchmarks/ConvergingPaths.java): Class where control flow paths repeatedly diverge and converge.
+- [`ExprEvaluator`](/src/main/java/nl/uu/maze/benchmarks/ExprEvaluator.java): Evaluates simple arithemetic expressions in a char array, using recursive descent parsing.
+- [`Fibonacci`](/src/main/java/nl/uu/maze/benchmarks/Fibonacci.java): Implementation of the Fibonacci function, both iterative and recursive.
+- [`FloatStatistics`](/src/main/java/nl/uu/maze/benchmarks/FloatStatistics.java): Provides methods for statistics and functions of floating-point numbers (e.g., mean, sqrt, etc.).
+- [`MatrixAnalyzer`](/src/main/java/nl/uu/maze/benchmarks/MatrixAnalyzer.java): Performs operations on a 2D int array.
+- [`NestedLoops`](/src/main/java/nl/uu/maze/benchmarks/NestedLoops.java): Sorts an array with bubble sort while calculating a specific value.
+- [`QuickSort`](/src/main/java/nl/uu/maze/benchmarks/QuickSort.java): Implementation of the quicksort algorithm on an int array.
+- [`SinglyLinkedList`](/src/main/java/nl/uu/maze/benchmarks/SinglyLinkedList.java): Implements a singly linked list with various operations (e.g., add, delete, etc.).
+- [`TriangleClassifier`](/src/main/java/nl/uu/maze/benchmarks/TriangleClassifier.java): Classifies a triangle based on its sides (e.g., equilateral, isosceles, etc.).
+
+More information about the reasoning behind the design of each subject can be found in their respective source files.
+
+### Example Output
+
+The output for each of the benchmark classes when run using **BFS** with a **10 second time budget** is available in the [src/test/java/nl/uu/maze/generated/benchmarks](/src/test/java/nl/uu/tests/maze/generated/benchmarks/) directory.
+These test cases achieve an overall 91% instruction coverage and 88% branch coverage for the benchmark set (see JaCoCo report after running the tests).
+
 ## Architecture
 
 ### Dynamic Symbolic Execution (DSE)
@@ -230,38 +262,6 @@ MAZE supports the following search heuristics:
   The waiting time is based on the iterations, so the number of times the target was not selected for execution in the search strategy.
   This heuristic can be configured to prefer either long-waiting targets or short-waiting targets, depending on the desired behavior.
   Preferring long-waiting targets would result in behavior similar to a breadth-first search, while preferring short-waiting targets would result in behavior similar to a depth-first search.
-
-## Benchmarking
-
-MAZE was benchmarked using the [JUGE](https://github.com/JUnitContest/JUGE) benchmarking framework, which is designed for evaluating test generation tools for the SBFT tool competitions.
-A fork of JUGE that is specifically set up to benchmark MAZE is available [here](https://github.com/ThijnK/JUGE).
-Further instructions and details on the benchmarks can be found there.
-
-### Benchmark Set
-
-The synthetic benchmark classes used to compare different search strategies are available in the [`nl.uu.maze.benchmarks`](/src/main/java/nl/uu/maze/benchmarks/) package.
-These classes are designed to test the engine's capabilities and performance across various scenarios.
-
-The following benchmark subjects are included:
-
-- [`AckermannPeter`](/src/main/java/nl/uu/maze/benchmarks/AckermannPeter.java): Implementation of the Ackermann-Peter function.
-- [`BinarySearch`](/src/main/java/nl/uu/maze/benchmarks/BinarySearch.java): Implementation of a binary search algorithm on an int array.
-- [`ConvergingPaths`](/src/main/java/nl/uu/maze/benchmarks/ConvergingPaths.java): Class where control flow paths repeatedly diverge and converge.
-- [`ExprEvaluator`](/src/main/java/nl/uu/maze/benchmarks/ExprEvaluator.java): Evaluates simple arithemetic expressions in a char array, using recursive descent parsing.
-- [`Fibonacci`](/src/main/java/nl/uu/maze/benchmarks/Fibonacci.java): Implementation of the Fibonacci function, both iterative and recursive.
-- [`FloatStatistics`](/src/main/java/nl/uu/maze/benchmarks/FloatStatistics.java): Provides methods for statistics and functions of floating-point numbers (e.g., mean, sqrt, etc.).
-- [`MatrixAnalyzer`](/src/main/java/nl/uu/maze/benchmarks/MatrixAnalyzer.java): Performs operations on a 2D int array.
-- [`NestedLoops`](/src/main/java/nl/uu/maze/benchmarks/NestedLoops.java): Sorts an array with bubble sort while calculating a specific value.
-- [`QuickSort`](/src/main/java/nl/uu/maze/benchmarks/QuickSort.java): Implementation of the quicksort algorithm on an int array.
-- [`SinglyLinkedList`](/src/main/java/nl/uu/maze/benchmarks/SinglyLinkedList.java): Implements a singly linked list with various operations (e.g., add, delete, etc.).
-- [`TriangleClassifier`](/src/main/java/nl/uu/maze/benchmarks/TriangleClassifier.java): Classifies a triangle based on its sides (e.g., equilateral, isosceles, etc.).
-
-More information about the reasoning behind the design of each subject can be found in their respective source files.
-
-### Example Output
-
-The output for each of the benchmark classes when run using **BFS** with a **10 second time budget** is available in the [src/test/java/nl/uu/maze/generated/benchmarks](/src/test/java/nl/uu/tests/maze/generated/benchmarks/) directory.
-These test cases achieve an overall 91% instruction coverage and 88% branch coverage for the benchmark set (see JaCoCo report after running the tests).
 
 ## Troubleshooting
 
