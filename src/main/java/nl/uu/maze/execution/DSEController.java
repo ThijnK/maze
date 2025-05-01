@@ -352,13 +352,12 @@ public class DSEController {
             logger.debug("Current state: {}", current);
             logger.debug("Next stmt: {}", current.getStmt());
             if (!current.isCtorState() && current.isFinalState() || current.getDepth() >= maxDepth) {
+                // For concrete-driven, we only care about one final state, so we can stop
+                if (concreteDriven)
+                    return Optional.of(current);
                 if (!current.isInfeasible()) {
-                    // For concrete-driven, we only care about one final state, so we can stop
-                    if (concreteDriven)
-                        return Optional.of(current);
                     // For symblic-driven, generate test case
-                    else
-                        generateTestCase(current.returnToRootCaller());
+                    generateTestCase(current.returnToRootCaller());
                 }
                 continue;
             }
