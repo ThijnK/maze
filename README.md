@@ -130,7 +130,7 @@ MAZE provides the following command-line options:
 
 The project is organized into the following main packages:
 
-- `nl.uu.maze.main`: Main application class
+- `nl.uu.maze.main`: Application entry point and command-line interface
 - `nl.uu.maze.analysis`: Java program analysis utilities
 - `nl.uu.maze.execution`: Core DSE execution engine
   - `nl.uu.maze.execution.concrete`: Concrete execution components
