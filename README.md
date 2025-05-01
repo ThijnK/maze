@@ -241,7 +241,6 @@ The engine also provides some predefined search strategies for probabilistic sea
 - **Feasibility Optimized Search (FOS)**:
   Strategy designed to prioritize states that are most feasible to solve (in reasonable time).
   This is achieved by using the `QueryCost` and `WaitingTime` heuristics, the former to prefer states with simpler path constraints and the latter to prefer states that have been waiting in the queue for a long time (similar to a breadth-first search, thus avoiding deep states, which are more likely to be harder to solve and are thus less feasible).
-  Additionally, it incorporates the `DistanceToUncovered` heuristic to guide the search toward unexplored regions of the program.
 
 #### Search Heuristics
 
