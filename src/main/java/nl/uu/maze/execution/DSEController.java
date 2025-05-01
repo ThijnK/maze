@@ -225,6 +225,7 @@ public class DSEController {
             }
 
             executionDeadline = overallDeadline;
+            ConcreteSearchStrategy strategy = searchStrategy.toConcrete();
             Arrays.sort(muts, (m1, m2) -> m1.getName().compareTo(m2.getName()));
             for (i = 0; i < muts.length; i++) {
                 JavaSootMethod method = muts[i];
@@ -243,8 +244,9 @@ public class DSEController {
                 }
 
                 try {
+                    strategy.reset();
                     logger.info("Processing method: {}", method.getName());
-                    runConcreteDriven(method, searchStrategy.toConcrete());
+                    runConcreteDriven(method, strategy);
                 } catch (Exception e) {
                     logger.error("Error processing method {}: {}", method.getName(), e.getMessage());
                     logger.debug("Error stack trace: ", e);
