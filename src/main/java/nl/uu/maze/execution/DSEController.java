@@ -353,9 +353,9 @@ public class DSEController {
             logger.debug("Next stmt: {}", current.getStmt());
             if (!current.isCtorState() && current.isFinalState() || current.getDepth() >= maxDepth) {
                 // For concrete-driven, we only care about one final state, so we can stop
-                if (concreteDriven)
+                if (concreteDriven) {
                     return Optional.of(current);
-                if (!current.isInfeasible()) {
+                } else if (!current.isInfeasible()) {
                     // For symblic-driven, generate test case
                     generateTestCase(current.returnToRootCaller());
                 }
@@ -373,11 +373,10 @@ public class DSEController {
                         // If the state is an exception-throwing state, generate test case and stop
                         // exploring (i.e., don't go into the target method)
                         if (state.isExceptionThrown() || state.isInfeasible()) {
-                            if (!state.isInfeasible()) {
-                                if (concreteDriven)
-                                    return Optional.of(state);
-                                else
-                                    generateTestCase(state);
+                            if (concreteDriven) {
+                                return Optional.of(state);
+                            } else if (!state.isInfeasible()) {
+                                generateTestCase(state);
                             }
                             continue;
                         }
