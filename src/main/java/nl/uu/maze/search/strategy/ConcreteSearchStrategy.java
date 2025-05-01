@@ -7,6 +7,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.microsoft.z3.Model;
 
 import nl.uu.maze.execution.concrete.PathConditionCandidate;
@@ -24,6 +27,8 @@ import nl.uu.maze.util.Pair;
  * additional specialization.
  */
 public class ConcreteSearchStrategy extends SearchStrategy<PathConditionCandidate> {
+    private static final Logger logger = LoggerFactory.getLogger(ConcreteSearchStrategy.class);
+
     private final SearchStrategy<PathConditionCandidate> strategy;
     private final Set<Integer> exploredPaths = new HashSet<>();
 
@@ -73,10 +78,15 @@ public class ConcreteSearchStrategy extends SearchStrategy<PathConditionCandidat
      * @return The Z3 model of the next candidate to explore, or empty if there are
      *         no more candidates
      */
-    public Optional<Pair<Model, SymbolicState>> next(SymbolicStateValidator validator) {
+    public Optional<Pair<Model, SymbolicState>> next(SymbolicStateValidator validator, long deadline) {
         // Find the first candidate that has not been explored yet and is satisfiable
         PathConditionCandidate candidate;
         while ((candidate = next()) != null) {
+            if (System.currentTimeMillis() >= deadline) {
+                logger.debug("Time budget exceeded while selecting next path condition candidate, stopping...");
+                return Optional.empty();
+            }
+
             candidate.applyNegation();
             if (!isExplored(candidate)) {
                 Optional<Model> model = validator.validate(candidate.getConstraints());

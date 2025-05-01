@@ -481,7 +481,7 @@ public class DSEController {
                 break;
             }
 
-            Optional<Pair<Model, SymbolicState>> candidate = searchStrategy.next(validator);
+            Optional<Pair<Model, SymbolicState>> candidate = searchStrategy.next(validator, executionDeadline);
             // If we cannot find a new path condition, we are done
             if (candidate.isEmpty()) {
                 break;
