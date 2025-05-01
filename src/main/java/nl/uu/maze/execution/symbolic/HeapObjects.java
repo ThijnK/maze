@@ -127,6 +127,7 @@ public class HeapObjects {
             return (ArrayType) type;
         }
 
+        @SuppressWarnings("unchecked")
         public <E extends Sort> ArrayExpr<BitVecSort, E> getElems() {
             return (ArrayExpr<BitVecSort, E>) getField("elems").getValue();
         }
@@ -168,6 +169,7 @@ public class HeapObjects {
         /**
          * Returns the length of the array at the given dimension.
          */
+        @SuppressWarnings("unchecked")
         public Expr<BitVecSort> getLength(int index) {
             BitVecExpr indexExpr = ctx.mkBV(index, sorts.getIntBitSize());
             return ctx.mkSelect((ArrayExpr<BitVecSort, BitVecSort>) getLength(), indexExpr);
@@ -217,6 +219,7 @@ public class HeapObjects {
             super.setElem(calcIndex(indices), value);
         }
 
+        @SuppressWarnings("unchecked")
         @Override
         public MultiArrayObject clone() {
             return new MultiArrayObject((ArrayType) type, getElems(), (ArrayExpr<BitVecSort, BitVecSort>) getLength());
@@ -248,6 +251,7 @@ public class HeapObjects {
             return new JavaClassType(clazz.getName(), new PackageName(clazz.getPackageName()));
         }
 
+        @SuppressWarnings("unchecked")
         public <E extends Sort> Expr<E> getValue() {
             return (Expr<E>) getField("value").getValue();
         }

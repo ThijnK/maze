@@ -687,6 +687,7 @@ public class SymbolicHeap {
     /**
      * Sets the value at the given index for the given symbolic array reference.
      */
+    @SuppressWarnings("unchecked")
     public <E extends Sort> void setArrayElement(String var, Expr<?> symRef, BitVecExpr index, Expr<E> value) {
         ArrayObject arrObj = getArrayObject(symRef);
         if (arrObj == null) {

@@ -216,6 +216,7 @@ public class SymbolicState implements SearchTarget {
 
     public Pair<Stmt, StmtGraph<?>>[] getCallStack() {
         int depth = getCallDepth();
+        @SuppressWarnings("unchecked")
         Pair<Stmt, StmtGraph<?>>[] callStack = new Pair[depth + 1];
 
         SymbolicState state = this;

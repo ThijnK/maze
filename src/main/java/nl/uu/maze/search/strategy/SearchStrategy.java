@@ -99,6 +99,7 @@ public abstract class SearchStrategy<T extends SearchTarget> {
      * strategy.
      * This is only possible if this search strategy operates on symbolic states.
      */
+    @SuppressWarnings("unchecked")
     public SymbolicSearchStrategy toSymbolic() {
         if (this instanceof SymbolicSearchStrategy) {
             return (SymbolicSearchStrategy) this;
@@ -113,6 +114,7 @@ public abstract class SearchStrategy<T extends SearchTarget> {
      * This is only possible if this search strategy operates on path condition
      * candidates.
      */
+    @SuppressWarnings("unchecked")
     public ConcreteSearchStrategy toConcrete() {
         if (this instanceof ConcreteSearchStrategy) {
             return (ConcreteSearchStrategy) this;
