@@ -494,7 +494,7 @@ public class DSEController {
             // If a new path condition is found, evaluate it to get the next set of
             // arguments which will be used in the next iteration for concrete execution
             Pair<Model, SymbolicState> pair = candidate.get();
-            argMap = validator.evaluate(pair.getFirst(), pair.getSecond(), false);
+            argMap = validator.evaluate(pair.getFirst(), pair.getSecond().returnToRootCaller(), false);
         }
     }
 }
