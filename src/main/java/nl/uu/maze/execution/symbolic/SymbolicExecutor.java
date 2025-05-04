@@ -116,6 +116,7 @@ public class SymbolicExecutor {
         List<Stmt> succs = state.getSuccessors();
         BoolExpr cond = (BoolExpr) jimpleToZ3.transform(stmt.getCondition(), state);
         List<SymbolicState> newStates = new ArrayList<>();
+        state.incrementDepth();
 
         // If replaying a trace, follow the branch indicated by the trace
         if (replay) {
@@ -157,7 +158,6 @@ public class SymbolicExecutor {
             }
         }
 
-        state.incrementDepth();
         return newStates;
     }
 
@@ -175,6 +175,7 @@ public class SymbolicExecutor {
         Expr<?> var = state.lookup(stmt.getKey().toString());
         List<IntConstant> cases = stmt.getValues();
         List<SymbolicState> newStates = new ArrayList<>();
+        state.incrementDepth();
 
         Expr<?>[] values = new Expr<?>[cases.size()];
         for (int i = 0; i < cases.size(); i++) {
@@ -218,7 +219,6 @@ public class SymbolicExecutor {
             }
         }
 
-        state.incrementDepth();
         return newStates;
     }
 
