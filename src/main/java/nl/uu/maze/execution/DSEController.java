@@ -238,7 +238,11 @@ public class DSEController {
                 if (timeBudget > 0) {
                     // Divide remaining time budget by the number of remaining methods
                     long remainingBudget = overallDeadline - System.currentTimeMillis();
-                    long methodBudget = (long) (remainingBudget * 1.1 / (muts.length - i));
+                    // If not last method, can use a little more time than just dividing
+                    // by the number of remaining methods, because following methods may be
+                    // easier to execute
+                    double factor = muts.length - i > 1 ? 1.1 : 1.0;
+                    long methodBudget = (long) (remainingBudget * factor / (muts.length - i));
                     executionDeadline = System.currentTimeMillis() + methodBudget;
                     logger.info("Time budget for method {}: {}", method.getName(), methodBudget);
                 }
