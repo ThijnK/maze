@@ -85,6 +85,16 @@ public class ArgMap {
     }
 
     /**
+     * Clear the map of converted values.
+     * Useful after using this ArgMap instance in a method/constructor invocation to
+     * ensure that the object and/or arrays are not re-used, since they may have
+     * been modified by the mehtod/constructor invocation.
+     */
+    public void resetConverted() {
+        converted.clear();
+    }
+
+    /**
      * Get an appropriate symbolic name for a parameter based on its index and a
      * prefix to avoid name conflicts between different methods (e.g., constructor
      * and target method).
@@ -159,7 +169,7 @@ public class ArgMap {
      * times.
      */
     private Object toJava(String key, Object value, Class<?> type) {
-        // If already defined from resolving a reference, skip
+        // If already defined from resolving a reference, return that
         if (converted.containsKey(key) && !key.equals("temp")) {
             return converted.get(key);
         }

@@ -123,6 +123,12 @@ public class JUnitTestGenerator {
         Object[] ctorArgs;
         Object[] args;
         try {
+            // Reset the ArgMap's converted state to ensure fresh values for the arguments
+            // of constructor/method, since reusing converted values could lead to incorrect
+            // behavior if a previous method invocation with the same values modified the
+            // state of those values
+            argMap.resetConverted();
+
             Constructor<?> _ctor = ctor != null ? analyzer.getJavaConstructor(ctor, clazz) : null;
             ctorArgs = _ctor != null
                     ? ObjectInstantiation.generateArgs(_ctor.getParameters(), MethodType.CTOR, argMap)

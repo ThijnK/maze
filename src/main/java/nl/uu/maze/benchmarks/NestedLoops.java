@@ -41,8 +41,8 @@ public class NestedLoops {
                     result += 10000;
                 }
                 if (result == 11000) {
-                    // Only reachable if previous condition is reached first (or the first condition
-                    // is reached 11 times)
+                    // Only reachable if previous condition is reached first or a very specific
+                    // combination of the other conditions is reached first
                     result += 20000;
                 }
 
