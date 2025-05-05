@@ -27,10 +27,10 @@ import sootup.java.core.JavaSootMethod;
  */
 public class DistanceToUncoveredHeuristic extends SearchHeuristic {
     /**
-     * Maximum weight for a target, used if a target cannot reach an uncovered
-     * statement.
+     * Maximum distance to uncovered for a target, used to limit the search and for
+     * targets that cannot reach any uncovered statement.
      */
-    private static final int MAX_WEIGHT = 1_000_000;
+    private static final int MAX_DISTANCE = 100;
     private static final CoverageTracker coverageTracker = CoverageTracker.getInstance();
 
     public DistanceToUncoveredHeuristic(double weight) {
@@ -95,6 +95,11 @@ public class DistanceToUncoveredHeuristic extends SearchHeuristic {
                 return item.dist;
             }
 
+            if (item.dist > MAX_DISTANCE) {
+                // If the distance is greater than the maximum, we can stop searching
+                continue;
+            }
+
             // For invoke expressions, need to enter the callee method
             if (!item.skipInvoke && item.stmt.containsInvokeExpr()) {
                 AbstractInvokeExpr invoke = item.stmt.getInvokeExpr();
@@ -122,7 +127,7 @@ public class DistanceToUncoveredHeuristic extends SearchHeuristic {
             }
         }
 
-        return MAX_WEIGHT;
+        return MAX_DISTANCE;
     }
 
     private static class StmtDistance {
