@@ -14,6 +14,7 @@ import nl.uu.maze.util.Pair;
 import sootup.core.graph.StmtGraph;
 import sootup.core.jimple.common.expr.AbstractInvokeExpr;
 import sootup.core.jimple.common.stmt.JReturnStmt;
+import sootup.core.jimple.common.stmt.JReturnVoidStmt;
 import sootup.core.jimple.common.stmt.Stmt;
 import sootup.core.signatures.MethodSignature;
 import sootup.java.core.JavaSootMethod;
@@ -80,11 +81,13 @@ public class DistanceToUncoveredHeuristic extends SearchHeuristic {
         JavaAnalyzer analyzer = JavaAnalyzer.getInstance();
         while (!worklist.isEmpty()) {
             StmtDistance item = worklist.poll();
+            boolean isReturn = item.stmt instanceof JReturnStmt || item.stmt instanceof JReturnVoidStmt;
 
             // If a statement has been visited before, we're dealing with a loop, so we can
             // skip it because the first iteration of the loop would have been the shortest
             // path
-            if (!visited.add(item.stmt)) {
+            // However, return statements and invocations may be visited multiple times
+            if (!isReturn && !visited.add(item.stmt) && !item.returning) {
                 continue;
             }
 
@@ -101,7 +104,7 @@ public class DistanceToUncoveredHeuristic extends SearchHeuristic {
             }
 
             // For invoke expressions, need to enter the callee method
-            if (!item.skipInvoke && item.stmt.containsInvokeExpr()) {
+            if (!item.returning && item.stmt.containsInvokeExpr()) {
                 AbstractInvokeExpr invoke = item.stmt.getInvokeExpr();
                 MethodSignature sig = invoke.getMethodSignature();
 
@@ -113,7 +116,7 @@ public class DistanceToUncoveredHeuristic extends SearchHeuristic {
                 }
             }
 
-            if (item.stmt instanceof JReturnStmt) {
+            if (isReturn) {
                 // If we reach a return statement, we need to return to the caller
                 StmtDistance caller = item.returnToCaller();
                 if (caller != null) {
@@ -130,18 +133,19 @@ public class DistanceToUncoveredHeuristic extends SearchHeuristic {
         return MAX_DISTANCE;
     }
 
-    private static class StmtDistance {
-        private final Stmt stmt;
-        private final StmtGraph<?> cfg;
-        private final StmtDistance caller;
-        private int dist;
-        private boolean skipInvoke;
+    public static class StmtDistance {
+        public final Stmt stmt;
+        public final StmtGraph<?> cfg;
+        public final StmtDistance caller;
+        public int dist;
+        // Returning from a callee method to the caller
+        public boolean returning;
 
         private StmtDistance(Stmt stmt, int dist, StmtGraph<?> cfg, StmtDistance caller) {
             this.stmt = stmt;
             this.dist = dist;
             this.cfg = cfg;
-            this.skipInvoke = false;
+            this.returning = false;
             this.caller = caller;
         }
 
@@ -161,7 +165,7 @@ public class DistanceToUncoveredHeuristic extends SearchHeuristic {
          * method.
          */
         public StmtDistance callee(StmtGraph<?> cfg) {
-            return new StmtDistance(cfg.getStartingStmt(), dist + 1, cfg, this);
+            return new StmtDistance(cfg.getStartingStmt(), dist, cfg, this);
         }
 
         /**
@@ -173,7 +177,7 @@ public class DistanceToUncoveredHeuristic extends SearchHeuristic {
                 return null;
             }
 
-            caller.skipInvoke = true;
+            caller.returning = true;
             caller.dist = dist + 1;
             return caller;
         }
