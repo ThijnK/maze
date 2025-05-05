@@ -487,6 +487,7 @@ public class SymbolicState implements SearchTarget {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("Stmt: ").append(stmt).append(", ");
+        sb.append("Method: ").append(method.getName()).append(", ");
         sb.append("Store: ").append(store).append(", ");
         sb.append("Heap: ").append(heap).append(", ");
         sb.append("PC: ").append(pathConstraints).append(", ");

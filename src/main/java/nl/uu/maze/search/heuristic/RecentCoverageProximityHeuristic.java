@@ -37,7 +37,7 @@ public class RecentCoverageProximityHeuristic extends SearchHeuristic {
         // If no coverage depths, we consider the last coverage to be very far away (so
         // not at 0, which would imply that it covered new code at the start of its
         // path)
-        int lastCoverageDepth = coverageDepths.isEmpty() ? -1_000 : coverageDepths.getLast();
+        int lastCoverageDepth = coverageDepths.isEmpty() ? -100 : coverageDepths.getLast();
         int diff = targetDepth - lastCoverageDepth;
         return applyExponentialScaling(diff, 0.3, false);
     }

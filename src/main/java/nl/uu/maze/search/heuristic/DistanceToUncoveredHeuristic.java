@@ -49,7 +49,7 @@ public class DistanceToUncoveredHeuristic extends SearchHeuristic {
 
     @Override
     public <T extends SearchTarget> double calculateWeight(T target) {
-        return applyExponentialScaling(calculateDistance(target), 0.3, false);
+        return applyExponentialScaling(calculateDistance(target), 0.1, false);
     }
 
     private <T extends SearchTarget> int calculateDistance(T target) {
