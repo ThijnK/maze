@@ -28,7 +28,10 @@ public class SearchHeuristicFactory {
             case "Uniform", "UniformHeuristic", "UH" -> new UniformHeuristic(weight);
             case "DistanceToUncovered", "DistanceToUncoveredHeuristic", "DTUH" ->
                 new DistanceToUncoveredHeuristic(weight);
-            case "RecentCoverage", "RecentCoverageHeuristic", "RCH" -> new RecentCoverageHeuristic(weight);
+            case "RecentCoverageDensity", "RecentCoverageDensityHeuristic", "RCDH" ->
+                new RecentCoverageDensityHeuristic(weight);
+            case "RecentCoverageProximity", "RecentCoverageProximityHeuristic", "RCPH" ->
+                new RecentCoverageProximityHeuristic(weight);
             case "QueryCost", "QueryCostHeuristic", "QCH" -> new QueryCostHeuristic(weight);
             case "SmallestDepth", "SmallestDepthHeuristic", "SDH" -> new DepthHeuristic(weight, false);
             case "GreatestDepth", "GreatestDepthHeuristic", "GDH" -> new DepthHeuristic(weight, true);

@@ -43,6 +43,7 @@ import sootup.java.core.JavaSootMethod;
  */
 public class SymbolicState implements SearchTarget {
     private static final Context ctx = Z3ContextProvider.getContext();
+    private static final CoverageTracker coverageTracker = CoverageTracker.getInstance();
 
     private JavaSootMethod method;
     private StmtGraph<?> cfg;
@@ -363,7 +364,7 @@ public class SymbolicState implements SearchTarget {
      */
     public void recordCoverage() {
         if (!exceptionThrown) {
-            boolean newCoverage = CoverageTracker.getInstance().setCovered(stmt);
+            boolean newCoverage = coverageTracker.setCovered(stmt);
             if (newCoverage) {
                 newCoverageDepths.add(depth);
             }

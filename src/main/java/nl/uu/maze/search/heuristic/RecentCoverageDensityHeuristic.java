@@ -5,25 +5,29 @@ import java.util.List;
 import nl.uu.maze.search.SearchTarget;
 
 /**
- * Recent Coverage Heuristic (RCH).
+ * Recent Coverage Density Heuristic (RCDH).
  * <p>
  * Prioritizes targets that have recently discovered new code, focusing on
  * "hot" exploration paths. This helps concentrate resources on targets that
  * are actively expanding coverage rather than those that may have stagnated.
+ * <p>
+ * In particular, this strategy focuses on the density of recent coverage, i.e.,
+ * then number of newly covered instructions that were covered within a recent
+ * window.
  */
-public class RecentCoverageHeuristic extends SearchHeuristic {
+public class RecentCoverageDensityHeuristic extends SearchHeuristic {
     /**
      * How many previous statements to consider as "recent".
      */
     private static final int RECENCY_DEPTH = 10;
 
-    public RecentCoverageHeuristic(double weight) {
+    public RecentCoverageDensityHeuristic(double weight) {
         super(weight);
     }
 
     @Override
     public String getName() {
-        return "RecentCoverageHeuristic";
+        return "RecentCoverageDensityHeuristic";
     }
 
     @Override
@@ -48,6 +52,7 @@ public class RecentCoverageHeuristic extends SearchHeuristic {
             }
         }
 
-        return applyExponentialScaling(recentCoverage, 0.3, true);
+        // No scaling, this number is in the range [0, RECENCY_DEPTH]
+        return recentCoverage;
     }
 }
