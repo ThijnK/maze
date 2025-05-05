@@ -354,7 +354,6 @@ public class DSEController {
             }
 
             logger.debug("Current state: {}", current);
-            logger.debug("Next stmt: {}", current.getStmt());
             if (!current.isCtorState() && current.isFinalState() || current.getDepth() >= maxDepth) {
                 // For concrete-driven, we only care about one final state, so we can stop
                 if (concreteDriven) {
