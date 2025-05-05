@@ -18,6 +18,7 @@ import nl.uu.maze.util.Tree.TreeNode;
 public class RandomPathSearch<T extends SearchTarget> extends SearchStrategy<T> {
     private Tree<T> tree;
     private TreeNode<T> current;
+    private TreeNode<T> selected;
     private final Random random = new Random();
 
     public String getName() {
@@ -50,6 +51,11 @@ public class RandomPathSearch<T extends SearchTarget> extends SearchStrategy<T> 
 
     @Override
     public T next() {
+        // Clean up previously selected node if it had no children added to it
+        if (selected != null && selected.isLeaf()) {
+            tree.removePath(selected);
+        }
+
         // Walk the tree from the root to a leaf, randomly selecting the branch to
         // follow at each node
         current = tree.getRoot();
@@ -57,6 +63,7 @@ public class RandomPathSearch<T extends SearchTarget> extends SearchStrategy<T> 
             List<TreeNode<T>> children = current.getChildren();
             current = children.get(random.nextInt(children.size()));
         }
+        selected = current;
         return current != null ? current.getValue() : null;
     }
 
@@ -64,7 +71,10 @@ public class RandomPathSearch<T extends SearchTarget> extends SearchStrategy<T> 
     public void select(T target) {
         // When a specific target is selected, we need to set the current node to that
         // node, so that adding new targets will be added as children of that node
-        tree.findNode(target).ifPresent(node -> current = node);
+        tree.findNode(target).ifPresent(node -> {
+            current = node;
+            selected = node;
+        });
     }
 
     @Override
