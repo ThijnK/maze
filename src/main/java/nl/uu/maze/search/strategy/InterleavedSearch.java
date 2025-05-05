@@ -3,6 +3,9 @@ package nl.uu.maze.search.strategy;
 import java.util.Collection;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import nl.uu.maze.search.SearchTarget;
 
 /**
@@ -13,6 +16,8 @@ import nl.uu.maze.search.SearchTarget;
  * of the search space.
  */
 public class InterleavedSearch<T extends SearchTarget> extends SearchStrategy<T> {
+    private static final Logger logger = LoggerFactory.getLogger(InterleavedSearch.class);
+
     private final List<SearchStrategy<T>> strategies;
     /**
      * Time slice in ms before switching strategies.
@@ -28,7 +33,13 @@ public class InterleavedSearch<T extends SearchTarget> extends SearchStrategy<T>
             throw new IllegalArgumentException("At least one strategy must be provided");
         }
         this.strategies = strategies;
-        this.timeSlice = totalTimeBudget > 0 ? totalTimeBudget / 20 : 1000;
+        // Set time slice such that we complete 5 cycles through all strategies such
+        // that each strategy gets multiple opportunities to shine
+        if (totalTimeBudget > 0) {
+            this.timeSlice = totalTimeBudget / (strategies.size() * 5);
+        } else {
+            this.timeSlice = 1000; // Default time slice if no budget is set
+        }
     }
 
     public String getName() {
@@ -74,8 +85,10 @@ public class InterleavedSearch<T extends SearchTarget> extends SearchStrategy<T>
 
         long currentTime = System.currentTimeMillis();
         if (currentTime - currentStrategyStartTime > timeSlice) {
+            // Switch to the next strategy
             currentStrategyIndex = (currentStrategyIndex + 1) % strategies.size();
             currentStrategyStartTime = currentTime;
+            logger.debug("Switching to strategy: {}", strategies.get(currentStrategyIndex).getName());
         }
 
         return next;
