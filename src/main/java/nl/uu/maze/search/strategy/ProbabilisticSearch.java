@@ -43,7 +43,7 @@ public class ProbabilisticSearch<T extends SearchTarget> extends SearchStrategy<
     public String getName() {
         StringBuilder sb = new StringBuilder("ProbabilisticSearch(");
         for (SearchHeuristic heuristic : heuristics) {
-            sb.append(heuristic.getName()).append(", ");
+            sb.append(heuristic.getName()).append("(").append(heuristic.weight).append(")").append(", ");
         }
         sb.setLength(sb.length() - 2);
         sb.append(")");
