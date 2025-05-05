@@ -94,14 +94,14 @@ public class SearchStrategyFactory {
             // Special case for coverage-optimized search, which uses predefined heuristics
             case "CoverageOptimized", "CoverageOptimizedSearch", "COS" -> new ProbabilisticSearch<>(
                     SearchHeuristicFactory.createHeuristics(
-                            List.of("RecentCoverage", "DistanceToUncovered", "SmallestCallDepth"),
-                            List.of(0.35, 0.45, 0.2)));
+                            List.of("DistanceToUncovered", "RecentCoverageDensity", "RecentCoverageProximity"),
+                            List.of(0.6, 0.2, 0.2)));
             // Special case for feasibility-optimized search, which uses predefined
             // heuristics
             case "FeasibilityOptimized", "FeasibilityOptimizedSearch", "FOS" -> new ProbabilisticSearch<>(
                     SearchHeuristicFactory.createHeuristics(
                             List.of("QueryCost", "SmallestDepth"),
-                            List.of(0.55, 0.45)));
+                            List.of(0.7, 0.3)));
             default -> {
                 logger.warn("Unknown symbolic search strategy: {}, defaulting to DFS", name);
                 yield new DFS<>();
