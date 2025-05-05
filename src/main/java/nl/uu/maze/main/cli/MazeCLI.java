@@ -62,7 +62,7 @@ public class MazeCLI implements Callable<Integer> {
     private List<Double> heuristicWeights;
 
     @Option(names = { "-d",
-            "--max-depth" }, description = "Maximum depth of the search (default: ${DEFAULT-VALUE})", defaultValue = "100", paramLabel = "<int>")
+            "--max-depth" }, description = "Maximum depth of the search (default: ${DEFAULT-VALUE})", defaultValue = "200", paramLabel = "<int>")
     private int maxDepth;
 
     @Option(names = { "-b",
