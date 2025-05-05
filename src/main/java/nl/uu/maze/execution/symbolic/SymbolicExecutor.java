@@ -34,6 +34,7 @@ public class SymbolicExecutor {
     private static final Context ctx = Z3ContextProvider.getContext();
 
     private final MethodInvoker methodInvoker;
+    private final SymbolicStateValidator validator;
     private final JimpleToZ3Transformer jimpleToZ3 = new JimpleToZ3Transformer();
     private final boolean trackCoverage;
     private final boolean trackBranchHistory;
@@ -41,6 +42,7 @@ public class SymbolicExecutor {
     public SymbolicExecutor(ConcreteExecutor executor, SymbolicStateValidator validator,
             JavaAnalyzer analyzer, boolean trackCoverage, boolean trackBranchHistory) {
         this.methodInvoker = new MethodInvoker(executor, validator, analyzer);
+        this.validator = validator;
         this.trackCoverage = trackCoverage;
         this.trackBranchHistory = trackBranchHistory;
     }
@@ -148,8 +150,11 @@ public class SymbolicExecutor {
             state.addPathConstraint(cond);
             state.setStmt(succs.get(1));
 
-            newStates.add(state);
-            newStates.add(falseState);
+            // Prune states that are not satisfiable
+            if (validator.isSatisfiable(state))
+                newStates.add(state);
+            if (validator.isSatisfiable(falseState))
+                newStates.add(falseState);
 
             if (trackBranchHistory) {
                 // Record the branch taken for both states
@@ -213,9 +218,13 @@ public class SymbolicExecutor {
                         i >= cases.size() ? -1 : i);
                 newState.addPathConstraint(constraint);
                 newState.setStmt(succs.get(i));
-                newStates.add(newState);
-                if (trackBranchHistory)
-                    newState.recordBranch(stmt, i);
+
+                // Prune if not satisfiable
+                if (validator.isSatisfiable(newState)) {
+                    newStates.add(newState);
+                    if (trackBranchHistory)
+                        newState.recordBranch(stmt, i);
+                }
             }
         }
 

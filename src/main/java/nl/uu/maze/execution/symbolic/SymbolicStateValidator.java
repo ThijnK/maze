@@ -72,6 +72,14 @@ public class SymbolicStateValidator {
     }
 
     /**
+     * Checks the given symbolic state for satisfiability. If the path condition is
+     * satisfiable, this returns {@code true} and otherwise {@code false}.
+     */
+    public boolean isSatisfiable(SymbolicState state) {
+        return validate(state).isPresent();
+    }
+
+    /**
      * Evaluates the model and returns a map of known parameters.
      * 
      * @param model            The Z3 model to evaluate
