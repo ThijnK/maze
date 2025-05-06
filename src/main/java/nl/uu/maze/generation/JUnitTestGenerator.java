@@ -248,8 +248,14 @@ public class JUnitTestGenerator {
                     methodBuilder.addStatement("$T.assertArrayEquals(expected, retval)",
                             targetJUnit4 ? org.junit.Assert.class : Assertions.class);
                 } else {
-                    methodBuilder.addStatement("$T.assertEquals(expected, retval)",
-                            targetJUnit4 ? org.junit.Assert.class : Assertions.class);
+                    // For JUnit 4, assertEquals on float and double values requires a delta
+                    if (targetJUnit4 && (retval instanceof Float || retval instanceof Double)) {
+                        methodBuilder.addStatement("$T.assertEquals(expected, retval, 0.0001)",
+                                targetJUnit4 ? org.junit.Assert.class : Assertions.class);
+                    } else {
+                        methodBuilder.addStatement("$T.assertEquals(expected, retval)",
+                                targetJUnit4 ? org.junit.Assert.class : Assertions.class);
+                    }
                 }
             }
         }
