@@ -16,23 +16,23 @@ public class SinglyLinkedListTest {
   }
 
   @Test
-  public void testHasDuplicates1() throws Exception {
-    Object[] carg0 = {};
-    SinglyLinkedList cut = new SinglyLinkedList(carg0);
-
-    boolean retval = cut.hasDuplicates();
-
-    boolean expected = false;
-    Assertions.assertEquals(expected, retval);
-  }
-
-  @Test
   public void testDelete1() throws Exception {
     Object[] carg0 = {};
     SinglyLinkedList cut = new SinglyLinkedList(carg0);
 
     Object marg0 = null;
     boolean retval = cut.delete(marg0);
+
+    boolean expected = false;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testHasDuplicates1() throws Exception {
+    Object[] carg0 = {};
+    SinglyLinkedList cut = new SinglyLinkedList(carg0);
+
+    boolean retval = cut.hasDuplicates();
 
     boolean expected = false;
     Assertions.assertEquals(expected, retval);
@@ -195,14 +195,6 @@ public class SinglyLinkedListTest {
   }
 
   @Test
-  public void testReverse2() throws Exception {
-    Object[] carg0 = { null };
-    SinglyLinkedList cut = new SinglyLinkedList(carg0);
-
-    cut.reverse();
-  }
-
-  @Test
   public void testDelete4() throws Exception {
     Object[] carg0 = { null };
     SinglyLinkedList cut = new SinglyLinkedList(carg0);
@@ -215,9 +207,8 @@ public class SinglyLinkedListTest {
   }
 
   @Test
-  public void testReverse3() throws Exception {
-    Object obj2 = new Object();
-    Object[] carg0 = { obj2 };
+  public void testReverse2() throws Exception {
+    Object[] carg0 = { null };
     SinglyLinkedList cut = new SinglyLinkedList(carg0);
 
     cut.reverse();
@@ -234,6 +225,15 @@ public class SinglyLinkedListTest {
 
     boolean expected = true;
     Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testReverse3() throws Exception {
+    Object obj2 = new Object();
+    Object[] carg0 = { obj2 };
+    SinglyLinkedList cut = new SinglyLinkedList(carg0);
+
+    cut.reverse();
   }
 
   @Test
@@ -386,6 +386,279 @@ public class SinglyLinkedListTest {
 
   @Test
   public void testDelete11() throws Exception {
+    Object[] carg0 = {};
+    SinglyLinkedList cut = new SinglyLinkedList(carg0);
+
+    Object obj2 = new Object();
+    Object obj9_value = obj2;
+    Object marg0 = obj9_value;
+    boolean retval = cut.delete(marg0);
+
+    boolean expected = false;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testInit2() throws Exception {
+    Object obj5 = new Object();
+    Object obj7 = new Object();
+    Object[] carg0 = { null, obj5, obj7 };
+    new SinglyLinkedList(carg0);
+  }
+
+  @Test
+  public void testInit3() throws Exception {
+    Object obj5 = new Object();
+    Object[] carg0 = { null, obj5, obj5 };
+    new SinglyLinkedList(carg0);
+  }
+
+  @Test
+  public void testInit4() throws Exception {
+    Object obj5 = new Object();
+    Object[] carg0 = { null, obj5, null };
+    new SinglyLinkedList(carg0);
+  }
+
+  @Test
+  public void testInit5() throws Exception {
+    Object obj5 = new Object();
+    Object obj2 = new Object();
+    Object[] carg0 = { null, obj5, obj2 };
+    new SinglyLinkedList(carg0);
+  }
+
+  @Test
+  public void testAdd12() throws Exception {
+    Object obj5 = new Object();
+    Object[] carg0 = { null, obj5 };
+    SinglyLinkedList cut = new SinglyLinkedList(carg0);
+
+    Object marg0 = null;
+    boolean retval = cut.add(marg0);
+
+    boolean expected = false;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testDelete12() throws Exception {
+    Object obj5 = new Object();
+    Object[] carg0 = { null, obj5 };
+    SinglyLinkedList cut = new SinglyLinkedList(carg0);
+
+    Object marg0 = null;
+    boolean retval = cut.delete(marg0);
+
+    boolean expected = true;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testHasDuplicates4() throws Exception {
+    Object obj5 = new Object();
+    Object[] carg0 = { null, obj5 };
+    SinglyLinkedList cut = new SinglyLinkedList(carg0);
+
+    boolean retval = cut.hasDuplicates();
+
+    boolean expected = false;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testHasCycle4() throws Exception {
+    Object obj5 = new Object();
+    Object[] carg0 = { null, obj5 };
+    SinglyLinkedList cut = new SinglyLinkedList(carg0);
+
+    boolean retval = cut.hasCycle();
+
+    boolean expected = false;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testReverse4() throws Exception {
+    Object obj5 = new Object();
+    Object[] carg0 = { null, obj5 };
+    SinglyLinkedList cut = new SinglyLinkedList(carg0);
+
+    cut.reverse();
+  }
+
+  @Test
+  public void testInit6() throws Exception {
+    Object obj7 = new Object();
+    Object[] carg0 = { null, null, obj7 };
+    new SinglyLinkedList(carg0);
+  }
+
+  @Test
+  public void testInit7() throws Exception {
+    Object obj5 = new Object();
+    Object[] carg0 = { null, null, obj5 };
+    new SinglyLinkedList(carg0);
+  }
+
+  @Test
+  public void testInit8() throws Exception {
+    Object[] carg0 = { null, null, null };
+    new SinglyLinkedList(carg0);
+  }
+
+  @Test
+  public void testInit9() throws Exception {
+    Object obj2 = new Object();
+    Object[] carg0 = { null, null, obj2 };
+    new SinglyLinkedList(carg0);
+  }
+
+  @Test
+  public void testAdd13() throws Exception {
+    Object[] carg0 = { null, null };
+    SinglyLinkedList cut = new SinglyLinkedList(carg0);
+
+    Object marg0 = null;
+    boolean retval = cut.add(marg0);
+
+    boolean expected = false;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testDelete13() throws Exception {
+    Object[] carg0 = { null, null };
+    SinglyLinkedList cut = new SinglyLinkedList(carg0);
+
+    Object marg0 = null;
+    boolean retval = cut.delete(marg0);
+
+    boolean expected = true;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testHasDuplicates5() throws Exception {
+    Object[] carg0 = { null, null };
+    SinglyLinkedList cut = new SinglyLinkedList(carg0);
+
+    boolean retval = cut.hasDuplicates();
+
+    boolean expected = true;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testHasCycle5() throws Exception {
+    Object[] carg0 = { null, null };
+    SinglyLinkedList cut = new SinglyLinkedList(carg0);
+
+    boolean retval = cut.hasCycle();
+
+    boolean expected = false;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testReverse5() throws Exception {
+    Object[] carg0 = { null, null };
+    SinglyLinkedList cut = new SinglyLinkedList(carg0);
+
+    cut.reverse();
+  }
+
+  @Test
+  public void testInit10() throws Exception {
+    Object obj2 = new Object();
+    Object obj7 = new Object();
+    Object[] carg0 = { null, obj2, obj7 };
+    new SinglyLinkedList(carg0);
+  }
+
+  @Test
+  public void testInit11() throws Exception {
+    Object obj2 = new Object();
+    Object obj5 = new Object();
+    Object[] carg0 = { null, obj2, obj5 };
+    new SinglyLinkedList(carg0);
+  }
+
+  @Test
+  public void testInit12() throws Exception {
+    Object obj2 = new Object();
+    Object[] carg0 = { null, obj2, null };
+    new SinglyLinkedList(carg0);
+  }
+
+  @Test
+  public void testInit13() throws Exception {
+    Object obj2 = new Object();
+    Object[] carg0 = { null, obj2, obj2 };
+    new SinglyLinkedList(carg0);
+  }
+
+  @Test
+  public void testAdd14() throws Exception {
+    Object obj2 = new Object();
+    Object[] carg0 = { null, obj2 };
+    SinglyLinkedList cut = new SinglyLinkedList(carg0);
+
+    Object marg0 = null;
+    boolean retval = cut.add(marg0);
+
+    boolean expected = false;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testDelete14() throws Exception {
+    Object obj2 = new Object();
+    Object[] carg0 = { null, obj2 };
+    SinglyLinkedList cut = new SinglyLinkedList(carg0);
+
+    Object marg0 = null;
+    boolean retval = cut.delete(marg0);
+
+    boolean expected = true;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testHasDuplicates6() throws Exception {
+    Object obj2 = new Object();
+    Object[] carg0 = { null, obj2 };
+    SinglyLinkedList cut = new SinglyLinkedList(carg0);
+
+    boolean retval = cut.hasDuplicates();
+
+    boolean expected = false;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testHasCycle6() throws Exception {
+    Object obj2 = new Object();
+    Object[] carg0 = { null, obj2 };
+    SinglyLinkedList cut = new SinglyLinkedList(carg0);
+
+    boolean retval = cut.hasCycle();
+
+    boolean expected = false;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testReverse6() throws Exception {
+    Object obj2 = new Object();
+    Object[] carg0 = { null, obj2 };
+    SinglyLinkedList cut = new SinglyLinkedList(carg0);
+
+    cut.reverse();
+  }
+
+  @Test
+  public void testDelete15() throws Exception {
     Object[] carg0 = { null };
     SinglyLinkedList cut = new SinglyLinkedList(carg0);
 
@@ -396,5 +669,280 @@ public class SinglyLinkedListTest {
 
     boolean expected = false;
     Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testInit14() throws Exception {
+    Object obj2 = new Object();
+    Object obj5 = new Object();
+    Object obj7 = new Object();
+    Object[] carg0 = { obj2, obj5, obj7 };
+    new SinglyLinkedList(carg0);
+  }
+
+  @Test
+  public void testInit15() throws Exception {
+    Object obj2 = new Object();
+    Object obj5 = new Object();
+    Object[] carg0 = { obj2, obj5, obj5 };
+    new SinglyLinkedList(carg0);
+  }
+
+  @Test
+  public void testInit16() throws Exception {
+    Object obj2 = new Object();
+    Object obj5 = new Object();
+    Object[] carg0 = { obj2, obj5, null };
+    new SinglyLinkedList(carg0);
+  }
+
+  @Test
+  public void testInit17() throws Exception {
+    Object obj2 = new Object();
+    Object obj5 = new Object();
+    Object[] carg0 = { obj2, obj5, obj2 };
+    new SinglyLinkedList(carg0);
+  }
+
+  @Test
+  public void testAdd15() throws Exception {
+    Object obj2 = new Object();
+    Object obj5 = new Object();
+    Object[] carg0 = { obj2, obj5 };
+    SinglyLinkedList cut = new SinglyLinkedList(carg0);
+
+    Object marg0 = null;
+    boolean retval = cut.add(marg0);
+
+    boolean expected = true;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testDelete16() throws Exception {
+    Object obj2 = new Object();
+    Object obj5 = new Object();
+    Object[] carg0 = { obj2, obj5 };
+    SinglyLinkedList cut = new SinglyLinkedList(carg0);
+
+    Object marg0 = null;
+    boolean retval = cut.delete(marg0);
+
+    boolean expected = false;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testHasDuplicates7() throws Exception {
+    Object obj2 = new Object();
+    Object obj5 = new Object();
+    Object[] carg0 = { obj2, obj5 };
+    SinglyLinkedList cut = new SinglyLinkedList(carg0);
+
+    boolean retval = cut.hasDuplicates();
+
+    boolean expected = false;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testHasCycle7() throws Exception {
+    Object obj2 = new Object();
+    Object obj5 = new Object();
+    Object[] carg0 = { obj2, obj5 };
+    SinglyLinkedList cut = new SinglyLinkedList(carg0);
+
+    boolean retval = cut.hasCycle();
+
+    boolean expected = false;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testReverse7() throws Exception {
+    Object obj2 = new Object();
+    Object obj5 = new Object();
+    Object[] carg0 = { obj2, obj5 };
+    SinglyLinkedList cut = new SinglyLinkedList(carg0);
+
+    cut.reverse();
+  }
+
+  @Test
+  public void testInit18() throws Exception {
+    Object obj2 = new Object();
+    Object obj7 = new Object();
+    Object[] carg0 = { obj2, null, obj7 };
+    new SinglyLinkedList(carg0);
+  }
+
+  @Test
+  public void testInit19() throws Exception {
+    Object obj2 = new Object();
+    Object obj5 = new Object();
+    Object[] carg0 = { obj2, null, obj5 };
+    new SinglyLinkedList(carg0);
+  }
+
+  @Test
+  public void testInit20() throws Exception {
+    Object obj2 = new Object();
+    Object[] carg0 = { obj2, null, null };
+    new SinglyLinkedList(carg0);
+  }
+
+  @Test
+  public void testInit21() throws Exception {
+    Object obj2 = new Object();
+    Object[] carg0 = { obj2, null, obj2 };
+    new SinglyLinkedList(carg0);
+  }
+
+  @Test
+  public void testAdd16() throws Exception {
+    Object obj2 = new Object();
+    Object[] carg0 = { obj2, null };
+    SinglyLinkedList cut = new SinglyLinkedList(carg0);
+
+    Object marg0 = null;
+    boolean retval = cut.add(marg0);
+
+    boolean expected = false;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testDelete17() throws Exception {
+    Object obj2 = new Object();
+    Object[] carg0 = { obj2, null };
+    SinglyLinkedList cut = new SinglyLinkedList(carg0);
+
+    Object marg0 = null;
+    boolean retval = cut.delete(marg0);
+
+    boolean expected = true;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testHasDuplicates8() throws Exception {
+    Object obj2 = new Object();
+    Object[] carg0 = { obj2, null };
+    SinglyLinkedList cut = new SinglyLinkedList(carg0);
+
+    boolean retval = cut.hasDuplicates();
+
+    boolean expected = false;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testHasCycle8() throws Exception {
+    Object obj2 = new Object();
+    Object[] carg0 = { obj2, null };
+    SinglyLinkedList cut = new SinglyLinkedList(carg0);
+
+    boolean retval = cut.hasCycle();
+
+    boolean expected = false;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testReverse8() throws Exception {
+    Object obj2 = new Object();
+    Object[] carg0 = { obj2, null };
+    SinglyLinkedList cut = new SinglyLinkedList(carg0);
+
+    cut.reverse();
+  }
+
+  @Test
+  public void testInit22() throws Exception {
+    Object obj2 = new Object();
+    Object obj7 = new Object();
+    Object[] carg0 = { obj2, obj2, obj7 };
+    new SinglyLinkedList(carg0);
+  }
+
+  @Test
+  public void testInit23() throws Exception {
+    Object obj2 = new Object();
+    Object obj5 = new Object();
+    Object[] carg0 = { obj2, obj2, obj5 };
+    new SinglyLinkedList(carg0);
+  }
+
+  @Test
+  public void testInit24() throws Exception {
+    Object obj2 = new Object();
+    Object[] carg0 = { obj2, obj2, null };
+    new SinglyLinkedList(carg0);
+  }
+
+  @Test
+  public void testInit25() throws Exception {
+    Object obj2 = new Object();
+    Object[] carg0 = { obj2, obj2, obj2 };
+    new SinglyLinkedList(carg0);
+  }
+
+  @Test
+  public void testAdd17() throws Exception {
+    Object obj2 = new Object();
+    Object[] carg0 = { obj2, obj2 };
+    SinglyLinkedList cut = new SinglyLinkedList(carg0);
+
+    Object marg0 = null;
+    boolean retval = cut.add(marg0);
+
+    boolean expected = true;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testDelete18() throws Exception {
+    Object obj2 = new Object();
+    Object[] carg0 = { obj2, obj2 };
+    SinglyLinkedList cut = new SinglyLinkedList(carg0);
+
+    Object marg0 = null;
+    boolean retval = cut.delete(marg0);
+
+    boolean expected = false;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testHasDuplicates9() throws Exception {
+    Object obj2 = new Object();
+    Object[] carg0 = { obj2, obj2 };
+    SinglyLinkedList cut = new SinglyLinkedList(carg0);
+
+    boolean retval = cut.hasDuplicates();
+
+    boolean expected = true;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testHasCycle9() throws Exception {
+    Object obj2 = new Object();
+    Object[] carg0 = { obj2, obj2 };
+    SinglyLinkedList cut = new SinglyLinkedList(carg0);
+
+    boolean retval = cut.hasCycle();
+
+    boolean expected = false;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testReverse9() throws Exception {
+    Object obj2 = new Object();
+    Object[] carg0 = { obj2, obj2 };
+    SinglyLinkedList cut = new SinglyLinkedList(carg0);
+
+    cut.reverse();
   }
 }

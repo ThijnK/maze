@@ -172,7 +172,7 @@ More information about the reasoning behind the design of each subject can be fo
 ### Example Output
 
 The output for each of the benchmark classes when run using **BFS** with a **10 second time budget** is available in the [src/test/java/nl/uu/maze/generated/benchmarks](/src/test/java/nl/uu/tests/maze/generated/benchmarks/) directory.
-These test cases achieve an overall 91% instruction coverage and 88% branch coverage for the benchmark set (see JaCoCo report after running the tests).
+These test cases achieve an overall 88% line coverage and 83% branch coverage for the benchmark set (see JaCoCo report after running the tests), but better coverage can be achieved using different search strategies and/or a larger time budget.
 
 ## Architecture
 

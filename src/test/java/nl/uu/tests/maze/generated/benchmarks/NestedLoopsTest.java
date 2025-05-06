@@ -25,7 +25,7 @@ public class NestedLoopsTest {
 
   @Test
   public void testComplexNested3() throws Exception {
-    int[] marg0 = { 74428311, 75672468 };
+    int[] marg0 = { 369660271, 470323562 };
     int retval = NestedLoops.complexNested(marg0);
 
     int expected = 0;
@@ -43,7 +43,7 @@ public class NestedLoopsTest {
 
   @Test
   public void testComplexNested5() throws Exception {
-    int[] marg0 = { 16624851, 1078209728 };
+    int[] marg0 = { 734262629, 1757566272 };
     int retval = NestedLoops.complexNested(marg0);
 
     int expected = 4000;
@@ -52,7 +52,7 @@ public class NestedLoopsTest {
 
   @Test
   public void testComplexNested6() throws Exception {
-    int[] marg0 = { 265160220, 265160220 };
+    int[] marg0 = { 1900551266, 1900551266 };
     int retval = NestedLoops.complexNested(marg0);
 
     int expected = 0;
@@ -70,7 +70,7 @@ public class NestedLoopsTest {
 
   @Test
   public void testComplexNested8() throws Exception {
-    int[] marg0 = { 207402472, 207402472 };
+    int[] marg0 = { 475837928, 475837928 };
     int retval = NestedLoops.complexNested(marg0);
 
     int expected = 4000;
@@ -88,7 +88,7 @@ public class NestedLoopsTest {
 
   @Test
   public void testComplexNested10() throws Exception {
-    int[] marg0 = { -1811934747, -738193084 };
+    int[] marg0 = { -1946156993, 62 };
     int retval = NestedLoops.complexNested(marg0);
 
     int expected = 0;
@@ -115,7 +115,7 @@ public class NestedLoopsTest {
 
   @Test
   public void testComplexNested13() throws Exception {
-    int[] marg0 = { -122709824, 35 };
+    int[] marg0 = { -1982290224, 52 };
     int retval = NestedLoops.complexNested(marg0);
 
     int expected = 4000;
@@ -124,7 +124,7 @@ public class NestedLoopsTest {
 
   @Test
   public void testComplexNested14() throws Exception {
-    int[] marg0 = { -1701307991, 167778728 };
+    int[] marg0 = { -1731944491, 4494228 };
     int retval = NestedLoops.complexNested(marg0);
 
     int expected = 2000;
@@ -151,7 +151,7 @@ public class NestedLoopsTest {
 
   @Test
   public void testComplexNested17() throws Exception {
-    int[] marg0 = { -850269865, -850269865 };
+    int[] marg0 = { -1790199994, -1790199994 };
     int retval = NestedLoops.complexNested(marg0);
 
     int expected = 0;
@@ -160,7 +160,7 @@ public class NestedLoopsTest {
 
   @Test
   public void testComplexNested18() throws Exception {
-    int[] marg0 = { -420482365, 1684533440 };
+    int[] marg0 = { -1413240855, 407873600 };
     int retval = NestedLoops.complexNested(marg0);
 
     int expected = 6000;
@@ -178,10 +178,10 @@ public class NestedLoopsTest {
 
   @Test
   public void testComplexNested20() throws Exception {
-    int[] marg0 = { 1249903040, 1249927619 };
+    int[] marg0 = { -401932264, 1745551897 };
     int retval = NestedLoops.complexNested(marg0);
 
-    int expected = 0;
+    int expected = 2000;
     Assertions.assertEquals(expected, retval);
   }
 
@@ -205,7 +205,7 @@ public class NestedLoopsTest {
 
   @Test
   public void testComplexNested23() throws Exception {
-    int[] marg0 = { 750548288, 1012720869 };
+    int[] marg0 = { 1180732480, 1286892761 };
     int retval = NestedLoops.complexNested(marg0);
 
     int expected = 4000;
@@ -223,7 +223,7 @@ public class NestedLoopsTest {
 
   @Test
   public void testComplexNested25() throws Exception {
-    int[] marg0 = { -1073673178, -1054110169 };
+    int[] marg0 = { -804518892, -770964459 };
     int retval = NestedLoops.complexNested(marg0);
 
     int expected = 0;
@@ -241,7 +241,7 @@ public class NestedLoopsTest {
 
   @Test
   public void testComplexNested27() throws Exception {
-    int[] marg0 = { -735776576, -726860093 };
+    int[] marg0 = { -726744000, -675359495 };
     int retval = NestedLoops.complexNested(marg0);
 
     int expected = 4000;
@@ -268,78 +268,6 @@ public class NestedLoopsTest {
 
   @Test
   public void testComplexNested30() throws Exception {
-    int[] marg0 = { 969972996, 1231913923, 1037551342, 1037551342, 1037551342, 1037551342, 1037551342, 1037551342 };
-    int retval = NestedLoops.complexNested(marg0);
-
-    int expected = 0;
-    Assertions.assertEquals(expected, retval);
-  }
-
-  @Test
-  public void testComplexNested31() throws Exception {
-    int[] marg0 = { 11, 42, 1 };
-    int retval = NestedLoops.complexNested(marg0);
-
-    int expected = 0;
-    Assertions.assertEquals(expected, retval);
-  }
-
-  @Test
-  public void testComplexNested32() throws Exception {
-    int[] marg0 = { -515355852, 1665818493, 0 };
-    int retval = NestedLoops.complexNested(marg0);
-
-    int expected = 2000;
-    Assertions.assertEquals(expected, retval);
-  }
-
-  @Test
-  public void testComplexNested33() throws Exception {
-    int[] marg0 = { -2076946870, 38, 1412570384, 1412570384, 1412570384, 1412570384, 1412570384, 1412570384, 1412570384, 1412570384, 1412570384, 1412570384, 1412570384, 1412570384, 1412570384, 1412570384, 1412570384, 1412570384, 1412570384, 1412570384, 1412570384, 1412570384, 1412570384, 1412570384, 1412570384, 1412570384, 1412570384, 1412570384, 1412570384, 1412570384, 1412570384, 1412570384, 1412570384, 1412570384, 1412570384, 1412570384, 1412570384, 1412570384, 1412570384, 1412570384, 1412570384, 1412570384, 1412570384, 1412570384, 1412570384, 1412570384, 1412570384, 1412570384, 1412570384, 1412570384, 1412570384, 1412570384, 1412570384, 1412570384, 1412570384, 1412570384, 1412570384, 1412570384, 1412570384, 1412570384, 1412570384, 1412570384, 1412570384, 1412570384 };
-    int retval = NestedLoops.complexNested(marg0);
-
-    int expected = 0;
-    Assertions.assertEquals(expected, retval);
-  }
-
-  @Test
-  public void testComplexNested34() throws Exception {
-    int[] marg0 = { 42, 1677721601, -1074151875, -1074151875, -1074151875, -1074151875, -1074151875, -1074151875, -1074151875, -1074151875, -1074151875, -1074151875, -1074151875, -1074151875, -1074151875, -1074151875, -1074151875, -1074151875, -1074151875, -1074151875, -1074151875, -1074151875, -1074151875, -1074151875, -1074151875, -1074151875, -1074151875, -1074151875, -1074151875, -1074151875, -1074151875, -1074151875, -1074151875, -1074151875 };
-    int retval = NestedLoops.complexNested(marg0);
-
-    int expected = 0;
-    Assertions.assertEquals(expected, retval);
-  }
-
-  @Test
-  public void testComplexNested35() throws Exception {
-    int[] marg0 = { 42, 42, 0 };
-    int retval = NestedLoops.complexNested(marg0);
-
-    int expected = 0;
-    Assertions.assertEquals(expected, retval);
-  }
-
-  @Test
-  public void testComplexNested36() throws Exception {
-    int[] marg0 = { 42, 42, 42 };
-    int retval = NestedLoops.complexNested(marg0);
-
-    int expected = 0;
-    Assertions.assertEquals(expected, retval);
-  }
-
-  @Test
-  public void testComplexNested37() throws Exception {
-    int[] marg0 = { 42, 42, -42 };
-    int retval = NestedLoops.complexNested(marg0);
-
-    int expected = 32000;
-    Assertions.assertEquals(expected, retval);
-  }
-
-  @Test
-  public void testComplexNested38() throws Exception {
     int[] marg0 = { -42, 42 };
     int retval = NestedLoops.complexNested(marg0);
 
@@ -348,26 +276,116 @@ public class NestedLoopsTest {
   }
 
   @Test
-  public void testComplexNested39() throws Exception {
-    int[] marg0 = { -42, 42, 42 };
+  public void testComplexNested31() throws Exception {
+    int[] marg0 = { -1533913952, 42, 335544321 };
     int retval = NestedLoops.complexNested(marg0);
 
-    int expected = 0;
+    int expected = 8000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested32() throws Exception {
+    int[] marg0 = { -1533913952, 42, 613569696 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 12000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested33() throws Exception {
+    int[] marg0 = { -1533913952, 42, 42 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 8000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested34() throws Exception {
+    int[] marg0 = { -1533913952, 42, -42 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 5000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested35() throws Exception {
+    int[] marg0 = { -2082559423, -1993420224, -2083480776 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 4000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested36() throws Exception {
+    int[] marg0 = { -1527747056, -491489628, -1527747056 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 8000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested37() throws Exception {
+    int[] marg0 = { -1168117936, -803109100, -803109100, -803109100, -803109100, -803109100, -803109100, -803109100, -803109100, -803109100, -803109100, -803109100, -803109100, -803109100, -803109100, -803109100, -803109100, -803109100, -803109100, -803109100, -803109100, -803109100, -803109100, -803109100, -803109100, -803109100, -803109100, -803109100, -803109100, -803109100, -803109100, -803109100, -803109100, -803109100, -803109100, -803109100, -803109100, -803109100, -803109100, -803109100, -803109100, -803109100, -803109100, -803109100, -803109100, -803109100, -803109100, -803109100, -803109100, -803109100, -803109100, -803109100, -803109100, -803109100, -803109100, -803109100, -803109100, -803109100, -803109100, -803109100, -803109100, -803109100, -803109100, -803109100 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 252000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested38() throws Exception {
+    int[] marg0 = { -2124640560, -2124626380, 17756352, 17756352, 17756352, 17756352, 17756352, 17756352, 17756352, 17756352, 17756352, 17756352, 17756352, 17756352, 17756352, 17756352 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 88000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested39() throws Exception {
+    int[] marg0 = { -2052908768, -1392299646, 94574880 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 14000;
     Assertions.assertEquals(expected, retval);
   }
 
   @Test
   public void testComplexNested40() throws Exception {
-    int[] marg0 = { 40104688, 1073807552, 50462339, 50462339, 50462339, 50462339, 50462339, 50462339, 50462339, 50462339, 50462339, 50462339, 50462339, 50462339, 50462339, 50462339, 50462339, 50462339, 50462339, 50462339, 50462339, 50462339, 50462339, 50462339, 50462339, 50462339, 50462339, 50462339, 50462339, 50462339, 50462339, 50462339 };
+    int[] marg0 = { -2147468216, 8, 0 };
     int retval = NestedLoops.complexNested(marg0);
 
-    int expected = 120000;
+    int expected = 9000;
     Assertions.assertEquals(expected, retval);
   }
 
   @Test
   public void testComplexNested41() throws Exception {
-    int[] marg0 = { 1384181838, 1417674817, 1417674817 };
+    int[] marg0 = { -2147468216, 8, 15432 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 22000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested42() throws Exception {
+    int[] marg0 = { -2147468216, 8, 8 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 18000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested43() throws Exception {
+    int[] marg0 = { -2147483648, -2147483648, -2147483547 };
     int retval = NestedLoops.complexNested(marg0);
 
     int expected = 0;
@@ -375,35 +393,17 @@ public class NestedLoopsTest {
   }
 
   @Test
-  public void testComplexNested42() throws Exception {
-    int[] marg0 = { 347615301, 475837928, 475837928 };
-    int retval = NestedLoops.complexNested(marg0);
-
-    int expected = 4000;
-    Assertions.assertEquals(expected, retval);
-  }
-
-  @Test
-  public void testComplexNested43() throws Exception {
-    int[] marg0 = { 0, 2147483647, 2147483647 };
-    int retval = NestedLoops.complexNested(marg0);
-
-    int expected = 3000;
-    Assertions.assertEquals(expected, retval);
-  }
-
-  @Test
   public void testComplexNested44() throws Exception {
-    int[] marg0 = { 11, 42, 613569696 };
+    int[] marg0 = { -822598592, -822598592, -2104085639, -822598592, -822598592, -822598592, -822598592, -822598592, -822598592, -822598592, -822598592, -822598592, -822598592, -822598592, -822598592, -822598592, -822598592, -822598592, -822598592, -822598592, -822598592, -822598592, -822598592, -822598592, -822598592, -822598592, -822598592, -822598592, -822598592, -822598592, -822598592, -822598592 };
     int retval = NestedLoops.complexNested(marg0);
 
-    int expected = 4000;
+    int expected = 124000;
     Assertions.assertEquals(expected, retval);
   }
 
   @Test
   public void testComplexNested45() throws Exception {
-    int[] marg0 = { 11, 42, 42 };
+    int[] marg0 = { -577222234, -577222234, -577222234 };
     int retval = NestedLoops.complexNested(marg0);
 
     int expected = 0;
@@ -412,6 +412,654 @@ public class NestedLoopsTest {
 
   @Test
   public void testComplexNested46() throws Exception {
+    int[] marg0 = { -2068840447, -2068840447, 457167100 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 2000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested47() throws Exception {
+    int[] marg0 = { -1025482200, -1025482200, 46916520 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 6000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested48() throws Exception {
+    int[] marg0 = { -1818015208, -1818015208, -2032719999, -1818015208, -1818015208, -1818015208, -1818015208, -1818015208, -1818015208, -1818015208, -1818015208, -1818015208, -1818015208, -1818015208, -1818015208, -1818015208, -1818015208, -1818015208, -1818015208, -1818015208, -1818015208, -1818015208, -1818015208, -1818015208, -1818015208, -1818015208, -1818015208, -1818015208, -1818015208, -1818015208, -1818015208, -1818015208 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 1860000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested49() throws Exception {
+    int[] marg0 = { -1549579752, -1549579752, -2086450664, -1549579752, -1549579752, -1549579752, -1549579752, -1549579752, -1549579752, -1549579752, -1549579752, -1549579752, -1549579752, -1549579752, -1549579752, -1549579752, -1549579752, -1549579752, -1549579752, -1549579752, -1549579752, -1549579752, -1549579752, -1549579752, -1549579752, -1549579752, -1549579752, -1549579752, -1549579752, -1549579752, -1549579752, -1549579752 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 1984000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested50() throws Exception {
+    int[] marg0 = { -1940081176, -1940081176, -1940081176, -1940081176, -1940081176, -1940081176, -1940081176, -1940081176, -1940081176, -1940081176, -1940081176, -1940081176, -1940081176, -1940081176, -1940081176, -1940081176 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 480000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested51() throws Exception {
+    int[] marg0 = { -1403210264, -1403210264, 12601708, -1403210264, -1403210264, -1403210264 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 46000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested52() throws Exception {
+    int[] marg0 = { -1940081176, -1940081176, 207402472, -1940081176 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 26000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested53() throws Exception {
+    int[] marg0 = { -1602108216, 391708443, 1879056144, 1879056144, 1879056144, 1879056144 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 10000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested54() throws Exception {
+    int[] marg0 = { -669612566, 1715996103, -1505753658, -1505753658, -1505753658, -1505753658, -1505753658, -1505753658, -1505753658, -1505753658, -1505753658, -1505753658, -1505753658, -1505753658, -1505753658, -1505753658, -1505753658, -1505753658, -1505753658, -1505753658, -1505753658, -1505753658, -1505753658, -1505753658, -1505753658, -1505753658, -1505753658, -1505753658, -1505753658, -1505753658, -1505753658, -1505753658 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 2000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested55() throws Exception {
+    int[] marg0 = { -1055203410, 1073741856, 67112722 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 8000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested56() throws Exception {
+    int[] marg0 = { -2051505064, 609883265, 609883265 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 4000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested57() throws Exception {
+    int[] marg0 = { -1341545725, 329468440, 329468440 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 8000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested58() throws Exception {
+    int[] marg0 = { -2147483648, 2147483647, 2147483647 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 7000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested59() throws Exception {
+    int[] marg0 = { -1400370880, 867461781, 158059847, 158059847, 158059847, 158059847, 158059847, 158059847, 158059847, 158059847, 158059847, 158059847, 158059847, 158059847, 158059847, 158059847, 158059847, 158059847, 158059847, 158059847, 158059847, 158059847, 158059847, 158059847, 158059847, 158059847, 158059847, 158059847, 158059847, 158059847, 158059847, 158059847 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 66000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested60() throws Exception {
+    int[] marg0 = { -1399698796, 536871248, 210913940, 210913940, 210913940, 210913940, 210913940, 210913940, 210913940, 210913940, 210913940, 210913940, 210913940, 210913940, 210913940, 210913940, 210913940, 210913940, 210913940, 210913940, 210913940, 210913940, 210913940, 210913940, 210913940, 210913940, 210913940, 210913940, 210913940, 210913940, 210913940, 210913940 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 186000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested61() throws Exception {
+    int[] marg0 = { -1460986712, 539670824, 539670824 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 12000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested62() throws Exception {
+    int[] marg0 = { -1134774808, 475837928, 475837928, 475837928, 475837928, 475837928, 475837928, 475837928 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 126000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested63() throws Exception {
+    int[] marg0 = { -123456, 2147483647, 2147483647 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 15000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested64() throws Exception {
+    int[] marg0 = { 42, 455953193, 1126255400, 1126255400, 1126255400, 1126255400, 1126255400, 1126255400, 1126255400, 1126255400, 1126255400, 1126255400, 1126255400, 1126255400, 1126255400, 1126255400, 1126255400, 1126255400, 1126255400, 1126255400, 1126255400, 1126255400, 1126255400, 1126255400, 1126255400, 1126255400, 1126255400, 1126255400, 1126255400, 1126255400, 1126255400, 1126255400, 1126255400, 1126255400 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 0;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested65() throws Exception {
+    int[] marg0 = { 42, 1667065527, -2113116538, -2113116538, -2113116538, -2113116538, -2113116538, -2113116538, -2113116538, -2113116538, -2113116538, -2113116538, -2113116538, -2113116538, -2113116538, -2113116538, -2113116538, -2113116538, -2113116538, -2113116538, -2113116538, -2113116538, -2113116538, -2113116538, -2113116538, -2113116538, -2113116538, -2113116538, -2113116538, -2113116538, -2113116538, -2113116538, -2113116538, -2113116538 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 0;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested66() throws Exception {
+    int[] marg0 = { 42, 534224733, 676366144, 676366144, 676366144, 676366144, 676366144, 676366144, 676366144, 676366144, 676366144, 676366144, 676366144, 676366144, 676366144, 676366144, 676366144, 676366144, 676366144, 676366144, 676366144, 676366144, 676366144, 676366144, 676366144, 676366144, 676366144, 676366144, 676366144, 676366144, 676366144, 676366144 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 120000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested67() throws Exception {
+    int[] marg0 = { 42, 1580123385, 739427392, 739427392, 739427392, 739427392 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 16000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested68() throws Exception {
+    int[] marg0 = { 42, 537920001, 537920001 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 0;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested69() throws Exception {
+    int[] marg0 = { 42, 866339352, 866339352, 866339352, 866339352, 866339352, 866339352, 866339352, 866339352, 866339352, 866339352, 866339352, 866339352, 866339352, 866339352, 866339352, 866339352, 866339352, 866339352, 866339352, 866339352, 866339352, 866339352, 866339352, 866339352, 866339352, 866339352, 866339352, 866339352, 866339352, 866339352, 866339352 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 1860000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested70() throws Exception {
+    int[] marg0 = { 42, 2147483647, 2147483647 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 3000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested71() throws Exception {
+    int[] marg0 = { -2147478207, 42, 1342177281 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 0;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested72() throws Exception {
+    int[] marg0 = { 1, 42, 613569696 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 4000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested73() throws Exception {
+    int[] marg0 = { 1, 42, 42 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 0;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested74() throws Exception {
+    int[] marg0 = { 1, 42, -42 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 31000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested75() throws Exception {
+    int[] marg0 = { 8, 42, 352321537 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 0;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested76() throws Exception {
+    int[] marg0 = { 8, 42, 613569696 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 4000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested77() throws Exception {
+    int[] marg0 = { 8, 42, 42 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 0;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested78() throws Exception {
+    int[] marg0 = { 8, 42, -42 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 31000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested79() throws Exception {
+    int[] marg0 = { 42, 613569696, 1150439425 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 8000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested80() throws Exception {
+    int[] marg0 = { 42, 613569696, 76547073, 76547073, 76547073, 76547073, 76547073, 76547073, 76547073, 76547073, 76547073, 76547073, 76547073, 76547073, 76547073, 76547073, 76547073, 76547073, 76547073, 76547073, 76547073, 76547073, 76547073, 76547073, 76547073, 76547073, 76547073, 76547073, 76547073, 76547073, 76547073, 76547073, 76547073, 76547073, 76547073, 76547073, 76547073, 76547073, 76547073, 76547073, 76547073, 76547073, 76547073, 76547073, 76547073, 76547073, 76547073, 76547073, 76547073, 76547073, 76547073, 76547073, 76547073, 76547073, 76547073, 76547073, 76547073, 76547073, 76547073, 76547073, 76547073, 76547073, 76547073, 76547073 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 4000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested81() throws Exception {
+    int[] marg0 = { 42, 613569696, 42 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 8000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested82() throws Exception {
+    int[] marg0 = { 42, 613569696, 613569696 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 8000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested83() throws Exception {
+    int[] marg0 = { -1533913952, 42, 1 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 4000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested84() throws Exception {
+    int[] marg0 = { 42, 42, 335544321, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 0;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested85() throws Exception {
+    int[] marg0 = { 42, 42, 613569696 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 4000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested86() throws Exception {
+    int[] marg0 = { 42, 42, 42 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 0;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested87() throws Exception {
+    int[] marg0 = { 42, 42, -42 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 32000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested88() throws Exception {
+    int[] marg0 = { -42, 42, 0 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 0;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested89() throws Exception {
+    int[] marg0 = { -42, 42, 42 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 0;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested90() throws Exception {
+    int[] marg0 = { -42, 42, -42 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 31000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested91() throws Exception {
+    int[] marg0 = { 25187843, 92193047, 1704188274, 1704188274, 1704188274, 1704188274, 1704188274, 1704188274, 1704188274, 1704188274, 1704188274, 1704188274, 1704188274, 1704188274, 1704188274, 1704188274, 1704188274, 1704188274, 1704188274, 1704188274, 1704188274, 1704188274, 1704188274, 1704188274, 1704188274, 1704188274, 1704188274, 1704188274, 1704188274, 1704188274, 1704188274, 1704188274 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 0;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested92() throws Exception {
+    int[] marg0 = { 644296707, 715923448, 794832872 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 0;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested93() throws Exception {
+    int[] marg0 = { 503631911, -905145024, -905145024, -905145024, -905145024, -905145024, -905145024, -905145024, -905145024, -905145024, -905145024, -905145024, -905145024, -905145024, -905145024, -905145024, -905145024, -905145024, -905145024, -905145024, -905145024, -905145024, -905145024, -905145024, -905145024, -905145024, -905145024, -905145024, -905145024, -905145024, -905145024, -905145024 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 0;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested94() throws Exception {
+    int[] marg0 = { 7, 759169217, 1816133824, 1816133824, 1816133824, 1816133824, 1816133824, 1816133824, 1816133824, 1816133824, 1816133824, 1816133824, 1816133824, 1816133824, 1816133824, 1816133824, 1816133824, 1816133824, 1816133824, 1816133824, 1816133824, 1816133824, 1816133824, 1816133824, 1816133824, 1816133824, 1816133824, 1816133824, 1816133824, 1816133824, 1816133824, 1816133824 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 0;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested95() throws Exception {
+    int[] marg0 = { 7, 1697907041, -468450976, -468450976, -468450976, -468450976, -468450976, -468450976, -468450976, -468450976, -468450976, -468450976, -468450976, -468450976, -468450976, -468450976, -468450976, -468450976, -468450976, -468450976, -468450976, -468450976, -468450976, -468450976, -468450976, -468450976, -468450976, -468450976, -468450976, -468450976, -468450976, -468450976 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 0;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested96() throws Exception {
+    int[] marg0 = { 7, 9, 8 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 10000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested97() throws Exception {
+    int[] marg0 = { 342183683, 723211377, 1457792576, 1457792576, 1457792576, 1457792576, 1457792576, 1457792576, 1457792576, 1457792576, 1457792576, 1457792576, 1457792576, 1457792576, 1457792576, 1457792576, 1457792576, 1457792576, 1457792576, 1457792576, 1457792576, 1457792576, 1457792576, 1457792576, 1457792576, 1457792576, 1457792576, 1457792576, 1457792576, 1457792576, 1457792576, 1457792576, 1457792576, 1457792576, 1457792576, 1457792576, 1457792576, 1457792576, 1457792576, 1457792576, 1457792576, 1457792576, 1457792576, 1457792576, 1457792576, 1457792576, 1457792576, 1457792576, 1457792576, 1457792576, 1457792576, 1457792576, 1457792576, 1457792576, 1457792576, 1457792576, 1457792576, 1457792576, 1457792576, 1457792576, 1457792576, 1457792576, 1457792576, 1457792576 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 248000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested98() throws Exception {
+    int[] marg0 = { 14693395, 338758293, 417335616 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 4000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested99() throws Exception {
+    int[] marg0 = { 939539490, 1756416448, 1756416448, 1756416448, 1756416448, 1756416448, 1756416448, 1756416448, 1756416448, 1756416448, 1756416448, 1756416448, 1756416448, 1756416448, 1756416448, 1756416448, 1756416448, 1756416448, 1756416448, 1756416448, 1756416448, 1756416448, 1756416448, 1756416448, 1756416448, 1756416448, 1756416448, 1756416448, 1756416448, 1756416448, 1756416448, 1756416448, 1756416448, 1756416448 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 0;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested100() throws Exception {
+    int[] marg0 = { 7, 1173739499, 1283806912, 1283806912, 1283806912, 1283806912, 1283806912, 1283806912, 1283806912, 1283806912, 1283806912, 1283806912, 1283806912, 1283806912, 1283806912, 1283806912, 1283806912, 1283806912, 1283806912, 1283806912, 1283806912, 1283806912, 1283806912, 1283806912, 1283806912, 1283806912, 1283806912, 1283806912, 1283806912, 1283806912, 1283806912, 1283806912, 1283806912, 1283806912, 1283806912, 1283806912, 1283806912, 1283806912, 1283806912, 1283806912, 1283806912, 1283806912, 1283806912, 1283806912, 1283806912, 1283806912, 1283806912, 1283806912, 1283806912, 1283806912, 1283806912, 1283806912, 1283806912, 1283806912, 1283806912, 1283806912, 1283806912, 1283806912, 1283806912, 1283806912, 1283806912, 1283806912, 1283806912, 1283806912 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 248000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested101() throws Exception {
+    int[] marg0 = { 7, 305921601, -1875783104, -1875783104, -1875783104, -1875783104, -1875783104, -1875783104, -1875783104, -1875783104, -1875783104, -1875783104, -1875783104, -1875783104, -1875783104, -1875783104, -1875783104, -1875783104, -1875783104, -1875783104, -1875783104, -1875783104, -1875783104, -1875783104, -1875783104, -1875783104, -1875783104, -1875783104, -1875783104, -1875783104, -1875783104, -1875783104 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 120000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested102() throws Exception {
+    int[] marg0 = { 7, 15432, 8 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 14000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested103() throws Exception {
+    int[] marg0 = { 850927692, 1906514757, 1906514757 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 0;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested104() throws Exception {
+    int[] marg0 = { 7, 327901342, 327901342, 327901342, 327901342, 327901342, 327901342, 327901342, 327901342, 327901342, 327901342, 327901342, 327901342, 327901342, 327901342, 327901342 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 0;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested105() throws Exception {
+    int[] marg0 = { 270536032, 329468440, 329468440 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 4000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested106() throws Exception {
+    int[] marg0 = { 7, 61032984, 61032984 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 4000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested107() throws Exception {
+    int[] marg0 = { 0, 2147483647, 2147483647 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 3000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested108() throws Exception {
+    int[] marg0 = { 7, 2147483647, 2147483647 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 3000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested109() throws Exception {
+    int[] marg0 = { 11, 42, 1073741825 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 0;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested110() throws Exception {
+    int[] marg0 = { 11, 42, 1 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 0;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested111() throws Exception {
+    int[] marg0 = { 7, 42, 350224385, 350224385, 350224385, 350224385, 350224385, 350224385, 350224385, 350224385, 350224385, 350224385, 350224385, 350224385, 350224385, 350224385, 350224385, 350224385, 350224385, 350224385, 350224385, 350224385, 350224385, 350224385, 350224385, 350224385, 350224385, 350224385, 350224385, 350224385, 350224385, 350224385, 350224385, 350224385 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 0;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested112() throws Exception {
+    int[] marg0 = { 7, 42, 8 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 10000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested113() throws Exception {
+    int[] marg0 = { 11, 42, 613569696 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 4000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested114() throws Exception {
+    int[] marg0 = { 11, 42, -1533913952 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 4000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested115() throws Exception {
+    int[] marg0 = { 7, 42, 613569696 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 4000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested116() throws Exception {
+    int[] marg0 = { 11, 42, 42 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 0;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested117() throws Exception {
+    int[] marg0 = { 7, 42, 42 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 0;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested118() throws Exception {
     int[] marg0 = { 11, 42, -42 };
     int retval = NestedLoops.complexNested(marg0);
 
@@ -420,8 +1068,17 @@ public class NestedLoopsTest {
   }
 
   @Test
-  public void testComplexNested47() throws Exception {
-    int[] marg0 = { -2147483648, 0, 0 };
+  public void testComplexNested119() throws Exception {
+    int[] marg0 = { 7, 42, -42 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 31000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested120() throws Exception {
+    int[] marg0 = { 227469846, 1556189319, 186914609, 186914609, 186914609, 186914609, 186914609, 186914609, 186914609, 186914609, 186914609, 186914609, 186914609, 186914609, 186914609, 186914609 };
     int retval = NestedLoops.complexNested(marg0);
 
     int expected = 0;
@@ -429,8 +1086,116 @@ public class NestedLoopsTest {
   }
 
   @Test
-  public void testComplexNested48() throws Exception {
-    int[] marg0 = { 1, 8, 0 };
+  public void testComplexNested121() throws Exception {
+    int[] marg0 = { 7, 896123485, 1446490882, 1446490882, 1446490882, 1446490882, 1446490882, 1446490882, 1446490882, 1446490882, 1446490882, 1446490882, 1446490882, 1446490882, 1446490882, 1446490882, 1446490882, 1446490882, 1446490882, 1446490882, 1446490882, 1446490882, 1446490882, 1446490882, 1446490882, 1446490882, 1446490882, 1446490882, 1446490882, 1446490882, 1446490882, 1446490882, 1446490882 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 0;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested122() throws Exception {
+    int[] marg0 = { 81836163, 134217744, 234888740 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 4000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested123() throws Exception {
+    int[] marg0 = { 7, 805306560, 54526595, 54526595, 54526595, 54526595, 54526595, 54526595, 54526595, 54526595, 54526595, 54526595, 54526595, 54526595, 54526595, 54526595, 54526595, 54526595, 54526595, 54526595, 54526595, 54526595, 54526595, 54526595, 54526595, 54526595, 54526595, 54526595, 54526595, 54526595, 54526595, 54526595, 54526595, 54526595 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 128000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested124() throws Exception {
+    int[] marg0 = { 209021883, 700994117, 700994117, 700994117, 700994117, 700994117, 700994117, 700994117, 700994117, 700994117, 700994117, 700994117, 700994117, 700994117, 700994117, 700994117 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 0;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested125() throws Exception {
+    int[] marg0 = { 7, 1851729169, 1851729169, 1851729169, 1851729169, 1851729169, 1851729169, 1851729169 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 0;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested126() throws Exception {
+    int[] marg0 = { 7, 8, 8 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 15000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested127() throws Exception {
+    int[] marg0 = { 269887488, 475837928, 475837928 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 4000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested128() throws Exception {
+    int[] marg0 = { 7, 207402472, 207402472 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 4000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested129() throws Exception {
+    int[] marg0 = { 1, 8, 1073741824, 1073741824, 1073741824, 1073741824, 1073741824, 1073741824, 1073741824, 1073741824, 1073741824, 1073741824, 1073741824, 1073741824, 1073741824, 1073741824, 1073741824, 1073741824, 1073741824, 1073741824, 1073741824, 1073741824, 1073741824, 1073741824, 1073741824, 1073741824, 1073741824, 1073741824, 1073741824, 1073741824, 1073741824, 1073741824 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 155000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested130() throws Exception {
+    int[] marg0 = { 1, 8, 1073741824 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 10000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested131() throws Exception {
+    int[] marg0 = { 1, 0, 0 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 0;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested132() throws Exception {
+    int[] marg0 = { 7, 8, 1073741824 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 10000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested133() throws Exception {
+    int[] marg0 = { 7, 8, 0 };
     int retval = NestedLoops.complexNested(marg0);
 
     int expected = 5000;
@@ -438,7 +1203,7 @@ public class NestedLoopsTest {
   }
 
   @Test
-  public void testComplexNested49() throws Exception {
+  public void testComplexNested134() throws Exception {
     int[] marg0 = { 1, 8, 15432 };
     int retval = NestedLoops.complexNested(marg0);
 
@@ -447,7 +1212,34 @@ public class NestedLoopsTest {
   }
 
   @Test
-  public void testComplexNested50() throws Exception {
+  public void testComplexNested135() throws Exception {
+    int[] marg0 = { 1, 8, -2147468216 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 9000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested136() throws Exception {
+    int[] marg0 = { 7, 8, 15432 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 14000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested137() throws Exception {
+    int[] marg0 = { 7, 8, -2147468216 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 9000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested138() throws Exception {
     int[] marg0 = { 1, 8, 8 };
     int retval = NestedLoops.complexNested(marg0);
 
@@ -456,8 +1248,8 @@ public class NestedLoopsTest {
   }
 
   @Test
-  public void testComplexNested51() throws Exception {
-    int[] marg0 = { 8, 9, 0 };
+  public void testComplexNested139() throws Exception {
+    int[] marg0 = { 8, 694812929, -1369203478, -1369203478, -1369203478, -1369203478, -1369203478, -1369203478, -1369203478, -1369203478, -1369203478, -1369203478, -1369203478, -1369203478, -1369203478, -1369203478, -1369203478, -1369203478, -1369203478, -1369203478, -1369203478, -1369203478, -1369203478, -1369203478, -1369203478, -1369203478, -1369203478, -1369203478, -1369203478, -1369203478, -1369203478, -1369203478, -1369203478, -1369203478 };
     int retval = NestedLoops.complexNested(marg0);
 
     int expected = 0;
@@ -465,8 +1257,17 @@ public class NestedLoopsTest {
   }
 
   @Test
-  public void testComplexNested52() throws Exception {
-    int[] marg0 = { 8, 9, 9 };
+  public void testComplexNested140() throws Exception {
+    int[] marg0 = { 8, 291422368, 53165418 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 4000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested141() throws Exception {
+    int[] marg0 = { 8, 759602927, 759602927 };
     int retval = NestedLoops.complexNested(marg0);
 
     int expected = 0;
@@ -474,11 +1275,668 @@ public class NestedLoopsTest {
   }
 
   @Test
-  public void testComplexNested53() throws Exception {
+  public void testComplexNested142() throws Exception {
+    int[] marg0 = { 8, 475837928, 475837928, 475837928, 475837928, 475837928, 475837928, 475837928, 475837928, 475837928, 475837928, 475837928, 475837928, 475837928, 475837928, 475837928, 475837928, 475837928, 475837928, 475837928, 475837928, 475837928, 475837928, 475837928, 475837928, 475837928, 475837928, 475837928, 475837928, 475837928, 475837928, 475837928, 475837928, 475837928, 475837928, 475837928, 475837928, 475837928, 475837928, 475837928, 475837928, 475837928, 475837928, 475837928, 475837928, 475837928, 475837928, 475837928, 475837928, 475837928, 475837928, 475837928, 475837928, 475837928, 475837928, 475837928, 475837928, 475837928, 475837928, 475837928, 475837928, 475837928, 475837928, 475837928, 475837928, 475837928 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 8320000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested143() throws Exception {
     int[] marg0 = { 8, 2147483647, 2147483647 };
     int retval = NestedLoops.complexNested(marg0);
 
     int expected = 3000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested144() throws Exception {
+    int[] marg0 = { 197499584, 754585307, 1692010698, 1692010698, 1692010698, 1692010698, 1692010698, 1692010698, 1692010698, 1692010698, 1692010698, 1692010698, 1692010698, 1692010698, 1692010698, 1692010698, 1692010698, 1692010698, 1692010698, 1692010698, 1692010698, 1692010698, 1692010698, 1692010698, 1692010698, 1692010698, 1692010698, 1692010698, 1692010698, 1692010698, 1692010698, 1692010698, 1692010698, 1692010698, 1692010698, 1692010698, 1692010698, 1692010698, 1692010698, 1692010698, 1692010698, 1692010698, 1692010698, 1692010698, 1692010698, 1692010698, 1692010698, 1692010698, 1692010698, 1692010698, 1692010698, 1692010698, 1692010698, 1692010698, 1692010698, 1692010698, 1692010698, 1692010698, 1692010698, 1692010698, 1692010698, 1692010698, 1692010698, 1692010698 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 252000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested145() throws Exception {
+    int[] marg0 = { 623574290, 830480416, 964691964 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 8000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested146() throws Exception {
+    int[] marg0 = { 347054912, 1143299052, 1143299052 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 0;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested147() throws Exception {
+    int[] marg0 = { 135439364, 398026896, 1209181188, 1209181188, 1209181188, 1209181188, 1209181188, 1209181188, 1209181188, 1209181188, 1209181188, 1209181188, 1209181188, 1209181188, 1209181188, 1209181188, 1209181188, 1209181188, 1209181188, 1209181188, 1209181188, 1209181188, 1209181188, 1209181188, 1209181188, 1209181188, 1209181188, 1209181188, 1209181188, 1209181188, 1209181188, 1209181188, 1209181188, 1209181188, 1209181188, 1209181188, 1209181188, 1209181188, 1209181188, 1209181188, 1209181188, 1209181188, 1209181188, 1209181188, 1209181188, 1209181188, 1209181188, 1209181188, 1209181188, 1209181188, 1209181188, 1209181188, 1209181188, 1209181188, 1209181188, 1209181188, 1209181188, 1209181188, 1209181188, 1209181188, 1209181188, 1209181188, 1209181188, 1209181188 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 500000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested148() throws Exception {
+    int[] marg0 = { 1484152128, 1500929861, 1484152128, 1484152128, 1484152128, 1484152128, 1484152128, 1484152128, 1484152128, 1484152128, 1484152128, 1484152128, 1484152128, 1484152128, 1484152128, 1484152128, 1484152128, 1484152128, 1484152128, 1484152128, 1484152128, 1484152128, 1484152128, 1484152128, 1484152128, 1484152128, 1484152128, 1484152128, 1484152128, 1484152128, 1484152128, 1484152128, 1484152128 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 128000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested149() throws Exception {
+    int[] marg0 = { 85909668, 169084432, 169084432, 169084432, 169084432, 169084432, 169084432, 169084432 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 28000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested150() throws Exception {
+    int[] marg0 = { 329468440, 866339352, 866339352, 866339352, 866339352, 866339352, 866339352, 866339352 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 112000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested151() throws Exception {
+    int[] marg0 = { -487779392, 2116688039, 546665938, 546665938, 546665938, 546665938, 546665938, 546665938, 546665938, 546665938, 546665938, 546665938, 546665938, 546665938, 546665938, 546665938, 546665938, 546665938 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 38000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested152() throws Exception {
+    int[] marg0 = { 47986537, 354076736, 47986537, 47986537, 47986537, 47986537, 47986537, 47986537, 47986537, 47986537, 47986537, 47986537, 47986537, 47986537, 47986537, 47986537 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 60000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested153() throws Exception {
+    int[] marg0 = { 112439870, 861948640, 861948640, 861948640, 861948640 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 16000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested154() throws Exception {
+    int[] marg0 = { 61032984, 597903896, 597903896, 597903896, 597903896, 597903896, 597903896, 597903896, 597903896, 597903896, 597903896, 597903896, 597903896, 597903896, 597903896, 597903896, 597903896, 597903896, 597903896, 597903896, 597903896, 597903896, 597903896, 597903896, 597903896, 597903896, 597903896, 597903896, 597903896, 597903896, 597903896, 597903896, 597903896 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 2112000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested155() throws Exception {
+    int[] marg0 = { 8, 1073757256, 404321719, 404321719, 404321719, 404321719, 404321719, 404321719, 404321719, 404321719, 404321719, 404321719, 404321719, 404321719, 404321719, 404321719, 404321719, 404321719, 404321719, 404321719, 404321719, 404321719, 404321719, 404321719, 404321719, 404321719, 404321719, 404321719, 404321719, 404321719, 404321719, 404321719, 404321719, 404321719, 404321719, 404321719, 404321719, 404321719, 404321719, 404321719, 404321719, 404321719, 404321719, 404321719, 404321719, 404321719, 404321719, 404321719, 404321719, 404321719, 404321719, 404321719, 404321719, 404321719, 404321719, 404321719, 404321719, 404321719, 404321719, 404321719, 404321719, 404321719, 404321719, 404321719 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 4000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested156() throws Exception {
+    int[] marg0 = { 8, 15432, 8 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 13000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested157() throws Exception {
+    int[] marg0 = { 8, 15432, 15432 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 8000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested158() throws Exception {
+    int[] marg0 = { 532759363, 532759363, 658588416, 532759363, 532759363, 532759363, 532759363, 532759363, 532759363, 532759363, 532759363, 532759363, 532759363, 532759363, 532759363, 532759363, 532759363, 532759363, 532759363, 532759363, 532759363, 532759363, 532759363, 532759363, 532759363, 532759363, 532759363, 532759363, 532759363, 532759363, 532759363, 532759363 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 0;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested159() throws Exception {
+    int[] marg0 = { 1793695801, 1793695801, -513201780, 1793695801, 1793695801, 1793695801, 1793695801, 1793695801, 1793695801, 1793695801, 1793695801, 1793695801, 1793695801, 1793695801, 1793695801, 1793695801, 1793695801, 1793695801, 1793695801, 1793695801, 1793695801, 1793695801, 1793695801, 1793695801, 1793695801, 1793695801, 1793695801, 1793695801, 1793695801, 1793695801, 1793695801, 1793695801 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 58000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested160() throws Exception {
+    int[] marg0 = { 7, 7, 1073741824 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 0;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested161() throws Exception {
+    int[] marg0 = { 7, 7, 0 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 0;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested162() throws Exception {
+    int[] marg0 = { 7, 7, 8 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 5000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested163() throws Exception {
+    int[] marg0 = { 192851553, 192851553, 437684800, 192851553, 192851553, 192851553, 192851553, 192851553, 192851553, 192851553, 192851553, 192851553, 192851553, 192851553, 192851553, 192851553, 192851553, 192851553, 192851553, 192851553, 192851553, 192851553, 192851553, 192851553, 192851553, 192851553, 192851553, 192851553, 192851553, 192851553, 192851553, 192851553 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 120000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested164() throws Exception {
+    int[] marg0 = { 2081000921, 2081000921, 2018659392, 2081000921, 2081000921, 2081000921, 2081000921, 2081000921, 2081000921, 2081000921, 2081000921, 2081000921, 2081000921, 2081000921, 2081000921, 2081000921, 2081000921, 2081000921, 2081000921, 2081000921, 2081000921, 2081000921, 2081000921, 2081000921, 2081000921, 2081000921, 2081000921, 2081000921, 2081000921, 2081000921, 2081000921, 2081000921, 2081000921, 2081000921 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 132000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested165() throws Exception {
+    int[] marg0 = { 7, 7, -613549120 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 8000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested166() throws Exception {
+    int[] marg0 = { 593736545, 593736545, 593736545, 593736545, 593736545, 593736545, 593736545, 593736545, 593736545, 593736545, 593736545, 593736545, 593736545, 593736545, 593736545, 593736545, 593736545, 593736545 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 0;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested167() throws Exception {
+    int[] marg0 = { 7, 7, 7 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 0;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested168() throws Exception {
+    int[] marg0 = { 8, 8, 1073741824 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 10000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested169() throws Exception {
+    int[] marg0 = { 8, 8, 0 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 5000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested170() throws Exception {
+    int[] marg0 = { 8, 8, 15432 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 14000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested171() throws Exception {
+    int[] marg0 = { 8, 8, -2147468216 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 13000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested172() throws Exception {
+    int[] marg0 = { 8, 8, 8 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 10000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested173() throws Exception {
+    int[] marg0 = { 475837928, 475837928, 1322027193 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 8000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested174() throws Exception {
+    int[] marg0 = { 329468440, 329468440, 50332558 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 4000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested175() throws Exception {
+    int[] marg0 = { 1403210264, 1403210264, 1940081176, 1403210264 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 24000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested176() throws Exception {
+    int[] marg0 = { 207402472, 207402472, -1940081176, 207402472 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 26000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested177() throws Exception {
+    int[] marg0 = { 207402472, 207402472, 207402472, 207402472, 207402472, 207402472, 207402472, 207402472, 207402472, 207402472, 207402472, 207402472, 207402472, 207402472, 207402472, 207402472, 207402472, 207402472, 207402472, 207402472, 207402472, 207402472, 207402472, 207402472, 207402472, 207402472, 207402472, 207402472, 207402472, 207402472, 207402472, 207402472, 207402472, 207402472, 207402472, 207402472, 207402472, 207402472, 207402472, 207402472, 207402472, 207402472, 207402472, 207402472, 207402472, 207402472, 207402472, 207402472, 207402472, 207402472, 207402472, 207402472, 207402472, 207402472, 207402472, 207402472, 207402472, 207402472, 207402472, 207402472, 207402472, 207402472, 207402472, 207402472, 207402472, 207402472 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 8580000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested178() throws Exception {
+    int[] marg0 = { 2147483647, 2147483647, 0 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 3000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested179() throws Exception {
+    int[] marg0 = { 2147483647, 2147483647, -123456 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 31000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested180() throws Exception {
+    int[] marg0 = { 2147483647, 2147483647, 2147483647 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 9000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested181() throws Exception {
+    int[] marg0 = { -1961855874, 95, 1073741916 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 0;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested182() throws Exception {
+    int[] marg0 = { -1764686686, 93, -2147483556 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 0;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested183() throws Exception {
+    int[] marg0 = { -1685779254, 88, 1171356120 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 4000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested184() throws Exception {
+    int[] marg0 = { -2026416898, 96, -2147482362 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 4000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested185() throws Exception {
+    int[] marg0 = { -726280937, 6, 6 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 0;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested186() throws Exception {
+    int[] marg0 = { -2147483464, -2147483135, -1080018943 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 0;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested187() throws Exception {
+    int[] marg0 = { -1336999342, -1316998240, -2059239494, -2059239494, -2059239494, -2059239494, -2059239494, -2059239494, -2059239494, -2059239494, -2059239494, -2059239494, -2059239494, -2059239494, -2059239494, -2059239494, -2059239494, -2059239494, -2059239494, -2059239494, -2059239494, -2059239494, -2059239494, -2059239494, -2059239494, -2059239494, -2059239494, -2059239494, -2059239494, -2059239494, -2059239494, -2059239494 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 120000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested188() throws Exception {
+    int[] marg0 = { -1971037264, -1927282426, -1927282426 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 0;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested189() throws Exception {
+    int[] marg0 = { -2146959312, -2086450664, -2086450664, -2086450664, -2086450664, -2086450664, -2086450664, -2086450664, -2086450664 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 112000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested190() throws Exception {
+    int[] marg0 = { -2147483648, -2147483647, 2147483647 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 2000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested191() throws Exception {
+    int[] marg0 = { -2076159292, -2063593200, 75267044, 75267044, 75267044, 75267044, 75267044, 75267044, 75267044, 75267044, 75267044, 75267044, 75267044, 75267044, 75267044, 75267044, 75267044, 75267044, 75267044, 75267044, 75267044, 75267044, 75267044, 75267044, 75267044, 75267044, 75267044, 75267044, 75267044, 75267044, 75267044, 75267044 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 180000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested192() throws Exception {
+    int[] marg0 = { -1811930581, 42, 335544321, 335544321, 335544321, 335544321, 335544321, 335544321, 335544321, 335544321, 335544321, 335544321, 335544321, 335544321, 335544321, 335544321, 335544321, 335544321, 335544321, 335544321, 335544321, 335544321, 335544321, 335544321, 335544321, 335544321, 335544321, 335544321, 335544321, 335544321, 335544321, 335544321 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 0;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested193() throws Exception {
+    int[] marg0 = { -603979733, 42, 613569696 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 4000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested194() throws Exception {
+    int[] marg0 = { -1795162069, 42, 42 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 0;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested195() throws Exception {
+    int[] marg0 = { -1006632917, 42, -42 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 31000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested196() throws Exception {
+    int[] marg0 = { -1416325099, -670105245, -563066937, -563066937, -563066937, -563066937, -563066937, -563066937, -563066937, -563066937, -563066937, -563066937, -563066937, -563066937, -563066937, -563066937, -563066937, -563066937, -563066937, -563066937, -563066937, -563066937, -563066937, -563066937, -563066937, -563066937, -563066937, -563066937, -563066937, -563066937, -563066937, -563066937 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 0;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested197() throws Exception {
+    int[] marg0 = { -2147483635, -2147483584, -2113927287 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 4000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested198() throws Exception {
+    int[] marg0 = { -2131990519, -2126736335, -2126736335 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 0;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested199() throws Exception {
+    int[] marg0 = { -2138635314, -1940081176, -1940081176 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 4000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested200() throws Exception {
+    int[] marg0 = { -2147483611, -2147483584, 33556361 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 6000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested201() throws Exception {
+    int[] marg0 = { -2147483639, 8, 1073741824 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 10000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested202() throws Exception {
+    int[] marg0 = { -2147483639, 8, 0 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 5000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested203() throws Exception {
+    int[] marg0 = { -2147483639, 8, 15432 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 14000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested204() throws Exception {
+    int[] marg0 = { -2147483639, 8, -2147468216 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 9000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested205() throws Exception {
+    int[] marg0 = { -2147483639, 8, 8 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 10000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested206() throws Exception {
+    int[] marg0 = { -1195505088, 97, 1073741920 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 8000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested207() throws Exception {
+    int[] marg0 = { -1195505088, 97, -2147483552 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 4000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested208() throws Exception {
+    int[] marg0 = { -585675488, 66, 1561808160 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 12000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested209() throws Exception {
+    int[] marg0 = { -858989344, 30, -858989344 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 8000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested210() throws Exception {
+    int[] marg0 = { -1002157664, 90, 90, 90, 90, 90, 90, 90, 90, 90, 90, 90, 90, 90, 90, 90 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 60000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested211() throws Exception {
+    int[] marg0 = { -2072818064, -1887205316, -2026791580, -2026791580, -2026791580, -2026791580, -2026791580, -2026791580, -2026791580, -2026791580, -2026791580, -2026791580, -2026791580, -2026791580, -2026791580, -2026791580, -2026791580, -2026791580, -2026791580, -2026791580, -2026791580, -2026791580, -2026791580, -2026791580, -2026791580, -2026791580, -2026791580, -2026791580, -2026791580, -2026791580, -2026791580, -2026791580 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 4000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested212() throws Exception {
+    int[] marg0 = { -1377166384, -1231671564, -1377166384, -1377166384, -1377166384, -1377166384, -1377166384, -1377166384, -1377166384, -1377166384, -1377166384, -1377166384, -1377166384, -1377166384, -1377166384, -1377166384, -1377166384, -1377166384, -1377166384, -1377166384, -1377166384, -1377166384, -1377166384, -1377166384, -1377166384, -1377166384, -1377166384, -1377166384, -1377166384, -1377166384, -1377166384, -1377166384, -1377166384 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 128000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested213() throws Exception {
+    int[] marg0 = { -1395860256, -503316450, -503316450 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 8000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested214() throws Exception {
+    int[] marg0 = { -1818015208, -1281144296, -1281144296 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 12000;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testComplexNested215() throws Exception {
+    int[] marg0 = { -1188006336, -996330191, 477858278 };
+    int retval = NestedLoops.complexNested(marg0);
+
+    int expected = 10000;
     Assertions.assertEquals(expected, retval);
   }
 }

@@ -30,22 +30,22 @@ public class TriangleClassifierTest {
   }
 
   @Test
-  public void testClassifyDouble1() throws Exception {
-    double marg0 = -2.225073858507202E-308;
-    double marg1 = 0.0;
-    double marg2 = 0.0;
-    TriangleClassifier.TriangleType retval = TriangleClassifier.classifyDouble(marg0, marg1, marg2);
+  public void testClassifyInt2() throws Exception {
+    int marg0 = 1;
+    int marg1 = 0;
+    int marg2 = 0;
+    TriangleClassifier.TriangleType retval = TriangleClassifier.classifyInt(marg0, marg1, marg2);
 
     TriangleClassifier.TriangleType expected = TriangleClassifier.TriangleType.valueOf("INVALID");
     Assertions.assertEquals(expected, retval);
   }
 
   @Test
-  public void testClassifyInt2() throws Exception {
-    int marg0 = 1;
-    int marg1 = 0;
-    int marg2 = 0;
-    TriangleClassifier.TriangleType retval = TriangleClassifier.classifyInt(marg0, marg1, marg2);
+  public void testClassifyDouble1() throws Exception {
+    double marg0 = -0.0;
+    double marg1 = 0.0;
+    double marg2 = 0.0;
+    TriangleClassifier.TriangleType retval = TriangleClassifier.classifyDouble(marg0, marg1, marg2);
 
     TriangleClassifier.TriangleType expected = TriangleClassifier.TriangleType.valueOf("INVALID");
     Assertions.assertEquals(expected, retval);
@@ -76,7 +76,7 @@ public class TriangleClassifierTest {
   @Test
   public void testClassifyDouble2() throws Exception {
     double marg0 = 2.2946074165855514E-308;
-    double marg1 = -2.225073858507202E-308;
+    double marg1 = -0.0;
     double marg2 = 0.0;
     TriangleClassifier.TriangleType retval = TriangleClassifier.classifyDouble(marg0, marg1, marg2);
 
@@ -97,8 +97,8 @@ public class TriangleClassifierTest {
 
   @Test
   public void testClassifyFloat3() throws Exception {
-    float marg0 = 1.0884373E-19F;
-    float marg1 = 2.387723E-38F;
+    float marg0 = 9.440689E-38F;
+    float marg1 = 1.1011428E-19F;
     float marg2 = 0.0F;
     TriangleClassifier.TriangleType retval = TriangleClassifier.classifyFloat(marg0, marg1, marg2);
 
@@ -108,7 +108,7 @@ public class TriangleClassifierTest {
 
   @Test
   public void testClassifyDouble3() throws Exception {
-    double marg0 = 2.565335500811485E-289;
+    double marg0 = 4.778309726771247E-299;
     double marg1 = 2.2250738585719596E-308;
     double marg2 = 0.0;
     TriangleClassifier.TriangleType retval = TriangleClassifier.classifyDouble(marg0, marg1, marg2);
@@ -130,21 +130,10 @@ public class TriangleClassifierTest {
 
   @Test
   public void testClassifyFloat4() throws Exception {
-    float marg0 = 1.93054E-40F;
-    float marg1 = 2.43156E-40F;
-    float marg2 = 4.706569E-38F;
+    float marg0 = 524287.0F;
+    float marg1 = 1.0019531F;
+    float marg2 = 7748759.0F;
     TriangleClassifier.TriangleType retval = TriangleClassifier.classifyFloat(marg0, marg1, marg2);
-
-    TriangleClassifier.TriangleType expected = TriangleClassifier.TriangleType.valueOf("INVALID");
-    Assertions.assertEquals(expected, retval);
-  }
-
-  @Test
-  public void testClassifyDouble4() throws Exception {
-    double marg0 = 0.001159675031445373;
-    double marg1 = 1.0000000018627304;
-    double marg2 = 1.0025024505719176;
-    TriangleClassifier.TriangleType retval = TriangleClassifier.classifyDouble(marg0, marg1, marg2);
 
     TriangleClassifier.TriangleType expected = TriangleClassifier.TriangleType.valueOf("INVALID");
     Assertions.assertEquals(expected, retval);
@@ -156,6 +145,17 @@ public class TriangleClassifierTest {
     int marg1 = 1073741826;
     int marg2 = 1073741825;
     TriangleClassifier.TriangleType retval = TriangleClassifier.classifyInt(marg0, marg1, marg2);
+
+    TriangleClassifier.TriangleType expected = TriangleClassifier.TriangleType.valueOf("INVALID");
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testClassifyDouble4() throws Exception {
+    double marg0 = 1.029830813416993;
+    double marg1 = 0.999755859375;
+    double marg2 = 3.468765839312777E38;
+    TriangleClassifier.TriangleType retval = TriangleClassifier.classifyDouble(marg0, marg1, marg2);
 
     TriangleClassifier.TriangleType expected = TriangleClassifier.TriangleType.valueOf("INVALID");
     Assertions.assertEquals(expected, retval);
@@ -174,21 +174,10 @@ public class TriangleClassifierTest {
 
   @Test
   public void testClassifyFloat5() throws Exception {
-    float marg0 = 1.4E-45F;
-    float marg1 = 1.0000305F;
-    float marg2 = 5.906173E-39F;
+    float marg0 = 2.62E-43F;
+    float marg1 = Float.POSITIVE_INFINITY;
+    float marg2 = 4.16153E-40F;
     TriangleClassifier.TriangleType retval = TriangleClassifier.classifyFloat(marg0, marg1, marg2);
-
-    TriangleClassifier.TriangleType expected = TriangleClassifier.TriangleType.valueOf("INVALID");
-    Assertions.assertEquals(expected, retval);
-  }
-
-  @Test
-  public void testClassifyDouble5() throws Exception {
-    double marg0 = 1.000000000003638;
-    double marg1 = 1.8014400255361024E16;
-    double marg2 = 1.75;
-    TriangleClassifier.TriangleType retval = TriangleClassifier.classifyDouble(marg0, marg1, marg2);
 
     TriangleClassifier.TriangleType expected = TriangleClassifier.TriangleType.valueOf("INVALID");
     Assertions.assertEquals(expected, retval);
@@ -217,9 +206,20 @@ public class TriangleClassifierTest {
   }
 
   @Test
+  public void testClassifyDouble5() throws Exception {
+    double marg0 = 6.366246407E-314;
+    double marg1 = 5.1176699201563165E-307;
+    double marg2 = 2.1863866467E-314;
+    TriangleClassifier.TriangleType retval = TriangleClassifier.classifyDouble(marg0, marg1, marg2);
+
+    TriangleClassifier.TriangleType expected = TriangleClassifier.TriangleType.valueOf("INVALID");
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
   public void testClassifyInt10() throws Exception {
-    int marg0 = 65538;
-    int marg1 = 65536;
+    int marg0 = 32770;
+    int marg1 = 32768;
     int marg2 = 3;
     TriangleClassifier.TriangleType retval = TriangleClassifier.classifyInt(marg0, marg1, marg2);
 
@@ -241,8 +241,8 @@ public class TriangleClassifierTest {
   @Test
   public void testClassifyFloat6() throws Exception {
     float marg0 = Float.POSITIVE_INFINITY;
-    float marg1 = 1.015625F;
-    float marg2 = Float.POSITIVE_INFINITY;
+    float marg1 = 1.0000014F;
+    float marg2 = 6.7762636E-20F;
     TriangleClassifier.TriangleType retval = TriangleClassifier.classifyFloat(marg0, marg1, marg2);
 
     TriangleClassifier.TriangleType expected = TriangleClassifier.TriangleType.valueOf("INVALID");
@@ -251,34 +251,12 @@ public class TriangleClassifierTest {
 
   @Test
   public void testClassifyDouble6() throws Exception {
-    double marg0 = Double.POSITIVE_INFINITY;
-    double marg1 = Double.POSITIVE_INFINITY;
-    double marg2 = 3.6602923434976877E-308;
+    double marg0 = 2.688435678E-315;
+    double marg1 = 5.949657E-318;
+    double marg2 = 8.095E-320;
     TriangleClassifier.TriangleType retval = TriangleClassifier.classifyDouble(marg0, marg1, marg2);
 
     TriangleClassifier.TriangleType expected = TriangleClassifier.TriangleType.valueOf("INVALID");
-    Assertions.assertEquals(expected, retval);
-  }
-
-  @Test
-  public void testClassifyFloat7() throws Exception {
-    float marg0 = 1.1754946E-37F;
-    float marg1 = 1.1754946E-37F;
-    float marg2 = 1.1754946E-37F;
-    TriangleClassifier.TriangleType retval = TriangleClassifier.classifyFloat(marg0, marg1, marg2);
-
-    TriangleClassifier.TriangleType expected = TriangleClassifier.TriangleType.valueOf("EQUILATERAL");
-    Assertions.assertEquals(expected, retval);
-  }
-
-  @Test
-  public void testClassifyDouble7() throws Exception {
-    double marg0 = 1.1125369292536007E-308;
-    double marg1 = 1.1125369292536007E-308;
-    double marg2 = 1.1125369292536007E-308;
-    TriangleClassifier.TriangleType retval = TriangleClassifier.classifyDouble(marg0, marg1, marg2);
-
-    TriangleClassifier.TriangleType expected = TriangleClassifier.TriangleType.valueOf("EQUILATERAL");
     Assertions.assertEquals(expected, retval);
   }
 }

@@ -19,7 +19,7 @@ public class ExprEvaluatorTest {
 
   @Test
   public void testParse2() throws Exception {
-    char[] carg0 = { '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    char[] carg0 = { '\r', '\t', ' ', '\u0000', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
     ExprEvaluator cut = new ExprEvaluator(carg0);
 
     Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
@@ -27,7 +27,7 @@ public class ExprEvaluatorTest {
 
   @Test
   public void testParse3() throws Exception {
-    char[] carg0 = { '\t', '\t', '\n', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    char[] carg0 = { '\r', '\t', ' ', '(', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
     ExprEvaluator cut = new ExprEvaluator(carg0);
 
     Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
@@ -35,7 +35,7 @@ public class ExprEvaluatorTest {
 
   @Test
   public void testParse4() throws Exception {
-    char[] carg0 = { '\t', '\t', '\r', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    char[] carg0 = { '\r', '\t', '\u0000' };
     ExprEvaluator cut = new ExprEvaluator(carg0);
 
     Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
@@ -43,7 +43,7 @@ public class ExprEvaluatorTest {
 
   @Test
   public void testParse5() throws Exception {
-    char[] carg0 = { '\t', '\t', ' ', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    char[] carg0 = { '\r', '\t', '@' };
     ExprEvaluator cut = new ExprEvaluator(carg0);
 
     Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
@@ -51,15 +51,18 @@ public class ExprEvaluatorTest {
 
   @Test
   public void testParse6() throws Exception {
-    char[] carg0 = { '\t', '\n', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    char[] carg0 = { '\r', '\t', '2' };
     ExprEvaluator cut = new ExprEvaluator(carg0);
 
-    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+    int retval = cut.parse();
+
+    int expected = 2;
+    Assertions.assertEquals(expected, retval);
   }
 
   @Test
   public void testParse7() throws Exception {
-    char[] carg0 = { '\t', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    char[] carg0 = { '\r', '\t', '(' };
     ExprEvaluator cut = new ExprEvaluator(carg0);
 
     Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
@@ -67,7 +70,7 @@ public class ExprEvaluatorTest {
 
   @Test
   public void testParse8() throws Exception {
-    char[] carg0 = { '\t', '\n', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    char[] carg0 = { '\r', '\t', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(' };
     ExprEvaluator cut = new ExprEvaluator(carg0);
 
     Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
@@ -75,7 +78,7 @@ public class ExprEvaluatorTest {
 
   @Test
   public void testParse9() throws Exception {
-    char[] carg0 = { '\t', '\n', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    char[] carg0 = { '\r', '\n' };
     ExprEvaluator cut = new ExprEvaluator(carg0);
 
     Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
@@ -83,7 +86,7 @@ public class ExprEvaluatorTest {
 
   @Test
   public void testParse10() throws Exception {
-    char[] carg0 = { '\t', '\r', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    char[] carg0 = { '\r', '\n', '\t' };
     ExprEvaluator cut = new ExprEvaluator(carg0);
 
     Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
@@ -91,7 +94,7 @@ public class ExprEvaluatorTest {
 
   @Test
   public void testParse11() throws Exception {
-    char[] carg0 = { '\t', '\r', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    char[] carg0 = { '\r', '\n', '\t', '\t' };
     ExprEvaluator cut = new ExprEvaluator(carg0);
 
     Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
@@ -99,214 +102,6 @@ public class ExprEvaluatorTest {
 
   @Test
   public void testParse12() throws Exception {
-    char[] carg0 = { '\t', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
-    ExprEvaluator cut = new ExprEvaluator(carg0);
-
-    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
-  }
-
-  @Test
-  public void testParse13() throws Exception {
-    char[] carg0 = { '\t', '\r', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
-    ExprEvaluator cut = new ExprEvaluator(carg0);
-
-    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
-  }
-
-  @Test
-  public void testParse14() throws Exception {
-    char[] carg0 = { '\t', ' ', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
-    ExprEvaluator cut = new ExprEvaluator(carg0);
-
-    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
-  }
-
-  @Test
-  public void testParse15() throws Exception {
-    char[] carg0 = { '\t', ' ', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
-    ExprEvaluator cut = new ExprEvaluator(carg0);
-
-    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
-  }
-
-  @Test
-  public void testParse16() throws Exception {
-    char[] carg0 = { '\t', ' ', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
-    ExprEvaluator cut = new ExprEvaluator(carg0);
-
-    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
-  }
-
-  @Test
-  public void testParse17() throws Exception {
-    char[] carg0 = { '\t', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
-    ExprEvaluator cut = new ExprEvaluator(carg0);
-
-    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
-  }
-
-  @Test
-  public void testParse18() throws Exception {
-    char[] carg0 = { '\n', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
-    ExprEvaluator cut = new ExprEvaluator(carg0);
-
-    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
-  }
-
-  @Test
-  public void testParse19() throws Exception {
-    char[] carg0 = { '\n', '\t', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
-    ExprEvaluator cut = new ExprEvaluator(carg0);
-
-    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
-  }
-
-  @Test
-  public void testParse20() throws Exception {
-    char[] carg0 = { '\n', '\t', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
-    ExprEvaluator cut = new ExprEvaluator(carg0);
-
-    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
-  }
-
-  @Test
-  public void testParse21() throws Exception {
-    char[] carg0 = { '\n', '\t', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
-    ExprEvaluator cut = new ExprEvaluator(carg0);
-
-    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
-  }
-
-  @Test
-  public void testParse22() throws Exception {
-    char[] carg0 = { '\n', '\n', '\t', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
-    ExprEvaluator cut = new ExprEvaluator(carg0);
-
-    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
-  }
-
-  @Test
-  public void testParse23() throws Exception {
-    char[] carg0 = { '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
-    ExprEvaluator cut = new ExprEvaluator(carg0);
-
-    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
-  }
-
-  @Test
-  public void testParse24() throws Exception {
-    char[] carg0 = { '\n', '\n', '\r', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
-    ExprEvaluator cut = new ExprEvaluator(carg0);
-
-    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
-  }
-
-  @Test
-  public void testParse25() throws Exception {
-    char[] carg0 = { '\n', '\n', ' ', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
-    ExprEvaluator cut = new ExprEvaluator(carg0);
-
-    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
-  }
-
-  @Test
-  public void testParse26() throws Exception {
-    char[] carg0 = { '\n', '\r', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
-    ExprEvaluator cut = new ExprEvaluator(carg0);
-
-    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
-  }
-
-  @Test
-  public void testParse27() throws Exception {
-    char[] carg0 = { '\n', '\r', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
-    ExprEvaluator cut = new ExprEvaluator(carg0);
-
-    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
-  }
-
-  @Test
-  public void testParse28() throws Exception {
-    char[] carg0 = { '\n', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
-    ExprEvaluator cut = new ExprEvaluator(carg0);
-
-    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
-  }
-
-  @Test
-  public void testParse29() throws Exception {
-    char[] carg0 = { '\n', '\r', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
-    ExprEvaluator cut = new ExprEvaluator(carg0);
-
-    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
-  }
-
-  @Test
-  public void testParse30() throws Exception {
-    char[] carg0 = { '\n', ' ', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
-    ExprEvaluator cut = new ExprEvaluator(carg0);
-
-    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
-  }
-
-  @Test
-  public void testParse31() throws Exception {
-    char[] carg0 = { '\n', ' ', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
-    ExprEvaluator cut = new ExprEvaluator(carg0);
-
-    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
-  }
-
-  @Test
-  public void testParse32() throws Exception {
-    char[] carg0 = { '\n', ' ', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
-    ExprEvaluator cut = new ExprEvaluator(carg0);
-
-    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
-  }
-
-  @Test
-  public void testParse33() throws Exception {
-    char[] carg0 = { '\n', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
-    ExprEvaluator cut = new ExprEvaluator(carg0);
-
-    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
-  }
-
-  @Test
-  public void testParse34() throws Exception {
-    char[] carg0 = { '\r', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
-    ExprEvaluator cut = new ExprEvaluator(carg0);
-
-    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
-  }
-
-  @Test
-  public void testParse35() throws Exception {
-    char[] carg0 = { '\r', '\t', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
-    ExprEvaluator cut = new ExprEvaluator(carg0);
-
-    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
-  }
-
-  @Test
-  public void testParse36() throws Exception {
-    char[] carg0 = { '\r', '\t', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
-    ExprEvaluator cut = new ExprEvaluator(carg0);
-
-    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
-  }
-
-  @Test
-  public void testParse37() throws Exception {
-    char[] carg0 = { '\r', '\t', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
-    ExprEvaluator cut = new ExprEvaluator(carg0);
-
-    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
-  }
-
-  @Test
-  public void testParse38() throws Exception {
     char[] carg0 = { '\r', '\n', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
     ExprEvaluator cut = new ExprEvaluator(carg0);
 
@@ -314,8 +109,216 @@ public class ExprEvaluatorTest {
   }
 
   @Test
+  public void testParse13() throws Exception {
+    char[] carg0 = { '\r', '\n', '\t', '\t', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse14() throws Exception {
+    char[] carg0 = { '\r', '\n', '\t', '\t', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse15() throws Exception {
+    char[] carg0 = { '\r', '\n', '\t', '\t', ' ', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse16() throws Exception {
+    char[] carg0 = { '\r', '\n', '\t', '\t', '\u0000', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse17() throws Exception {
+    char[] carg0 = { '\r', '\n', '\t', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse18() throws Exception {
+    char[] carg0 = { '\r', '\n', '\t', '\n', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse19() throws Exception {
+    char[] carg0 = { '\r', '\n', '\t', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse20() throws Exception {
+    char[] carg0 = { '\r', '\n', '\t', '\n', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse21() throws Exception {
+    char[] carg0 = { '\r', '\n', '\t', '\n', ' ', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse22() throws Exception {
+    char[] carg0 = { '\r', '\n', '\t', '\n', '\u0000', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse23() throws Exception {
+    char[] carg0 = { '\r', '\n', '\t', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse24() throws Exception {
+    char[] carg0 = { '\r', '\n', '\t', '\r', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse25() throws Exception {
+    char[] carg0 = { '\r', '\n', '\t', '\r', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse26() throws Exception {
+    char[] carg0 = { '\r', '\n', '\t', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse27() throws Exception {
+    char[] carg0 = { '\r', '\n', '\t', '\r', ' ', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse28() throws Exception {
+    char[] carg0 = { '\r', '\n', '\t', '\r', '\u0000', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse29() throws Exception {
+    char[] carg0 = { '\r', '\n', '\t', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse30() throws Exception {
+    char[] carg0 = { '\r', '\n', '\t', ' ', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse31() throws Exception {
+    char[] carg0 = { '\r', '\n', '\t', ' ', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse32() throws Exception {
+    char[] carg0 = { '\r', '\n', '\t', ' ', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse33() throws Exception {
+    char[] carg0 = { '\r', '\n', '\t', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse34() throws Exception {
+    char[] carg0 = { '\r', '\n', '\t', ' ', '\u0000', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse35() throws Exception {
+    char[] carg0 = { '\r', '\n', '\t', '\u0000', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse36() throws Exception {
+    char[] carg0 = { '\r', '\n', '\t', '(', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse37() throws Exception {
+    char[] carg0 = { '\r', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse38() throws Exception {
+    char[] carg0 = { '\r', '\n', '\n', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
   public void testParse39() throws Exception {
-    char[] carg0 = { '\r', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    char[] carg0 = { '\r', '\n', '\n', '\t', '\t', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
     ExprEvaluator cut = new ExprEvaluator(carg0);
 
     Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
@@ -323,7 +326,7 @@ public class ExprEvaluatorTest {
 
   @Test
   public void testParse40() throws Exception {
-    char[] carg0 = { '\r', '\n', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    char[] carg0 = { '\r', '\n', '\n', '\t', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
     ExprEvaluator cut = new ExprEvaluator(carg0);
 
     Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
@@ -331,7 +334,7 @@ public class ExprEvaluatorTest {
 
   @Test
   public void testParse41() throws Exception {
-    char[] carg0 = { '\r', '\n', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    char[] carg0 = { '\r', '\n', '\n', '\t', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
     ExprEvaluator cut = new ExprEvaluator(carg0);
 
     Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
@@ -339,7 +342,7 @@ public class ExprEvaluatorTest {
 
   @Test
   public void testParse42() throws Exception {
-    char[] carg0 = { '\r', '\r', '\t', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    char[] carg0 = { '\r', '\n', '\n', '\t', ' ', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
     ExprEvaluator cut = new ExprEvaluator(carg0);
 
     Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
@@ -347,7 +350,7 @@ public class ExprEvaluatorTest {
 
   @Test
   public void testParse43() throws Exception {
-    char[] carg0 = { '\r', '\r', '\n', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    char[] carg0 = { '\r', '\n', '\n', '\t', '\u0000', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
     ExprEvaluator cut = new ExprEvaluator(carg0);
 
     Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
@@ -355,7 +358,7 @@ public class ExprEvaluatorTest {
 
   @Test
   public void testParse44() throws Exception {
-    char[] carg0 = { '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    char[] carg0 = { '\r', '\n', '\n', '\n' };
     ExprEvaluator cut = new ExprEvaluator(carg0);
 
     Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
@@ -363,7 +366,7 @@ public class ExprEvaluatorTest {
 
   @Test
   public void testParse45() throws Exception {
-    char[] carg0 = { '\r', '\r', ' ', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    char[] carg0 = { '\r', '\n', '\n', '\n', '\t', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
     ExprEvaluator cut = new ExprEvaluator(carg0);
 
     Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
@@ -371,7 +374,7 @@ public class ExprEvaluatorTest {
 
   @Test
   public void testParse46() throws Exception {
-    char[] carg0 = { '\r', ' ', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    char[] carg0 = { '\r', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
     ExprEvaluator cut = new ExprEvaluator(carg0);
 
     Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
@@ -379,7 +382,7 @@ public class ExprEvaluatorTest {
 
   @Test
   public void testParse47() throws Exception {
-    char[] carg0 = { '\r', ' ', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    char[] carg0 = { '\r', '\n', '\n', '\n', '\r', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
     ExprEvaluator cut = new ExprEvaluator(carg0);
 
     Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
@@ -387,7 +390,7 @@ public class ExprEvaluatorTest {
 
   @Test
   public void testParse48() throws Exception {
-    char[] carg0 = { '\r', ' ', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    char[] carg0 = { '\r', '\n', '\n', '\n', ' ', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
     ExprEvaluator cut = new ExprEvaluator(carg0);
 
     Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
@@ -395,7 +398,7 @@ public class ExprEvaluatorTest {
 
   @Test
   public void testParse49() throws Exception {
-    char[] carg0 = { '\r', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    char[] carg0 = { '\r', '\n', '\n', '\n', '\u0000', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
     ExprEvaluator cut = new ExprEvaluator(carg0);
 
     Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
@@ -403,7 +406,7 @@ public class ExprEvaluatorTest {
 
   @Test
   public void testParse50() throws Exception {
-    char[] carg0 = { ' ', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    char[] carg0 = { '\r', '\n', '\n', '\r' };
     ExprEvaluator cut = new ExprEvaluator(carg0);
 
     Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
@@ -411,7 +414,7 @@ public class ExprEvaluatorTest {
 
   @Test
   public void testParse51() throws Exception {
-    char[] carg0 = { ' ', '\t', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    char[] carg0 = { '\r', '\n', '\n', '\r', '\t', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
     ExprEvaluator cut = new ExprEvaluator(carg0);
 
     Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
@@ -419,7 +422,7 @@ public class ExprEvaluatorTest {
 
   @Test
   public void testParse52() throws Exception {
-    char[] carg0 = { ' ', '\t', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    char[] carg0 = { '\r', '\n', '\n', '\r', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
     ExprEvaluator cut = new ExprEvaluator(carg0);
 
     Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
@@ -427,7 +430,7 @@ public class ExprEvaluatorTest {
 
   @Test
   public void testParse53() throws Exception {
-    char[] carg0 = { ' ', '\t', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    char[] carg0 = { '\r', '\n', '\n', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
     ExprEvaluator cut = new ExprEvaluator(carg0);
 
     Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
@@ -435,7 +438,7 @@ public class ExprEvaluatorTest {
 
   @Test
   public void testParse54() throws Exception {
-    char[] carg0 = { ' ', '\n', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    char[] carg0 = { '\r', '\n', '\n', '\r', ' ', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
     ExprEvaluator cut = new ExprEvaluator(carg0);
 
     Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
@@ -443,7 +446,7 @@ public class ExprEvaluatorTest {
 
   @Test
   public void testParse55() throws Exception {
-    char[] carg0 = { ' ', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    char[] carg0 = { '\r', '\n', '\n', '\r', '\u0000', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
     ExprEvaluator cut = new ExprEvaluator(carg0);
 
     Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
@@ -451,7 +454,7 @@ public class ExprEvaluatorTest {
 
   @Test
   public void testParse56() throws Exception {
-    char[] carg0 = { ' ', '\n', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    char[] carg0 = { '\r', '\n', '\n', ' ' };
     ExprEvaluator cut = new ExprEvaluator(carg0);
 
     Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
@@ -459,7 +462,7 @@ public class ExprEvaluatorTest {
 
   @Test
   public void testParse57() throws Exception {
-    char[] carg0 = { ' ', '\n', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    char[] carg0 = { '\r', '\n', '\n', ' ', '\t', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
     ExprEvaluator cut = new ExprEvaluator(carg0);
 
     Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
@@ -467,7 +470,7 @@ public class ExprEvaluatorTest {
 
   @Test
   public void testParse58() throws Exception {
-    char[] carg0 = { ' ', '\r', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    char[] carg0 = { '\r', '\n', '\n', ' ', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
     ExprEvaluator cut = new ExprEvaluator(carg0);
 
     Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
@@ -475,7 +478,7 @@ public class ExprEvaluatorTest {
 
   @Test
   public void testParse59() throws Exception {
-    char[] carg0 = { ' ', '\r', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    char[] carg0 = { '\r', '\n', '\n', ' ', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
     ExprEvaluator cut = new ExprEvaluator(carg0);
 
     Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
@@ -483,7 +486,7 @@ public class ExprEvaluatorTest {
 
   @Test
   public void testParse60() throws Exception {
-    char[] carg0 = { ' ', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    char[] carg0 = { '\r', '\n', '\n', ' ', ' ', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
     ExprEvaluator cut = new ExprEvaluator(carg0);
 
     Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
@@ -491,7 +494,7 @@ public class ExprEvaluatorTest {
 
   @Test
   public void testParse61() throws Exception {
-    char[] carg0 = { ' ', '\r', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    char[] carg0 = { '\r', '\n', '\n', ' ', '\u0000', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
     ExprEvaluator cut = new ExprEvaluator(carg0);
 
     Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
@@ -499,7 +502,7 @@ public class ExprEvaluatorTest {
 
   @Test
   public void testParse62() throws Exception {
-    char[] carg0 = { ' ', ' ', '\t', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    char[] carg0 = { '\r', '\n', '\n', '\u0000', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
     ExprEvaluator cut = new ExprEvaluator(carg0);
 
     Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
@@ -507,7 +510,7 @@ public class ExprEvaluatorTest {
 
   @Test
   public void testParse63() throws Exception {
-    char[] carg0 = { ' ', ' ', '\n', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    char[] carg0 = { '\r', '\n', '\n', '(', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
     ExprEvaluator cut = new ExprEvaluator(carg0);
 
     Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
@@ -515,7 +518,7 @@ public class ExprEvaluatorTest {
 
   @Test
   public void testParse64() throws Exception {
-    char[] carg0 = { ' ', ' ', '\r', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    char[] carg0 = { '\r', '\n', '\r' };
     ExprEvaluator cut = new ExprEvaluator(carg0);
 
     Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
@@ -523,7 +526,7 @@ public class ExprEvaluatorTest {
 
   @Test
   public void testParse65() throws Exception {
-    char[] carg0 = { ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    char[] carg0 = { '\r', '\n', '\r', '\t' };
     ExprEvaluator cut = new ExprEvaluator(carg0);
 
     Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
@@ -531,6 +534,6263 @@ public class ExprEvaluatorTest {
 
   @Test
   public void testParse66() throws Exception {
+    char[] carg0 = { '\r', '\n', '\r', '\t', '\t', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse67() throws Exception {
+    char[] carg0 = { '\r', '\n', '\r', '\t', '\n', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse68() throws Exception {
+    char[] carg0 = { '\r', '\n', '\r', '\t', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse69() throws Exception {
+    char[] carg0 = { '\r', '\n', '\r', '\t', ' ', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse70() throws Exception {
+    char[] carg0 = { '\r', '\n', '\r', '\t', '\u0000', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse71() throws Exception {
+    char[] carg0 = { '\r', '\n', '\r', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse72() throws Exception {
+    char[] carg0 = { '\r', '\n', '\r', '\n', '\t', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse73() throws Exception {
+    char[] carg0 = { '\r', '\n', '\r', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse74() throws Exception {
+    char[] carg0 = { '\r', '\n', '\r', '\n', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse75() throws Exception {
+    char[] carg0 = { '\r', '\n', '\r', '\n', ' ', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse76() throws Exception {
+    char[] carg0 = { '\r', '\n', '\r', '\n', '\u0000', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse77() throws Exception {
+    char[] carg0 = { '\r', '\n', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse78() throws Exception {
+    char[] carg0 = { '\r', '\n', '\r', '\r', '\t', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse79() throws Exception {
+    char[] carg0 = { '\r', '\n', '\r', '\r', '\n', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse80() throws Exception {
+    char[] carg0 = { '\r', '\n', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse81() throws Exception {
+    char[] carg0 = { '\r', '\n', '\r', '\r', ' ', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse82() throws Exception {
+    char[] carg0 = { '\r', '\n', '\r', '\r', '\u0000', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse83() throws Exception {
+    char[] carg0 = { '\r', '\n', '\r', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse84() throws Exception {
+    char[] carg0 = { '\r', '\n', '\r', ' ', '\t', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse85() throws Exception {
+    char[] carg0 = { '\r', '\n', '\r', ' ', '\n', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse86() throws Exception {
+    char[] carg0 = { '\r', '\n', '\r', ' ', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse87() throws Exception {
+    char[] carg0 = { '\r', '\n', '\r', ' ', ' ', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse88() throws Exception {
+    char[] carg0 = { '\r', '\n', '\r', ' ', '\u0000', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse89() throws Exception {
+    char[] carg0 = { '\r', '\n', '\r', '\u0000', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse90() throws Exception {
+    char[] carg0 = { '\r', '\n', '\r', '(', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse91() throws Exception {
+    char[] carg0 = { '\r', '\n', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse92() throws Exception {
+    char[] carg0 = { '\r', '\n', ' ', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse93() throws Exception {
+    char[] carg0 = { '\r', '\n', ' ', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse94() throws Exception {
+    char[] carg0 = { '\r', '\n', ' ', '\t', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse95() throws Exception {
+    char[] carg0 = { '\r', '\n', ' ', '\t', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse96() throws Exception {
+    char[] carg0 = { '\r', '\n', ' ', '\t', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse97() throws Exception {
+    char[] carg0 = { '\r', '\n', ' ', '\t', '\u0000', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse98() throws Exception {
+    char[] carg0 = { '\r', '\n', ' ', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse99() throws Exception {
+    char[] carg0 = { '\r', '\n', ' ', '\n', '\t', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse100() throws Exception {
+    char[] carg0 = { '\r', '\n', ' ', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse101() throws Exception {
+    char[] carg0 = { '\r', '\n', ' ', '\n', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse102() throws Exception {
+    char[] carg0 = { '\r', '\n', ' ', '\n', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse103() throws Exception {
+    char[] carg0 = { '\r', '\n', ' ', '\n', '\u0000', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse104() throws Exception {
+    char[] carg0 = { '\r', '\n', ' ', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse105() throws Exception {
+    char[] carg0 = { '\r', '\n', ' ', '\r', '\t', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse106() throws Exception {
+    char[] carg0 = { '\r', '\n', ' ', '\r', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse107() throws Exception {
+    char[] carg0 = { '\r', '\n', ' ', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse108() throws Exception {
+    char[] carg0 = { '\r', '\n', ' ', '\r', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse109() throws Exception {
+    char[] carg0 = { '\r', '\n', ' ', '\r', '\u0000', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse110() throws Exception {
+    char[] carg0 = { '\r', '\n', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse111() throws Exception {
+    char[] carg0 = { '\r', '\n', ' ', ' ', '\t', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse112() throws Exception {
+    char[] carg0 = { '\r', '\n', ' ', ' ', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse113() throws Exception {
+    char[] carg0 = { '\r', '\n', ' ', ' ', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse114() throws Exception {
+    char[] carg0 = { '\r', '\n', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse115() throws Exception {
+    char[] carg0 = { '\r', '\n', ' ', ' ', '\u0000', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse116() throws Exception {
+    char[] carg0 = { '\r', '\n', ' ', '\u0000', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse117() throws Exception {
+    char[] carg0 = { '\r', '\n', ' ', '(', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse118() throws Exception {
+    char[] carg0 = { '\r', '\n', '\u0000' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse119() throws Exception {
+    char[] carg0 = { '\r', '\n', '@' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse120() throws Exception {
+    char[] carg0 = { '\r', '\n', '2' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    int retval = cut.parse();
+
+    int expected = 2;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testParse121() throws Exception {
+    char[] carg0 = { '\r', '\n', '(' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse122() throws Exception {
+    char[] carg0 = { '\r', '\n', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse123() throws Exception {
+    char[] carg0 = { '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse124() throws Exception {
+    char[] carg0 = { '\r', '\r', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse125() throws Exception {
+    char[] carg0 = { '\r', '\r', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse126() throws Exception {
+    char[] carg0 = { '\r', '\r', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse127() throws Exception {
+    char[] carg0 = { '\r', '\r', '\t', '\t', '\n', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse128() throws Exception {
+    char[] carg0 = { '\r', '\r', '\t', '\t', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse129() throws Exception {
+    char[] carg0 = { '\r', '\r', '\t', '\t', ' ', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse130() throws Exception {
+    char[] carg0 = { '\r', '\r', '\t', '\t', '\u0000', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse131() throws Exception {
+    char[] carg0 = { '\r', '\r', '\t', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse132() throws Exception {
+    char[] carg0 = { '\r', '\r', '\t', '\n', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse133() throws Exception {
+    char[] carg0 = { '\r', '\r', '\t', '\n', '\n', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse134() throws Exception {
+    char[] carg0 = { '\r', '\r', '\t', '\n', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse135() throws Exception {
+    char[] carg0 = { '\r', '\r', '\t', '\n', ' ', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse136() throws Exception {
+    char[] carg0 = { '\r', '\r', '\t', '\n', '\u0000', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse137() throws Exception {
+    char[] carg0 = { '\r', '\r', '\t', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse138() throws Exception {
+    char[] carg0 = { '\r', '\r', '\t', '\r', '\t', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse139() throws Exception {
+    char[] carg0 = { '\r', '\r', '\t', '\r', '\n', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse140() throws Exception {
+    char[] carg0 = { '\r', '\r', '\t', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse141() throws Exception {
+    char[] carg0 = { '\r', '\r', '\t', '\r', ' ', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse142() throws Exception {
+    char[] carg0 = { '\r', '\r', '\t', '\r', '\u0000', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse143() throws Exception {
+    char[] carg0 = { '\r', '\r', '\t', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse144() throws Exception {
+    char[] carg0 = { '\r', '\r', '\t', ' ', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse145() throws Exception {
+    char[] carg0 = { '\r', '\r', '\t', ' ', '\n', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse146() throws Exception {
+    char[] carg0 = { '\r', '\r', '\t', ' ', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse147() throws Exception {
+    char[] carg0 = { '\r', '\r', '\t', ' ', ' ', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse148() throws Exception {
+    char[] carg0 = { '\r', '\r', '\t', ' ', '\u0000', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse149() throws Exception {
+    char[] carg0 = { '\r', '\r', '\t', '\u0000', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse150() throws Exception {
+    char[] carg0 = { '\r', '\r', '\t', '(', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse151() throws Exception {
+    char[] carg0 = { '\r', '\r', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse152() throws Exception {
+    char[] carg0 = { '\r', '\r', '\n', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse153() throws Exception {
+    char[] carg0 = { '\r', '\r', '\n', '\t', '\t', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse154() throws Exception {
+    char[] carg0 = { '\r', '\r', '\n', '\t', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse155() throws Exception {
+    char[] carg0 = { '\r', '\r', '\n', '\t', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse156() throws Exception {
+    char[] carg0 = { '\r', '\r', '\n', '\t', ' ', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse157() throws Exception {
+    char[] carg0 = { '\r', '\r', '\n', '\t', '\u0000', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse158() throws Exception {
+    char[] carg0 = { '\r', '\r', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse159() throws Exception {
+    char[] carg0 = { '\r', '\r', '\n', '\n', '\t', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse160() throws Exception {
+    char[] carg0 = { '\r', '\r', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse161() throws Exception {
+    char[] carg0 = { '\r', '\r', '\n', '\n', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse162() throws Exception {
+    char[] carg0 = { '\r', '\r', '\n', '\n', ' ', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse163() throws Exception {
+    char[] carg0 = { '\r', '\r', '\n', '\n', '\u0000', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse164() throws Exception {
+    char[] carg0 = { '\r', '\r', '\n', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse165() throws Exception {
+    char[] carg0 = { '\r', '\r', '\n', '\r', '\t', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse166() throws Exception {
+    char[] carg0 = { '\r', '\r', '\n', '\r', '\n', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse167() throws Exception {
+    char[] carg0 = { '\r', '\r', '\n', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse168() throws Exception {
+    char[] carg0 = { '\r', '\r', '\n', '\r', ' ', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse169() throws Exception {
+    char[] carg0 = { '\r', '\r', '\n', '\r', '\u0000', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse170() throws Exception {
+    char[] carg0 = { '\r', '\r', '\n', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse171() throws Exception {
+    char[] carg0 = { '\r', '\r', '\n', ' ', '\t', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse172() throws Exception {
+    char[] carg0 = { '\r', '\r', '\n', ' ', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse173() throws Exception {
+    char[] carg0 = { '\r', '\r', '\n', ' ', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse174() throws Exception {
+    char[] carg0 = { '\r', '\r', '\n', ' ', ' ', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse175() throws Exception {
+    char[] carg0 = { '\r', '\r', '\n', ' ', '\u0000', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse176() throws Exception {
+    char[] carg0 = { '\r', '\r', '\n', '\u0000', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse177() throws Exception {
+    char[] carg0 = { '\r', '\r', '\n', '(', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse178() throws Exception {
+    char[] carg0 = { '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse179() throws Exception {
+    char[] carg0 = { '\r', '\r', '\r', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse180() throws Exception {
+    char[] carg0 = { '\r', '\r', '\r', '\t', '\t', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse181() throws Exception {
+    char[] carg0 = { '\r', '\r', '\r', '\t', '\n', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse182() throws Exception {
+    char[] carg0 = { '\r', '\r', '\r', '\t', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse183() throws Exception {
+    char[] carg0 = { '\r', '\r', '\r', '\t', ' ', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse184() throws Exception {
+    char[] carg0 = { '\r', '\r', '\r', '\t', '\u0000', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse185() throws Exception {
+    char[] carg0 = { '\r', '\r', '\r', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse186() throws Exception {
+    char[] carg0 = { '\r', '\r', '\r', '\n', '\t', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse187() throws Exception {
+    char[] carg0 = { '\r', '\r', '\r', '\n', '\n', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse188() throws Exception {
+    char[] carg0 = { '\r', '\r', '\r', '\n', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse189() throws Exception {
+    char[] carg0 = { '\r', '\r', '\r', '\n', ' ', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse190() throws Exception {
+    char[] carg0 = { '\r', '\r', '\r', '\n', '\u0000', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse191() throws Exception {
+    char[] carg0 = { '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse192() throws Exception {
+    char[] carg0 = { '\r', '\r', '\r', '\r', '\t', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse193() throws Exception {
+    char[] carg0 = { '\r', '\r', '\r', '\r', '\n', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse194() throws Exception {
+    char[] carg0 = { '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse195() throws Exception {
+    char[] carg0 = { '\r', '\r', '\r', '\r', ' ', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse196() throws Exception {
+    char[] carg0 = { '\r', '\r', '\r', '\r', '\u0000', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse197() throws Exception {
+    char[] carg0 = { '\r', '\r', '\r', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse198() throws Exception {
+    char[] carg0 = { '\r', '\r', '\r', ' ', '\t', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse199() throws Exception {
+    char[] carg0 = { '\r', '\r', '\r', ' ', '\n', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse200() throws Exception {
+    char[] carg0 = { '\r', '\r', '\r', ' ', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse201() throws Exception {
+    char[] carg0 = { '\r', '\r', '\r', ' ', ' ', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse202() throws Exception {
+    char[] carg0 = { '\r', '\r', '\r', ' ', '\u0000', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse203() throws Exception {
+    char[] carg0 = { '\r', '\r', '\r', '\u0000', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse204() throws Exception {
+    char[] carg0 = { '\r', '\r', '\r', '(', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse205() throws Exception {
+    char[] carg0 = { '\r', '\r', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse206() throws Exception {
+    char[] carg0 = { '\r', '\r', ' ', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse207() throws Exception {
+    char[] carg0 = { '\r', '\r', ' ', '\t', '\t', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse208() throws Exception {
+    char[] carg0 = { '\r', '\r', ' ', '\t', '\n', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse209() throws Exception {
+    char[] carg0 = { '\r', '\r', ' ', '\t', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse210() throws Exception {
+    char[] carg0 = { '\r', '\r', ' ', '\t', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse211() throws Exception {
+    char[] carg0 = { '\r', '\r', ' ', '\t', '\u0000', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse212() throws Exception {
+    char[] carg0 = { '\r', '\r', ' ', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse213() throws Exception {
+    char[] carg0 = { '\r', '\r', ' ', '\n', '\t', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse214() throws Exception {
+    char[] carg0 = { '\r', '\r', ' ', '\n', '\n', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse215() throws Exception {
+    char[] carg0 = { '\r', '\r', ' ', '\n', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse216() throws Exception {
+    char[] carg0 = { '\r', '\r', ' ', '\n', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse217() throws Exception {
+    char[] carg0 = { '\r', '\r', ' ', '\n', '\u0000', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse218() throws Exception {
+    char[] carg0 = { '\r', '\r', ' ', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse219() throws Exception {
+    char[] carg0 = { '\r', '\r', ' ', '\r', '\t', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse220() throws Exception {
+    char[] carg0 = { '\r', '\r', ' ', '\r', '\n', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse221() throws Exception {
+    char[] carg0 = { '\r', '\r', ' ', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse222() throws Exception {
+    char[] carg0 = { '\r', '\r', ' ', '\r', ' ', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse223() throws Exception {
+    char[] carg0 = { '\r', '\r', ' ', '\r', '\u0000', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse224() throws Exception {
+    char[] carg0 = { '\r', '\r', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse225() throws Exception {
+    char[] carg0 = { '\r', '\r', ' ', ' ', '\t', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse226() throws Exception {
+    char[] carg0 = { '\r', '\r', ' ', ' ', '\n', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse227() throws Exception {
+    char[] carg0 = { '\r', '\r', ' ', ' ', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse228() throws Exception {
+    char[] carg0 = { '\r', '\r', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse229() throws Exception {
+    char[] carg0 = { '\r', '\r', ' ', ' ', '\u0000', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse230() throws Exception {
+    char[] carg0 = { '\r', '\r', ' ', '\u0000', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse231() throws Exception {
+    char[] carg0 = { '\r', '\r', ' ', '(', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse232() throws Exception {
+    char[] carg0 = { '\r', '\r', '\u0000' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse233() throws Exception {
+    char[] carg0 = { '\r', '\r', '@' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse234() throws Exception {
+    char[] carg0 = { '\r', '\r', '2' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    int retval = cut.parse();
+
+    int expected = 2;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testParse235() throws Exception {
+    char[] carg0 = { '\r', '\r', '(' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse236() throws Exception {
+    char[] carg0 = { '\r', '\r', '(', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse237() throws Exception {
+    char[] carg0 = { '\r', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse238() throws Exception {
+    char[] carg0 = { '\r', ' ', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse239() throws Exception {
+    char[] carg0 = { '\r', ' ', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse240() throws Exception {
+    char[] carg0 = { '\r', ' ', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse241() throws Exception {
+    char[] carg0 = { '\r', ' ', '\t', '\t', '\n', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse242() throws Exception {
+    char[] carg0 = { '\r', ' ', '\t', '\t', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse243() throws Exception {
+    char[] carg0 = { '\r', ' ', '\t', '\t', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse244() throws Exception {
+    char[] carg0 = { '\r', ' ', '\t', '\t', '\u0000', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse245() throws Exception {
+    char[] carg0 = { '\r', ' ', '\t', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse246() throws Exception {
+    char[] carg0 = { '\r', ' ', '\t', '\n', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse247() throws Exception {
+    char[] carg0 = { '\r', ' ', '\t', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse248() throws Exception {
+    char[] carg0 = { '\r', ' ', '\t', '\n', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse249() throws Exception {
+    char[] carg0 = { '\r', ' ', '\t', '\n', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse250() throws Exception {
+    char[] carg0 = { '\r', ' ', '\t', '\n', '\u0000', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse251() throws Exception {
+    char[] carg0 = { '\r', ' ', '\t', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse252() throws Exception {
+    char[] carg0 = { '\r', ' ', '\t', '\r', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse253() throws Exception {
+    char[] carg0 = { '\r', ' ', '\t', '\r', '\n', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse254() throws Exception {
+    char[] carg0 = { '\r', ' ', '\t', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse255() throws Exception {
+    char[] carg0 = { '\r', ' ', '\t', '\r', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse256() throws Exception {
+    char[] carg0 = { '\r', ' ', '\t', '\r', '\u0000', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse257() throws Exception {
+    char[] carg0 = { '\r', ' ', '\t', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse258() throws Exception {
+    char[] carg0 = { '\r', ' ', '\t', ' ', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse259() throws Exception {
+    char[] carg0 = { '\r', ' ', '\t', ' ', '\n', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse260() throws Exception {
+    char[] carg0 = { '\r', ' ', '\t', ' ', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse261() throws Exception {
+    char[] carg0 = { '\r', ' ', '\t', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse262() throws Exception {
+    char[] carg0 = { '\r', ' ', '\t', ' ', '\u0000', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse263() throws Exception {
+    char[] carg0 = { '\r', ' ', '\t', '\u0000', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse264() throws Exception {
+    char[] carg0 = { '\r', ' ', '\t', '(', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse265() throws Exception {
+    char[] carg0 = { '\r', ' ', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse266() throws Exception {
+    char[] carg0 = { '\r', ' ', '\n', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse267() throws Exception {
+    char[] carg0 = { '\r', ' ', '\n', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse268() throws Exception {
+    char[] carg0 = { '\r', ' ', '\n', '\t', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse269() throws Exception {
+    char[] carg0 = { '\r', ' ', '\n', '\t', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse270() throws Exception {
+    char[] carg0 = { '\r', ' ', '\n', '\t', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse271() throws Exception {
+    char[] carg0 = { '\r', ' ', '\n', '\t', '\u0000', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse272() throws Exception {
+    char[] carg0 = { '\r', ' ', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse273() throws Exception {
+    char[] carg0 = { '\r', ' ', '\n', '\n', '\t', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse274() throws Exception {
+    char[] carg0 = { '\r', ' ', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse275() throws Exception {
+    char[] carg0 = { '\r', ' ', '\n', '\n', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse276() throws Exception {
+    char[] carg0 = { '\r', ' ', '\n', '\n', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse277() throws Exception {
+    char[] carg0 = { '\r', ' ', '\n', '\n', '\u0000', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse278() throws Exception {
+    char[] carg0 = { '\r', ' ', '\n', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse279() throws Exception {
+    char[] carg0 = { '\r', ' ', '\n', '\r', '\t', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse280() throws Exception {
+    char[] carg0 = { '\r', ' ', '\n', '\r', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse281() throws Exception {
+    char[] carg0 = { '\r', ' ', '\n', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse282() throws Exception {
+    char[] carg0 = { '\r', ' ', '\n', '\r', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse283() throws Exception {
+    char[] carg0 = { '\r', ' ', '\n', '\r', '\u0000', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse284() throws Exception {
+    char[] carg0 = { '\r', ' ', '\n', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse285() throws Exception {
+    char[] carg0 = { '\r', ' ', '\n', ' ', '\t', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse286() throws Exception {
+    char[] carg0 = { '\r', ' ', '\n', ' ', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse287() throws Exception {
+    char[] carg0 = { '\r', ' ', '\n', ' ', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse288() throws Exception {
+    char[] carg0 = { '\r', ' ', '\n', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse289() throws Exception {
+    char[] carg0 = { '\r', ' ', '\n', ' ', '\u0000', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse290() throws Exception {
+    char[] carg0 = { '\r', ' ', '\n', '\u0000', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse291() throws Exception {
+    char[] carg0 = { '\r', ' ', '\n', '(', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse292() throws Exception {
+    char[] carg0 = { '\r', ' ', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse293() throws Exception {
+    char[] carg0 = { '\r', ' ', '\r', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse294() throws Exception {
+    char[] carg0 = { '\r', ' ', '\r', '\t', '\t', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse295() throws Exception {
+    char[] carg0 = { '\r', ' ', '\r', '\t', '\n', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse296() throws Exception {
+    char[] carg0 = { '\r', ' ', '\r', '\t', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse297() throws Exception {
+    char[] carg0 = { '\r', ' ', '\r', '\t', ' ', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse298() throws Exception {
+    char[] carg0 = { '\r', ' ', '\r', '\t', '\u0000', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse299() throws Exception {
+    char[] carg0 = { '\r', ' ', '\r', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse300() throws Exception {
+    char[] carg0 = { '\r', ' ', '\r', '\n', '\t', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse301() throws Exception {
+    char[] carg0 = { '\r', ' ', '\r', '\n', '\n', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse302() throws Exception {
+    char[] carg0 = { '\r', ' ', '\r', '\n', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse303() throws Exception {
+    char[] carg0 = { '\r', ' ', '\r', '\n', ' ', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse304() throws Exception {
+    char[] carg0 = { '\r', ' ', '\r', '\n', '\u0000', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse305() throws Exception {
+    char[] carg0 = { '\r', ' ', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse306() throws Exception {
+    char[] carg0 = { '\r', ' ', '\r', '\r', '\t', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse307() throws Exception {
+    char[] carg0 = { '\r', ' ', '\r', '\r', '\n', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse308() throws Exception {
+    char[] carg0 = { '\r', ' ', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse309() throws Exception {
+    char[] carg0 = { '\r', ' ', '\r', '\r', ' ', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse310() throws Exception {
+    char[] carg0 = { '\r', ' ', '\r', '\r', '\u0000', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse311() throws Exception {
+    char[] carg0 = { '\r', ' ', '\r', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse312() throws Exception {
+    char[] carg0 = { '\r', ' ', '\r', ' ', '\t', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse313() throws Exception {
+    char[] carg0 = { '\r', ' ', '\r', ' ', '\n', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse314() throws Exception {
+    char[] carg0 = { '\r', ' ', '\r', ' ', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse315() throws Exception {
+    char[] carg0 = { '\r', ' ', '\r', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse316() throws Exception {
+    char[] carg0 = { '\r', ' ', '\r', ' ', '\u0000', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse317() throws Exception {
+    char[] carg0 = { '\r', ' ', '\r', '\u0000', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse318() throws Exception {
+    char[] carg0 = { '\r', ' ', '\r', '(', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse319() throws Exception {
+    char[] carg0 = { '\r', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse320() throws Exception {
+    char[] carg0 = { '\r', ' ', ' ', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse321() throws Exception {
+    char[] carg0 = { '\r', ' ', ' ', '\t', '\t', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse322() throws Exception {
+    char[] carg0 = { '\r', ' ', ' ', '\t', '\n', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse323() throws Exception {
+    char[] carg0 = { '\r', ' ', ' ', '\t', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse324() throws Exception {
+    char[] carg0 = { '\r', ' ', ' ', '\t', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse325() throws Exception {
+    char[] carg0 = { '\r', ' ', ' ', '\t', '\u0000', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse326() throws Exception {
+    char[] carg0 = { '\r', ' ', ' ', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse327() throws Exception {
+    char[] carg0 = { '\r', ' ', ' ', '\n', '\t', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse328() throws Exception {
+    char[] carg0 = { '\r', ' ', ' ', '\n', '\n', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse329() throws Exception {
+    char[] carg0 = { '\r', ' ', ' ', '\n', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse330() throws Exception {
+    char[] carg0 = { '\r', ' ', ' ', '\n', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse331() throws Exception {
+    char[] carg0 = { '\r', ' ', ' ', '\n', '\u0000', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse332() throws Exception {
+    char[] carg0 = { '\r', ' ', ' ', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse333() throws Exception {
+    char[] carg0 = { '\r', ' ', ' ', '\r', '\t', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse334() throws Exception {
+    char[] carg0 = { '\r', ' ', ' ', '\r', '\n', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse335() throws Exception {
+    char[] carg0 = { '\r', ' ', ' ', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse336() throws Exception {
+    char[] carg0 = { '\r', ' ', ' ', '\r', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse337() throws Exception {
+    char[] carg0 = { '\r', ' ', ' ', '\r', '\u0000', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse338() throws Exception {
+    char[] carg0 = { '\r', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse339() throws Exception {
+    char[] carg0 = { '\r', ' ', ' ', ' ', '\t', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse340() throws Exception {
+    char[] carg0 = { '\r', ' ', ' ', ' ', '\n', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse341() throws Exception {
+    char[] carg0 = { '\r', ' ', ' ', ' ', '\r', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse342() throws Exception {
+    char[] carg0 = { '\r', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse343() throws Exception {
+    char[] carg0 = { '\r', ' ', ' ', ' ', '\u0000', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse344() throws Exception {
+    char[] carg0 = { '\r', ' ', ' ', '\u0000', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse345() throws Exception {
+    char[] carg0 = { '\r', ' ', ' ', '(', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse346() throws Exception {
+    char[] carg0 = { '\r', ' ', '\u0000' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse347() throws Exception {
+    char[] carg0 = { '\r', ' ', '@' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse348() throws Exception {
+    char[] carg0 = { '\r', ' ', '2' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    int retval = cut.parse();
+
+    int expected = 2;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testParse349() throws Exception {
+    char[] carg0 = { '\r', ' ', '(' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse350() throws Exception {
+    char[] carg0 = { '\r', ' ', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse351() throws Exception {
+    char[] carg0 = { '\r', '\u0000' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse352() throws Exception {
+    char[] carg0 = { '\r', 'J' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse353() throws Exception {
+    char[] carg0 = { '\r', '2' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    int retval = cut.parse();
+
+    int expected = 2;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testParse354() throws Exception {
+    char[] carg0 = { '\r', '2', '\u0000' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse355() throws Exception {
+    char[] carg0 = { '\r', '2', ':' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse356() throws Exception {
+    char[] carg0 = { '\r', '2', '2' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    int retval = cut.parse();
+
+    int expected = 22;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testParse357() throws Exception {
+    char[] carg0 = { '\r', '(' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse358() throws Exception {
+    char[] carg0 = { '\r', '(', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse359() throws Exception {
+    char[] carg0 = { '\r', '(', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse360() throws Exception {
+    char[] carg0 = { '\r', '(', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse361() throws Exception {
+    char[] carg0 = { '\r', '(', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse362() throws Exception {
+    char[] carg0 = { '\r', '(', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse363() throws Exception {
+    char[] carg0 = { '\r', '(', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse364() throws Exception {
+    char[] carg0 = { '\r', '(', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse365() throws Exception {
+    char[] carg0 = { '\r', '(', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse366() throws Exception {
+    char[] carg0 = { '\r', '(', '\u0000' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse367() throws Exception {
+    char[] carg0 = { '\r', '(', '(' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse368() throws Exception {
+    char[] carg0 = { ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse369() throws Exception {
+    char[] carg0 = { ' ', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse370() throws Exception {
+    char[] carg0 = { ' ', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse371() throws Exception {
+    char[] carg0 = { ' ', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse372() throws Exception {
+    char[] carg0 = { ' ', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse373() throws Exception {
+    char[] carg0 = { ' ', '\t', '\t', '\t', '\n', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse374() throws Exception {
+    char[] carg0 = { ' ', '\t', '\t', '\t', '\r', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse375() throws Exception {
+    char[] carg0 = { ' ', '\t', '\t', '\t', ' ', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse376() throws Exception {
+    char[] carg0 = { ' ', '\t', '\t', '\t', '\u0000', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse377() throws Exception {
+    char[] carg0 = { ' ', '\t', '\t', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse378() throws Exception {
+    char[] carg0 = { ' ', '\t', '\t', '\n', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse379() throws Exception {
+    char[] carg0 = { ' ', '\t', '\t', '\n', '\n', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse380() throws Exception {
+    char[] carg0 = { ' ', '\t', '\t', '\n', '\r', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse381() throws Exception {
+    char[] carg0 = { ' ', '\t', '\t', '\n', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse382() throws Exception {
+    char[] carg0 = { ' ', '\t', '\t', '\n', '\u0000', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse383() throws Exception {
+    char[] carg0 = { ' ', '\t', '\t', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse384() throws Exception {
+    char[] carg0 = { ' ', '\t', '\t', '\r', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse385() throws Exception {
+    char[] carg0 = { ' ', '\t', '\t', '\r', '\n', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse386() throws Exception {
+    char[] carg0 = { ' ', '\t', '\t', '\r', '\r', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse387() throws Exception {
+    char[] carg0 = { ' ', '\t', '\t', '\r', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse388() throws Exception {
+    char[] carg0 = { ' ', '\t', '\t', '\r', '\u0000', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse389() throws Exception {
+    char[] carg0 = { ' ', '\t', '\t', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse390() throws Exception {
+    char[] carg0 = { ' ', '\t', '\t', ' ', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse391() throws Exception {
+    char[] carg0 = { ' ', '\t', '\t', ' ', '\n', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse392() throws Exception {
+    char[] carg0 = { ' ', '\t', '\t', ' ', '\r', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse393() throws Exception {
+    char[] carg0 = { ' ', '\t', '\t', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse394() throws Exception {
+    char[] carg0 = { ' ', '\t', '\t', ' ', '\u0000', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse395() throws Exception {
+    char[] carg0 = { ' ', '\t', '\t', '\u0000', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse396() throws Exception {
+    char[] carg0 = { ' ', '\t', '\t', '(', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse397() throws Exception {
+    char[] carg0 = { ' ', '\t', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse398() throws Exception {
+    char[] carg0 = { ' ', '\t', '\n', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse399() throws Exception {
+    char[] carg0 = { ' ', '\t', '\n', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse400() throws Exception {
+    char[] carg0 = { ' ', '\t', '\n', '\t', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse401() throws Exception {
+    char[] carg0 = { ' ', '\t', '\n', '\t', '\r', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse402() throws Exception {
+    char[] carg0 = { ' ', '\t', '\n', '\t', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse403() throws Exception {
+    char[] carg0 = { ' ', '\t', '\n', '\t', '\u0000', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse404() throws Exception {
+    char[] carg0 = { ' ', '\t', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse405() throws Exception {
+    char[] carg0 = { ' ', '\t', '\n', '\n', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse406() throws Exception {
+    char[] carg0 = { ' ', '\t', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse407() throws Exception {
+    char[] carg0 = { ' ', '\t', '\n', '\n', '\r', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse408() throws Exception {
+    char[] carg0 = { ' ', '\t', '\n', '\n', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse409() throws Exception {
+    char[] carg0 = { ' ', '\t', '\n', '\n', '\u0000', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse410() throws Exception {
+    char[] carg0 = { ' ', '\t', '\n', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse411() throws Exception {
+    char[] carg0 = { ' ', '\t', '\n', '\r', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse412() throws Exception {
+    char[] carg0 = { ' ', '\t', '\n', '\r', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse413() throws Exception {
+    char[] carg0 = { ' ', '\t', '\n', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse414() throws Exception {
+    char[] carg0 = { ' ', '\t', '\n', '\r', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse415() throws Exception {
+    char[] carg0 = { ' ', '\t', '\n', '\r', '\u0000', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse416() throws Exception {
+    char[] carg0 = { ' ', '\t', '\n', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse417() throws Exception {
+    char[] carg0 = { ' ', '\t', '\n', ' ', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse418() throws Exception {
+    char[] carg0 = { ' ', '\t', '\n', ' ', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse419() throws Exception {
+    char[] carg0 = { ' ', '\t', '\n', ' ', '\r', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse420() throws Exception {
+    char[] carg0 = { ' ', '\t', '\n', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse421() throws Exception {
+    char[] carg0 = { ' ', '\t', '\n', ' ', '\u0000', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse422() throws Exception {
+    char[] carg0 = { ' ', '\t', '\n', '\u0000', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse423() throws Exception {
+    char[] carg0 = { ' ', '\t', '\n', '(', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse424() throws Exception {
+    char[] carg0 = { ' ', '\t', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse425() throws Exception {
+    char[] carg0 = { ' ', '\t', '\r', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse426() throws Exception {
+    char[] carg0 = { ' ', '\t', '\r', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse427() throws Exception {
+    char[] carg0 = { ' ', '\t', '\r', '\t', '\n', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse428() throws Exception {
+    char[] carg0 = { ' ', '\t', '\r', '\t', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse429() throws Exception {
+    char[] carg0 = { ' ', '\t', '\r', '\t', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse430() throws Exception {
+    char[] carg0 = { ' ', '\t', '\r', '\t', '\u0000', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse431() throws Exception {
+    char[] carg0 = { ' ', '\t', '\r', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse432() throws Exception {
+    char[] carg0 = { ' ', '\t', '\r', '\n', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse433() throws Exception {
+    char[] carg0 = { ' ', '\t', '\r', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse434() throws Exception {
+    char[] carg0 = { ' ', '\t', '\r', '\n', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse435() throws Exception {
+    char[] carg0 = { ' ', '\t', '\r', '\n', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse436() throws Exception {
+    char[] carg0 = { ' ', '\t', '\r', '\n', '\u0000', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse437() throws Exception {
+    char[] carg0 = { ' ', '\t', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse438() throws Exception {
+    char[] carg0 = { ' ', '\t', '\r', '\r', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse439() throws Exception {
+    char[] carg0 = { ' ', '\t', '\r', '\r', '\n', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse440() throws Exception {
+    char[] carg0 = { ' ', '\t', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse441() throws Exception {
+    char[] carg0 = { ' ', '\t', '\r', '\r', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse442() throws Exception {
+    char[] carg0 = { ' ', '\t', '\r', '\r', '\u0000', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse443() throws Exception {
+    char[] carg0 = { ' ', '\t', '\r', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse444() throws Exception {
+    char[] carg0 = { ' ', '\t', '\r', ' ', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse445() throws Exception {
+    char[] carg0 = { ' ', '\t', '\r', ' ', '\n', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse446() throws Exception {
+    char[] carg0 = { ' ', '\t', '\r', ' ', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse447() throws Exception {
+    char[] carg0 = { ' ', '\t', '\r', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse448() throws Exception {
+    char[] carg0 = { ' ', '\t', '\r', ' ', '\u0000', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse449() throws Exception {
+    char[] carg0 = { ' ', '\t', '\r', '\u0000', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse450() throws Exception {
+    char[] carg0 = { ' ', '\t', '\r', '(', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse451() throws Exception {
+    char[] carg0 = { ' ', '\t', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse452() throws Exception {
+    char[] carg0 = { ' ', '\t', ' ', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse453() throws Exception {
+    char[] carg0 = { ' ', '\t', ' ', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse454() throws Exception {
+    char[] carg0 = { ' ', '\t', ' ', '\t', '\n', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse455() throws Exception {
+    char[] carg0 = { ' ', '\t', ' ', '\t', '\r', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse456() throws Exception {
+    char[] carg0 = { ' ', '\t', ' ', '\t', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse457() throws Exception {
+    char[] carg0 = { ' ', '\t', ' ', '\t', '\u0000', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse458() throws Exception {
+    char[] carg0 = { ' ', '\t', ' ', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse459() throws Exception {
+    char[] carg0 = { ' ', '\t', ' ', '\n', '\t', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse460() throws Exception {
+    char[] carg0 = { ' ', '\t', ' ', '\n', '\n', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse461() throws Exception {
+    char[] carg0 = { ' ', '\t', ' ', '\n', '\r', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse462() throws Exception {
+    char[] carg0 = { ' ', '\t', ' ', '\n', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse463() throws Exception {
+    char[] carg0 = { ' ', '\t', ' ', '\n', '\u0000', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse464() throws Exception {
+    char[] carg0 = { ' ', '\t', ' ', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse465() throws Exception {
+    char[] carg0 = { ' ', '\t', ' ', '\r', '\t', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse466() throws Exception {
+    char[] carg0 = { ' ', '\t', ' ', '\r', '\n', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse467() throws Exception {
+    char[] carg0 = { ' ', '\t', ' ', '\r', '\r', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse468() throws Exception {
+    char[] carg0 = { ' ', '\t', ' ', '\r', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse469() throws Exception {
+    char[] carg0 = { ' ', '\t', ' ', '\r', '\u0000', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse470() throws Exception {
+    char[] carg0 = { ' ', '\t', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse471() throws Exception {
+    char[] carg0 = { ' ', '\t', ' ', ' ', '\t', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse472() throws Exception {
+    char[] carg0 = { ' ', '\t', ' ', ' ', '\n', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse473() throws Exception {
+    char[] carg0 = { ' ', '\t', ' ', ' ', '\r', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse474() throws Exception {
+    char[] carg0 = { ' ', '\t', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse475() throws Exception {
+    char[] carg0 = { ' ', '\t', ' ', ' ', '\u0000', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse476() throws Exception {
+    char[] carg0 = { ' ', '\t', ' ', '\u0000', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse477() throws Exception {
+    char[] carg0 = { ' ', '\t', ' ', '(', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse478() throws Exception {
+    char[] carg0 = { ' ', '\t', '\u0000' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse479() throws Exception {
+    char[] carg0 = { ' ', '\t', ':' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse480() throws Exception {
+    char[] carg0 = { ' ', '\t', '2' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    int retval = cut.parse();
+
+    int expected = 2;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testParse481() throws Exception {
+    char[] carg0 = { ' ', '\t', '(' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse482() throws Exception {
+    char[] carg0 = { ' ', '\t', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse483() throws Exception {
+    char[] carg0 = { ' ', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse484() throws Exception {
+    char[] carg0 = { ' ', '\n', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse485() throws Exception {
+    char[] carg0 = { ' ', '\n', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse486() throws Exception {
+    char[] carg0 = { ' ', '\n', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse487() throws Exception {
+    char[] carg0 = { ' ', '\n', '\t', '\t', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse488() throws Exception {
+    char[] carg0 = { ' ', '\n', '\t', '\t', '\r', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse489() throws Exception {
+    char[] carg0 = { ' ', '\n', '\t', '\t', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse490() throws Exception {
+    char[] carg0 = { ' ', '\n', '\t', '\t', '\u0000', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse491() throws Exception {
+    char[] carg0 = { ' ', '\n', '\t', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse492() throws Exception {
+    char[] carg0 = { ' ', '\n', '\t', '\n', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse493() throws Exception {
+    char[] carg0 = { ' ', '\n', '\t', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse494() throws Exception {
+    char[] carg0 = { ' ', '\n', '\t', '\n', '\r', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse495() throws Exception {
+    char[] carg0 = { ' ', '\n', '\t', '\n', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse496() throws Exception {
+    char[] carg0 = { ' ', '\n', '\t', '\n', '\u0000', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse497() throws Exception {
+    char[] carg0 = { ' ', '\n', '\t', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse498() throws Exception {
+    char[] carg0 = { ' ', '\n', '\t', '\r', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse499() throws Exception {
+    char[] carg0 = { ' ', '\n', '\t', '\r', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse500() throws Exception {
+    char[] carg0 = { ' ', '\n', '\t', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse501() throws Exception {
+    char[] carg0 = { ' ', '\n', '\t', '\r', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse502() throws Exception {
+    char[] carg0 = { ' ', '\n', '\t', '\r', '\u0000', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse503() throws Exception {
+    char[] carg0 = { ' ', '\n', '\t', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse504() throws Exception {
+    char[] carg0 = { ' ', '\n', '\t', ' ', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse505() throws Exception {
+    char[] carg0 = { ' ', '\n', '\t', ' ', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse506() throws Exception {
+    char[] carg0 = { ' ', '\n', '\t', ' ', '\r', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse507() throws Exception {
+    char[] carg0 = { ' ', '\n', '\t', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse508() throws Exception {
+    char[] carg0 = { ' ', '\n', '\t', ' ', '\u0000', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse509() throws Exception {
+    char[] carg0 = { ' ', '\n', '\t', '\u0000', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse510() throws Exception {
+    char[] carg0 = { ' ', '\n', '\t', '(', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse511() throws Exception {
+    char[] carg0 = { ' ', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse512() throws Exception {
+    char[] carg0 = { ' ', '\n', '\n', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse513() throws Exception {
+    char[] carg0 = { ' ', '\n', '\n', '\t', '\t', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse514() throws Exception {
+    char[] carg0 = { ' ', '\n', '\n', '\t', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse515() throws Exception {
+    char[] carg0 = { ' ', '\n', '\n', '\t', '\r', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse516() throws Exception {
+    char[] carg0 = { ' ', '\n', '\n', '\t', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse517() throws Exception {
+    char[] carg0 = { ' ', '\n', '\n', '\t', '\u0000', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse518() throws Exception {
+    char[] carg0 = { ' ', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse519() throws Exception {
+    char[] carg0 = { ' ', '\n', '\n', '\n', '\t', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse520() throws Exception {
+    char[] carg0 = { ' ', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse521() throws Exception {
+    char[] carg0 = { ' ', '\n', '\n', '\n', '\r', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse522() throws Exception {
+    char[] carg0 = { ' ', '\n', '\n', '\n', ' ', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse523() throws Exception {
+    char[] carg0 = { ' ', '\n', '\n', '\n', '\u0000', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse524() throws Exception {
+    char[] carg0 = { ' ', '\n', '\n', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse525() throws Exception {
+    char[] carg0 = { ' ', '\n', '\n', '\r', '\t', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse526() throws Exception {
+    char[] carg0 = { ' ', '\n', '\n', '\r', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse527() throws Exception {
+    char[] carg0 = { ' ', '\n', '\n', '\r', '\r', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse528() throws Exception {
+    char[] carg0 = { ' ', '\n', '\n', '\r', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse529() throws Exception {
+    char[] carg0 = { ' ', '\n', '\n', '\r', '\u0000', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse530() throws Exception {
+    char[] carg0 = { ' ', '\n', '\n', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse531() throws Exception {
+    char[] carg0 = { ' ', '\n', '\n', ' ', '\t', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse532() throws Exception {
+    char[] carg0 = { ' ', '\n', '\n', ' ', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse533() throws Exception {
+    char[] carg0 = { ' ', '\n', '\n', ' ', '\r', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse534() throws Exception {
+    char[] carg0 = { ' ', '\n', '\n', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse535() throws Exception {
+    char[] carg0 = { ' ', '\n', '\n', ' ', '\u0000', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse536() throws Exception {
+    char[] carg0 = { ' ', '\n', '\n', '\u0000', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse537() throws Exception {
+    char[] carg0 = { ' ', '\n', '\n', '(', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse538() throws Exception {
+    char[] carg0 = { ' ', '\n', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse539() throws Exception {
+    char[] carg0 = { ' ', '\n', '\r', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse540() throws Exception {
+    char[] carg0 = { ' ', '\n', '\r', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse541() throws Exception {
+    char[] carg0 = { ' ', '\n', '\r', '\t', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse542() throws Exception {
+    char[] carg0 = { ' ', '\n', '\r', '\t', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse543() throws Exception {
+    char[] carg0 = { ' ', '\n', '\r', '\t', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse544() throws Exception {
+    char[] carg0 = { ' ', '\n', '\r', '\t', '\u0000', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse545() throws Exception {
+    char[] carg0 = { ' ', '\n', '\r', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse546() throws Exception {
+    char[] carg0 = { ' ', '\n', '\r', '\n', '\t', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse547() throws Exception {
+    char[] carg0 = { ' ', '\n', '\r', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse548() throws Exception {
+    char[] carg0 = { ' ', '\n', '\r', '\n', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse549() throws Exception {
+    char[] carg0 = { ' ', '\n', '\r', '\n', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse550() throws Exception {
+    char[] carg0 = { ' ', '\n', '\r', '\n', '\u0000', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse551() throws Exception {
+    char[] carg0 = { ' ', '\n', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse552() throws Exception {
+    char[] carg0 = { ' ', '\n', '\r', '\r', '\t', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse553() throws Exception {
+    char[] carg0 = { ' ', '\n', '\r', '\r', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse554() throws Exception {
+    char[] carg0 = { ' ', '\n', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse555() throws Exception {
+    char[] carg0 = { ' ', '\n', '\r', '\r', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse556() throws Exception {
+    char[] carg0 = { ' ', '\n', '\r', '\r', '\u0000', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse557() throws Exception {
+    char[] carg0 = { ' ', '\n', '\r', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse558() throws Exception {
+    char[] carg0 = { ' ', '\n', '\r', ' ', '\t', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse559() throws Exception {
+    char[] carg0 = { ' ', '\n', '\r', ' ', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse560() throws Exception {
+    char[] carg0 = { ' ', '\n', '\r', ' ', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse561() throws Exception {
+    char[] carg0 = { ' ', '\n', '\r', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse562() throws Exception {
+    char[] carg0 = { ' ', '\n', '\r', ' ', '\u0000', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse563() throws Exception {
+    char[] carg0 = { ' ', '\n', '\r', '\u0000', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse564() throws Exception {
+    char[] carg0 = { ' ', '\n', '\r', '(', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse565() throws Exception {
+    char[] carg0 = { ' ', '\n', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse566() throws Exception {
+    char[] carg0 = { ' ', '\n', ' ', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse567() throws Exception {
+    char[] carg0 = { ' ', '\n', ' ', '\t', '\t', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse568() throws Exception {
+    char[] carg0 = { ' ', '\n', ' ', '\t', '\n', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse569() throws Exception {
+    char[] carg0 = { ' ', '\n', ' ', '\t', '\r', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse570() throws Exception {
+    char[] carg0 = { ' ', '\n', ' ', '\t', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse571() throws Exception {
+    char[] carg0 = { ' ', '\n', ' ', '\t', '\u0000', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse572() throws Exception {
+    char[] carg0 = { ' ', '\n', ' ', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse573() throws Exception {
+    char[] carg0 = { ' ', '\n', ' ', '\n', '\t', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse574() throws Exception {
+    char[] carg0 = { ' ', '\n', ' ', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse575() throws Exception {
+    char[] carg0 = { ' ', '\n', ' ', '\n', '\r', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse576() throws Exception {
+    char[] carg0 = { ' ', '\n', ' ', '\n', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse577() throws Exception {
+    char[] carg0 = { ' ', '\n', ' ', '\n', '\u0000', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse578() throws Exception {
+    char[] carg0 = { ' ', '\n', ' ', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse579() throws Exception {
+    char[] carg0 = { ' ', '\n', ' ', '\r', '\t', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse580() throws Exception {
+    char[] carg0 = { ' ', '\n', ' ', '\r', '\n', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse581() throws Exception {
+    char[] carg0 = { ' ', '\n', ' ', '\r', '\r', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse582() throws Exception {
+    char[] carg0 = { ' ', '\n', ' ', '\r', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse583() throws Exception {
+    char[] carg0 = { ' ', '\n', ' ', '\r', '\u0000', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse584() throws Exception {
+    char[] carg0 = { ' ', '\n', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse585() throws Exception {
+    char[] carg0 = { ' ', '\n', ' ', ' ', '\t', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse586() throws Exception {
+    char[] carg0 = { ' ', '\n', ' ', ' ', '\n', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse587() throws Exception {
+    char[] carg0 = { ' ', '\n', ' ', ' ', '\r', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse588() throws Exception {
+    char[] carg0 = { ' ', '\n', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse589() throws Exception {
+    char[] carg0 = { ' ', '\n', ' ', ' ', '\u0000', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse590() throws Exception {
+    char[] carg0 = { ' ', '\n', ' ', '\u0000', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse591() throws Exception {
+    char[] carg0 = { ' ', '\n', ' ', '(', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse592() throws Exception {
+    char[] carg0 = { ' ', '\n', '\u0000' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse593() throws Exception {
+    char[] carg0 = { ' ', '\n', ':' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse594() throws Exception {
+    char[] carg0 = { ' ', '\n', '2' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    int retval = cut.parse();
+
+    int expected = 2;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testParse595() throws Exception {
+    char[] carg0 = { ' ', '\n', '(' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse596() throws Exception {
+    char[] carg0 = { ' ', '\n', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse597() throws Exception {
+    char[] carg0 = { ' ', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse598() throws Exception {
+    char[] carg0 = { ' ', '\r', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse599() throws Exception {
+    char[] carg0 = { ' ', '\r', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse600() throws Exception {
+    char[] carg0 = { ' ', '\r', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse601() throws Exception {
+    char[] carg0 = { ' ', '\r', '\t', '\t', '\n', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse602() throws Exception {
+    char[] carg0 = { ' ', '\r', '\t', '\t', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse603() throws Exception {
+    char[] carg0 = { ' ', '\r', '\t', '\t', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse604() throws Exception {
+    char[] carg0 = { ' ', '\r', '\t', '\t', '\u0000', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse605() throws Exception {
+    char[] carg0 = { ' ', '\r', '\t', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse606() throws Exception {
+    char[] carg0 = { ' ', '\r', '\t', '\n', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse607() throws Exception {
+    char[] carg0 = { ' ', '\r', '\t', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse608() throws Exception {
+    char[] carg0 = { ' ', '\r', '\t', '\n', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse609() throws Exception {
+    char[] carg0 = { ' ', '\r', '\t', '\n', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse610() throws Exception {
+    char[] carg0 = { ' ', '\r', '\t', '\n', '\u0000', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse611() throws Exception {
+    char[] carg0 = { ' ', '\r', '\t', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse612() throws Exception {
+    char[] carg0 = { ' ', '\r', '\t', '\r', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse613() throws Exception {
+    char[] carg0 = { ' ', '\r', '\t', '\r', '\n', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse614() throws Exception {
+    char[] carg0 = { ' ', '\r', '\t', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse615() throws Exception {
+    char[] carg0 = { ' ', '\r', '\t', '\r', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse616() throws Exception {
+    char[] carg0 = { ' ', '\r', '\t', '\r', '\u0000', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse617() throws Exception {
+    char[] carg0 = { ' ', '\r', '\t', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse618() throws Exception {
+    char[] carg0 = { ' ', '\r', '\t', ' ', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse619() throws Exception {
+    char[] carg0 = { ' ', '\r', '\t', ' ', '\n', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse620() throws Exception {
+    char[] carg0 = { ' ', '\r', '\t', ' ', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse621() throws Exception {
+    char[] carg0 = { ' ', '\r', '\t', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse622() throws Exception {
+    char[] carg0 = { ' ', '\r', '\t', ' ', '\u0000', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse623() throws Exception {
+    char[] carg0 = { ' ', '\r', '\t', '\u0000', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse624() throws Exception {
+    char[] carg0 = { ' ', '\r', '\t', '(', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse625() throws Exception {
+    char[] carg0 = { ' ', '\r', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse626() throws Exception {
+    char[] carg0 = { ' ', '\r', '\n', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse627() throws Exception {
+    char[] carg0 = { ' ', '\r', '\n', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse628() throws Exception {
+    char[] carg0 = { ' ', '\r', '\n', '\t', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse629() throws Exception {
+    char[] carg0 = { ' ', '\r', '\n', '\t', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse630() throws Exception {
+    char[] carg0 = { ' ', '\r', '\n', '\t', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse631() throws Exception {
+    char[] carg0 = { ' ', '\r', '\n', '\t', '\u0000', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse632() throws Exception {
+    char[] carg0 = { ' ', '\r', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse633() throws Exception {
+    char[] carg0 = { ' ', '\r', '\n', '\n', '\t', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse634() throws Exception {
+    char[] carg0 = { ' ', '\r', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse635() throws Exception {
+    char[] carg0 = { ' ', '\r', '\n', '\n', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse636() throws Exception {
+    char[] carg0 = { ' ', '\r', '\n', '\n', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse637() throws Exception {
+    char[] carg0 = { ' ', '\r', '\n', '\n', '\u0000', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse638() throws Exception {
+    char[] carg0 = { ' ', '\r', '\n', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse639() throws Exception {
+    char[] carg0 = { ' ', '\r', '\n', '\r', '\t', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse640() throws Exception {
+    char[] carg0 = { ' ', '\r', '\n', '\r', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse641() throws Exception {
+    char[] carg0 = { ' ', '\r', '\n', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse642() throws Exception {
+    char[] carg0 = { ' ', '\r', '\n', '\r', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse643() throws Exception {
+    char[] carg0 = { ' ', '\r', '\n', '\r', '\u0000', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse644() throws Exception {
+    char[] carg0 = { ' ', '\r', '\n', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse645() throws Exception {
+    char[] carg0 = { ' ', '\r', '\n', ' ', '\t', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse646() throws Exception {
+    char[] carg0 = { ' ', '\r', '\n', ' ', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse647() throws Exception {
+    char[] carg0 = { ' ', '\r', '\n', ' ', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse648() throws Exception {
+    char[] carg0 = { ' ', '\r', '\n', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse649() throws Exception {
+    char[] carg0 = { ' ', '\r', '\n', ' ', '\u0000', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse650() throws Exception {
+    char[] carg0 = { ' ', '\r', '\n', '\u0000', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse651() throws Exception {
+    char[] carg0 = { ' ', '\r', '\n', '(', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse652() throws Exception {
+    char[] carg0 = { ' ', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse653() throws Exception {
+    char[] carg0 = { ' ', '\r', '\r', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse654() throws Exception {
+    char[] carg0 = { ' ', '\r', '\r', '\t', '\t', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse655() throws Exception {
+    char[] carg0 = { ' ', '\r', '\r', '\t', '\n', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse656() throws Exception {
+    char[] carg0 = { ' ', '\r', '\r', '\t', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse657() throws Exception {
+    char[] carg0 = { ' ', '\r', '\r', '\t', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse658() throws Exception {
+    char[] carg0 = { ' ', '\r', '\r', '\t', '\u0000', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse659() throws Exception {
+    char[] carg0 = { ' ', '\r', '\r', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse660() throws Exception {
+    char[] carg0 = { ' ', '\r', '\r', '\n', '\t', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse661() throws Exception {
+    char[] carg0 = { ' ', '\r', '\r', '\n', '\n', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse662() throws Exception {
+    char[] carg0 = { ' ', '\r', '\r', '\n', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse663() throws Exception {
+    char[] carg0 = { ' ', '\r', '\r', '\n', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse664() throws Exception {
+    char[] carg0 = { ' ', '\r', '\r', '\n', '\u0000', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse665() throws Exception {
+    char[] carg0 = { ' ', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse666() throws Exception {
+    char[] carg0 = { ' ', '\r', '\r', '\r', '\t', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse667() throws Exception {
+    char[] carg0 = { ' ', '\r', '\r', '\r', '\n', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse668() throws Exception {
+    char[] carg0 = { ' ', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse669() throws Exception {
+    char[] carg0 = { ' ', '\r', '\r', '\r', ' ', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse670() throws Exception {
+    char[] carg0 = { ' ', '\r', '\r', '\r', '\u0000', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse671() throws Exception {
+    char[] carg0 = { ' ', '\r', '\r', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse672() throws Exception {
+    char[] carg0 = { ' ', '\r', '\r', ' ', '\t', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse673() throws Exception {
+    char[] carg0 = { ' ', '\r', '\r', ' ', '\n', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse674() throws Exception {
+    char[] carg0 = { ' ', '\r', '\r', ' ', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse675() throws Exception {
+    char[] carg0 = { ' ', '\r', '\r', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse676() throws Exception {
+    char[] carg0 = { ' ', '\r', '\r', ' ', '\u0000', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse677() throws Exception {
+    char[] carg0 = { ' ', '\r', '\r', '\u0000', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse678() throws Exception {
+    char[] carg0 = { ' ', '\r', '\r', '(', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse679() throws Exception {
+    char[] carg0 = { ' ', '\r', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse680() throws Exception {
+    char[] carg0 = { ' ', '\r', ' ', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse681() throws Exception {
+    char[] carg0 = { ' ', '\r', ' ', '\t', '\t', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse682() throws Exception {
+    char[] carg0 = { ' ', '\r', ' ', '\t', '\n', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse683() throws Exception {
+    char[] carg0 = { ' ', '\r', ' ', '\t', '\r', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse684() throws Exception {
+    char[] carg0 = { ' ', '\r', ' ', '\t', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse685() throws Exception {
+    char[] carg0 = { ' ', '\r', ' ', '\t', '\u0000', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse686() throws Exception {
+    char[] carg0 = { ' ', '\r', ' ', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse687() throws Exception {
+    char[] carg0 = { ' ', '\r', ' ', '\n', '\t', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse688() throws Exception {
+    char[] carg0 = { ' ', '\r', ' ', '\n', '\n', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse689() throws Exception {
+    char[] carg0 = { ' ', '\r', ' ', '\n', '\r', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse690() throws Exception {
+    char[] carg0 = { ' ', '\r', ' ', '\n', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse691() throws Exception {
+    char[] carg0 = { ' ', '\r', ' ', '\n', '\u0000', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse692() throws Exception {
+    char[] carg0 = { ' ', '\r', ' ', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse693() throws Exception {
+    char[] carg0 = { ' ', '\r', ' ', '\r', '\t', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse694() throws Exception {
+    char[] carg0 = { ' ', '\r', ' ', '\r', '\n', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse695() throws Exception {
+    char[] carg0 = { ' ', '\r', ' ', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse696() throws Exception {
+    char[] carg0 = { ' ', '\r', ' ', '\r', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse697() throws Exception {
+    char[] carg0 = { ' ', '\r', ' ', '\r', '\u0000', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse698() throws Exception {
+    char[] carg0 = { ' ', '\r', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse699() throws Exception {
+    char[] carg0 = { ' ', '\r', ' ', ' ', '\t', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse700() throws Exception {
+    char[] carg0 = { ' ', '\r', ' ', ' ', '\n', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse701() throws Exception {
+    char[] carg0 = { ' ', '\r', ' ', ' ', '\r', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse702() throws Exception {
+    char[] carg0 = { ' ', '\r', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse703() throws Exception {
+    char[] carg0 = { ' ', '\r', ' ', ' ', '\u0000', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse704() throws Exception {
+    char[] carg0 = { ' ', '\r', ' ', '\u0000', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse705() throws Exception {
+    char[] carg0 = { ' ', '\r', ' ', '(', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse706() throws Exception {
+    char[] carg0 = { ' ', '\r', '\u0000' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse707() throws Exception {
+    char[] carg0 = { ' ', '\r', ':' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse708() throws Exception {
+    char[] carg0 = { ' ', '\r', '2' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    int retval = cut.parse();
+
+    int expected = 2;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testParse709() throws Exception {
+    char[] carg0 = { ' ', '\r', '(' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse710() throws Exception {
+    char[] carg0 = { ' ', '\r', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse711() throws Exception {
+    char[] carg0 = { ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse712() throws Exception {
+    char[] carg0 = { ' ', ' ', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse713() throws Exception {
+    char[] carg0 = { ' ', ' ', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse714() throws Exception {
+    char[] carg0 = { ' ', ' ', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse715() throws Exception {
+    char[] carg0 = { ' ', ' ', '\t', '\t', '\n', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse716() throws Exception {
+    char[] carg0 = { ' ', ' ', '\t', '\t', '\r', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse717() throws Exception {
+    char[] carg0 = { ' ', ' ', '\t', '\t', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse718() throws Exception {
+    char[] carg0 = { ' ', ' ', '\t', '\t', '\u0000', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse719() throws Exception {
+    char[] carg0 = { ' ', ' ', '\t', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse720() throws Exception {
+    char[] carg0 = { ' ', ' ', '\t', '\n', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse721() throws Exception {
+    char[] carg0 = { ' ', ' ', '\t', '\n', '\n', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse722() throws Exception {
+    char[] carg0 = { ' ', ' ', '\t', '\n', '\r', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse723() throws Exception {
+    char[] carg0 = { ' ', ' ', '\t', '\n', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse724() throws Exception {
+    char[] carg0 = { ' ', ' ', '\t', '\n', '\u0000', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse725() throws Exception {
+    char[] carg0 = { ' ', ' ', '\t', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse726() throws Exception {
+    char[] carg0 = { ' ', ' ', '\t', '\r', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse727() throws Exception {
+    char[] carg0 = { ' ', ' ', '\t', '\r', '\n', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse728() throws Exception {
+    char[] carg0 = { ' ', ' ', '\t', '\r', '\r', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse729() throws Exception {
+    char[] carg0 = { ' ', ' ', '\t', '\r', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse730() throws Exception {
+    char[] carg0 = { ' ', ' ', '\t', '\r', '\u0000', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse731() throws Exception {
+    char[] carg0 = { ' ', ' ', '\t', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse732() throws Exception {
+    char[] carg0 = { ' ', ' ', '\t', ' ', '\t', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse733() throws Exception {
+    char[] carg0 = { ' ', ' ', '\t', ' ', '\n', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse734() throws Exception {
+    char[] carg0 = { ' ', ' ', '\t', ' ', '\r', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse735() throws Exception {
+    char[] carg0 = { ' ', ' ', '\t', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse736() throws Exception {
+    char[] carg0 = { ' ', ' ', '\t', ' ', '\u0000', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse737() throws Exception {
+    char[] carg0 = { ' ', ' ', '\t', '\u0000', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse738() throws Exception {
+    char[] carg0 = { ' ', ' ', '\t', '(', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse739() throws Exception {
+    char[] carg0 = { ' ', ' ', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse740() throws Exception {
+    char[] carg0 = { ' ', ' ', '\n', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse741() throws Exception {
+    char[] carg0 = { ' ', ' ', '\n', '\t', '\t', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse742() throws Exception {
+    char[] carg0 = { ' ', ' ', '\n', '\t', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse743() throws Exception {
+    char[] carg0 = { ' ', ' ', '\n', '\t', '\r', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse744() throws Exception {
+    char[] carg0 = { ' ', ' ', '\n', '\t', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse745() throws Exception {
+    char[] carg0 = { ' ', ' ', '\n', '\t', '\u0000', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse746() throws Exception {
+    char[] carg0 = { ' ', ' ', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse747() throws Exception {
+    char[] carg0 = { ' ', ' ', '\n', '\n', '\t', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse748() throws Exception {
+    char[] carg0 = { ' ', ' ', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse749() throws Exception {
+    char[] carg0 = { ' ', ' ', '\n', '\n', '\r', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse750() throws Exception {
+    char[] carg0 = { ' ', ' ', '\n', '\n', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse751() throws Exception {
+    char[] carg0 = { ' ', ' ', '\n', '\n', '\u0000', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse752() throws Exception {
+    char[] carg0 = { ' ', ' ', '\n', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse753() throws Exception {
+    char[] carg0 = { ' ', ' ', '\n', '\r', '\t', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse754() throws Exception {
+    char[] carg0 = { ' ', ' ', '\n', '\r', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse755() throws Exception {
+    char[] carg0 = { ' ', ' ', '\n', '\r', '\r', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse756() throws Exception {
+    char[] carg0 = { ' ', ' ', '\n', '\r', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse757() throws Exception {
+    char[] carg0 = { ' ', ' ', '\n', '\r', '\u0000', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse758() throws Exception {
+    char[] carg0 = { ' ', ' ', '\n', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse759() throws Exception {
+    char[] carg0 = { ' ', ' ', '\n', ' ', '\t', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse760() throws Exception {
+    char[] carg0 = { ' ', ' ', '\n', ' ', '\n', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse761() throws Exception {
+    char[] carg0 = { ' ', ' ', '\n', ' ', '\r', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse762() throws Exception {
+    char[] carg0 = { ' ', ' ', '\n', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse763() throws Exception {
+    char[] carg0 = { ' ', ' ', '\n', ' ', '\u0000', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse764() throws Exception {
+    char[] carg0 = { ' ', ' ', '\n', '\u0000', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse765() throws Exception {
+    char[] carg0 = { ' ', ' ', '\n', '(', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse766() throws Exception {
+    char[] carg0 = { ' ', ' ', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse767() throws Exception {
+    char[] carg0 = { ' ', ' ', '\r', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse768() throws Exception {
+    char[] carg0 = { ' ', ' ', '\r', '\t', '\t', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse769() throws Exception {
+    char[] carg0 = { ' ', ' ', '\r', '\t', '\n', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse770() throws Exception {
+    char[] carg0 = { ' ', ' ', '\r', '\t', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse771() throws Exception {
+    char[] carg0 = { ' ', ' ', '\r', '\t', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse772() throws Exception {
+    char[] carg0 = { ' ', ' ', '\r', '\t', '\u0000', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse773() throws Exception {
+    char[] carg0 = { ' ', ' ', '\r', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse774() throws Exception {
+    char[] carg0 = { ' ', ' ', '\r', '\n', '\t', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse775() throws Exception {
+    char[] carg0 = { ' ', ' ', '\r', '\n', '\n', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse776() throws Exception {
+    char[] carg0 = { ' ', ' ', '\r', '\n', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse777() throws Exception {
+    char[] carg0 = { ' ', ' ', '\r', '\n', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse778() throws Exception {
+    char[] carg0 = { ' ', ' ', '\r', '\n', '\u0000', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse779() throws Exception {
+    char[] carg0 = { ' ', ' ', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse780() throws Exception {
+    char[] carg0 = { ' ', ' ', '\r', '\r', '\t', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse781() throws Exception {
+    char[] carg0 = { ' ', ' ', '\r', '\r', '\n', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse782() throws Exception {
+    char[] carg0 = { ' ', ' ', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse783() throws Exception {
+    char[] carg0 = { ' ', ' ', '\r', '\r', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse784() throws Exception {
+    char[] carg0 = { ' ', ' ', '\r', '\r', '\u0000', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse785() throws Exception {
+    char[] carg0 = { ' ', ' ', '\r', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse786() throws Exception {
+    char[] carg0 = { ' ', ' ', '\r', ' ', '\t', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse787() throws Exception {
+    char[] carg0 = { ' ', ' ', '\r', ' ', '\n', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse788() throws Exception {
+    char[] carg0 = { ' ', ' ', '\r', ' ', '\r', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse789() throws Exception {
+    char[] carg0 = { ' ', ' ', '\r', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse790() throws Exception {
+    char[] carg0 = { ' ', ' ', '\r', ' ', '\u0000', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse791() throws Exception {
+    char[] carg0 = { ' ', ' ', '\r', '\u0000', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse792() throws Exception {
+    char[] carg0 = { ' ', ' ', '\r', '(', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse793() throws Exception {
+    char[] carg0 = { ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse794() throws Exception {
+    char[] carg0 = { ' ', ' ', ' ', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse795() throws Exception {
+    char[] carg0 = { ' ', ' ', ' ', '\t', '\t', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse796() throws Exception {
+    char[] carg0 = { ' ', ' ', ' ', '\t', '\n', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse797() throws Exception {
+    char[] carg0 = { ' ', ' ', ' ', '\t', '\r', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse798() throws Exception {
+    char[] carg0 = { ' ', ' ', ' ', '\t', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse799() throws Exception {
+    char[] carg0 = { ' ', ' ', ' ', '\t', '\u0000', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse800() throws Exception {
+    char[] carg0 = { ' ', ' ', ' ', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse801() throws Exception {
+    char[] carg0 = { ' ', ' ', ' ', '\n', '\t', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse802() throws Exception {
+    char[] carg0 = { ' ', ' ', ' ', '\n', '\n', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse803() throws Exception {
+    char[] carg0 = { ' ', ' ', ' ', '\n', '\r', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse804() throws Exception {
+    char[] carg0 = { ' ', ' ', ' ', '\n', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse805() throws Exception {
+    char[] carg0 = { ' ', ' ', ' ', '\n', '\u0000', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse806() throws Exception {
+    char[] carg0 = { ' ', ' ', ' ', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse807() throws Exception {
+    char[] carg0 = { ' ', ' ', ' ', '\r', '\t', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse808() throws Exception {
+    char[] carg0 = { ' ', ' ', ' ', '\r', '\n', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse809() throws Exception {
+    char[] carg0 = { ' ', ' ', ' ', '\r', '\r', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse810() throws Exception {
+    char[] carg0 = { ' ', ' ', ' ', '\r', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse811() throws Exception {
+    char[] carg0 = { ' ', ' ', ' ', '\r', '\u0000', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse812() throws Exception {
+    char[] carg0 = { ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse813() throws Exception {
+    char[] carg0 = { ' ', ' ', ' ', ' ', '\t', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse814() throws Exception {
+    char[] carg0 = { ' ', ' ', ' ', ' ', '\n', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse815() throws Exception {
+    char[] carg0 = { ' ', ' ', ' ', ' ', '\r', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse816() throws Exception {
+    char[] carg0 = { ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse817() throws Exception {
+    char[] carg0 = { ' ', ' ', ' ', ' ', '\u0000', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse818() throws Exception {
+    char[] carg0 = { ' ', ' ', ' ', '\u0000', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse819() throws Exception {
+    char[] carg0 = { ' ', ' ', ' ', '(', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse820() throws Exception {
+    char[] carg0 = { ' ', ' ', '\u0000' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse821() throws Exception {
+    char[] carg0 = { ' ', ' ', ':' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse822() throws Exception {
+    char[] carg0 = { ' ', ' ', '2' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    int retval = cut.parse();
+
+    int expected = 2;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testParse823() throws Exception {
+    char[] carg0 = { ' ', ' ', '(' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse824() throws Exception {
+    char[] carg0 = { ' ', ' ', '(', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse825() throws Exception {
+    char[] carg0 = { ' ', '\u0000' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse826() throws Exception {
+    char[] carg0 = { ' ', ':' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse827() throws Exception {
+    char[] carg0 = { ' ', '2' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    int retval = cut.parse();
+
+    int expected = 2;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testParse828() throws Exception {
+    char[] carg0 = { ' ', '2', '\u0000' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse829() throws Exception {
+    char[] carg0 = { ' ', '2', ':' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse830() throws Exception {
+    char[] carg0 = { ' ', '2', '2' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    int retval = cut.parse();
+
+    int expected = 22;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testParse831() throws Exception {
+    char[] carg0 = { ' ', '(' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse832() throws Exception {
+    char[] carg0 = { ' ', '(', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse833() throws Exception {
+    char[] carg0 = { ' ', '(', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse834() throws Exception {
+    char[] carg0 = { ' ', '(', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse835() throws Exception {
+    char[] carg0 = { ' ', '(', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse836() throws Exception {
+    char[] carg0 = { ' ', '(', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse837() throws Exception {
+    char[] carg0 = { ' ', '(', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse838() throws Exception {
+    char[] carg0 = { ' ', '(', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse839() throws Exception {
+    char[] carg0 = { ' ', '(', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse840() throws Exception {
+    char[] carg0 = { ' ', '(', '\u0000' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse841() throws Exception {
+    char[] carg0 = { ' ', '(', '(' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse842() throws Exception {
+    char[] carg0 = { '\u0000' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse843() throws Exception {
+    char[] carg0 = { ':' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse844() throws Exception {
     char[] carg0 = { '2' };
     ExprEvaluator cut = new ExprEvaluator(carg0);
 
@@ -541,135 +6801,7 @@ public class ExprEvaluatorTest {
   }
 
   @Test
-  public void testParse67() throws Exception {
-    char[] carg0 = { '(', '\t', '\t' };
-    ExprEvaluator cut = new ExprEvaluator(carg0);
-
-    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
-  }
-
-  @Test
-  public void testParse68() throws Exception {
-    char[] carg0 = { '(', '\t', '\n' };
-    ExprEvaluator cut = new ExprEvaluator(carg0);
-
-    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
-  }
-
-  @Test
-  public void testParse69() throws Exception {
-    char[] carg0 = { '(', '\t', '\r' };
-    ExprEvaluator cut = new ExprEvaluator(carg0);
-
-    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
-  }
-
-  @Test
-  public void testParse70() throws Exception {
-    char[] carg0 = { '(', '\t', ' ' };
-    ExprEvaluator cut = new ExprEvaluator(carg0);
-
-    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
-  }
-
-  @Test
-  public void testParse71() throws Exception {
-    char[] carg0 = { '(', '\n', '\t' };
-    ExprEvaluator cut = new ExprEvaluator(carg0);
-
-    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
-  }
-
-  @Test
-  public void testParse72() throws Exception {
-    char[] carg0 = { '(', '\n', '\n' };
-    ExprEvaluator cut = new ExprEvaluator(carg0);
-
-    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
-  }
-
-  @Test
-  public void testParse73() throws Exception {
-    char[] carg0 = { '(', '\n', '\r' };
-    ExprEvaluator cut = new ExprEvaluator(carg0);
-
-    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
-  }
-
-  @Test
-  public void testParse74() throws Exception {
-    char[] carg0 = { '(', '\n', ' ' };
-    ExprEvaluator cut = new ExprEvaluator(carg0);
-
-    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
-  }
-
-  @Test
-  public void testParse75() throws Exception {
-    char[] carg0 = { '(', '\r', '\t' };
-    ExprEvaluator cut = new ExprEvaluator(carg0);
-
-    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
-  }
-
-  @Test
-  public void testParse76() throws Exception {
-    char[] carg0 = { '(', '\r', '\n' };
-    ExprEvaluator cut = new ExprEvaluator(carg0);
-
-    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
-  }
-
-  @Test
-  public void testParse77() throws Exception {
-    char[] carg0 = { '(', '\r', '\r' };
-    ExprEvaluator cut = new ExprEvaluator(carg0);
-
-    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
-  }
-
-  @Test
-  public void testParse78() throws Exception {
-    char[] carg0 = { '(', '\r', ' ' };
-    ExprEvaluator cut = new ExprEvaluator(carg0);
-
-    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
-  }
-
-  @Test
-  public void testParse79() throws Exception {
-    char[] carg0 = { '(', ' ', '\t' };
-    ExprEvaluator cut = new ExprEvaluator(carg0);
-
-    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
-  }
-
-  @Test
-  public void testParse80() throws Exception {
-    char[] carg0 = { '(', ' ', '\n' };
-    ExprEvaluator cut = new ExprEvaluator(carg0);
-
-    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
-  }
-
-  @Test
-  public void testParse81() throws Exception {
-    char[] carg0 = { '(', ' ', '\r' };
-    ExprEvaluator cut = new ExprEvaluator(carg0);
-
-    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
-  }
-
-  @Test
-  public void testParse82() throws Exception {
-    char[] carg0 = { '(', ' ', ' ' };
-    ExprEvaluator cut = new ExprEvaluator(carg0);
-
-    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
-  }
-
-  @Test
-  public void testParse83() throws Exception {
+  public void testParse845() throws Exception {
     char[] carg0 = { '2', '\u0000' };
     ExprEvaluator cut = new ExprEvaluator(carg0);
 
@@ -677,135 +6809,7 @@ public class ExprEvaluatorTest {
   }
 
   @Test
-  public void testParse84() throws Exception {
-    char[] carg0 = { '(', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
-    ExprEvaluator cut = new ExprEvaluator(carg0);
-
-    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
-  }
-
-  @Test
-  public void testParse85() throws Exception {
-    char[] carg0 = { '(', '\t', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
-    ExprEvaluator cut = new ExprEvaluator(carg0);
-
-    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
-  }
-
-  @Test
-  public void testParse86() throws Exception {
-    char[] carg0 = { '(', '\t', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
-    ExprEvaluator cut = new ExprEvaluator(carg0);
-
-    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
-  }
-
-  @Test
-  public void testParse87() throws Exception {
-    char[] carg0 = { '(', '\t', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
-    ExprEvaluator cut = new ExprEvaluator(carg0);
-
-    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
-  }
-
-  @Test
-  public void testParse88() throws Exception {
-    char[] carg0 = { '(', '\n', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
-    ExprEvaluator cut = new ExprEvaluator(carg0);
-
-    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
-  }
-
-  @Test
-  public void testParse89() throws Exception {
-    char[] carg0 = { '(', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
-    ExprEvaluator cut = new ExprEvaluator(carg0);
-
-    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
-  }
-
-  @Test
-  public void testParse90() throws Exception {
-    char[] carg0 = { '(', '\n', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
-    ExprEvaluator cut = new ExprEvaluator(carg0);
-
-    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
-  }
-
-  @Test
-  public void testParse91() throws Exception {
-    char[] carg0 = { '(', '\n', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
-    ExprEvaluator cut = new ExprEvaluator(carg0);
-
-    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
-  }
-
-  @Test
-  public void testParse92() throws Exception {
-    char[] carg0 = { '(', '\r', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
-    ExprEvaluator cut = new ExprEvaluator(carg0);
-
-    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
-  }
-
-  @Test
-  public void testParse93() throws Exception {
-    char[] carg0 = { '(', '\r', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
-    ExprEvaluator cut = new ExprEvaluator(carg0);
-
-    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
-  }
-
-  @Test
-  public void testParse94() throws Exception {
-    char[] carg0 = { '(', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
-    ExprEvaluator cut = new ExprEvaluator(carg0);
-
-    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
-  }
-
-  @Test
-  public void testParse95() throws Exception {
-    char[] carg0 = { '(', '\r', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
-    ExprEvaluator cut = new ExprEvaluator(carg0);
-
-    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
-  }
-
-  @Test
-  public void testParse96() throws Exception {
-    char[] carg0 = { '(', ' ', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
-    ExprEvaluator cut = new ExprEvaluator(carg0);
-
-    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
-  }
-
-  @Test
-  public void testParse97() throws Exception {
-    char[] carg0 = { '(', ' ', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
-    ExprEvaluator cut = new ExprEvaluator(carg0);
-
-    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
-  }
-
-  @Test
-  public void testParse98() throws Exception {
-    char[] carg0 = { '(', ' ', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
-    ExprEvaluator cut = new ExprEvaluator(carg0);
-
-    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
-  }
-
-  @Test
-  public void testParse99() throws Exception {
-    char[] carg0 = { '(', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
-    ExprEvaluator cut = new ExprEvaluator(carg0);
-
-    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
-  }
-
-  @Test
-  public void testParse100() throws Exception {
+  public void testParse846() throws Exception {
     char[] carg0 = { '2', '<' };
     ExprEvaluator cut = new ExprEvaluator(carg0);
 
@@ -813,7 +6817,7 @@ public class ExprEvaluatorTest {
   }
 
   @Test
-  public void testParse101() throws Exception {
+  public void testParse847() throws Exception {
     char[] carg0 = { '2', '2' };
     ExprEvaluator cut = new ExprEvaluator(carg0);
 
@@ -824,7 +6828,23 @@ public class ExprEvaluatorTest {
   }
 
   @Test
-  public void testParse102() throws Exception {
+  public void testParse848() throws Exception {
+    char[] carg0 = { '2', '2', '\u0000' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse849() throws Exception {
+    char[] carg0 = { '2', '2', ':' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse850() throws Exception {
     char[] carg0 = { '2', '2', '2' };
     ExprEvaluator cut = new ExprEvaluator(carg0);
 
@@ -835,23 +6855,7 @@ public class ExprEvaluatorTest {
   }
 
   @Test
-  public void testParse103() throws Exception {
-    char[] carg0 = { '\u0000' };
-    ExprEvaluator cut = new ExprEvaluator(carg0);
-
-    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
-  }
-
-  @Test
-  public void testParse104() throws Exception {
-    char[] carg0 = { ':' };
-    ExprEvaluator cut = new ExprEvaluator(carg0);
-
-    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
-  }
-
-  @Test
-  public void testParse105() throws Exception {
+  public void testParse851() throws Exception {
     char[] carg0 = { '(' };
     ExprEvaluator cut = new ExprEvaluator(carg0);
 
@@ -859,7 +6863,7 @@ public class ExprEvaluatorTest {
   }
 
   @Test
-  public void testParse106() throws Exception {
+  public void testParse852() throws Exception {
     char[] carg0 = { '(', '\t' };
     ExprEvaluator cut = new ExprEvaluator(carg0);
 
@@ -867,7 +6871,71 @@ public class ExprEvaluatorTest {
   }
 
   @Test
-  public void testParse107() throws Exception {
+  public void testParse853() throws Exception {
+    char[] carg0 = { '(', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse854() throws Exception {
+    char[] carg0 = { '(', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse855() throws Exception {
+    char[] carg0 = { '(', '\t', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse856() throws Exception {
+    char[] carg0 = { '(', '\t', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse857() throws Exception {
+    char[] carg0 = { '(', '\t', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse858() throws Exception {
+    char[] carg0 = { '(', '\t', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse859() throws Exception {
+    char[] carg0 = { '(', '\t', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse860() throws Exception {
+    char[] carg0 = { '(', '\t', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse861() throws Exception {
     char[] carg0 = { '(', '\t', '\u0000' };
     ExprEvaluator cut = new ExprEvaluator(carg0);
 
@@ -875,7 +6943,7 @@ public class ExprEvaluatorTest {
   }
 
   @Test
-  public void testParse108() throws Exception {
+  public void testParse862() throws Exception {
     char[] carg0 = { '(', '\t', '(' };
     ExprEvaluator cut = new ExprEvaluator(carg0);
 
@@ -883,7 +6951,7 @@ public class ExprEvaluatorTest {
   }
 
   @Test
-  public void testParse109() throws Exception {
+  public void testParse863() throws Exception {
     char[] carg0 = { '(', '\n' };
     ExprEvaluator cut = new ExprEvaluator(carg0);
 
@@ -891,7 +6959,71 @@ public class ExprEvaluatorTest {
   }
 
   @Test
-  public void testParse110() throws Exception {
+  public void testParse864() throws Exception {
+    char[] carg0 = { '(', '\n', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse865() throws Exception {
+    char[] carg0 = { '(', '\n', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse866() throws Exception {
+    char[] carg0 = { '(', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse867() throws Exception {
+    char[] carg0 = { '(', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse868() throws Exception {
+    char[] carg0 = { '(', '\n', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse869() throws Exception {
+    char[] carg0 = { '(', '\n', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse870() throws Exception {
+    char[] carg0 = { '(', '\n', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse871() throws Exception {
+    char[] carg0 = { '(', '\n', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse872() throws Exception {
     char[] carg0 = { '(', '\n', '\u0000' };
     ExprEvaluator cut = new ExprEvaluator(carg0);
 
@@ -899,7 +7031,7 @@ public class ExprEvaluatorTest {
   }
 
   @Test
-  public void testParse111() throws Exception {
+  public void testParse873() throws Exception {
     char[] carg0 = { '(', '\n', '(' };
     ExprEvaluator cut = new ExprEvaluator(carg0);
 
@@ -907,7 +7039,7 @@ public class ExprEvaluatorTest {
   }
 
   @Test
-  public void testParse112() throws Exception {
+  public void testParse874() throws Exception {
     char[] carg0 = { '(', '\r' };
     ExprEvaluator cut = new ExprEvaluator(carg0);
 
@@ -915,7 +7047,71 @@ public class ExprEvaluatorTest {
   }
 
   @Test
-  public void testParse113() throws Exception {
+  public void testParse875() throws Exception {
+    char[] carg0 = { '(', '\r', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse876() throws Exception {
+    char[] carg0 = { '(', '\r', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse877() throws Exception {
+    char[] carg0 = { '(', '\r', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse878() throws Exception {
+    char[] carg0 = { '(', '\r', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse879() throws Exception {
+    char[] carg0 = { '(', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse880() throws Exception {
+    char[] carg0 = { '(', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse881() throws Exception {
+    char[] carg0 = { '(', '\r', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse882() throws Exception {
+    char[] carg0 = { '(', '\r', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse883() throws Exception {
     char[] carg0 = { '(', '\r', '\u0000' };
     ExprEvaluator cut = new ExprEvaluator(carg0);
 
@@ -923,7 +7119,7 @@ public class ExprEvaluatorTest {
   }
 
   @Test
-  public void testParse114() throws Exception {
+  public void testParse884() throws Exception {
     char[] carg0 = { '(', '\r', '(' };
     ExprEvaluator cut = new ExprEvaluator(carg0);
 
@@ -931,7 +7127,7 @@ public class ExprEvaluatorTest {
   }
 
   @Test
-  public void testParse115() throws Exception {
+  public void testParse885() throws Exception {
     char[] carg0 = { '(', ' ' };
     ExprEvaluator cut = new ExprEvaluator(carg0);
 
@@ -939,7 +7135,71 @@ public class ExprEvaluatorTest {
   }
 
   @Test
-  public void testParse116() throws Exception {
+  public void testParse886() throws Exception {
+    char[] carg0 = { '(', ' ', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse887() throws Exception {
+    char[] carg0 = { '(', ' ', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse888() throws Exception {
+    char[] carg0 = { '(', ' ', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse889() throws Exception {
+    char[] carg0 = { '(', ' ', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse890() throws Exception {
+    char[] carg0 = { '(', ' ', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse891() throws Exception {
+    char[] carg0 = { '(', ' ', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse892() throws Exception {
+    char[] carg0 = { '(', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse893() throws Exception {
+    char[] carg0 = { '(', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse894() throws Exception {
     char[] carg0 = { '(', ' ', '\u0000' };
     ExprEvaluator cut = new ExprEvaluator(carg0);
 
@@ -947,7 +7207,7 @@ public class ExprEvaluatorTest {
   }
 
   @Test
-  public void testParse117() throws Exception {
+  public void testParse895() throws Exception {
     char[] carg0 = { '(', ' ', '(' };
     ExprEvaluator cut = new ExprEvaluator(carg0);
 
@@ -955,7 +7215,7 @@ public class ExprEvaluatorTest {
   }
 
   @Test
-  public void testParse118() throws Exception {
+  public void testParse896() throws Exception {
     char[] carg0 = { '(', '\u0000' };
     ExprEvaluator cut = new ExprEvaluator(carg0);
 
@@ -963,7 +7223,7 @@ public class ExprEvaluatorTest {
   }
 
   @Test
-  public void testParse119() throws Exception {
+  public void testParse897() throws Exception {
     char[] carg0 = { '(', ':' };
     ExprEvaluator cut = new ExprEvaluator(carg0);
 
@@ -971,7 +7231,7 @@ public class ExprEvaluatorTest {
   }
 
   @Test
-  public void testParse120() throws Exception {
+  public void testParse898() throws Exception {
     char[] carg0 = { '(', '2' };
     ExprEvaluator cut = new ExprEvaluator(carg0);
 
@@ -979,15 +7239,7 @@ public class ExprEvaluatorTest {
   }
 
   @Test
-  public void testParse121() throws Exception {
-    char[] carg0 = { '(', '2', '(' };
-    ExprEvaluator cut = new ExprEvaluator(carg0);
-
-    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
-  }
-
-  @Test
-  public void testParse122() throws Exception {
+  public void testParse899() throws Exception {
     char[] carg0 = { '(', '(' };
     ExprEvaluator cut = new ExprEvaluator(carg0);
 
@@ -995,48 +7247,6712 @@ public class ExprEvaluatorTest {
   }
 
   @Test
-  public void testParse123() throws Exception {
-    char[] carg0 = { '(', '(', '\t' };
+  public void testParse900() throws Exception {
+    char[] carg0 = { '(', '(', '(' };
     ExprEvaluator cut = new ExprEvaluator(carg0);
 
     Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
   }
 
   @Test
-  public void testParse124() throws Exception {
-    char[] carg0 = { '(', '(', '\n' };
-    ExprEvaluator cut = new ExprEvaluator(carg0);
-
-    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
-  }
-
-  @Test
-  public void testParse125() throws Exception {
-    char[] carg0 = { '(', '(', '\r' };
-    ExprEvaluator cut = new ExprEvaluator(carg0);
-
-    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
-  }
-
-  @Test
-  public void testParse126() throws Exception {
-    char[] carg0 = { '(', '(', ' ' };
-    ExprEvaluator cut = new ExprEvaluator(carg0);
-
-    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
-  }
-
-  @Test
-  public void testParse127() throws Exception {
-    char[] carg0 = { '(', '(', '\u0000' };
-    ExprEvaluator cut = new ExprEvaluator(carg0);
-
-    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
-  }
-
-  @Test
-  public void testParse128() throws Exception {
+  public void testParse901() throws Exception {
     char[] carg0 = {};
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse902() throws Exception {
+    char[] carg0 = { '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse903() throws Exception {
+    char[] carg0 = { '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse904() throws Exception {
+    char[] carg0 = { '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse905() throws Exception {
+    char[] carg0 = { '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse906() throws Exception {
+    char[] carg0 = { '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse907() throws Exception {
+    char[] carg0 = { '\t', '\t', '\t', '\t', '\n', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse908() throws Exception {
+    char[] carg0 = { '\t', '\t', '\t', '\t', '\r', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse909() throws Exception {
+    char[] carg0 = { '\t', '\t', '\t', '\t', ' ', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse910() throws Exception {
+    char[] carg0 = { '\t', '\t', '\t', '\t', '\u0000', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse911() throws Exception {
+    char[] carg0 = { '\t', '\t', '\t', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse912() throws Exception {
+    char[] carg0 = { '\t', '\t', '\t', '\n', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse913() throws Exception {
+    char[] carg0 = { '\t', '\t', '\t', '\n', '\n', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse914() throws Exception {
+    char[] carg0 = { '\t', '\t', '\t', '\n', '\r', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse915() throws Exception {
+    char[] carg0 = { '\t', '\t', '\t', '\n', ' ', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse916() throws Exception {
+    char[] carg0 = { '\t', '\t', '\t', '\n', '\u0000', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse917() throws Exception {
+    char[] carg0 = { '\t', '\t', '\t', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse918() throws Exception {
+    char[] carg0 = { '\t', '\t', '\t', '\r', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse919() throws Exception {
+    char[] carg0 = { '\t', '\t', '\t', '\r', '\n', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse920() throws Exception {
+    char[] carg0 = { '\t', '\t', '\t', '\r', '\r', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse921() throws Exception {
+    char[] carg0 = { '\t', '\t', '\t', '\r', ' ', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse922() throws Exception {
+    char[] carg0 = { '\t', '\t', '\t', '\r', '\u0000', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse923() throws Exception {
+    char[] carg0 = { '\t', '\t', '\t', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse924() throws Exception {
+    char[] carg0 = { '\t', '\t', '\t', ' ', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse925() throws Exception {
+    char[] carg0 = { '\t', '\t', '\t', ' ', '\n', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse926() throws Exception {
+    char[] carg0 = { '\t', '\t', '\t', ' ', '\r', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse927() throws Exception {
+    char[] carg0 = { '\t', '\t', '\t', ' ', ' ', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse928() throws Exception {
+    char[] carg0 = { '\t', '\t', '\t', ' ', '\u0000', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse929() throws Exception {
+    char[] carg0 = { '\t', '\t', '\t', '\u0000', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse930() throws Exception {
+    char[] carg0 = { '\t', '\t', '\t', '(', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse931() throws Exception {
+    char[] carg0 = { '\t', '\t', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse932() throws Exception {
+    char[] carg0 = { '\t', '\t', '\n', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse933() throws Exception {
+    char[] carg0 = { '\t', '\t', '\n', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse934() throws Exception {
+    char[] carg0 = { '\t', '\t', '\n', '\t', '\n', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse935() throws Exception {
+    char[] carg0 = { '\t', '\t', '\n', '\t', '\r', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse936() throws Exception {
+    char[] carg0 = { '\t', '\t', '\n', '\t', ' ', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse937() throws Exception {
+    char[] carg0 = { '\t', '\t', '\n', '\t', '\u0000', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse938() throws Exception {
+    char[] carg0 = { '\t', '\t', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse939() throws Exception {
+    char[] carg0 = { '\t', '\t', '\n', '\n', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse940() throws Exception {
+    char[] carg0 = { '\t', '\t', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse941() throws Exception {
+    char[] carg0 = { '\t', '\t', '\n', '\n', '\r', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse942() throws Exception {
+    char[] carg0 = { '\t', '\t', '\n', '\n', ' ', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse943() throws Exception {
+    char[] carg0 = { '\t', '\t', '\n', '\n', '\u0000', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse944() throws Exception {
+    char[] carg0 = { '\t', '\t', '\n', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse945() throws Exception {
+    char[] carg0 = { '\t', '\t', '\n', '\r', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse946() throws Exception {
+    char[] carg0 = { '\t', '\t', '\n', '\r', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse947() throws Exception {
+    char[] carg0 = { '\t', '\t', '\n', '\r', '\r', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse948() throws Exception {
+    char[] carg0 = { '\t', '\t', '\n', '\r', ' ', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse949() throws Exception {
+    char[] carg0 = { '\t', '\t', '\n', '\r', '\u0000', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse950() throws Exception {
+    char[] carg0 = { '\t', '\t', '\n', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse951() throws Exception {
+    char[] carg0 = { '\t', '\t', '\n', ' ', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse952() throws Exception {
+    char[] carg0 = { '\t', '\t', '\n', ' ', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse953() throws Exception {
+    char[] carg0 = { '\t', '\t', '\n', ' ', '\r', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse954() throws Exception {
+    char[] carg0 = { '\t', '\t', '\n', ' ', ' ', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse955() throws Exception {
+    char[] carg0 = { '\t', '\t', '\n', ' ', '\u0000', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse956() throws Exception {
+    char[] carg0 = { '\t', '\t', '\n', '\u0000', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse957() throws Exception {
+    char[] carg0 = { '\t', '\t', '\n', '(', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse958() throws Exception {
+    char[] carg0 = { '\t', '\t', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse959() throws Exception {
+    char[] carg0 = { '\t', '\t', '\r', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse960() throws Exception {
+    char[] carg0 = { '\t', '\t', '\r', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse961() throws Exception {
+    char[] carg0 = { '\t', '\t', '\r', '\t', '\n', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse962() throws Exception {
+    char[] carg0 = { '\t', '\t', '\r', '\t', '\r', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse963() throws Exception {
+    char[] carg0 = { '\t', '\t', '\r', '\t', ' ', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse964() throws Exception {
+    char[] carg0 = { '\t', '\t', '\r', '\t', '\u0000', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse965() throws Exception {
+    char[] carg0 = { '\t', '\t', '\r', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse966() throws Exception {
+    char[] carg0 = { '\t', '\t', '\r', '\n', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse967() throws Exception {
+    char[] carg0 = { '\t', '\t', '\r', '\n', '\n', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse968() throws Exception {
+    char[] carg0 = { '\t', '\t', '\r', '\n', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse969() throws Exception {
+    char[] carg0 = { '\t', '\t', '\r', '\n', ' ', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse970() throws Exception {
+    char[] carg0 = { '\t', '\t', '\r', '\n', '\u0000', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse971() throws Exception {
+    char[] carg0 = { '\t', '\t', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse972() throws Exception {
+    char[] carg0 = { '\t', '\t', '\r', '\r', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse973() throws Exception {
+    char[] carg0 = { '\t', '\t', '\r', '\r', '\n', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse974() throws Exception {
+    char[] carg0 = { '\t', '\t', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse975() throws Exception {
+    char[] carg0 = { '\t', '\t', '\r', '\r', ' ', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse976() throws Exception {
+    char[] carg0 = { '\t', '\t', '\r', '\r', '\u0000', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse977() throws Exception {
+    char[] carg0 = { '\t', '\t', '\r', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse978() throws Exception {
+    char[] carg0 = { '\t', '\t', '\r', ' ', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse979() throws Exception {
+    char[] carg0 = { '\t', '\t', '\r', ' ', '\n', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse980() throws Exception {
+    char[] carg0 = { '\t', '\t', '\r', ' ', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse981() throws Exception {
+    char[] carg0 = { '\t', '\t', '\r', ' ', ' ', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse982() throws Exception {
+    char[] carg0 = { '\t', '\t', '\r', ' ', '\u0000', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse983() throws Exception {
+    char[] carg0 = { '\t', '\t', '\r', '\u0000', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse984() throws Exception {
+    char[] carg0 = { '\t', '\t', '\r', '(', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse985() throws Exception {
+    char[] carg0 = { '\t', '\t', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse986() throws Exception {
+    char[] carg0 = { '\t', '\t', ' ', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse987() throws Exception {
+    char[] carg0 = { '\t', '\t', ' ', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse988() throws Exception {
+    char[] carg0 = { '\t', '\t', ' ', '\t', '\n', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse989() throws Exception {
+    char[] carg0 = { '\t', '\t', ' ', '\t', '\r', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse990() throws Exception {
+    char[] carg0 = { '\t', '\t', ' ', '\t', ' ', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse991() throws Exception {
+    char[] carg0 = { '\t', '\t', ' ', '\t', '\u0000', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse992() throws Exception {
+    char[] carg0 = { '\t', '\t', ' ', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse993() throws Exception {
+    char[] carg0 = { '\t', '\t', ' ', '\n', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse994() throws Exception {
+    char[] carg0 = { '\t', '\t', ' ', '\n', '\n', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse995() throws Exception {
+    char[] carg0 = { '\t', '\t', ' ', '\n', '\r', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse996() throws Exception {
+    char[] carg0 = { '\t', '\t', ' ', '\n', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse997() throws Exception {
+    char[] carg0 = { '\t', '\t', ' ', '\n', '\u0000', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse998() throws Exception {
+    char[] carg0 = { '\t', '\t', ' ', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse999() throws Exception {
+    char[] carg0 = { '\t', '\t', ' ', '\r', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1000() throws Exception {
+    char[] carg0 = { '\t', '\t', ' ', '\r', '\n', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1001() throws Exception {
+    char[] carg0 = { '\t', '\t', ' ', '\r', '\r', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1002() throws Exception {
+    char[] carg0 = { '\t', '\t', ' ', '\r', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1003() throws Exception {
+    char[] carg0 = { '\t', '\t', ' ', '\r', '\u0000', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1004() throws Exception {
+    char[] carg0 = { '\t', '\t', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1005() throws Exception {
+    char[] carg0 = { '\t', '\t', ' ', ' ', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1006() throws Exception {
+    char[] carg0 = { '\t', '\t', ' ', ' ', '\n', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1007() throws Exception {
+    char[] carg0 = { '\t', '\t', ' ', ' ', '\r', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1008() throws Exception {
+    char[] carg0 = { '\t', '\t', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1009() throws Exception {
+    char[] carg0 = { '\t', '\t', ' ', ' ', '\u0000', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1010() throws Exception {
+    char[] carg0 = { '\t', '\t', ' ', '\u0000', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1011() throws Exception {
+    char[] carg0 = { '\t', '\t', ' ', '(', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1012() throws Exception {
+    char[] carg0 = { '\t', '\t', '\u0000' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1013() throws Exception {
+    char[] carg0 = { '\t', '\t', '@' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1014() throws Exception {
+    char[] carg0 = { '\t', '\t', '2' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    int retval = cut.parse();
+
+    int expected = 2;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testParse1015() throws Exception {
+    char[] carg0 = { '\t', '\t', '(' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1016() throws Exception {
+    char[] carg0 = { '\t', '\t', '(', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1017() throws Exception {
+    char[] carg0 = { '\t', '\t', '(', '\n', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1018() throws Exception {
+    char[] carg0 = { '\t', '\t', '(', '\r', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1019() throws Exception {
+    char[] carg0 = { '\t', '\t', '(', ' ', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1020() throws Exception {
+    char[] carg0 = { '\t', '\t', '(', '\u0000', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1021() throws Exception {
+    char[] carg0 = { '\t', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1022() throws Exception {
+    char[] carg0 = { '\t', '\n', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1023() throws Exception {
+    char[] carg0 = { '\t', '\n', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1024() throws Exception {
+    char[] carg0 = { '\t', '\n', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1025() throws Exception {
+    char[] carg0 = { '\t', '\n', '\t', '\t', '\n', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1026() throws Exception {
+    char[] carg0 = { '\t', '\n', '\t', '\t', '\r', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1027() throws Exception {
+    char[] carg0 = { '\t', '\n', '\t', '\t', ' ', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1028() throws Exception {
+    char[] carg0 = { '\t', '\n', '\t', '\t', '\u0000', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1029() throws Exception {
+    char[] carg0 = { '\t', '\n', '\t', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1030() throws Exception {
+    char[] carg0 = { '\t', '\n', '\t', '\n', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1031() throws Exception {
+    char[] carg0 = { '\t', '\n', '\t', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1032() throws Exception {
+    char[] carg0 = { '\t', '\n', '\t', '\n', '\r', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1033() throws Exception {
+    char[] carg0 = { '\t', '\n', '\t', '\n', ' ', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1034() throws Exception {
+    char[] carg0 = { '\t', '\n', '\t', '\n', '\u0000', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1035() throws Exception {
+    char[] carg0 = { '\t', '\n', '\t', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1036() throws Exception {
+    char[] carg0 = { '\t', '\n', '\t', '\r', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1037() throws Exception {
+    char[] carg0 = { '\t', '\n', '\t', '\r', '\n', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1038() throws Exception {
+    char[] carg0 = { '\t', '\n', '\t', '\r', '\r', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1039() throws Exception {
+    char[] carg0 = { '\t', '\n', '\t', '\r', ' ', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1040() throws Exception {
+    char[] carg0 = { '\t', '\n', '\t', '\r', '\u0000', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1041() throws Exception {
+    char[] carg0 = { '\t', '\n', '\t', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1042() throws Exception {
+    char[] carg0 = { '\t', '\n', '\t', ' ', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1043() throws Exception {
+    char[] carg0 = { '\t', '\n', '\t', ' ', '\n', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1044() throws Exception {
+    char[] carg0 = { '\t', '\n', '\t', ' ', '\r', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1045() throws Exception {
+    char[] carg0 = { '\t', '\n', '\t', ' ', ' ', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1046() throws Exception {
+    char[] carg0 = { '\t', '\n', '\t', ' ', '\u0000', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1047() throws Exception {
+    char[] carg0 = { '\t', '\n', '\t', '\u0000', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1048() throws Exception {
+    char[] carg0 = { '\t', '\n', '\t', '(', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1049() throws Exception {
+    char[] carg0 = { '\t', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1050() throws Exception {
+    char[] carg0 = { '\t', '\n', '\n', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1051() throws Exception {
+    char[] carg0 = { '\t', '\n', '\n', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1052() throws Exception {
+    char[] carg0 = { '\t', '\n', '\n', '\t', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1053() throws Exception {
+    char[] carg0 = { '\t', '\n', '\n', '\t', '\r', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1054() throws Exception {
+    char[] carg0 = { '\t', '\n', '\n', '\t', ' ', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1055() throws Exception {
+    char[] carg0 = { '\t', '\n', '\n', '\t', '\u0000', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1056() throws Exception {
+    char[] carg0 = { '\t', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1057() throws Exception {
+    char[] carg0 = { '\t', '\n', '\n', '\n', '\t', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1058() throws Exception {
+    char[] carg0 = { '\t', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1059() throws Exception {
+    char[] carg0 = { '\t', '\n', '\n', '\n', '\r', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1060() throws Exception {
+    char[] carg0 = { '\t', '\n', '\n', '\n', ' ', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1061() throws Exception {
+    char[] carg0 = { '\t', '\n', '\n', '\n', '\u0000', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1062() throws Exception {
+    char[] carg0 = { '\t', '\n', '\n', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1063() throws Exception {
+    char[] carg0 = { '\t', '\n', '\n', '\r', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1064() throws Exception {
+    char[] carg0 = { '\t', '\n', '\n', '\r', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1065() throws Exception {
+    char[] carg0 = { '\t', '\n', '\n', '\r', '\r', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1066() throws Exception {
+    char[] carg0 = { '\t', '\n', '\n', '\r', ' ', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1067() throws Exception {
+    char[] carg0 = { '\t', '\n', '\n', '\r', '\u0000', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1068() throws Exception {
+    char[] carg0 = { '\t', '\n', '\n', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1069() throws Exception {
+    char[] carg0 = { '\t', '\n', '\n', ' ', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1070() throws Exception {
+    char[] carg0 = { '\t', '\n', '\n', ' ', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1071() throws Exception {
+    char[] carg0 = { '\t', '\n', '\n', ' ', '\r', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1072() throws Exception {
+    char[] carg0 = { '\t', '\n', '\n', ' ', ' ', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1073() throws Exception {
+    char[] carg0 = { '\t', '\n', '\n', ' ', '\u0000', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1074() throws Exception {
+    char[] carg0 = { '\t', '\n', '\n', '\u0000', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1075() throws Exception {
+    char[] carg0 = { '\t', '\n', '\n', '(', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1076() throws Exception {
+    char[] carg0 = { '\t', '\n', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1077() throws Exception {
+    char[] carg0 = { '\t', '\n', '\r', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1078() throws Exception {
+    char[] carg0 = { '\t', '\n', '\r', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1079() throws Exception {
+    char[] carg0 = { '\t', '\n', '\r', '\t', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1080() throws Exception {
+    char[] carg0 = { '\t', '\n', '\r', '\t', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1081() throws Exception {
+    char[] carg0 = { '\t', '\n', '\r', '\t', ' ', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1082() throws Exception {
+    char[] carg0 = { '\t', '\n', '\r', '\t', '\u0000', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1083() throws Exception {
+    char[] carg0 = { '\t', '\n', '\r', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1084() throws Exception {
+    char[] carg0 = { '\t', '\n', '\r', '\n', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1085() throws Exception {
+    char[] carg0 = { '\t', '\n', '\r', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1086() throws Exception {
+    char[] carg0 = { '\t', '\n', '\r', '\n', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1087() throws Exception {
+    char[] carg0 = { '\t', '\n', '\r', '\n', ' ', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1088() throws Exception {
+    char[] carg0 = { '\t', '\n', '\r', '\n', '\u0000', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1089() throws Exception {
+    char[] carg0 = { '\t', '\n', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1090() throws Exception {
+    char[] carg0 = { '\t', '\n', '\r', '\r', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1091() throws Exception {
+    char[] carg0 = { '\t', '\n', '\r', '\r', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1092() throws Exception {
+    char[] carg0 = { '\t', '\n', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1093() throws Exception {
+    char[] carg0 = { '\t', '\n', '\r', '\r', ' ', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1094() throws Exception {
+    char[] carg0 = { '\t', '\n', '\r', '\r', '\u0000', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1095() throws Exception {
+    char[] carg0 = { '\t', '\n', '\r', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1096() throws Exception {
+    char[] carg0 = { '\t', '\n', '\r', ' ', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1097() throws Exception {
+    char[] carg0 = { '\t', '\n', '\r', ' ', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1098() throws Exception {
+    char[] carg0 = { '\t', '\n', '\r', ' ', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1099() throws Exception {
+    char[] carg0 = { '\t', '\n', '\r', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1100() throws Exception {
+    char[] carg0 = { '\t', '\n', '\r', ' ', '\u0000', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1101() throws Exception {
+    char[] carg0 = { '\t', '\n', '\r', '\u0000', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1102() throws Exception {
+    char[] carg0 = { '\t', '\n', '\r', '(', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1103() throws Exception {
+    char[] carg0 = { '\t', '\n', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1104() throws Exception {
+    char[] carg0 = { '\t', '\n', ' ', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1105() throws Exception {
+    char[] carg0 = { '\t', '\n', ' ', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1106() throws Exception {
+    char[] carg0 = { '\t', '\n', ' ', '\t', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1107() throws Exception {
+    char[] carg0 = { '\t', '\n', ' ', '\t', '\r', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1108() throws Exception {
+    char[] carg0 = { '\t', '\n', ' ', '\t', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1109() throws Exception {
+    char[] carg0 = { '\t', '\n', ' ', '\t', '\u0000', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1110() throws Exception {
+    char[] carg0 = { '\t', '\n', ' ', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1111() throws Exception {
+    char[] carg0 = { '\t', '\n', ' ', '\n', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1112() throws Exception {
+    char[] carg0 = { '\t', '\n', ' ', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1113() throws Exception {
+    char[] carg0 = { '\t', '\n', ' ', '\n', '\r', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1114() throws Exception {
+    char[] carg0 = { '\t', '\n', ' ', '\n', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1115() throws Exception {
+    char[] carg0 = { '\t', '\n', ' ', '\n', '\u0000', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1116() throws Exception {
+    char[] carg0 = { '\t', '\n', ' ', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1117() throws Exception {
+    char[] carg0 = { '\t', '\n', ' ', '\r', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1118() throws Exception {
+    char[] carg0 = { '\t', '\n', ' ', '\r', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1119() throws Exception {
+    char[] carg0 = { '\t', '\n', ' ', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1120() throws Exception {
+    char[] carg0 = { '\t', '\n', ' ', '\r', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1121() throws Exception {
+    char[] carg0 = { '\t', '\n', ' ', '\r', '\u0000', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1122() throws Exception {
+    char[] carg0 = { '\t', '\n', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1123() throws Exception {
+    char[] carg0 = { '\t', '\n', ' ', ' ', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1124() throws Exception {
+    char[] carg0 = { '\t', '\n', ' ', ' ', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1125() throws Exception {
+    char[] carg0 = { '\t', '\n', ' ', ' ', '\r', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1126() throws Exception {
+    char[] carg0 = { '\t', '\n', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1127() throws Exception {
+    char[] carg0 = { '\t', '\n', ' ', ' ', '\u0000', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1128() throws Exception {
+    char[] carg0 = { '\t', '\n', ' ', '\u0000', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1129() throws Exception {
+    char[] carg0 = { '\t', '\n', ' ', '(', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1130() throws Exception {
+    char[] carg0 = { '\t', '\n', '\u0000' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1131() throws Exception {
+    char[] carg0 = { '\t', '\n', '@' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1132() throws Exception {
+    char[] carg0 = { '\t', '\n', '2' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    int retval = cut.parse();
+
+    int expected = 2;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testParse1133() throws Exception {
+    char[] carg0 = { '\t', '\n', '(' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1134() throws Exception {
+    char[] carg0 = { '\t', '\n', '(', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1135() throws Exception {
+    char[] carg0 = { '\t', '\n', '(', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1136() throws Exception {
+    char[] carg0 = { '\t', '\n', '(', '\r', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1137() throws Exception {
+    char[] carg0 = { '\t', '\n', '(', ' ', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1138() throws Exception {
+    char[] carg0 = { '\t', '\n', '(', '\u0000', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1139() throws Exception {
+    char[] carg0 = { '\t', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1140() throws Exception {
+    char[] carg0 = { '\t', '\r', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1141() throws Exception {
+    char[] carg0 = { '\t', '\r', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1142() throws Exception {
+    char[] carg0 = { '\t', '\r', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1143() throws Exception {
+    char[] carg0 = { '\t', '\r', '\t', '\t', '\n', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1144() throws Exception {
+    char[] carg0 = { '\t', '\r', '\t', '\t', '\r', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1145() throws Exception {
+    char[] carg0 = { '\t', '\r', '\t', '\t', ' ', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1146() throws Exception {
+    char[] carg0 = { '\t', '\r', '\t', '\t', '\u0000', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1147() throws Exception {
+    char[] carg0 = { '\t', '\r', '\t', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1148() throws Exception {
+    char[] carg0 = { '\t', '\r', '\t', '\n', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1149() throws Exception {
+    char[] carg0 = { '\t', '\r', '\t', '\n', '\n', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1150() throws Exception {
+    char[] carg0 = { '\t', '\r', '\t', '\n', '\r', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1151() throws Exception {
+    char[] carg0 = { '\t', '\r', '\t', '\n', ' ', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1152() throws Exception {
+    char[] carg0 = { '\t', '\r', '\t', '\n', '\u0000', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1153() throws Exception {
+    char[] carg0 = { '\t', '\r', '\t', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1154() throws Exception {
+    char[] carg0 = { '\t', '\r', '\t', '\r', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1155() throws Exception {
+    char[] carg0 = { '\t', '\r', '\t', '\r', '\n', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1156() throws Exception {
+    char[] carg0 = { '\t', '\r', '\t', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1157() throws Exception {
+    char[] carg0 = { '\t', '\r', '\t', '\r', ' ', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1158() throws Exception {
+    char[] carg0 = { '\t', '\r', '\t', '\r', '\u0000', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1159() throws Exception {
+    char[] carg0 = { '\t', '\r', '\t', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1160() throws Exception {
+    char[] carg0 = { '\t', '\r', '\t', ' ', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1161() throws Exception {
+    char[] carg0 = { '\t', '\r', '\t', ' ', '\n', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1162() throws Exception {
+    char[] carg0 = { '\t', '\r', '\t', ' ', '\r', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1163() throws Exception {
+    char[] carg0 = { '\t', '\r', '\t', ' ', ' ', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1164() throws Exception {
+    char[] carg0 = { '\t', '\r', '\t', ' ', '\u0000', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1165() throws Exception {
+    char[] carg0 = { '\t', '\r', '\t', '\u0000', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1166() throws Exception {
+    char[] carg0 = { '\t', '\r', '\t', '(', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1167() throws Exception {
+    char[] carg0 = { '\t', '\r', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1168() throws Exception {
+    char[] carg0 = { '\t', '\r', '\n', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1169() throws Exception {
+    char[] carg0 = { '\t', '\r', '\n', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1170() throws Exception {
+    char[] carg0 = { '\t', '\r', '\n', '\t', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1171() throws Exception {
+    char[] carg0 = { '\t', '\r', '\n', '\t', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1172() throws Exception {
+    char[] carg0 = { '\t', '\r', '\n', '\t', ' ', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1173() throws Exception {
+    char[] carg0 = { '\t', '\r', '\n', '\t', '\u0000', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1174() throws Exception {
+    char[] carg0 = { '\t', '\r', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1175() throws Exception {
+    char[] carg0 = { '\t', '\r', '\n', '\n', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1176() throws Exception {
+    char[] carg0 = { '\t', '\r', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1177() throws Exception {
+    char[] carg0 = { '\t', '\r', '\n', '\n', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1178() throws Exception {
+    char[] carg0 = { '\t', '\r', '\n', '\n', ' ', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1179() throws Exception {
+    char[] carg0 = { '\t', '\r', '\n', '\n', '\u0000', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1180() throws Exception {
+    char[] carg0 = { '\t', '\r', '\n', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1181() throws Exception {
+    char[] carg0 = { '\t', '\r', '\n', '\r', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1182() throws Exception {
+    char[] carg0 = { '\t', '\r', '\n', '\r', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1183() throws Exception {
+    char[] carg0 = { '\t', '\r', '\n', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1184() throws Exception {
+    char[] carg0 = { '\t', '\r', '\n', '\r', ' ', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1185() throws Exception {
+    char[] carg0 = { '\t', '\r', '\n', '\r', '\u0000', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1186() throws Exception {
+    char[] carg0 = { '\t', '\r', '\n', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1187() throws Exception {
+    char[] carg0 = { '\t', '\r', '\n', ' ', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1188() throws Exception {
+    char[] carg0 = { '\t', '\r', '\n', ' ', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1189() throws Exception {
+    char[] carg0 = { '\t', '\r', '\n', ' ', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1190() throws Exception {
+    char[] carg0 = { '\t', '\r', '\n', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1191() throws Exception {
+    char[] carg0 = { '\t', '\r', '\n', ' ', '\u0000', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1192() throws Exception {
+    char[] carg0 = { '\t', '\r', '\n', '\u0000', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1193() throws Exception {
+    char[] carg0 = { '\t', '\r', '\n', '(', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1194() throws Exception {
+    char[] carg0 = { '\t', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1195() throws Exception {
+    char[] carg0 = { '\t', '\r', '\r', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1196() throws Exception {
+    char[] carg0 = { '\t', '\r', '\r', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1197() throws Exception {
+    char[] carg0 = { '\t', '\r', '\r', '\t', '\n', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1198() throws Exception {
+    char[] carg0 = { '\t', '\r', '\r', '\t', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1199() throws Exception {
+    char[] carg0 = { '\t', '\r', '\r', '\t', ' ', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1200() throws Exception {
+    char[] carg0 = { '\t', '\r', '\r', '\t', '\u0000', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1201() throws Exception {
+    char[] carg0 = { '\t', '\r', '\r', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1202() throws Exception {
+    char[] carg0 = { '\t', '\r', '\r', '\n', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1203() throws Exception {
+    char[] carg0 = { '\t', '\r', '\r', '\n', '\n', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1204() throws Exception {
+    char[] carg0 = { '\t', '\r', '\r', '\n', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1205() throws Exception {
+    char[] carg0 = { '\t', '\r', '\r', '\n', ' ', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1206() throws Exception {
+    char[] carg0 = { '\t', '\r', '\r', '\n', '\u0000', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1207() throws Exception {
+    char[] carg0 = { '\t', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1208() throws Exception {
+    char[] carg0 = { '\t', '\r', '\r', '\r', '\t', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1209() throws Exception {
+    char[] carg0 = { '\t', '\r', '\r', '\r', '\n', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1210() throws Exception {
+    char[] carg0 = { '\t', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1211() throws Exception {
+    char[] carg0 = { '\t', '\r', '\r', '\r', ' ', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1212() throws Exception {
+    char[] carg0 = { '\t', '\r', '\r', '\r', '\u0000', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1213() throws Exception {
+    char[] carg0 = { '\t', '\r', '\r', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1214() throws Exception {
+    char[] carg0 = { '\t', '\r', '\r', ' ', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1215() throws Exception {
+    char[] carg0 = { '\t', '\r', '\r', ' ', '\n', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1216() throws Exception {
+    char[] carg0 = { '\t', '\r', '\r', ' ', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1217() throws Exception {
+    char[] carg0 = { '\t', '\r', '\r', ' ', ' ', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1218() throws Exception {
+    char[] carg0 = { '\t', '\r', '\r', ' ', '\u0000', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1219() throws Exception {
+    char[] carg0 = { '\t', '\r', '\r', '\u0000', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1220() throws Exception {
+    char[] carg0 = { '\t', '\r', '\r', '(', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1221() throws Exception {
+    char[] carg0 = { '\t', '\r', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1222() throws Exception {
+    char[] carg0 = { '\t', '\r', ' ', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1223() throws Exception {
+    char[] carg0 = { '\t', '\r', ' ', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1224() throws Exception {
+    char[] carg0 = { '\t', '\r', ' ', '\t', '\n', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1225() throws Exception {
+    char[] carg0 = { '\t', '\r', ' ', '\t', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1226() throws Exception {
+    char[] carg0 = { '\t', '\r', ' ', '\t', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1227() throws Exception {
+    char[] carg0 = { '\t', '\r', ' ', '\t', '\u0000', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1228() throws Exception {
+    char[] carg0 = { '\t', '\r', ' ', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1229() throws Exception {
+    char[] carg0 = { '\t', '\r', ' ', '\n', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1230() throws Exception {
+    char[] carg0 = { '\t', '\r', ' ', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1231() throws Exception {
+    char[] carg0 = { '\t', '\r', ' ', '\n', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1232() throws Exception {
+    char[] carg0 = { '\t', '\r', ' ', '\n', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1233() throws Exception {
+    char[] carg0 = { '\t', '\r', ' ', '\n', '\u0000', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1234() throws Exception {
+    char[] carg0 = { '\t', '\r', ' ', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1235() throws Exception {
+    char[] carg0 = { '\t', '\r', ' ', '\r', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1236() throws Exception {
+    char[] carg0 = { '\t', '\r', ' ', '\r', '\n', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1237() throws Exception {
+    char[] carg0 = { '\t', '\r', ' ', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1238() throws Exception {
+    char[] carg0 = { '\t', '\r', ' ', '\r', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1239() throws Exception {
+    char[] carg0 = { '\t', '\r', ' ', '\r', '\u0000', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1240() throws Exception {
+    char[] carg0 = { '\t', '\r', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1241() throws Exception {
+    char[] carg0 = { '\t', '\r', ' ', ' ', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1242() throws Exception {
+    char[] carg0 = { '\t', '\r', ' ', ' ', '\n', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1243() throws Exception {
+    char[] carg0 = { '\t', '\r', ' ', ' ', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1244() throws Exception {
+    char[] carg0 = { '\t', '\r', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1245() throws Exception {
+    char[] carg0 = { '\t', '\r', ' ', ' ', '\u0000', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1246() throws Exception {
+    char[] carg0 = { '\t', '\r', ' ', '\u0000', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1247() throws Exception {
+    char[] carg0 = { '\t', '\r', ' ', '(', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1248() throws Exception {
+    char[] carg0 = { '\t', '\r', '\u0000' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1249() throws Exception {
+    char[] carg0 = { '\t', '\r', '@' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1250() throws Exception {
+    char[] carg0 = { '\t', '\r', '2' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    int retval = cut.parse();
+
+    int expected = 2;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testParse1251() throws Exception {
+    char[] carg0 = { '\t', '\r', '(' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1252() throws Exception {
+    char[] carg0 = { '\t', '\r', '(', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1253() throws Exception {
+    char[] carg0 = { '\t', '\r', '(', '\n', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1254() throws Exception {
+    char[] carg0 = { '\t', '\r', '(', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1255() throws Exception {
+    char[] carg0 = { '\t', '\r', '(', ' ', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1256() throws Exception {
+    char[] carg0 = { '\t', '\r', '(', '\u0000', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1257() throws Exception {
+    char[] carg0 = { '\t', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1258() throws Exception {
+    char[] carg0 = { '\t', ' ', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1259() throws Exception {
+    char[] carg0 = { '\t', ' ', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1260() throws Exception {
+    char[] carg0 = { '\t', ' ', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1261() throws Exception {
+    char[] carg0 = { '\t', ' ', '\t', '\t', '\n', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1262() throws Exception {
+    char[] carg0 = { '\t', ' ', '\t', '\t', '\r', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1263() throws Exception {
+    char[] carg0 = { '\t', ' ', '\t', '\t', ' ', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1264() throws Exception {
+    char[] carg0 = { '\t', ' ', '\t', '\t', '\u0000', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1265() throws Exception {
+    char[] carg0 = { '\t', ' ', '\t', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1266() throws Exception {
+    char[] carg0 = { '\t', ' ', '\t', '\n', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1267() throws Exception {
+    char[] carg0 = { '\t', ' ', '\t', '\n', '\n', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1268() throws Exception {
+    char[] carg0 = { '\t', ' ', '\t', '\n', '\r', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1269() throws Exception {
+    char[] carg0 = { '\t', ' ', '\t', '\n', ' ', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1270() throws Exception {
+    char[] carg0 = { '\t', ' ', '\t', '\n', '\u0000', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1271() throws Exception {
+    char[] carg0 = { '\t', ' ', '\t', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1272() throws Exception {
+    char[] carg0 = { '\t', ' ', '\t', '\r', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1273() throws Exception {
+    char[] carg0 = { '\t', ' ', '\t', '\r', '\n', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1274() throws Exception {
+    char[] carg0 = { '\t', ' ', '\t', '\r', '\r', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1275() throws Exception {
+    char[] carg0 = { '\t', ' ', '\t', '\r', ' ', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1276() throws Exception {
+    char[] carg0 = { '\t', ' ', '\t', '\r', '\u0000', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1277() throws Exception {
+    char[] carg0 = { '\t', ' ', '\t', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1278() throws Exception {
+    char[] carg0 = { '\t', ' ', '\t', ' ', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1279() throws Exception {
+    char[] carg0 = { '\t', ' ', '\t', ' ', '\n', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1280() throws Exception {
+    char[] carg0 = { '\t', ' ', '\t', ' ', '\r', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1281() throws Exception {
+    char[] carg0 = { '\t', ' ', '\t', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1282() throws Exception {
+    char[] carg0 = { '\t', ' ', '\t', ' ', '\u0000', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1283() throws Exception {
+    char[] carg0 = { '\t', ' ', '\t', '\u0000', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1284() throws Exception {
+    char[] carg0 = { '\t', ' ', '\t', '(', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1285() throws Exception {
+    char[] carg0 = { '\t', ' ', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1286() throws Exception {
+    char[] carg0 = { '\t', ' ', '\n', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1287() throws Exception {
+    char[] carg0 = { '\t', ' ', '\n', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1288() throws Exception {
+    char[] carg0 = { '\t', ' ', '\n', '\t', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1289() throws Exception {
+    char[] carg0 = { '\t', ' ', '\n', '\t', '\r', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1290() throws Exception {
+    char[] carg0 = { '\t', ' ', '\n', '\t', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1291() throws Exception {
+    char[] carg0 = { '\t', ' ', '\n', '\t', '\u0000', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1292() throws Exception {
+    char[] carg0 = { '\t', ' ', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1293() throws Exception {
+    char[] carg0 = { '\t', ' ', '\n', '\n', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1294() throws Exception {
+    char[] carg0 = { '\t', ' ', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1295() throws Exception {
+    char[] carg0 = { '\t', ' ', '\n', '\n', '\r', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1296() throws Exception {
+    char[] carg0 = { '\t', ' ', '\n', '\n', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1297() throws Exception {
+    char[] carg0 = { '\t', ' ', '\n', '\n', '\u0000', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1298() throws Exception {
+    char[] carg0 = { '\t', ' ', '\n', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1299() throws Exception {
+    char[] carg0 = { '\t', ' ', '\n', '\r', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1300() throws Exception {
+    char[] carg0 = { '\t', ' ', '\n', '\r', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1301() throws Exception {
+    char[] carg0 = { '\t', ' ', '\n', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1302() throws Exception {
+    char[] carg0 = { '\t', ' ', '\n', '\r', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1303() throws Exception {
+    char[] carg0 = { '\t', ' ', '\n', '\r', '\u0000', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1304() throws Exception {
+    char[] carg0 = { '\t', ' ', '\n', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1305() throws Exception {
+    char[] carg0 = { '\t', ' ', '\n', ' ', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1306() throws Exception {
+    char[] carg0 = { '\t', ' ', '\n', ' ', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1307() throws Exception {
+    char[] carg0 = { '\t', ' ', '\n', ' ', '\r', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1308() throws Exception {
+    char[] carg0 = { '\t', ' ', '\n', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1309() throws Exception {
+    char[] carg0 = { '\t', ' ', '\n', ' ', '\u0000', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1310() throws Exception {
+    char[] carg0 = { '\t', ' ', '\n', '\u0000', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1311() throws Exception {
+    char[] carg0 = { '\t', ' ', '\n', '(', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1312() throws Exception {
+    char[] carg0 = { '\t', ' ', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1313() throws Exception {
+    char[] carg0 = { '\t', ' ', '\r', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1314() throws Exception {
+    char[] carg0 = { '\t', ' ', '\r', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1315() throws Exception {
+    char[] carg0 = { '\t', ' ', '\r', '\t', '\n', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1316() throws Exception {
+    char[] carg0 = { '\t', ' ', '\r', '\t', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1317() throws Exception {
+    char[] carg0 = { '\t', ' ', '\r', '\t', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1318() throws Exception {
+    char[] carg0 = { '\t', ' ', '\r', '\t', '\u0000', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1319() throws Exception {
+    char[] carg0 = { '\t', ' ', '\r', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1320() throws Exception {
+    char[] carg0 = { '\t', ' ', '\r', '\n', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1321() throws Exception {
+    char[] carg0 = { '\t', ' ', '\r', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1322() throws Exception {
+    char[] carg0 = { '\t', ' ', '\r', '\n', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1323() throws Exception {
+    char[] carg0 = { '\t', ' ', '\r', '\n', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1324() throws Exception {
+    char[] carg0 = { '\t', ' ', '\r', '\n', '\u0000', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1325() throws Exception {
+    char[] carg0 = { '\t', ' ', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1326() throws Exception {
+    char[] carg0 = { '\t', ' ', '\r', '\r', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1327() throws Exception {
+    char[] carg0 = { '\t', ' ', '\r', '\r', '\n', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1328() throws Exception {
+    char[] carg0 = { '\t', ' ', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1329() throws Exception {
+    char[] carg0 = { '\t', ' ', '\r', '\r', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1330() throws Exception {
+    char[] carg0 = { '\t', ' ', '\r', '\r', '\u0000', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1331() throws Exception {
+    char[] carg0 = { '\t', ' ', '\r', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1332() throws Exception {
+    char[] carg0 = { '\t', ' ', '\r', ' ', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1333() throws Exception {
+    char[] carg0 = { '\t', ' ', '\r', ' ', '\n', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1334() throws Exception {
+    char[] carg0 = { '\t', ' ', '\r', ' ', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1335() throws Exception {
+    char[] carg0 = { '\t', ' ', '\r', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1336() throws Exception {
+    char[] carg0 = { '\t', ' ', '\r', ' ', '\u0000', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1337() throws Exception {
+    char[] carg0 = { '\t', ' ', '\r', '\u0000', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1338() throws Exception {
+    char[] carg0 = { '\t', ' ', '\r', '(', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1339() throws Exception {
+    char[] carg0 = { '\t', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1340() throws Exception {
+    char[] carg0 = { '\t', ' ', ' ', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1341() throws Exception {
+    char[] carg0 = { '\t', ' ', ' ', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1342() throws Exception {
+    char[] carg0 = { '\t', ' ', ' ', '\t', '\n', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1343() throws Exception {
+    char[] carg0 = { '\t', ' ', ' ', '\t', '\r', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1344() throws Exception {
+    char[] carg0 = { '\t', ' ', ' ', '\t', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1345() throws Exception {
+    char[] carg0 = { '\t', ' ', ' ', '\t', '\u0000', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1346() throws Exception {
+    char[] carg0 = { '\t', ' ', ' ', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1347() throws Exception {
+    char[] carg0 = { '\t', ' ', ' ', '\n', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1348() throws Exception {
+    char[] carg0 = { '\t', ' ', ' ', '\n', '\n', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1349() throws Exception {
+    char[] carg0 = { '\t', ' ', ' ', '\n', '\r', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1350() throws Exception {
+    char[] carg0 = { '\t', ' ', ' ', '\n', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1351() throws Exception {
+    char[] carg0 = { '\t', ' ', ' ', '\n', '\u0000', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1352() throws Exception {
+    char[] carg0 = { '\t', ' ', ' ', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1353() throws Exception {
+    char[] carg0 = { '\t', ' ', ' ', '\r', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1354() throws Exception {
+    char[] carg0 = { '\t', ' ', ' ', '\r', '\n', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1355() throws Exception {
+    char[] carg0 = { '\t', ' ', ' ', '\r', '\r', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1356() throws Exception {
+    char[] carg0 = { '\t', ' ', ' ', '\r', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1357() throws Exception {
+    char[] carg0 = { '\t', ' ', ' ', '\r', '\u0000', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1358() throws Exception {
+    char[] carg0 = { '\t', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1359() throws Exception {
+    char[] carg0 = { '\t', ' ', ' ', ' ', '\t', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1360() throws Exception {
+    char[] carg0 = { '\t', ' ', ' ', ' ', '\n', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1361() throws Exception {
+    char[] carg0 = { '\t', ' ', ' ', ' ', '\r', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1362() throws Exception {
+    char[] carg0 = { '\t', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1363() throws Exception {
+    char[] carg0 = { '\t', ' ', ' ', ' ', '\u0000', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1364() throws Exception {
+    char[] carg0 = { '\t', ' ', ' ', '\u0000', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1365() throws Exception {
+    char[] carg0 = { '\t', ' ', ' ', '(', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1366() throws Exception {
+    char[] carg0 = { '\t', ' ', '\u0000' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1367() throws Exception {
+    char[] carg0 = { '\t', ' ', '@' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1368() throws Exception {
+    char[] carg0 = { '\t', ' ', '2' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    int retval = cut.parse();
+
+    int expected = 2;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testParse1369() throws Exception {
+    char[] carg0 = { '\t', ' ', '(' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1370() throws Exception {
+    char[] carg0 = { '\t', ' ', '(', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1371() throws Exception {
+    char[] carg0 = { '\t', ' ', '(', '\n', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1372() throws Exception {
+    char[] carg0 = { '\t', ' ', '(', '\r', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1373() throws Exception {
+    char[] carg0 = { '\t', ' ', '(', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1374() throws Exception {
+    char[] carg0 = { '\t', ' ', '(', '\u0000', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1375() throws Exception {
+    char[] carg0 = { '\t', '\u0000' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1376() throws Exception {
+    char[] carg0 = { '\t', 'J' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1377() throws Exception {
+    char[] carg0 = { '\t', '2' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    int retval = cut.parse();
+
+    int expected = 2;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testParse1378() throws Exception {
+    char[] carg0 = { '\t', '2', '\u0000' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1379() throws Exception {
+    char[] carg0 = { '\t', '2', ':' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1380() throws Exception {
+    char[] carg0 = { '\t', '2', '2' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    int retval = cut.parse();
+
+    int expected = 22;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testParse1381() throws Exception {
+    char[] carg0 = { '\t', '(' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1382() throws Exception {
+    char[] carg0 = { '\t', '(', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1383() throws Exception {
+    char[] carg0 = { '\t', '(', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1384() throws Exception {
+    char[] carg0 = { '\t', '(', '\t', '\n', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1385() throws Exception {
+    char[] carg0 = { '\t', '(', '\t', '\r', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1386() throws Exception {
+    char[] carg0 = { '\t', '(', '\t', ' ', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1387() throws Exception {
+    char[] carg0 = { '\t', '(', '\t', '\u0000', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1388() throws Exception {
+    char[] carg0 = { '\t', '(', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1389() throws Exception {
+    char[] carg0 = { '\t', '(', '\n', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1390() throws Exception {
+    char[] carg0 = { '\t', '(', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1391() throws Exception {
+    char[] carg0 = { '\t', '(', '\n', '\r', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1392() throws Exception {
+    char[] carg0 = { '\t', '(', '\n', ' ', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1393() throws Exception {
+    char[] carg0 = { '\t', '(', '\n', '\u0000', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1394() throws Exception {
+    char[] carg0 = { '\t', '(', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1395() throws Exception {
+    char[] carg0 = { '\t', '(', '\r', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1396() throws Exception {
+    char[] carg0 = { '\t', '(', '\r', '\n', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1397() throws Exception {
+    char[] carg0 = { '\t', '(', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1398() throws Exception {
+    char[] carg0 = { '\t', '(', '\r', ' ', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1399() throws Exception {
+    char[] carg0 = { '\t', '(', '\r', '\u0000', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1400() throws Exception {
+    char[] carg0 = { '\t', '(', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1401() throws Exception {
+    char[] carg0 = { '\t', '(', ' ', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1402() throws Exception {
+    char[] carg0 = { '\t', '(', ' ', '\n', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1403() throws Exception {
+    char[] carg0 = { '\t', '(', ' ', '\r', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1404() throws Exception {
+    char[] carg0 = { '\t', '(', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1405() throws Exception {
+    char[] carg0 = { '\t', '(', ' ', '\u0000', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1406() throws Exception {
+    char[] carg0 = { '\t', '(', '\u0000' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1407() throws Exception {
+    char[] carg0 = { '\t', '(', '(' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1408() throws Exception {
+    char[] carg0 = { '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1409() throws Exception {
+    char[] carg0 = { '\n', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1410() throws Exception {
+    char[] carg0 = { '\n', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1411() throws Exception {
+    char[] carg0 = { '\n', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1412() throws Exception {
+    char[] carg0 = { '\n', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1413() throws Exception {
+    char[] carg0 = { '\n', '\t', '\t', '\t', '\n', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1414() throws Exception {
+    char[] carg0 = { '\n', '\t', '\t', '\t', '\r', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1415() throws Exception {
+    char[] carg0 = { '\n', '\t', '\t', '\t', ' ', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1416() throws Exception {
+    char[] carg0 = { '\n', '\t', '\t', '\t', '\u0000', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1417() throws Exception {
+    char[] carg0 = { '\n', '\t', '\t', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1418() throws Exception {
+    char[] carg0 = { '\n', '\t', '\t', '\n', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1419() throws Exception {
+    char[] carg0 = { '\n', '\t', '\t', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1420() throws Exception {
+    char[] carg0 = { '\n', '\t', '\t', '\n', '\r', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1421() throws Exception {
+    char[] carg0 = { '\n', '\t', '\t', '\n', ' ', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1422() throws Exception {
+    char[] carg0 = { '\n', '\t', '\t', '\n', '\u0000', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1423() throws Exception {
+    char[] carg0 = { '\n', '\t', '\t', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1424() throws Exception {
+    char[] carg0 = { '\n', '\t', '\t', '\r', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1425() throws Exception {
+    char[] carg0 = { '\n', '\t', '\t', '\r', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1426() throws Exception {
+    char[] carg0 = { '\n', '\t', '\t', '\r', '\r', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1427() throws Exception {
+    char[] carg0 = { '\n', '\t', '\t', '\r', ' ', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1428() throws Exception {
+    char[] carg0 = { '\n', '\t', '\t', '\r', '\u0000', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1429() throws Exception {
+    char[] carg0 = { '\n', '\t', '\t', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1430() throws Exception {
+    char[] carg0 = { '\n', '\t', '\t', ' ', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1431() throws Exception {
+    char[] carg0 = { '\n', '\t', '\t', ' ', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1432() throws Exception {
+    char[] carg0 = { '\n', '\t', '\t', ' ', '\r', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1433() throws Exception {
+    char[] carg0 = { '\n', '\t', '\t', ' ', ' ', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1434() throws Exception {
+    char[] carg0 = { '\n', '\t', '\t', ' ', '\u0000', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1435() throws Exception {
+    char[] carg0 = { '\n', '\t', '\t', '\u0000', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1436() throws Exception {
+    char[] carg0 = { '\n', '\t', '\t', '(', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1437() throws Exception {
+    char[] carg0 = { '\n', '\t', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1438() throws Exception {
+    char[] carg0 = { '\n', '\t', '\n', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1439() throws Exception {
+    char[] carg0 = { '\n', '\t', '\n', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1440() throws Exception {
+    char[] carg0 = { '\n', '\t', '\n', '\t', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1441() throws Exception {
+    char[] carg0 = { '\n', '\t', '\n', '\t', '\r', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1442() throws Exception {
+    char[] carg0 = { '\n', '\t', '\n', '\t', ' ', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1443() throws Exception {
+    char[] carg0 = { '\n', '\t', '\n', '\t', '\u0000', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1444() throws Exception {
+    char[] carg0 = { '\n', '\t', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1445() throws Exception {
+    char[] carg0 = { '\n', '\t', '\n', '\n', '\t', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1446() throws Exception {
+    char[] carg0 = { '\n', '\t', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1447() throws Exception {
+    char[] carg0 = { '\n', '\t', '\n', '\n', '\r', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1448() throws Exception {
+    char[] carg0 = { '\n', '\t', '\n', '\n', ' ', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1449() throws Exception {
+    char[] carg0 = { '\n', '\t', '\n', '\n', '\u0000', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1450() throws Exception {
+    char[] carg0 = { '\n', '\t', '\n', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1451() throws Exception {
+    char[] carg0 = { '\n', '\t', '\n', '\r', '\t', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1452() throws Exception {
+    char[] carg0 = { '\n', '\t', '\n', '\r', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1453() throws Exception {
+    char[] carg0 = { '\n', '\t', '\n', '\r', '\r', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1454() throws Exception {
+    char[] carg0 = { '\n', '\t', '\n', '\r', ' ', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1455() throws Exception {
+    char[] carg0 = { '\n', '\t', '\n', '\r', '\u0000', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1456() throws Exception {
+    char[] carg0 = { '\n', '\t', '\n', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1457() throws Exception {
+    char[] carg0 = { '\n', '\t', '\n', ' ', '\t', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1458() throws Exception {
+    char[] carg0 = { '\n', '\t', '\n', ' ', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1459() throws Exception {
+    char[] carg0 = { '\n', '\t', '\n', ' ', '\r', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1460() throws Exception {
+    char[] carg0 = { '\n', '\t', '\n', ' ', ' ', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1461() throws Exception {
+    char[] carg0 = { '\n', '\t', '\n', ' ', '\u0000', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1462() throws Exception {
+    char[] carg0 = { '\n', '\t', '\n', '\u0000', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1463() throws Exception {
+    char[] carg0 = { '\n', '\t', '\n', '(', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1464() throws Exception {
+    char[] carg0 = { '\n', '\t', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1465() throws Exception {
+    char[] carg0 = { '\n', '\t', '\r', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1466() throws Exception {
+    char[] carg0 = { '\n', '\t', '\r', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1467() throws Exception {
+    char[] carg0 = { '\n', '\t', '\r', '\t', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1468() throws Exception {
+    char[] carg0 = { '\n', '\t', '\r', '\t', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1469() throws Exception {
+    char[] carg0 = { '\n', '\t', '\r', '\t', ' ', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1470() throws Exception {
+    char[] carg0 = { '\n', '\t', '\r', '\t', '\u0000', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1471() throws Exception {
+    char[] carg0 = { '\n', '\t', '\r', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1472() throws Exception {
+    char[] carg0 = { '\n', '\t', '\r', '\n', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1473() throws Exception {
+    char[] carg0 = { '\n', '\t', '\r', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1474() throws Exception {
+    char[] carg0 = { '\n', '\t', '\r', '\n', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1475() throws Exception {
+    char[] carg0 = { '\n', '\t', '\r', '\n', ' ', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1476() throws Exception {
+    char[] carg0 = { '\n', '\t', '\r', '\n', '\u0000', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1477() throws Exception {
+    char[] carg0 = { '\n', '\t', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1478() throws Exception {
+    char[] carg0 = { '\n', '\t', '\r', '\r', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1479() throws Exception {
+    char[] carg0 = { '\n', '\t', '\r', '\r', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1480() throws Exception {
+    char[] carg0 = { '\n', '\t', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1481() throws Exception {
+    char[] carg0 = { '\n', '\t', '\r', '\r', ' ', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1482() throws Exception {
+    char[] carg0 = { '\n', '\t', '\r', '\r', '\u0000', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1483() throws Exception {
+    char[] carg0 = { '\n', '\t', '\r', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1484() throws Exception {
+    char[] carg0 = { '\n', '\t', '\r', ' ', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1485() throws Exception {
+    char[] carg0 = { '\n', '\t', '\r', ' ', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1486() throws Exception {
+    char[] carg0 = { '\n', '\t', '\r', ' ', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1487() throws Exception {
+    char[] carg0 = { '\n', '\t', '\r', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1488() throws Exception {
+    char[] carg0 = { '\n', '\t', '\r', ' ', '\u0000', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1489() throws Exception {
+    char[] carg0 = { '\n', '\t', '\r', '\u0000', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1490() throws Exception {
+    char[] carg0 = { '\n', '\t', '\r', '(', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1491() throws Exception {
+    char[] carg0 = { '\n', '\t', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1492() throws Exception {
+    char[] carg0 = { '\n', '\t', ' ', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1493() throws Exception {
+    char[] carg0 = { '\n', '\t', ' ', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1494() throws Exception {
+    char[] carg0 = { '\n', '\t', ' ', '\t', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1495() throws Exception {
+    char[] carg0 = { '\n', '\t', ' ', '\t', '\r', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1496() throws Exception {
+    char[] carg0 = { '\n', '\t', ' ', '\t', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1497() throws Exception {
+    char[] carg0 = { '\n', '\t', ' ', '\t', '\u0000', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1498() throws Exception {
+    char[] carg0 = { '\n', '\t', ' ', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1499() throws Exception {
+    char[] carg0 = { '\n', '\t', ' ', '\n', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1500() throws Exception {
+    char[] carg0 = { '\n', '\t', ' ', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1501() throws Exception {
+    char[] carg0 = { '\n', '\t', ' ', '\n', '\r', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1502() throws Exception {
+    char[] carg0 = { '\n', '\t', ' ', '\n', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1503() throws Exception {
+    char[] carg0 = { '\n', '\t', ' ', '\n', '\u0000', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1504() throws Exception {
+    char[] carg0 = { '\n', '\t', ' ', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1505() throws Exception {
+    char[] carg0 = { '\n', '\t', ' ', '\r', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1506() throws Exception {
+    char[] carg0 = { '\n', '\t', ' ', '\r', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1507() throws Exception {
+    char[] carg0 = { '\n', '\t', ' ', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1508() throws Exception {
+    char[] carg0 = { '\n', '\t', ' ', '\r', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1509() throws Exception {
+    char[] carg0 = { '\n', '\t', ' ', '\r', '\u0000', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1510() throws Exception {
+    char[] carg0 = { '\n', '\t', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1511() throws Exception {
+    char[] carg0 = { '\n', '\t', ' ', ' ', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1512() throws Exception {
+    char[] carg0 = { '\n', '\t', ' ', ' ', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1513() throws Exception {
+    char[] carg0 = { '\n', '\t', ' ', ' ', '\r', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1514() throws Exception {
+    char[] carg0 = { '\n', '\t', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1515() throws Exception {
+    char[] carg0 = { '\n', '\t', ' ', ' ', '\u0000', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1516() throws Exception {
+    char[] carg0 = { '\n', '\t', ' ', '\u0000', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1517() throws Exception {
+    char[] carg0 = { '\n', '\t', ' ', '(', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1518() throws Exception {
+    char[] carg0 = { '\n', '\t', '\u0000' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1519() throws Exception {
+    char[] carg0 = { '\n', '\t', ':' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1520() throws Exception {
+    char[] carg0 = { '\n', '\t', '2' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    int retval = cut.parse();
+
+    int expected = 2;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testParse1521() throws Exception {
+    char[] carg0 = { '\n', '\t', '(' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1522() throws Exception {
+    char[] carg0 = { '\n', '\t', '(', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1523() throws Exception {
+    char[] carg0 = { '\n', '\t', '(', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1524() throws Exception {
+    char[] carg0 = { '\n', '\t', '(', '\r', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1525() throws Exception {
+    char[] carg0 = { '\n', '\t', '(', ' ', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1526() throws Exception {
+    char[] carg0 = { '\n', '\t', '(', '\u0000', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(', '(' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1527() throws Exception {
+    char[] carg0 = { '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1528() throws Exception {
+    char[] carg0 = { '\n', '\n', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1529() throws Exception {
+    char[] carg0 = { '\n', '\n', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1530() throws Exception {
+    char[] carg0 = { '\n', '\n', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1531() throws Exception {
+    char[] carg0 = { '\n', '\n', '\t', '\t', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1532() throws Exception {
+    char[] carg0 = { '\n', '\n', '\t', '\t', '\r', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1533() throws Exception {
+    char[] carg0 = { '\n', '\n', '\t', '\t', ' ', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1534() throws Exception {
+    char[] carg0 = { '\n', '\n', '\t', '\t', '\u0000', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1535() throws Exception {
+    char[] carg0 = { '\n', '\n', '\t', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1536() throws Exception {
+    char[] carg0 = { '\n', '\n', '\t', '\n', '\t', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1537() throws Exception {
+    char[] carg0 = { '\n', '\n', '\t', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1538() throws Exception {
+    char[] carg0 = { '\n', '\n', '\t', '\n', '\r', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1539() throws Exception {
+    char[] carg0 = { '\n', '\n', '\t', '\n', ' ', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1540() throws Exception {
+    char[] carg0 = { '\n', '\n', '\t', '\n', '\u0000', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1541() throws Exception {
+    char[] carg0 = { '\n', '\n', '\t', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1542() throws Exception {
+    char[] carg0 = { '\n', '\n', '\t', '\r', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1543() throws Exception {
+    char[] carg0 = { '\n', '\n', '\t', '\r', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1544() throws Exception {
+    char[] carg0 = { '\n', '\n', '\t', '\r', '\r', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1545() throws Exception {
+    char[] carg0 = { '\n', '\n', '\t', '\r', ' ', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1546() throws Exception {
+    char[] carg0 = { '\n', '\n', '\t', '\r', '\u0000', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1547() throws Exception {
+    char[] carg0 = { '\n', '\n', '\t', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1548() throws Exception {
+    char[] carg0 = { '\n', '\n', '\t', ' ', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1549() throws Exception {
+    char[] carg0 = { '\n', '\n', '\t', ' ', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1550() throws Exception {
+    char[] carg0 = { '\n', '\n', '\t', ' ', '\r', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1551() throws Exception {
+    char[] carg0 = { '\n', '\n', '\t', ' ', ' ', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1552() throws Exception {
+    char[] carg0 = { '\n', '\n', '\t', ' ', '\u0000', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1553() throws Exception {
+    char[] carg0 = { '\n', '\n', '\t', '\u0000', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1554() throws Exception {
+    char[] carg0 = { '\n', '\n', '\t', '(', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1555() throws Exception {
+    char[] carg0 = { '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1556() throws Exception {
+    char[] carg0 = { '\n', '\n', '\n', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1557() throws Exception {
+    char[] carg0 = { '\n', '\n', '\n', '\t', '\t', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1558() throws Exception {
+    char[] carg0 = { '\n', '\n', '\n', '\t', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1559() throws Exception {
+    char[] carg0 = { '\n', '\n', '\n', '\t', '\r', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1560() throws Exception {
+    char[] carg0 = { '\n', '\n', '\n', '\t', ' ', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1561() throws Exception {
+    char[] carg0 = { '\n', '\n', '\n', '\t', '\u0000', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1562() throws Exception {
+    char[] carg0 = { '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1563() throws Exception {
+    char[] carg0 = { '\n', '\n', '\n', '\n', '\t', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1564() throws Exception {
+    char[] carg0 = { '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1565() throws Exception {
+    char[] carg0 = { '\n', '\n', '\n', '\n', '\r', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1566() throws Exception {
+    char[] carg0 = { '\n', '\n', '\n', '\n', ' ', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1567() throws Exception {
+    char[] carg0 = { '\n', '\n', '\n', '\n', '\u0000', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1568() throws Exception {
+    char[] carg0 = { '\n', '\n', '\n', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1569() throws Exception {
+    char[] carg0 = { '\n', '\n', '\n', '\r', '\t', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1570() throws Exception {
+    char[] carg0 = { '\n', '\n', '\n', '\r', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1571() throws Exception {
+    char[] carg0 = { '\n', '\n', '\n', '\r', '\r', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1572() throws Exception {
+    char[] carg0 = { '\n', '\n', '\n', '\r', ' ', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1573() throws Exception {
+    char[] carg0 = { '\n', '\n', '\n', '\r', '\u0000', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1574() throws Exception {
+    char[] carg0 = { '\n', '\n', '\n', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1575() throws Exception {
+    char[] carg0 = { '\n', '\n', '\n', ' ', '\t', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1576() throws Exception {
+    char[] carg0 = { '\n', '\n', '\n', ' ', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1577() throws Exception {
+    char[] carg0 = { '\n', '\n', '\n', ' ', '\r', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1578() throws Exception {
+    char[] carg0 = { '\n', '\n', '\n', ' ', ' ', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1579() throws Exception {
+    char[] carg0 = { '\n', '\n', '\n', ' ', '\u0000', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1580() throws Exception {
+    char[] carg0 = { '\n', '\n', '\n', '\u0000', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1581() throws Exception {
+    char[] carg0 = { '\n', '\n', '\n', '(', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1582() throws Exception {
+    char[] carg0 = { '\n', '\n', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1583() throws Exception {
+    char[] carg0 = { '\n', '\n', '\r', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1584() throws Exception {
+    char[] carg0 = { '\n', '\n', '\r', '\t', '\t', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1585() throws Exception {
+    char[] carg0 = { '\n', '\n', '\r', '\t', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1586() throws Exception {
+    char[] carg0 = { '\n', '\n', '\r', '\t', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1587() throws Exception {
+    char[] carg0 = { '\n', '\n', '\r', '\t', ' ', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1588() throws Exception {
+    char[] carg0 = { '\n', '\n', '\r', '\t', '\u0000', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1589() throws Exception {
+    char[] carg0 = { '\n', '\n', '\r', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1590() throws Exception {
+    char[] carg0 = { '\n', '\n', '\r', '\n', '\t', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1591() throws Exception {
+    char[] carg0 = { '\n', '\n', '\r', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1592() throws Exception {
+    char[] carg0 = { '\n', '\n', '\r', '\n', '\r', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1593() throws Exception {
+    char[] carg0 = { '\n', '\n', '\r', '\n', ' ', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1594() throws Exception {
+    char[] carg0 = { '\n', '\n', '\r', '\n', '\u0000', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1595() throws Exception {
+    char[] carg0 = { '\n', '\n', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1596() throws Exception {
+    char[] carg0 = { '\n', '\n', '\r', '\r', '\t', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1597() throws Exception {
+    char[] carg0 = { '\n', '\n', '\r', '\r', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1598() throws Exception {
+    char[] carg0 = { '\n', '\n', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1599() throws Exception {
+    char[] carg0 = { '\n', '\n', '\r', '\r', ' ', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1600() throws Exception {
+    char[] carg0 = { '\n', '\n', '\r', '\r', '\u0000', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1601() throws Exception {
+    char[] carg0 = { '\n', '\n', '\r', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1602() throws Exception {
+    char[] carg0 = { '\n', '\n', '\r', ' ', '\t', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1603() throws Exception {
+    char[] carg0 = { '\n', '\n', '\r', ' ', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1604() throws Exception {
+    char[] carg0 = { '\n', '\n', '\r', ' ', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1605() throws Exception {
+    char[] carg0 = { '\n', '\n', '\r', ' ', ' ', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1606() throws Exception {
+    char[] carg0 = { '\n', '\n', '\r', ' ', '\u0000', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1607() throws Exception {
+    char[] carg0 = { '\n', '\n', '\r', '\u0000', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1608() throws Exception {
+    char[] carg0 = { '\n', '\n', '\r', '(', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1609() throws Exception {
+    char[] carg0 = { '\n', '\n', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1610() throws Exception {
+    char[] carg0 = { '\n', '\n', ' ', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1611() throws Exception {
+    char[] carg0 = { '\n', '\n', ' ', '\t', '\t', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1612() throws Exception {
+    char[] carg0 = { '\n', '\n', ' ', '\t', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1613() throws Exception {
+    char[] carg0 = { '\n', '\n', ' ', '\t', '\r', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1614() throws Exception {
+    char[] carg0 = { '\n', '\n', ' ', '\t', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1615() throws Exception {
+    char[] carg0 = { '\n', '\n', ' ', '\t', '\u0000', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1616() throws Exception {
+    char[] carg0 = { '\n', '\n', ' ', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1617() throws Exception {
+    char[] carg0 = { '\n', '\n', ' ', '\n', '\t', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1618() throws Exception {
+    char[] carg0 = { '\n', '\n', ' ', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1619() throws Exception {
+    char[] carg0 = { '\n', '\n', ' ', '\n', '\r', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1620() throws Exception {
+    char[] carg0 = { '\n', '\n', ' ', '\n', ' ', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1621() throws Exception {
+    char[] carg0 = { '\n', '\n', ' ', '\n', '\u0000', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1622() throws Exception {
+    char[] carg0 = { '\n', '\n', ' ', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1623() throws Exception {
+    char[] carg0 = { '\n', '\n', ' ', '\r', '\t', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1624() throws Exception {
+    char[] carg0 = { '\n', '\n', ' ', '\r', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1625() throws Exception {
+    char[] carg0 = { '\n', '\n', ' ', '\r', '\r', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1626() throws Exception {
+    char[] carg0 = { '\n', '\n', ' ', '\r', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1627() throws Exception {
+    char[] carg0 = { '\n', '\n', ' ', '\r', '\u0000', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1628() throws Exception {
+    char[] carg0 = { '\n', '\n', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1629() throws Exception {
+    char[] carg0 = { '\n', '\n', ' ', ' ', '\t', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1630() throws Exception {
+    char[] carg0 = { '\n', '\n', ' ', ' ', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1631() throws Exception {
+    char[] carg0 = { '\n', '\n', ' ', ' ', '\r', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1632() throws Exception {
+    char[] carg0 = { '\n', '\n', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1633() throws Exception {
+    char[] carg0 = { '\n', '\n', ' ', ' ', '\u0000', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1634() throws Exception {
+    char[] carg0 = { '\n', '\n', ' ', '\u0000', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1635() throws Exception {
+    char[] carg0 = { '\n', '\n', ' ', '(', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1636() throws Exception {
+    char[] carg0 = { '\n', '\n', '\u0000' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1637() throws Exception {
+    char[] carg0 = { '\n', '\n', ':' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1638() throws Exception {
+    char[] carg0 = { '\n', '\n', '2' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    int retval = cut.parse();
+
+    int expected = 2;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testParse1639() throws Exception {
+    char[] carg0 = { '\n', '\n', '(' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1640() throws Exception {
+    char[] carg0 = { '\n', '\n', '(', '\t', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1641() throws Exception {
+    char[] carg0 = { '\n', '\n', '(', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1642() throws Exception {
+    char[] carg0 = { '\n', '\n', '(', '\r', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1643() throws Exception {
+    char[] carg0 = { '\n', '\n', '(', ' ', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1644() throws Exception {
+    char[] carg0 = { '\n', '\n', '(', '\u0000', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1645() throws Exception {
+    char[] carg0 = { '\n', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1646() throws Exception {
+    char[] carg0 = { '\n', '\r', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1647() throws Exception {
+    char[] carg0 = { '\n', '\r', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1648() throws Exception {
+    char[] carg0 = { '\n', '\r', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1649() throws Exception {
+    char[] carg0 = { '\n', '\r', '\t', '\t', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1650() throws Exception {
+    char[] carg0 = { '\n', '\r', '\t', '\t', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1651() throws Exception {
+    char[] carg0 = { '\n', '\r', '\t', '\t', ' ', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1652() throws Exception {
+    char[] carg0 = { '\n', '\r', '\t', '\t', '\u0000', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1653() throws Exception {
+    char[] carg0 = { '\n', '\r', '\t', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1654() throws Exception {
+    char[] carg0 = { '\n', '\r', '\t', '\n', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1655() throws Exception {
+    char[] carg0 = { '\n', '\r', '\t', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1656() throws Exception {
+    char[] carg0 = { '\n', '\r', '\t', '\n', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1657() throws Exception {
+    char[] carg0 = { '\n', '\r', '\t', '\n', ' ', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1658() throws Exception {
+    char[] carg0 = { '\n', '\r', '\t', '\n', '\u0000', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1659() throws Exception {
+    char[] carg0 = { '\n', '\r', '\t', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1660() throws Exception {
+    char[] carg0 = { '\n', '\r', '\t', '\r', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1661() throws Exception {
+    char[] carg0 = { '\n', '\r', '\t', '\r', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1662() throws Exception {
+    char[] carg0 = { '\n', '\r', '\t', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1663() throws Exception {
+    char[] carg0 = { '\n', '\r', '\t', '\r', ' ', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1664() throws Exception {
+    char[] carg0 = { '\n', '\r', '\t', '\r', '\u0000', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1665() throws Exception {
+    char[] carg0 = { '\n', '\r', '\t', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1666() throws Exception {
+    char[] carg0 = { '\n', '\r', '\t', ' ', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1667() throws Exception {
+    char[] carg0 = { '\n', '\r', '\t', ' ', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1668() throws Exception {
+    char[] carg0 = { '\n', '\r', '\t', ' ', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1669() throws Exception {
+    char[] carg0 = { '\n', '\r', '\t', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1670() throws Exception {
+    char[] carg0 = { '\n', '\r', '\t', ' ', '\u0000', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1671() throws Exception {
+    char[] carg0 = { '\n', '\r', '\t', '\u0000', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1672() throws Exception {
+    char[] carg0 = { '\n', '\r', '\t', '(', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1673() throws Exception {
+    char[] carg0 = { '\n', '\r', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1674() throws Exception {
+    char[] carg0 = { '\n', '\r', '\n', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1675() throws Exception {
+    char[] carg0 = { '\n', '\r', '\n', '\t', '\t', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1676() throws Exception {
+    char[] carg0 = { '\n', '\r', '\n', '\t', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1677() throws Exception {
+    char[] carg0 = { '\n', '\r', '\n', '\t', '\r', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1678() throws Exception {
+    char[] carg0 = { '\n', '\r', '\n', '\t', ' ', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1679() throws Exception {
+    char[] carg0 = { '\n', '\r', '\n', '\t', '\u0000', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1680() throws Exception {
+    char[] carg0 = { '\n', '\r', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1681() throws Exception {
+    char[] carg0 = { '\n', '\r', '\n', '\n', '\t', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1682() throws Exception {
+    char[] carg0 = { '\n', '\r', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1683() throws Exception {
+    char[] carg0 = { '\n', '\r', '\n', '\n', '\r', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1684() throws Exception {
+    char[] carg0 = { '\n', '\r', '\n', '\n', ' ', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1685() throws Exception {
+    char[] carg0 = { '\n', '\r', '\n', '\n', '\u0000', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1686() throws Exception {
+    char[] carg0 = { '\n', '\r', '\n', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1687() throws Exception {
+    char[] carg0 = { '\n', '\r', '\n', '\r', '\t', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1688() throws Exception {
+    char[] carg0 = { '\n', '\r', '\n', '\r', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1689() throws Exception {
+    char[] carg0 = { '\n', '\r', '\n', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1690() throws Exception {
+    char[] carg0 = { '\n', '\r', '\n', '\r', ' ', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1691() throws Exception {
+    char[] carg0 = { '\n', '\r', '\n', '\r', '\u0000', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1692() throws Exception {
+    char[] carg0 = { '\n', '\r', '\n', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1693() throws Exception {
+    char[] carg0 = { '\n', '\r', '\n', ' ', '\t', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1694() throws Exception {
+    char[] carg0 = { '\n', '\r', '\n', ' ', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1695() throws Exception {
+    char[] carg0 = { '\n', '\r', '\n', ' ', '\r', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1696() throws Exception {
+    char[] carg0 = { '\n', '\r', '\n', ' ', ' ', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1697() throws Exception {
+    char[] carg0 = { '\n', '\r', '\n', ' ', '\u0000', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1698() throws Exception {
+    char[] carg0 = { '\n', '\r', '\n', '\u0000', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1699() throws Exception {
+    char[] carg0 = { '\n', '\r', '\n', '(', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1700() throws Exception {
+    char[] carg0 = { '\n', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1701() throws Exception {
+    char[] carg0 = { '\n', '\r', '\r', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1702() throws Exception {
+    char[] carg0 = { '\n', '\r', '\r', '\t', '\t', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1703() throws Exception {
+    char[] carg0 = { '\n', '\r', '\r', '\t', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1704() throws Exception {
+    char[] carg0 = { '\n', '\r', '\r', '\t', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1705() throws Exception {
+    char[] carg0 = { '\n', '\r', '\r', '\t', ' ', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1706() throws Exception {
+    char[] carg0 = { '\n', '\r', '\r', '\t', '\u0000', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1707() throws Exception {
+    char[] carg0 = { '\n', '\r', '\r', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1708() throws Exception {
+    char[] carg0 = { '\n', '\r', '\r', '\n', '\t', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1709() throws Exception {
+    char[] carg0 = { '\n', '\r', '\r', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1710() throws Exception {
+    char[] carg0 = { '\n', '\r', '\r', '\n', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1711() throws Exception {
+    char[] carg0 = { '\n', '\r', '\r', '\n', ' ', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1712() throws Exception {
+    char[] carg0 = { '\n', '\r', '\r', '\n', '\u0000', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1713() throws Exception {
+    char[] carg0 = { '\n', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1714() throws Exception {
+    char[] carg0 = { '\n', '\r', '\r', '\r', '\t', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1715() throws Exception {
+    char[] carg0 = { '\n', '\r', '\r', '\r', '\n', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1716() throws Exception {
+    char[] carg0 = { '\n', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1717() throws Exception {
+    char[] carg0 = { '\n', '\r', '\r', '\r', ' ', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1718() throws Exception {
+    char[] carg0 = { '\n', '\r', '\r', '\r', '\u0000', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1719() throws Exception {
+    char[] carg0 = { '\n', '\r', '\r', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1720() throws Exception {
+    char[] carg0 = { '\n', '\r', '\r', ' ', '\t', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1721() throws Exception {
+    char[] carg0 = { '\n', '\r', '\r', ' ', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1722() throws Exception {
+    char[] carg0 = { '\n', '\r', '\r', ' ', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1723() throws Exception {
+    char[] carg0 = { '\n', '\r', '\r', ' ', ' ', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1724() throws Exception {
+    char[] carg0 = { '\n', '\r', '\r', ' ', '\u0000', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1725() throws Exception {
+    char[] carg0 = { '\n', '\r', '\r', '\u0000', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1726() throws Exception {
+    char[] carg0 = { '\n', '\r', '\r', '(', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1727() throws Exception {
+    char[] carg0 = { '\n', '\r', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1728() throws Exception {
+    char[] carg0 = { '\n', '\r', ' ', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1729() throws Exception {
+    char[] carg0 = { '\n', '\r', ' ', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1730() throws Exception {
+    char[] carg0 = { '\n', '\r', ' ', '\t', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1731() throws Exception {
+    char[] carg0 = { '\n', '\r', ' ', '\t', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r', '\r' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1732() throws Exception {
+    char[] carg0 = { '\n', '\r', ' ', '\t', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1733() throws Exception {
+    char[] carg0 = { '\n', '\r', ' ', '\t', '\u0000', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1734() throws Exception {
+    char[] carg0 = { '\n', '\r', ' ', '\n' };
+    ExprEvaluator cut = new ExprEvaluator(carg0);
+
+    Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());
+  }
+
+  @Test
+  public void testParse1735() throws Exception {
+    char[] carg0 = { '\n', '\r', ' ', '\n', '\t', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n' };
     ExprEvaluator cut = new ExprEvaluator(carg0);
 
     Assertions.assertThrows(IllegalArgumentException.class, () -> cut.parse());

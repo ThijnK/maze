@@ -10,26 +10,26 @@ import org.junit.jupiter.api.Test;
 
 public class FloatStatisticsTest {
   @Test
-  public void testAbs1() throws Exception {
-    float marg0 = 1.4E-45F;
-    float retval = FloatStatistics.abs(marg0);
-
-    float expected = 1.4E-45F;
-    Assertions.assertEquals(expected, retval);
-  }
-
-  @Test
   public void testMean1() throws Exception {
     float[] marg0 = null;
     Assertions.assertThrows(NullPointerException.class, () -> FloatStatistics.mean(marg0));
   }
 
   @Test
-  public void testAbs2() throws Exception {
-    float marg0 = -2.503709E-32F;
+  public void testAbs1() throws Exception {
+    float marg0 = 5.877472E-39F;
     float retval = FloatStatistics.abs(marg0);
 
-    float expected = 2.503709E-32F;
+    float expected = 5.877472E-39F;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testAbs2() throws Exception {
+    float marg0 = -8.224535E15F;
+    float retval = FloatStatistics.abs(marg0);
+
+    float expected = 8.224535E15F;
     Assertions.assertEquals(expected, retval);
   }
 
@@ -40,15 +40,15 @@ public class FloatStatisticsTest {
   }
 
   @Test
-  public void testStandardDeviation1() throws Exception {
-    float[] marg0 = null;
-    Assertions.assertThrows(NullPointerException.class, () -> FloatStatistics.standardDeviation(marg0));
-  }
-
-  @Test
   public void testSqrt1() throws Exception {
     float marg0 = -1.0842023E-19F;
     Assertions.assertThrows(IllegalArgumentException.class, () -> FloatStatistics.sqrt(marg0));
+  }
+
+  @Test
+  public void testStandardDeviation1() throws Exception {
+    float[] marg0 = null;
+    Assertions.assertThrows(NullPointerException.class, () -> FloatStatistics.standardDeviation(marg0));
   }
 
   @Test
@@ -57,15 +57,6 @@ public class FloatStatisticsTest {
     float retval = FloatStatistics.mean(marg0);
 
     float expected = Float.NaN;
-    Assertions.assertEquals(expected, retval);
-  }
-
-  @Test
-  public void testSqrt2() throws Exception {
-    float marg0 = Float.POSITIVE_INFINITY;
-    float retval = FloatStatistics.sqrt(marg0);
-
-    float expected = Float.POSITIVE_INFINITY;
     Assertions.assertEquals(expected, retval);
   }
 
@@ -79,11 +70,20 @@ public class FloatStatisticsTest {
   }
 
   @Test
-  public void testSqrt3() throws Exception {
-    float marg0 = 7.703723E-34F;
+  public void testSqrt2() throws Exception {
+    float marg0 = 4.0000005F;
     float retval = FloatStatistics.sqrt(marg0);
 
-    float expected = 3.8518617E-34F;
+    float expected = 2.0000002F;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testSqrt3() throws Exception {
+    float marg0 = 3.3428412E-18F;
+    float retval = FloatStatistics.sqrt(marg0);
+
+    float expected = 1.6714206E-18F;
     Assertions.assertEquals(expected, retval);
   }
 
@@ -93,51 +93,6 @@ public class FloatStatisticsTest {
     float retval = FloatStatistics.mean(marg0);
 
     float expected = Float.NaN;
-    Assertions.assertEquals(expected, retval);
-  }
-
-  @Test
-  public void testVariance2() throws Exception {
-    float[] marg0 = {};
-    float retval = FloatStatistics.variance(marg0);
-
-    float expected = Float.NaN;
-    Assertions.assertEquals(expected, retval);
-  }
-
-  @Test
-  public void testMean5() throws Exception {
-    float[] marg0 = { Float.NaN, Float.NaN, Float.NaN };
-    float retval = FloatStatistics.mean(marg0);
-
-    float expected = Float.NaN;
-    Assertions.assertEquals(expected, retval);
-  }
-
-  @Test
-  public void testSqrt4() throws Exception {
-    float marg0 = 4.0046983F;
-    float retval = FloatStatistics.sqrt(marg0);
-
-    float expected = 2.0011744F;
-    Assertions.assertEquals(expected, retval);
-  }
-
-  @Test
-  public void testSqrt5() throws Exception {
-    float marg0 = 4.000794F;
-    float retval = FloatStatistics.sqrt(marg0);
-
-    float expected = 2.0001984F;
-    Assertions.assertEquals(expected, retval);
-  }
-
-  @Test
-  public void testSqrt6() throws Exception {
-    float marg0 = 3.9986854F;
-    float retval = FloatStatistics.sqrt(marg0);
-
-    float expected = 1.9996713F;
     Assertions.assertEquals(expected, retval);
   }
 }
