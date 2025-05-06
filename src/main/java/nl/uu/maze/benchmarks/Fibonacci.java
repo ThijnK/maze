@@ -9,14 +9,14 @@ package nl.uu.maze.benchmarks;
  * other from the recursive calls, respectively.
  */
 public class Fibonacci {
-    public static int iterative(int n) {
+    public static long iterative(long n) {
         if (n <= 1) {
             return n;
         }
-        int a = 0, b = 1;
-        int result = 0;
+        long a = 0, b = 1;
+        long result = 0;
 
-        for (int i = 2; i <= n; i++) {
+        for (long i = 2; i <= n; i++) {
             result = a + b;
             a = b;
             b = result;
@@ -24,7 +24,11 @@ public class Fibonacci {
         return result;
     }
 
-    public static int recursive(int n) {
+    public static long recursive(long n) {
+        // Cutoff for recursion to prevent stack overflow
+        if (n > 40) {
+            return iterative(n);
+        }
         if (n <= 1) {
             return n;
         }
