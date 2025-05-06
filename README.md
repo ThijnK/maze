@@ -160,7 +160,6 @@ The following benchmark subjects are included:
 - [`BinarySearch`](/src/main/java/nl/uu/maze/benchmarks/BinarySearch.java): Implementation of a binary search algorithm on an int array.
 - [`ConvergingPaths`](/src/main/java/nl/uu/maze/benchmarks/ConvergingPaths.java): Class where control flow paths repeatedly diverge and converge.
 - [`ExprEvaluator`](/src/main/java/nl/uu/maze/benchmarks/ExprEvaluator.java): Evaluates simple arithemetic expressions in a char array, using recursive descent parsing.
-- [`Fibonacci`](/src/main/java/nl/uu/maze/benchmarks/Fibonacci.java): Implementation of the Fibonacci function, both iterative and recursive.
 - [`FloatStatistics`](/src/main/java/nl/uu/maze/benchmarks/FloatStatistics.java): Provides methods for statistics and functions of floating-point numbers (e.g., mean, sqrt, etc.).
 - [`MatrixAnalyzer`](/src/main/java/nl/uu/maze/benchmarks/MatrixAnalyzer.java): Performs operations on a 2D int array.
 - [`NestedLoops`](/src/main/java/nl/uu/maze/benchmarks/NestedLoops.java): Sorts an array with bubble sort while calculating a specific value.
