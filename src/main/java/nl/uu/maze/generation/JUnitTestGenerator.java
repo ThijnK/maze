@@ -179,12 +179,12 @@ public class JUnitTestGenerator {
             List<String> ctorParams = addParamDefinitions(methodBuilder, ctor.getParameterTypes(), argMap,
                     MethodType.CTOR);
             // Assert throws for constructor call if it threw an exception
-            if (result.thrownByCtor()) {
+            if (result.thrownByCtor() && !targetJUnit4) {
                 // For JUnit 5, use assertThrows to check for exceptions
-                if (!targetJUnit4) {
-                    methodBuilder.addStatement("$T.assertThrows($T.class, () -> new $T($L))", Assertions.class,
-                            result.getTargetExceptionClass(), clazz, String.join(", ", ctorParams));
-                }
+                // For JUnit 4, the expected exception is added to the @Test annotation, so we
+                // just call the ctor below
+                methodBuilder.addStatement("$T.assertThrows($T.class, () -> new $T($L))", Assertions.class,
+                        result.getTargetExceptionClass(), clazz, String.join(", ", ctorParams));
             } else {
                 if (forCtor) {
                     methodBuilder.addStatement("new $T($L)", clazz, String.join(", ", ctorParams));
