@@ -480,18 +480,31 @@ public class SymbolicExecutor {
             return handleOtherStmts(caller, replay);
         }
 
+        // If the state is exceptional, only follow successors that are catch blocks,
+        // unless there are no catch blocks, in which case we just return the state
+        if (state.isExceptionThrown()) {
+            for (Stmt succ : succs) {
+                if (isCatchBlock(succ)) {
+                    SymbolicState newState = state.clone();
+                    newState.setStmt(succ);
+                    newState.setExceptionThrown(false);
+                    newStates.add(newState);
+                }
+            }
+
+            if (newStates.isEmpty()) {
+                // If no catch blocks, just return the state as is
+                // A test case will then be generated for the path up to this point that will
+                // trigger the exception
+                newStates.add(state);
+            }
+        }
+
         // Note: generally non-branching statements will not have more than 1 successor,
         // but it can happen for exception-throwing statements inside a try block
         for (int i = 0; i < succs.size(); i++) {
-            Stmt succ = succs.get(i);
-            // If the state is exceptional, and this succ is catch block, reset the
-            // exception flag
-            if (state.isExceptionThrown() && isCatchBlock(succ)) {
-                state.setExceptionThrown(false);
-            }
-
             SymbolicState newState = i == succs.size() - 1 ? state : state.clone();
-            newState.setStmt(succ);
+            newState.setStmt(succs.get(i));
             newStates.add(newState);
         }
 
