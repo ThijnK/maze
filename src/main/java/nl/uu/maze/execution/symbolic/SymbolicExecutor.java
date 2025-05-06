@@ -488,6 +488,13 @@ public class SymbolicExecutor {
                     SymbolicState newState = state.clone();
                     newState.setStmt(succ);
                     newState.setExceptionThrown(false);
+
+                    // For replay, return the first catch block, because there is no instrumentation
+                    // for which catch block should be followed (yet)
+                    // This is a limitation of the current implementation
+                    if (replay) {
+                        return List.of(newState);
+                    }
                     newStates.add(newState);
                 }
             }
@@ -496,12 +503,27 @@ public class SymbolicExecutor {
                 // If no catch blocks, just return the state as is
                 // A test case will then be generated for the path up to this point that will
                 // trigger the exception
-                newStates.add(state);
+                return List.of(state);
             }
         }
 
-        // Note: generally non-branching statements will not have more than 1 successor,
-        // but it can happen for exception-throwing statements inside a try block
+        // Note: generally non-branching statements will not have more than a single
+        // successor, but it does occur for statements inside a try block (one successor
+        // for every catch block, and of course the non-exceptional successor)
+
+        if (replay) {
+            // When replaying a trace, follow the first successor that is not a catch block
+            // Note: if an exception was thrown during the concrete execution that we are
+            // currently replaying, then we would not have gotten to this point, because the
+            // trace would have ended, meaning it's ok to simply follow the first non-catch
+            // successor
+            Stmt succ = succs.stream().filter(s -> !isCatchBlock(s)).findFirst().orElse(null);
+            if (succ != null) {
+                state.setStmt(succ);
+            }
+            return List.of(state);
+        }
+
         for (int i = 0; i < succs.size(); i++) {
             SymbolicState newState = i == succs.size() - 1 ? state : state.clone();
             newState.setStmt(succs.get(i));
