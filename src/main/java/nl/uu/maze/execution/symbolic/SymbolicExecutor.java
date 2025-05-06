@@ -277,6 +277,9 @@ public class SymbolicExecutor {
         // This is to ensure that the engine can create an array of the correct size
         // when generating test cases
         if (stmt.containsArrayRef()) {
+            // Note:it will never occur that both leftOp and rightOp are array references,
+            // because Jimple has a Three-Address-Code grammar structure, meaning there are
+            // no nested expressions!
             JArrayRef ref = leftOp instanceof JArrayRef ? (JArrayRef) leftOp : (JArrayRef) rightOp;
             BitVecExpr index = (BitVecExpr) jimpleToZ3.transform(ref.getIndex(), state);
             BitVecExpr len = (BitVecExpr) state.heap.getArrayLength(ref.getBase().getName());
