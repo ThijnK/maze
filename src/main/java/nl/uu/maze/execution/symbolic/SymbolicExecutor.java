@@ -243,65 +243,7 @@ public class SymbolicExecutor {
     private List<SymbolicState> handleDefStmt(AbstractDefinitionStmt stmt, SymbolicState state, boolean replay) {
         LValue leftOp = stmt.getLeftOp();
         Value rightOp = stmt.getRightOp();
-
-        // For array access on symbolic arrays (i.e., parameters), we split the state
-        // into one where the index is outside the bounds of the array (throws
-        // exception) and one where it is not
-        // This is to ensure that the engine can create an array of the correct size
-        // when generating test cases
-        SymbolicState outOfBoundsState = null;
-        if (stmt.containsArrayRef()) {
-            JArrayRef ref = leftOp instanceof JArrayRef ? (JArrayRef) leftOp : (JArrayRef) rightOp;
-            if (state.heap.isSymbolicArray(ref.getBase().getName())) {
-                BitVecExpr index = (BitVecExpr) jimpleToZ3.transform(ref.getIndex(), state);
-                BitVecExpr len = (BitVecExpr) state.heap.getArrayLength(ref.getBase().getName());
-                if (len == null) {
-                    // If length is null, means we have a null reference, and exception is thrown
-                    return handleOtherStmts(state, replay);
-                }
-
-                // If replaying a trace, we should have a trace entry for the array access
-                if (replay) {
-                    TraceEntry entry;
-                    // If end of trace is reached or not an array access, something is wrong
-                    if (!TraceManager.hasEntries(state.getMethodSignature())
-                            || !(entry = TraceManager.consumeEntry(state.getMethodSignature())).isArrayAccess()) {
-                        state.setExceptionThrown();
-                        return List.of(state);
-                    }
-
-                    // If the entry value is 1, inside bounds, otherwise out of bounds
-                    if (entry.getValue() == 0) {
-                        state.addPathConstraint(ctx.mkOr(ctx.mkBVSLT(index, ctx.mkBV(0, sorts.getIntBitSize())),
-                                ctx.mkBVSGE(index, len)));
-                        state.setExceptionThrown();
-                        return handleOtherStmts(state, true);
-                    } else {
-                        state.addPathConstraint(ctx.mkAnd(ctx.mkBVSGE(index, ctx.mkBV(0, sorts.getIntBitSize())),
-                                ctx.mkBVSLT(index, len)));
-                    }
-                } else {
-                    // If not replaying a trace, split the state into one where the index is out of
-                    // bounds and one where it is not
-                    outOfBoundsState = state.clone();
-                    outOfBoundsState
-                            .addPathConstraint(ctx.mkOr(ctx.mkBVSLT(index, ctx.mkBV(0, sorts.getIntBitSize())),
-                                    ctx.mkBVSGE(index, len)));
-                    outOfBoundsState.setExceptionThrown();
-                    state.addPathConstraint(ctx.mkAnd(ctx.mkBVSGE(index, ctx.mkBV(0, sorts.getIntBitSize())),
-                            ctx.mkBVSLT(index, len)));
-                }
-            }
-            // If not a symbolic array, and replaying a trace, we still need to consume the
-            // trace entry for the array access
-            else if (replay) {
-                if (!TraceManager.hasEntries(state.getMethodSignature())
-                        || !TraceManager.consumeEntry(state.getMethodSignature()).isArrayAccess()) {
-                    state.setExceptionThrown();
-                    return List.of(state);
-                }
-            }
-        }
+        List<SymbolicState> newStates = new ArrayList<>();
 
         Expr<?> value;
         if (stmt.containsInvokeExpr()) {
@@ -331,6 +273,57 @@ public class SymbolicExecutor {
             value = jimpleToZ3.transform(rightOp, state, leftOp.toString());
         }
 
+        // For array access on symbolic arrays (i.e., parameters), we split the state
+        // into one where the index is outside the bounds of the array (throws
+        // exception) and one where it is not
+        // This is to ensure that the engine can create an array of the correct size
+        // when generating test cases
+        if (stmt.containsArrayRef()) {
+            JArrayRef ref = leftOp instanceof JArrayRef ? (JArrayRef) leftOp : (JArrayRef) rightOp;
+            BitVecExpr index = (BitVecExpr) jimpleToZ3.transform(ref.getIndex(), state);
+            BitVecExpr len = (BitVecExpr) state.heap.getArrayLength(ref.getBase().getName());
+            if (len == null) {
+                // If length is null, means we have a null reference, and exception is thrown
+                return handleOtherStmts(state, replay);
+            }
+
+            // If replaying a trace, we should have a trace entry for the array access
+            if (replay) {
+                TraceEntry entry;
+                // If end of trace is reached or not an array access, something is wrong
+                if (!TraceManager.hasEntries(state.getMethodSignature())
+                        || !(entry = TraceManager.consumeEntry(state.getMethodSignature())).isArrayAccess()) {
+                    state.setExceptionThrown();
+                    return List.of(state);
+                }
+
+                // If the entry value is 1, inside bounds, otherwise out of bounds
+                if (entry.getValue() == 0) {
+                    state.addPathConstraint(ctx.mkOr(ctx.mkBVSLT(index, ctx.mkBV(0, sorts.getIntBitSize())),
+                            ctx.mkBVSGE(index, len)));
+                    state.setExceptionThrown();
+                    return handleOtherStmts(state, true);
+                } else {
+                    state.addPathConstraint(ctx.mkAnd(ctx.mkBVSGE(index, ctx.mkBV(0, sorts.getIntBitSize())),
+                            ctx.mkBVSLT(index, len)));
+                }
+            } else {
+                // If not replaying a trace, split the state into one where the index is out of
+                // bounds and one where it is not
+                SymbolicState outOfBoundsState = state.clone();
+                outOfBoundsState
+                        .addPathConstraint(ctx.mkOr(ctx.mkBVSLT(index, ctx.mkBV(0, sorts.getIntBitSize())),
+                                ctx.mkBVSGE(index, len)));
+                outOfBoundsState.setExceptionThrown();
+                // The handleOtherStmts method will take care of finding a catch block if there
+                // is one to catch the exception, and otherwise will just return the state
+                newStates.addAll(handleOtherStmts(outOfBoundsState, false));
+                // The other state is the one where the index is in bounds
+                state.addPathConstraint(ctx.mkAnd(ctx.mkBVSGE(index, ctx.mkBV(0, sorts.getIntBitSize())),
+                        ctx.mkBVSLT(index, len)));
+            }
+        }
+
         switch (leftOp) {
             case JArrayRef ref -> {
                 BitVecExpr index = (BitVecExpr) jimpleToZ3.transform(ref.getIndex(), state);
@@ -351,12 +344,8 @@ public class SymbolicExecutor {
         }
 
         // Definition statements follow the same control flow as other statements
-        List<SymbolicState> succStates = handleOtherStmts(state, replay);
-        // For optional out-of-bounds state, check successors for potential catch blocks
-        if (outOfBoundsState != null) {
-            succStates.addAll(handleOtherStmts(outOfBoundsState, false));
-        }
-        return succStates;
+        newStates.addAll(handleOtherStmts(state, replay));
+        return newStates;
     }
 
     /**
