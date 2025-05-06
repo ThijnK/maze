@@ -8,9 +8,12 @@ import com.microsoft.z3.ArraySort;
 import com.microsoft.z3.Context;
 import com.microsoft.z3.Expr;
 
+import nl.uu.maze.execution.ArgMap;
 import nl.uu.maze.execution.symbolic.HeapObjects.ArrayObject;
 import nl.uu.maze.execution.symbolic.HeapObjects.HeapObject;
 import nl.uu.maze.execution.symbolic.PathConstraint.AliasConstraint;
+import nl.uu.maze.instrument.TraceManager;
+import nl.uu.maze.instrument.TraceManager.TraceEntry;
 import nl.uu.maze.util.Pair;
 import nl.uu.maze.util.Z3ContextProvider;
 import nl.uu.maze.util.Z3Sorts;
@@ -130,5 +133,47 @@ public class SymbolicAliasResolver {
             currentCombination[index] = i;
             splitOnAliasCombinations(state, refs, index + 1, currentCombination, resultStates);
         }
+    }
+
+    /**
+     * Resolve alias for reference parameters when replaying a trace.
+     * The correct alias is recorded in the trace.
+     */
+    public static void resolveAliasForParameter(SymbolicState state, Expr<?> symRef) {
+        TraceEntry entry = TraceManager.consumeEntry(state.getMethodSignature());
+        if (entry == null || !entry.isAliasResolution()) {
+            state.setExceptionThrown();
+            return;
+        }
+        // For callee states, parameters are passed, so not symbolic and are thus
+        // already resolved to a single alias
+        if (state.getMethodType().isCallee() || state.heap.isResolved(symRef)) {
+            return;
+        }
+
+        Set<Expr<?>> aliases = state.heap.getAliases(symRef);
+        if (aliases == null) {
+            return;
+        }
+        Expr<?>[] aliasArr = aliases.toArray(Expr<?>[]::new);
+
+        // Find the right concrete reference for the parameter
+        // If null, this is simply the null constant
+        // Otherwise, it's the concrete reference of the aliased parameter
+        // Note: value in trace is the index of the aliased parameter or -1 for null
+        int aliasIndex = entry.getValue();
+        Expr<?> alias = aliasIndex == -1 ? sorts.getNullConst()
+                : state.heap.getSingleAlias(ArgMap.getSymbolicName(state.getMethodType(), aliasIndex));
+        // Find the index of this alias in the aliasArr
+        int i = 0;
+        for (; i < aliasArr.length; i++) {
+            if (aliasArr[i].equals(alias)) {
+                break;
+            }
+        }
+        // Constrain the parameter to the right alias
+        state.heap.setSingleAlias(symRef, alias);
+        AliasConstraint constraint = new AliasConstraint(state, symRef, aliasArr, i);
+        state.addPathConstraint(constraint);
     }
 }

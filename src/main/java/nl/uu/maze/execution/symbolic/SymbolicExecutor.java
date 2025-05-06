@@ -3,7 +3,6 @@ package nl.uu.maze.execution.symbolic;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,7 +10,6 @@ import org.slf4j.LoggerFactory;
 import com.microsoft.z3.*;
 
 import nl.uu.maze.analysis.JavaAnalyzer;
-import nl.uu.maze.execution.ArgMap;
 import nl.uu.maze.execution.concrete.ConcreteExecutor;
 import nl.uu.maze.execution.symbolic.PathConstraint.*;
 import nl.uu.maze.instrument.TraceManager;
@@ -340,54 +338,12 @@ public class SymbolicExecutor {
 
         // Special handling of parameters for reference types when replaying a trace
         if (replay && rightOp instanceof JParameterRef && sorts.isRef(value)) {
-            resolveAliasForParameter(state, value);
+            SymbolicAliasResolver.resolveAliasForParameter(state, value);
         }
 
         // Definition statements follow the same control flow as other statements
         newStates.addAll(handleOtherStmts(state, replay));
         return newStates;
-    }
-
-    /**
-     * Resolve alias for reference parameters when replaying a trace.
-     * The correct alias is recorded in the trace.
-     */
-    private void resolveAliasForParameter(SymbolicState state, Expr<?> symRef) {
-        TraceEntry entry = TraceManager.consumeEntry(state.getMethodSignature());
-        if (entry == null || !entry.isAliasResolution()) {
-            state.setExceptionThrown();
-            return;
-        }
-        // For callee states, parameters are passed, so not symbolic and are thus
-        // already resolved to a single alias
-        if (state.getMethodType().isCallee() || state.heap.isResolved(symRef)) {
-            return;
-        }
-
-        Set<Expr<?>> aliases = state.heap.getAliases(symRef);
-        if (aliases == null) {
-            return;
-        }
-        Expr<?>[] aliasArr = aliases.toArray(Expr<?>[]::new);
-
-        // Find the right concrete reference for the parameter
-        // If null, this is simply the null constant
-        // Otherwise, it's the concrete reference of the aliased parameter
-        // Note: value in trace is the index of the aliased parameter or -1 for null
-        int aliasIndex = entry.getValue();
-        Expr<?> alias = aliasIndex == -1 ? sorts.getNullConst()
-                : state.heap.getSingleAlias(ArgMap.getSymbolicName(state.getMethodType(), aliasIndex));
-        // Find the index of this alias in the aliasArr
-        int i = 0;
-        for (; i < aliasArr.length; i++) {
-            if (aliasArr[i].equals(alias)) {
-                break;
-            }
-        }
-        // Constrain the parameter to the right alias
-        state.heap.setSingleAlias(symRef, alias);
-        AliasConstraint constraint = new AliasConstraint(state, symRef, aliasArr, i);
-        state.addPathConstraint(constraint);
     }
 
     /**
