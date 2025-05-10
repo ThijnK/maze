@@ -24,11 +24,6 @@ import sootup.java.core.views.JavaView;
 
 /**
  * Provides analysis capabilities for Java programs using SootUp.
- * 
- * <p>
- * The constructor of this class takes an optional class path parameter. If no
- * class path is provided, a default class path "target/classes" is used.
- * </p>
  */
 public class JavaAnalyzer {
     private static final Logger logger = LoggerFactory.getLogger(JavaAnalyzer.class);
