@@ -354,24 +354,20 @@ public class JavaAnalyzer {
      * @return A concrete implementation class or null if no default is defined
      */
     public static Class<?> getDefaultImplementation(Class<?> interfaceClass) {
-        if (List.class.isAssignableFrom(interfaceClass)) {
+        if (interfaceClass.isAssignableFrom(ArrayList.class)) {
             return ArrayList.class;
-        } else if (Set.class.isAssignableFrom(interfaceClass)) {
+        } else if (interfaceClass.isAssignableFrom(HashSet.class)) {
             return HashSet.class;
-        } else if (Map.class.isAssignableFrom(interfaceClass)) {
+        } else if (interfaceClass.isAssignableFrom(HashMap.class)) {
             return HashMap.class;
-        } else if (Queue.class.isAssignableFrom(interfaceClass)) {
+        } else if (interfaceClass.isAssignableFrom(LinkedList.class)) {
             return LinkedList.class;
-        } else if (Deque.class.isAssignableFrom(interfaceClass)) {
+        } else if (interfaceClass.isAssignableFrom(ArrayDeque.class)) {
             return ArrayDeque.class;
-        } else if (Collection.class.isAssignableFrom(interfaceClass)) {
-            return ArrayList.class;
-        } else if (Iterable.class.isAssignableFrom(interfaceClass)) {
-            return ArrayList.class;
-        } else if (Iterator.class.isAssignableFrom(interfaceClass)) {
-            return ArrayList.class.getDeclaredClasses()[0]; // ArrayList$Itr
-        } else if (Enumeration.class.isAssignableFrom(interfaceClass)) {
+        } else if (interfaceClass.isAssignableFrom(Vector.class)) {
             return Vector.class;
+        } else if (interfaceClass.isAssignableFrom(ArrayList.class.getDeclaredClasses()[0])) { // ArrayList$Itr
+            return ArrayList.class.getDeclaredClasses()[0];
         }
         return null;
     }
