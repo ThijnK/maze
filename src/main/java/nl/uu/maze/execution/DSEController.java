@@ -378,7 +378,7 @@ public class DSEController {
                         if (state.isExceptionThrown() || state.isInfeasible()) {
                             if (concreteDriven) {
                                 return Optional.of(state);
-                            } else if (!state.isInfeasible()) {
+                            } else if (!clazz.isEnum() && !state.isInfeasible()) {
                                 generateTestCase(state);
                             }
                             continue;
