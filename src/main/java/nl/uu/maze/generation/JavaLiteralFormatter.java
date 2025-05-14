@@ -27,6 +27,10 @@ public class JavaLiteralFormatter {
         if (value.getClass().isArray()) {
             return arrayToString(value);
         }
+        // If an enum, return a string with valueOf
+        if (value.getClass().isEnum()) {
+            return classToString(value.getClass()) + ".valueOf(\"" + value.toString() + "\")";
+        }
 
         // Handle special cases for float and double
         if (value instanceof Float) {
@@ -48,6 +52,20 @@ public class JavaLiteralFormatter {
                 && !Float.isNaN((float) value) ? "F"
                         : value instanceof Long ? "L" : "";
         return value + postfix;
+    }
+
+    /**
+     * Returns the class name, with enclosing class names for nested class.
+     */
+    private static String classToString(Class<?> clazz) {
+        StringBuilder sb = new StringBuilder();
+        Class<?> enclosingClass = clazz.getEnclosingClass();
+        while (enclosingClass != null) {
+            sb.append(enclosingClass.getSimpleName()).append(".");
+            enclosingClass = enclosingClass.getEnclosingClass();
+        }
+        sb.append(clazz.getSimpleName());
+        return sb.toString();
     }
 
     /**
