@@ -1,6 +1,7 @@
 package nl.uu.maze.util;
 
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.List;
 import java.util.Optional;
 
@@ -150,11 +151,25 @@ public class Tree<T> {
     }
 
     private void collectLeafNodes(TreeNode<T> node, List<TreeNode<T>> leafNodes) {
-        if (node.isLeaf()) {
-            leafNodes.add(node);
-        } else {
-            for (TreeNode<T> child : node.getChildren()) {
-                collectLeafNodes(child, leafNodes);
+        if (node == null) {
+            return;
+        }
+
+        Deque<TreeNode<T>> stack = new java.util.ArrayDeque<>();
+        stack.push(node);
+
+        while (!stack.isEmpty()) {
+            TreeNode<T> current = stack.pop();
+
+            if (current.isLeaf()) {
+                leafNodes.add(current);
+            } else {
+                // Add children to the stack in reverse order
+                // to maintain the original traversal order
+                List<TreeNode<T>> children = current.getChildren();
+                for (int i = children.size() - 1; i >= 0; i--) {
+                    stack.push(children.get(i));
+                }
             }
         }
     }
