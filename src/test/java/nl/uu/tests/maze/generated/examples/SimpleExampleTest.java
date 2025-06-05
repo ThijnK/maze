@@ -15,7 +15,7 @@ public class SimpleExampleTest {
     int marg1 = 0;
     int retval = cut.foobar(marg0, marg1);
 
-    int expected = marg0;
+    int expected = 10;
     Assertions.assertEquals(expected, retval);
   }
 
