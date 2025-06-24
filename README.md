@@ -154,7 +154,7 @@ Further instructions and details on the benchmarking process can be found there.
 The synthetic benchmark classes used to compare different search strategies are available in the [`nl.uu.maze.benchmarks`](/src/main/java/nl/uu/maze/benchmarks/) package.
 These classes are designed to test the engine's capabilities and performance across various scenarios.
 
-The benchmark set used in the thesis includes the following classes:
+The benchmark set used in the thesis includes the following 10 classes:
 
 - [`AckermannPeter`](/src/main/java/nl/uu/maze/benchmarks/AckermannPeter.java): Implementation of the Ackermann-Peter function.
 - [`BinarySearch`](/src/main/java/nl/uu/maze/benchmarks/BinarySearch.java): Implementation of a binary search algorithm on an integer array.
@@ -171,19 +171,19 @@ More information about the reasoning behind the design of each subject can be fo
 
 ### Extended Benchmark Set
 
-The set of classes used in the thesis was extended with additional classes for further testing and evaluation.
+The set of classes used in the thesis was extended with 10 additional classes for further testing and evaluation, for a total of 20 benchmark classes.
 These classes are likewise available in the [`nl.uu.maze.generated.benchmarks`](/src/main/java/nl/uu/maze/generated/benchmarks/) package, and include:
 
-- [BinaryTree](/src/main/java/nl/uu/maze/benchmarks/BinaryTree.java): Provides a binary tree implementation and various traversal and utility methods (e.g., in-order, pre-order, post-order traversal, height calculation, finding certain values).
-- [BitwiseManipulator](/src/main/java/nl/uu/maze/benchmarks/BitwiseManipulator.java): Class that performs various bitwise operations on integers.
-- [BracketBalancer](/src/main/java/nl/uu/maze/benchmarks/BracketBalancer.java): Class that checks whether a string of brackets (represented as an array of characters) is balanced.
-- [ConnectedComponents](/src/main/java/nl/uu/maze/benchmarks/ConnectedComponents.java): Calculates the number of connected components in a graph represented as an adjacency matrix via DFS traversal.
-- [Dijkstra](/src/main/java/nl/uu/maze/benchmarks/Dijkstra.java): Implements Dijkstra's algorithm to find the shortest path in a graph represented as an adjacency matrix, as well as a DFS traversal method to check whether a particular node is reachable from another node.
-- [GraphTraversal](/src/main/java/nl/uu/maze/benchmarks/GraphTraversal.java): Implements DFS and BFS graph traversal algorithms on a graph represented as an adjacency matrix. The DFS algorithm is used by the `ConnectedComponents` class.
-- [HeapSort](/src/main/java/nl/uu/maze/benchmarks/HeapSort.java): Implementation of the heap sort algorithm on an integer array.
-- [IntUtils](/src/main/java/nl/uu/maze/benchmarks/IntUtils.java): Class that provides various utility methods for integers, such as calculating the GCD, LCM, and factorial.
-- [StringPatternMatcher](/src/main/java/nl/uu/maze/benchmarks/StringPatternMatcher.java): Implements a simple string pattern matching algorithm based on regex-like syntax.
-- [StringUtils](/src/main/java/nl/uu/maze/benchmarks/StringUtils.java): Class that provides various utility methods for strings, such as reversing a string, checking for palindromes, and trimming whitespace.
+- [`BinaryTree`](/src/main/java/nl/uu/maze/benchmarks/BinaryTree.java): Provides a binary tree implementation and various traversal and utility methods (e.g., in-order, pre-order, post-order traversal, height calculation, finding certain values).
+- [`BitwiseManipulator`](/src/main/java/nl/uu/maze/benchmarks/BitwiseManipulator.java): Class that performs various bitwise operations on integers.
+- [`BracketBalancer`](/src/main/java/nl/uu/maze/benchmarks/BracketBalancer.java): Class that checks whether a string of brackets (represented as an array of characters) is balanced.
+- [`ConnectedComponents`](/src/main/java/nl/uu/maze/benchmarks/ConnectedComponents.java): Calculates the number of connected components in a graph represented as an adjacency matrix via DFS traversal.
+- [`Dijkstra`](/src/main/java/nl/uu/maze/benchmarks/Dijkstra.java): Implements Dijkstra's algorithm to find the shortest path in a graph represented as an adjacency matrix, as well as a DFS traversal method to check whether a particular node is reachable from another node.
+- [`GraphTraversal`](/src/main/java/nl/uu/maze/benchmarks/GraphTraversal.java): Implements DFS and BFS graph traversal algorithms on a graph represented as an adjacency matrix. The DFS algorithm is used by the `ConnectedComponents` class.
+- [`HeapSort`](/src/main/java/nl/uu/maze/benchmarks/HeapSort.java): Implementation of the heap sort algorithm on an integer array.
+- [`IntUtils`](/src/main/java/nl/uu/maze/benchmarks/IntUtils.java): Class that provides various utility methods for integers, such as calculating the GCD, LCM, and factorial.
+- [`StringPatternMatcher`](/src/main/java/nl/uu/maze/benchmarks/StringPatternMatcher.java): Implements a simple string pattern matching algorithm based on regex-like syntax.
+- [`StringUtils`](/src/main/java/nl/uu/maze/benchmarks/StringUtils.java): Class that provides various utility methods for strings, such as reversing a string, checking for palindromes, and trimming whitespace.
 
 ### Example Output
 
