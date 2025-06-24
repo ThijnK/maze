@@ -9,11 +9,11 @@ package nl.uu.maze.benchmarks;
  * It uses custom stack and priority queue implementations to avoid
  * dependencies on Java's standard library collections.
  */
-public class MatrixGraphPaths {
+public class Dijkstra {
     private final int[][] adj;
     private final int n;
 
-    public MatrixGraphPaths(int[][] adj) {
+    public Dijkstra(int[][] adj) {
         if (adj.length != adj[0].length)
             throw new IllegalArgumentException("Adjacency matrix must be square");
         // Validate weights
