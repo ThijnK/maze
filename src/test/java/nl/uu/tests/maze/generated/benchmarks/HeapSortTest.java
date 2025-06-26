@@ -10,646 +10,70 @@ import org.junit.jupiter.api.Test;
 public class HeapSortTest {
   @Test
   public void testSort1() throws Exception {
-    int[] marg0 = null;
+    float[] marg0 = null;
     Assertions.assertThrows(NullPointerException.class, () -> HeapSort.sort(marg0));
   }
 
   @Test
   public void testSort2() throws Exception {
-    int[] marg0 = {};
-    int[] retval = HeapSort.sort(marg0);
+    float[] marg0 = {};
+    float[] retval = HeapSort.sort(marg0);
 
-    int[] expected = {};
+    float[] expected = {};
     Assertions.assertArrayEquals(expected, retval);
   }
 
   @Test
   public void testSort3() throws Exception {
-    int[] marg0 = { 0 };
-    int[] retval = HeapSort.sort(marg0);
+    float[] marg0 = { Float.NaN };
+    float[] retval = HeapSort.sort(marg0);
 
-    int[] expected = { 0 };
+    float[] expected = { Float.NaN };
     Assertions.assertArrayEquals(expected, retval);
   }
 
   @Test
   public void testSort4() throws Exception {
-    int[] marg0 = { -637534208, -671088639 };
-    int[] retval = HeapSort.sort(marg0);
+    float[] marg0 = { Float.NaN, Float.NaN, Float.NaN, Float.NaN, Float.NaN, Float.NaN, Float.NaN };
+    float[] retval = HeapSort.sort(marg0);
 
-    int[] expected = { -671088639, -637534208 };
+    float[] expected = { Float.NaN, Float.NaN, Float.NaN, Float.NaN, Float.NaN, Float.NaN, Float.NaN };
     Assertions.assertArrayEquals(expected, retval);
   }
 
   @Test
   public void testSort5() throws Exception {
-    int[] marg0 = { 0, 1 };
-    int[] retval = HeapSort.sort(marg0);
+    float[] marg0 = { Float.NaN, Float.NaN, Float.NaN, Float.NaN, Float.NaN, Float.NaN, Float.NaN, Float.NaN };
+    float[] retval = HeapSort.sort(marg0);
 
-    int[] expected = { 0, 1 };
+    float[] expected = { Float.NaN, Float.NaN, Float.NaN, Float.NaN, Float.NaN, Float.NaN, Float.NaN, Float.NaN };
     Assertions.assertArrayEquals(expected, retval);
   }
 
   @Test
   public void testSort6() throws Exception {
-    int[] marg0 = { 0, -2147483647, 0 };
-    int[] retval = HeapSort.sort(marg0);
+    float[] marg0 = { Float.NaN, Float.NaN, Float.NaN, Float.NaN, Float.NaN, Float.NaN, Float.NaN, Float.NaN, Float.NaN, Float.NaN, Float.NaN, Float.NaN, Float.NaN, Float.NaN, Float.NaN, Float.NaN, Float.NaN, Float.NaN, Float.NaN, Float.NaN, Float.NaN, Float.NaN, Float.NaN, Float.NaN, Float.NaN, Float.NaN, Float.NaN, Float.NaN, Float.NaN, Float.NaN, Float.NaN, Float.NaN, Float.NaN, Float.NaN, Float.NaN };
+    float[] retval = HeapSort.sort(marg0);
 
-    int[] expected = { -2147483647, 0, 0 };
+    float[] expected = { Float.NaN, Float.NaN, Float.NaN, Float.NaN, Float.NaN, Float.NaN, Float.NaN, Float.NaN, Float.NaN, Float.NaN, Float.NaN, Float.NaN, Float.NaN, Float.NaN, Float.NaN, Float.NaN, Float.NaN, Float.NaN, Float.NaN, Float.NaN, Float.NaN, Float.NaN, Float.NaN, Float.NaN, Float.NaN, Float.NaN, Float.NaN, Float.NaN, Float.NaN, Float.NaN, Float.NaN, Float.NaN, Float.NaN, Float.NaN, Float.NaN };
     Assertions.assertArrayEquals(expected, retval);
   }
 
   @Test
   public void testSort7() throws Exception {
-    int[] marg0 = { 0, 0, -2147483647, -2147483647, 0 };
-    int[] retval = HeapSort.sort(marg0);
+    float[] marg0 = { -1.0617564F, -5.1617546F };
+    float[] retval = HeapSort.sort(marg0);
 
-    int[] expected = { -2147483647, -2147483647, 0, 0, 0 };
+    float[] expected = { -5.1617546F, -1.0617564F };
     Assertions.assertArrayEquals(expected, retval);
   }
 
   @Test
   public void testSort8() throws Exception {
-    int[] marg0 = { 536870912, -2147483648, 1, -2147483648, -2147483648 };
-    int[] retval = HeapSort.sort(marg0);
+    float[] marg0 = { -1.2511921E-38F, -3.577662E-39F };
+    float[] retval = HeapSort.sort(marg0);
 
-    int[] expected = { -2147483648, -2147483648, -2147483648, 1, 536870912 };
-    Assertions.assertArrayEquals(expected, retval);
-  }
-
-  @Test
-  public void testSort9() throws Exception {
-    int[] marg0 = { 536870912, 268435456, 1, 1, 0 };
-    int[] retval = HeapSort.sort(marg0);
-
-    int[] expected = { 0, 1, 1, 268435456, 536870912 };
-    Assertions.assertArrayEquals(expected, retval);
-  }
-
-  @Test
-  public void testSort10() throws Exception {
-    int[] marg0 = { 1073741824, 0, 1, 0, -2147483648 };
-    int[] retval = HeapSort.sort(marg0);
-
-    int[] expected = { -2147483648, 0, 0, 1, 1073741824 };
-    Assertions.assertArrayEquals(expected, retval);
-  }
-
-  @Test
-  public void testSort11() throws Exception {
-    int[] marg0 = { 0, -2147483647, 1, -2147483648, -2147483648 };
-    int[] retval = HeapSort.sort(marg0);
-
-    int[] expected = { -2147483648, -2147483648, -2147483647, 0, 1 };
-    Assertions.assertArrayEquals(expected, retval);
-  }
-
-  @Test
-  public void testSort12() throws Exception {
-    int[] marg0 = { 268435456, 268435458, -1879048189, -1879048191, 2 };
-    int[] retval = HeapSort.sort(marg0);
-
-    int[] expected = { -1879048191, -1879048189, 2, 268435456, 268435458 };
-    Assertions.assertArrayEquals(expected, retval);
-  }
-
-  @Test
-  public void testSort13() throws Exception {
-    int[] marg0 = { -2143289344, 1073741826, 17, -2147483645, -2143027199 };
-    int[] retval = HeapSort.sort(marg0);
-
-    int[] expected = { -2147483645, -2143289344, -2143027199, 17, 1073741826 };
-    Assertions.assertArrayEquals(expected, retval);
-  }
-
-  @Test
-  public void testSort14() throws Exception {
-    int[] marg0 = { -2147483644, 0, 0, -268435452, -1610612731 };
-    int[] retval = HeapSort.sort(marg0);
-
-    int[] expected = { -2147483644, -1610612731, -268435452, 0, 0 };
-    Assertions.assertArrayEquals(expected, retval);
-  }
-
-  @Test
-  public void testSort15() throws Exception {
-    int[] marg0 = { -2147483648, 1073741824, 1, 0, 1 };
-    int[] retval = HeapSort.sort(marg0);
-
-    int[] expected = { -2147483648, 0, 1, 1, 1073741824 };
-    Assertions.assertArrayEquals(expected, retval);
-  }
-
-  @Test
-  public void testSort16() throws Exception {
-    int[] marg0 = { -2147483648, 0, 1, -2147483647, -2147483647 };
-    int[] retval = HeapSort.sort(marg0);
-
-    int[] expected = { -2147483648, -2147483647, -2147483647, 0, 1 };
-    Assertions.assertArrayEquals(expected, retval);
-  }
-
-  @Test
-  public void testSort17() throws Exception {
-    int[] marg0 = { 16384, -2147483648, -2147467263, -2147483648, -2147467264 };
-    int[] retval = HeapSort.sort(marg0);
-
-    int[] expected = { -2147483648, -2147483648, -2147467264, -2147467263, 16384 };
-    Assertions.assertArrayEquals(expected, retval);
-  }
-
-  @Test
-  public void testSort18() throws Exception {
-    int[] marg0 = { 0, -2147483648, 1, -2147483648, -2147483647 };
-    int[] retval = HeapSort.sort(marg0);
-
-    int[] expected = { -2147483648, -2147483648, -2147483647, 0, 1 };
-    Assertions.assertArrayEquals(expected, retval);
-  }
-
-  @Test
-  public void testSort19() throws Exception {
-    int[] marg0 = { -2080374784, -2080374784, 1, -2080374784, 67108864 };
-    int[] retval = HeapSort.sort(marg0);
-
-    int[] expected = { -2080374784, -2080374784, -2080374784, 1, 67108864 };
-    Assertions.assertArrayEquals(expected, retval);
-  }
-
-  @Test
-  public void testSort20() throws Exception {
-    int[] marg0 = { -2147483648, -2147483648, 1, -2147483648, 0 };
-    int[] retval = HeapSort.sort(marg0);
-
-    int[] expected = { -2147483648, -2147483648, -2147483648, 0, 1 };
-    Assertions.assertArrayEquals(expected, retval);
-  }
-
-  @Test
-  public void testSort21() throws Exception {
-    int[] marg0 = { 3211264, -2147483648, 2097153, -2122776575, -2139357182 };
-    int[] retval = HeapSort.sort(marg0);
-
-    int[] expected = { -2147483648, -2139357182, -2122776575, 2097153, 3211264 };
-    Assertions.assertArrayEquals(expected, retval);
-  }
-
-  @Test
-  public void testSort22() throws Exception {
-    int[] marg0 = { 0, -2147483648, 1, 0, 0 };
-    int[] retval = HeapSort.sort(marg0);
-
-    int[] expected = { -2147483648, 0, 0, 0, 1 };
-    Assertions.assertArrayEquals(expected, retval);
-  }
-
-  @Test
-  public void testSort23() throws Exception {
-    int[] marg0 = { -2147483648, -2147483648, -2147483647, 0, 0 };
-    int[] retval = HeapSort.sort(marg0);
-
-    int[] expected = { -2147483648, -2147483648, -2147483647, 0, 0 };
-    Assertions.assertArrayEquals(expected, retval);
-  }
-
-  @Test
-  public void testSort24() throws Exception {
-    int[] marg0 = { -2147483648, -2147483648, 1, 0, -2147483647 };
-    int[] retval = HeapSort.sort(marg0);
-
-    int[] expected = { -2147483648, -2147483648, -2147483647, 0, 1 };
-    Assertions.assertArrayEquals(expected, retval);
-  }
-
-  @Test
-  public void testSort25() throws Exception {
-    int[] marg0 = { 1073741824, 0, 1, 1, 536870912 };
-    int[] retval = HeapSort.sort(marg0);
-
-    int[] expected = { 0, 1, 1, 536870912, 1073741824 };
-    Assertions.assertArrayEquals(expected, retval);
-  }
-
-  @Test
-  public void testSort26() throws Exception {
-    int[] marg0 = { 0, -2147483648, 1, -2147483647, -2147483645 };
-    int[] retval = HeapSort.sort(marg0);
-
-    int[] expected = { -2147483648, -2147483647, -2147483645, 0, 1 };
-    Assertions.assertArrayEquals(expected, retval);
-  }
-
-  @Test
-  public void testSort27() throws Exception {
-    int[] marg0 = { 0, -2147483648, -2147483647, -1610612735, 268435456 };
-    int[] retval = HeapSort.sort(marg0);
-
-    int[] expected = { -2147483648, -2147483647, -1610612735, 0, 268435456 };
-    Assertions.assertArrayEquals(expected, retval);
-  }
-
-  @Test
-  public void testSort28() throws Exception {
-    int[] marg0 = { -2147483648, -2147483648, 1, -2147483647, 0 };
-    int[] retval = HeapSort.sort(marg0);
-
-    int[] expected = { -2147483648, -2147483648, -2147483647, 0, 1 };
-    Assertions.assertArrayEquals(expected, retval);
-  }
-
-  @Test
-  public void testSort29() throws Exception {
-    int[] marg0 = { 0, 0, -2147483647, 0 };
-    int[] retval = HeapSort.sort(marg0);
-
-    int[] expected = { -2147483647, 0, 0, 0 };
-    Assertions.assertArrayEquals(expected, retval);
-  }
-
-  @Test
-  public void testSort30() throws Exception {
-    int[] marg0 = { 1078984710, -1073696637, 1078014661, -1073696637 };
-    int[] retval = HeapSort.sort(marg0);
-
-    int[] expected = { -1073696637, -1073696637, 1078014661, 1078984710 };
-    Assertions.assertArrayEquals(expected, retval);
-  }
-
-  @Test
-  public void testSort31() throws Exception {
-    int[] marg0 = { 131072, 131072, -2147352575, 0 };
-    int[] retval = HeapSort.sort(marg0);
-
-    int[] expected = { -2147352575, 0, 131072, 131072 };
-    Assertions.assertArrayEquals(expected, retval);
-  }
-
-  @Test
-  public void testSort32() throws Exception {
-    int[] marg0 = { 1073741824, 0, 1, -2147483648 };
-    int[] retval = HeapSort.sort(marg0);
-
-    int[] expected = { -2147483648, 0, 1, 1073741824 };
-    Assertions.assertArrayEquals(expected, retval);
-  }
-
-  @Test
-  public void testSort33() throws Exception {
-    int[] marg0 = { -134217728, -220052959, 0, -220052959 };
-    int[] retval = HeapSort.sort(marg0);
-
-    int[] expected = { -220052959, -220052959, -134217728, 0 };
-    Assertions.assertArrayEquals(expected, retval);
-  }
-
-  @Test
-  public void testSort34() throws Exception {
-    int[] marg0 = { 2, 1, 8388608, 0 };
-    int[] retval = HeapSort.sort(marg0);
-
-    int[] expected = { 0, 1, 2, 8388608 };
-    Assertions.assertArrayEquals(expected, retval);
-  }
-
-  @Test
-  public void testSort35() throws Exception {
-    int[] marg0 = { 0, 4096, -2143289342, -2147479551 };
-    int[] retval = HeapSort.sort(marg0);
-
-    int[] expected = { -2147479551, -2143289342, 0, 4096 };
-    Assertions.assertArrayEquals(expected, retval);
-  }
-
-  @Test
-  public void testSort36() throws Exception {
-    int[] marg0 = { 0, 1879048192, -536870908, 1 };
-    int[] retval = HeapSort.sort(marg0);
-
-    int[] expected = { -536870908, 0, 1, 1879048192 };
-    Assertions.assertArrayEquals(expected, retval);
-  }
-
-  @Test
-  public void testSort37() throws Exception {
-    int[] marg0 = { 0, 322443270, 813709349, 322443270 };
-    int[] retval = HeapSort.sort(marg0);
-
-    int[] expected = { 0, 322443270, 322443270, 813709349 };
-    Assertions.assertArrayEquals(expected, retval);
-  }
-
-  @Test
-  public void testSort38() throws Exception {
-    int[] marg0 = { 0, 1207964681, 1209008640, 136320008 };
-    int[] retval = HeapSort.sort(marg0);
-
-    int[] expected = { 0, 136320008, 1207964681, 1209008640 };
-    Assertions.assertArrayEquals(expected, retval);
-  }
-
-  @Test
-  public void testSort39() throws Exception {
-    int[] marg0 = { 1, 0, 0, 1 };
-    int[] retval = HeapSort.sort(marg0);
-
-    int[] expected = { 0, 0, 1, 1 };
-    Assertions.assertArrayEquals(expected, retval);
-  }
-
-  @Test
-  public void testSort40() throws Exception {
-    int[] marg0 = { 0, -2147483648, 1, 0 };
-    int[] retval = HeapSort.sort(marg0);
-
-    int[] expected = { -2147483648, 0, 0, 1 };
-    Assertions.assertArrayEquals(expected, retval);
-  }
-
-  @Test
-  public void testSort41() throws Exception {
-    int[] marg0 = { 0, -2147483644, -2147483641, 6 };
-    int[] retval = HeapSort.sort(marg0);
-
-    int[] expected = { -2147483644, -2147483641, 0, 6 };
-    Assertions.assertArrayEquals(expected, retval);
-  }
-
-  @Test
-  public void testSort42() throws Exception {
-    int[] marg0 = { -2147483648, -2147483644, -2146959359, -1073741818 };
-    int[] retval = HeapSort.sort(marg0);
-
-    int[] expected = { -2147483648, -2147483644, -2146959359, -1073741818 };
-    Assertions.assertArrayEquals(expected, retval);
-  }
-
-  @Test
-  public void testSort43() throws Exception {
-    int[] marg0 = { -2147483648, -2147483648, 1, 0 };
-    int[] retval = HeapSort.sort(marg0);
-
-    int[] expected = { -2147483648, -2147483648, 0, 1 };
-    Assertions.assertArrayEquals(expected, retval);
-  }
-
-  @Test
-  public void testSort44() throws Exception {
-    int[] marg0 = { 1, 1, 0 };
-    int[] retval = HeapSort.sort(marg0);
-
-    int[] expected = { 0, 1, 1 };
-    Assertions.assertArrayEquals(expected, retval);
-  }
-
-  @Test
-  public void testSort45() throws Exception {
-    int[] marg0 = { 0, -2147483647, 1 };
-    int[] retval = HeapSort.sort(marg0);
-
-    int[] expected = { -2147483647, 0, 1 };
-    Assertions.assertArrayEquals(expected, retval);
-  }
-
-  @Test
-  public void testSort46() throws Exception {
-    int[] marg0 = { 134217729, 1073741824, 201326592 };
-    int[] retval = HeapSort.sort(marg0);
-
-    int[] expected = { 134217729, 201326592, 1073741824 };
-    Assertions.assertArrayEquals(expected, retval);
-  }
-
-  @Test
-  public void testSort47() throws Exception {
-    int[] marg0 = { -2147482624, 0, -2147483647 };
-    int[] retval = HeapSort.sort(marg0);
-
-    int[] expected = { -2147483647, -2147482624, 0 };
-    Assertions.assertArrayEquals(expected, retval);
-  }
-
-  @Test
-  public void testSort48() throws Exception {
-    int[] marg0 = { -2147483648, -2147483647, 0 };
-    int[] retval = HeapSort.sort(marg0);
-
-    int[] expected = { -2147483648, -2147483647, 0 };
-    Assertions.assertArrayEquals(expected, retval);
-  }
-
-  @Test
-  public void testSort49() throws Exception {
-    int[] marg0 = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-    int[] retval = HeapSort.sort(marg0);
-
-    int[] expected = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-    Assertions.assertArrayEquals(expected, retval);
-  }
-
-  @Test
-  public void testSort50() throws Exception {
-    int[] marg0 = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-    int[] retval = HeapSort.sort(marg0);
-
-    int[] expected = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-    Assertions.assertArrayEquals(expected, retval);
-  }
-
-  @Test
-  public void testSort51() throws Exception {
-    int[] marg0 = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-    int[] retval = HeapSort.sort(marg0);
-
-    int[] expected = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-    Assertions.assertArrayEquals(expected, retval);
-  }
-
-  @Test
-  public void testSort52() throws Exception {
-    int[] marg0 = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-    int[] retval = HeapSort.sort(marg0);
-
-    int[] expected = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-    Assertions.assertArrayEquals(expected, retval);
-  }
-
-  @Test
-  public void testSort53() throws Exception {
-    int[] marg0 = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -2147483647, 0 };
-    int[] retval = HeapSort.sort(marg0);
-
-    int[] expected = { -2147483647, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-    Assertions.assertArrayEquals(expected, retval);
-  }
-
-  @Test
-  public void testSort54() throws Exception {
-    int[] marg0 = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 };
-    int[] retval = HeapSort.sort(marg0);
-
-    int[] expected = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 };
-    Assertions.assertArrayEquals(expected, retval);
-  }
-
-  @Test
-  public void testSort55() throws Exception {
-    int[] marg0 = { 0, 0, 0, 0, 0, 0, 0, 134217728, 0, 0, 0, 0, 0, 0, 0, 1 };
-    int[] retval = HeapSort.sort(marg0);
-
-    int[] expected = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 134217728 };
-    Assertions.assertArrayEquals(expected, retval);
-  }
-
-  @Test
-  public void testSort56() throws Exception {
-    int[] marg0 = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 };
-    int[] retval = HeapSort.sort(marg0);
-
-    int[] expected = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 };
-    Assertions.assertArrayEquals(expected, retval);
-  }
-
-  @Test
-  public void testSort57() throws Exception {
-    int[] marg0 = { 0, 0, 0, 0, 0, 0, 16777216, 0, 0, 0, 0, 0, 0, -1040187391, 1 };
-    int[] retval = HeapSort.sort(marg0);
-
-    int[] expected = { -1040187391, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 16777216 };
-    Assertions.assertArrayEquals(expected, retval);
-  }
-
-  @Test
-  public void testSort58() throws Exception {
-    int[] marg0 = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -2147483647, 1 };
-    int[] retval = HeapSort.sort(marg0);
-
-    int[] expected = { -2147483647, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 };
-    Assertions.assertArrayEquals(expected, retval);
-  }
-
-  @Test
-  public void testSort59() throws Exception {
-    int[] marg0 = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 268435456, -2147483647 };
-    int[] retval = HeapSort.sort(marg0);
-
-    int[] expected = { -2147483647, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 268435456 };
-    Assertions.assertArrayEquals(expected, retval);
-  }
-
-  @Test
-  public void testSort60() throws Exception {
-    int[] marg0 = { 0, 0, 0, 0, 0, 0, -2147483648, 0, 0, 0, 0, 0, 0, 0, 1 };
-    int[] retval = HeapSort.sort(marg0);
-
-    int[] expected = { -2147483648, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 };
-    Assertions.assertArrayEquals(expected, retval);
-  }
-
-  @Test
-  public void testSort61() throws Exception {
-    int[] marg0 = { 0, 0, 0, 0, 0, 0, 268435456, 0, 0, 0, 0, 0, 0, 1 };
-    int[] retval = HeapSort.sort(marg0);
-
-    int[] expected = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 268435456 };
-    Assertions.assertArrayEquals(expected, retval);
-  }
-
-  @Test
-  public void testSort62() throws Exception {
-    int[] marg0 = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 };
-    int[] retval = HeapSort.sort(marg0);
-
-    int[] expected = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 };
-    Assertions.assertArrayEquals(expected, retval);
-  }
-
-  @Test
-  public void testSort63() throws Exception {
-    int[] marg0 = { 0, 0, 0, 0, 536870912, 0, 0, 0, 0, 1, 0, -2147483647, -2147483647 };
-    int[] retval = HeapSort.sort(marg0);
-
-    int[] expected = { -2147483647, -2147483647, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 536870912 };
-    Assertions.assertArrayEquals(expected, retval);
-  }
-
-  @Test
-  public void testSort64() throws Exception {
-    int[] marg0 = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, -2147483647, -2147483647 };
-    int[] retval = HeapSort.sort(marg0);
-
-    int[] expected = { -2147483647, -2147483647, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 };
-    Assertions.assertArrayEquals(expected, retval);
-  }
-
-  @Test
-  public void testSort65() throws Exception {
-    int[] marg0 = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 };
-    int[] retval = HeapSort.sort(marg0);
-
-    int[] expected = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 };
-    Assertions.assertArrayEquals(expected, retval);
-  }
-
-  @Test
-  public void testSort66() throws Exception {
-    int[] marg0 = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1073741824, -1073741823 };
-    int[] retval = HeapSort.sort(marg0);
-
-    int[] expected = { -1073741823, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1073741824 };
-    Assertions.assertArrayEquals(expected, retval);
-  }
-
-  @Test
-  public void testSort67() throws Exception {
-    int[] marg0 = { 0, 0, 0, 0, 0, -2147483648, 0, 0, 0, 0, 0, 0, 1 };
-    int[] retval = HeapSort.sort(marg0);
-
-    int[] expected = { -2147483648, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 };
-    Assertions.assertArrayEquals(expected, retval);
-  }
-
-  @Test
-  public void testSort68() throws Exception {
-    int[] marg0 = { 0, 0, 0, 0, -1879048192, 0, 0, 0, 0, -2147483648, -2147483647, -2147483647 };
-    int[] retval = HeapSort.sort(marg0);
-
-    int[] expected = { -2147483648, -2147483647, -2147483647, -1879048192, 0, 0, 0, 0, 0, 0, 0, 0 };
-    Assertions.assertArrayEquals(expected, retval);
-  }
-
-  @Test
-  public void testSort69() throws Exception {
-    int[] marg0 = { 0, 0, 0, 0, 0, 134217728, 0, 0, 0, 0, 1, 1 };
-    int[] retval = HeapSort.sort(marg0);
-
-    int[] expected = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 134217728 };
-    Assertions.assertArrayEquals(expected, retval);
-  }
-
-  @Test
-  public void testSort70() throws Exception {
-    int[] marg0 = { 0, 0, 0, 0, -2147483648, 0, 0, 0, 0, 0, -2147483647, -1073741823 };
-    int[] retval = HeapSort.sort(marg0);
-
-    int[] expected = { -2147483648, -2147483647, -1073741823, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-    Assertions.assertArrayEquals(expected, retval);
-  }
-
-  @Test
-  public void testSort71() throws Exception {
-    int[] marg0 = { 0, 0, 0, 0, 0, 335544320, 0, 0, 0, 16, 8388609, 268435457 };
-    int[] retval = HeapSort.sort(marg0);
-
-    int[] expected = { 0, 0, 0, 0, 0, 0, 0, 0, 16, 8388609, 268435457, 335544320 };
-    Assertions.assertArrayEquals(expected, retval);
-  }
-
-  @Test
-  public void testSort72() throws Exception {
-    int[] marg0 = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 };
-    int[] retval = HeapSort.sort(marg0);
-
-    int[] expected = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 };
+    float[] expected = { -1.2511921E-38F, -3.577662E-39F };
     Assertions.assertArrayEquals(expected, retval);
   }
 }

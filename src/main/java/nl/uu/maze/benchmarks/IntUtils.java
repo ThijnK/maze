@@ -60,7 +60,7 @@ public class IntUtils {
         return b;
     }
 
-    private static int abs(int n) {
+    public static int abs(int n) {
         return n < 0 ? -n : n;
     }
 }

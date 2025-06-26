@@ -86,4 +86,50 @@ public class BinaryTree {
             return true;
         return find(root.left, value) || find(root.right, value);
     }
+
+    /**
+     * Checks if the tree is simultaneously:
+     * - A BST
+     * - AVL balanced
+     * - All root-to-leaf paths have alternating even/odd values
+     * - No duplicate values
+     * Returns true if all conditions are met.
+     */
+    public static boolean isComplexValidTree(Node root) {
+        return isComplexValidTreeHelper(root, null, Integer.MIN_VALUE, Integer.MAX_VALUE, 0, root);
+    }
+
+    // Helper to check if value exists in the path from ancestor to current node
+    private static boolean existsInPath(Node ancestor, Node current, int value) {
+        if (ancestor == null || ancestor == current)
+            return false;
+        if (ancestor.val == value)
+            return true;
+        // Check both subtrees
+        return existsInPath(ancestor.left, current, value) || existsInPath(ancestor.right, current, value);
+    }
+
+    private static boolean isComplexValidTreeHelper(Node node, Integer parentVal, int min, int max, int depth,
+            Node root) {
+        if (node == null)
+            return true;
+        // BST property
+        if (node.val <= min || node.val >= max)
+            return false;
+        // No duplicates in the path from root to this node
+        if (existsInPath(root, node, node.val))
+            return false;
+        // Alternating even/odd with parent
+        if (parentVal != null && (node.val % 2 == parentVal % 2))
+            return false;
+        // AVL balance
+        int lh = height(node.left);
+        int rh = height(node.right);
+        if (IntUtils.abs(lh - rh) > 1)
+            return false;
+        // Recurse
+        boolean left = isComplexValidTreeHelper(node.left, node.val, min, node.val, depth + 1, root);
+        boolean right = isComplexValidTreeHelper(node.right, node.val, node.val, max, depth + 1, root);
+        return left && right;
+    }
 }

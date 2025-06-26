@@ -10,6 +10,9 @@ import nl.uu.maze.benchmarks.ExprEvaluator;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import org.junit.jupiter.api.Disabled;
+
+@Disabled("Manual tests to be ignored in favor of generated tests")
 class ExprEvaluatorTest {
 
     @ParameterizedTest
@@ -113,9 +116,9 @@ class ExprEvaluatorTest {
     @ParameterizedTest
     @DisplayName("Test whitespace handling")
     @CsvSource({
-            "'  42  ', 42",
+            "' 42 ', 42",
             "'\t5 +\n3', 8",
-            "'   10   -   2   ', 8"
+            "' 10 - 2 ', 8"
     })
     void testWhitespaceHandling(String input, int expected) {
         ExprEvaluator evaluator = new ExprEvaluator(input.toCharArray());
@@ -187,9 +190,9 @@ class ExprEvaluatorTest {
     @DisplayName("Test expressions with unusual spacing")
     @CsvSource({
             "'1 + 2+3 +4', 10",
-            "'5+   5-3  +1', 8",
-            "'   7-2   ', 5",
-            "'10  *  2   +   3', 23"
+            "'5+ 5-3 +1', 8",
+            "' 7-2 ', 5",
+            "'10 * 2 + 3', 23"
     })
     void testExpressionsWithUnusualSpacing(String input, int expected) {
         ExprEvaluator evaluator = new ExprEvaluator(input.toCharArray());

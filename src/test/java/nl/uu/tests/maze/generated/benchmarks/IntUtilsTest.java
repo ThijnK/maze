@@ -27,10 +27,29 @@ public class IntUtilsTest {
   }
 
   @Test
+  public void testAbs1() throws Exception {
+    int marg0 = 0;
+    int retval = IntUtils.abs(marg0);
+
+    int expected = 0;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
   public void testLcm1() throws Exception {
     int marg0 = 0;
     int marg1 = 0;
     int retval = IntUtils.lcm(marg0, marg1);
+
+    int expected = 0;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testGcd1() throws Exception {
+    int marg0 = 0;
+    int marg1 = 0;
+    int retval = IntUtils.gcd(marg0, marg1);
 
     int expected = 0;
     Assertions.assertEquals(expected, retval);
@@ -46,20 +65,19 @@ public class IntUtilsTest {
   }
 
   @Test
-  public void testLcm2() throws Exception {
+  public void testAbs2() throws Exception {
     int marg0 = -1;
-    int marg1 = 0;
-    int retval = IntUtils.lcm(marg0, marg1);
+    int retval = IntUtils.abs(marg0);
 
-    int expected = 0;
+    int expected = 1;
     Assertions.assertEquals(expected, retval);
   }
 
   @Test
-  public void testGcd1() throws Exception {
-    int marg0 = 0;
+  public void testLcm2() throws Exception {
+    int marg0 = -1;
     int marg1 = 0;
-    int retval = IntUtils.gcd(marg0, marg1);
+    int retval = IntUtils.lcm(marg0, marg1);
 
     int expected = 0;
     Assertions.assertEquals(expected, retval);
@@ -90,12 +108,6 @@ public class IntUtilsTest {
   }
 
   @Test
-  public void testFactorial2() throws Exception {
-    int marg0 = -1;
-    Assertions.assertThrows(IllegalArgumentException.class, () -> IntUtils.factorial(marg0));
-  }
-
-  @Test
   public void testIsPrime3() throws Exception {
     int marg0 = 1073741824;
     boolean retval = IntUtils.isPrime(marg0);
@@ -105,12 +117,18 @@ public class IntUtilsTest {
   }
 
   @Test
+  public void testFactorial2() throws Exception {
+    int marg0 = -1;
+    Assertions.assertThrows(IllegalArgumentException.class, () -> IntUtils.factorial(marg0));
+  }
+
+  @Test
   public void testGcd2() throws Exception {
-    int marg0 = -577306624;
-    int marg1 = 4;
+    int marg0 = -2147483648;
+    int marg1 = -2147483648;
     int retval = IntUtils.gcd(marg0, marg1);
 
-    int expected = 4;
+    int expected = -2147483648;
     Assertions.assertEquals(expected, retval);
   }
 
@@ -133,21 +151,21 @@ public class IntUtilsTest {
   }
 
   @Test
-  public void testGcd3() throws Exception {
-    int marg0 = -1392902300;
-    int marg1 = -679673934;
-    int retval = IntUtils.gcd(marg0, marg1);
+  public void testIsPrime5() throws Exception {
+    int marg0 = 722241945;
+    boolean retval = IntUtils.isPrime(marg0);
 
-    int expected = -2;
+    boolean expected = false;
     Assertions.assertEquals(expected, retval);
   }
 
   @Test
-  public void testIsPrime5() throws Exception {
-    int marg0 = 1744830465;
-    boolean retval = IntUtils.isPrime(marg0);
+  public void testGcd3() throws Exception {
+    int marg0 = 1900112772;
+    int marg1 = -98305;
+    int retval = IntUtils.gcd(marg0, marg1);
 
-    boolean expected = false;
+    int expected = 1;
     Assertions.assertEquals(expected, retval);
   }
 
@@ -179,6 +197,15 @@ public class IntUtilsTest {
   }
 
   @Test
+  public void testFibonacci5() throws Exception {
+    int marg0 = 3;
+    int retval = IntUtils.fibonacci(marg0);
+
+    int expected = 2;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
   public void testFactorial5() throws Exception {
     int marg0 = 4;
     long retval = IntUtils.factorial(marg0);
@@ -188,11 +215,22 @@ public class IntUtilsTest {
   }
 
   @Test
-  public void testFibonacci5() throws Exception {
-    int marg0 = 3;
-    int retval = IntUtils.fibonacci(marg0);
+  public void testLcm3() throws Exception {
+    int marg0 = 1543504016;
+    int marg1 = -1543504016;
+    int retval = IntUtils.lcm(marg0, marg1);
 
-    int expected = 2;
+    int expected = -1;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testLcm4() throws Exception {
+    int marg0 = -2147483648;
+    int marg1 = -1;
+    int retval = IntUtils.lcm(marg0, marg1);
+
+    int expected = -2147483648;
     Assertions.assertEquals(expected, retval);
   }
 
@@ -206,22 +244,11 @@ public class IntUtilsTest {
   }
 
   @Test
-  public void testLcm3() throws Exception {
-    int marg0 = -2147483648;
-    int marg1 = -2147483648;
-    int retval = IntUtils.lcm(marg0, marg1);
+  public void testIsPrime8() throws Exception {
+    int marg0 = 1073741825;
+    boolean retval = IntUtils.isPrime(marg0);
 
-    int expected = 0;
-    Assertions.assertEquals(expected, retval);
-  }
-
-  @Test
-  public void testLcm4() throws Exception {
-    int marg0 = 1098907649;
-    int marg1 = -1;
-    int retval = IntUtils.lcm(marg0, marg1);
-
-    int expected = -1098907649;
+    boolean expected = false;
     Assertions.assertEquals(expected, retval);
   }
 
@@ -231,15 +258,6 @@ public class IntUtilsTest {
     long retval = IntUtils.factorial(marg0);
 
     long expected = 120L;
-    Assertions.assertEquals(expected, retval);
-  }
-
-  @Test
-  public void testIsPrime8() throws Exception {
-    int marg0 = 1073741825;
-    boolean retval = IntUtils.isPrime(marg0);
-
-    boolean expected = false;
     Assertions.assertEquals(expected, retval);
   }
 
@@ -254,11 +272,21 @@ public class IntUtilsTest {
 
   @Test
   public void testLcm5() throws Exception {
-    int marg0 = -1392996976;
-    int marg1 = -1476363796;
+    int marg0 = -604511744;
+    int marg1 = 336076288;
     int retval = IntUtils.lcm(marg0, marg1);
 
-    int expected = -469951536;
+    int expected = 933376;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testLcm6() throws Exception {
+    int marg0 = -1073741824;
+    int marg1 = 1084098993;
+    int retval = IntUtils.lcm(marg0, marg1);
+
+    int expected = 1073741824;
     Assertions.assertEquals(expected, retval);
   }
 
@@ -268,16 +296,6 @@ public class IntUtilsTest {
     boolean retval = IntUtils.isPrime(marg0);
 
     boolean expected = true;
-    Assertions.assertEquals(expected, retval);
-  }
-
-  @Test
-  public void testLcm6() throws Exception {
-    int marg0 = -939700740;
-    int marg1 = -671265284;
-    int retval = IntUtils.lcm(marg0, marg1);
-
-    int expected = -252287996;
     Assertions.assertEquals(expected, retval);
   }
 
@@ -300,6 +318,15 @@ public class IntUtilsTest {
   }
 
   @Test
+  public void testIsPrime10() throws Exception {
+    int marg0 = 43;
+    boolean retval = IntUtils.isPrime(marg0);
+
+    boolean expected = true;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
   public void testFactorial8() throws Exception {
     int marg0 = 7;
     long retval = IntUtils.factorial(marg0);
@@ -309,17 +336,8 @@ public class IntUtilsTest {
   }
 
   @Test
-  public void testIsPrime10() throws Exception {
-    int marg0 = 41;
-    boolean retval = IntUtils.isPrime(marg0);
-
-    boolean expected = true;
-    Assertions.assertEquals(expected, retval);
-  }
-
-  @Test
   public void testIsPrime11() throws Exception {
-    int marg0 = 1207959557;
+    int marg0 = 1073741837;
     boolean retval = IntUtils.isPrime(marg0);
 
     boolean expected = false;
@@ -354,20 +372,20 @@ public class IntUtilsTest {
   }
 
   @Test
-  public void testFactorial10() throws Exception {
-    int marg0 = 9;
-    long retval = IntUtils.factorial(marg0);
-
-    long expected = 362880L;
-    Assertions.assertEquals(expected, retval);
-  }
-
-  @Test
   public void testFibonacci9() throws Exception {
     int marg0 = 7;
     int retval = IntUtils.fibonacci(marg0);
 
     int expected = 13;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testFactorial10() throws Exception {
+    int marg0 = 9;
+    long retval = IntUtils.factorial(marg0);
+
+    long expected = 362880L;
     Assertions.assertEquals(expected, retval);
   }
 
@@ -381,20 +399,20 @@ public class IntUtilsTest {
   }
 
   @Test
-  public void testFactorial11() throws Exception {
-    int marg0 = 10;
-    long retval = IntUtils.factorial(marg0);
-
-    long expected = 3628800L;
-    Assertions.assertEquals(expected, retval);
-  }
-
-  @Test
   public void testFibonacci10() throws Exception {
     int marg0 = 8;
     int retval = IntUtils.fibonacci(marg0);
 
     int expected = 21;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testFactorial11() throws Exception {
+    int marg0 = 10;
+    long retval = IntUtils.factorial(marg0);
+
+    long expected = 3628800L;
     Assertions.assertEquals(expected, retval);
   }
 
@@ -426,15 +444,6 @@ public class IntUtilsTest {
   }
 
   @Test
-  public void testFactorial13() throws Exception {
-    int marg0 = 12;
-    long retval = IntUtils.factorial(marg0);
-
-    long expected = 479001600L;
-    Assertions.assertEquals(expected, retval);
-  }
-
-  @Test
   public void testIsPrime15() throws Exception {
     int marg0 = 109;
     boolean retval = IntUtils.isPrime(marg0);
@@ -444,8 +453,17 @@ public class IntUtilsTest {
   }
 
   @Test
+  public void testFactorial13() throws Exception {
+    int marg0 = 12;
+    long retval = IntUtils.factorial(marg0);
+
+    long expected = 479001600L;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
   public void testIsPrime16() throws Exception {
-    int marg0 = 400549787;
+    int marg0 = 1439476313;
     boolean retval = IntUtils.isPrime(marg0);
 
     boolean expected = false;
@@ -462,17 +480,8 @@ public class IntUtilsTest {
   }
 
   @Test
-  public void testFactorial14() throws Exception {
-    int marg0 = 13;
-    long retval = IntUtils.factorial(marg0);
-
-    long expected = 6227020800L;
-    Assertions.assertEquals(expected, retval);
-  }
-
-  @Test
   public void testIsPrime17() throws Exception {
-    int marg0 = 131;
+    int marg0 = 137;
     boolean retval = IntUtils.isPrime(marg0);
 
     boolean expected = true;
@@ -480,11 +489,11 @@ public class IntUtilsTest {
   }
 
   @Test
-  public void testFactorial15() throws Exception {
-    int marg0 = 14;
+  public void testFactorial14() throws Exception {
+    int marg0 = 13;
     long retval = IntUtils.factorial(marg0);
 
-    long expected = 87178291200L;
+    long expected = 6227020800L;
     Assertions.assertEquals(expected, retval);
   }
 
@@ -498,6 +507,15 @@ public class IntUtilsTest {
   }
 
   @Test
+  public void testFactorial15() throws Exception {
+    int marg0 = 14;
+    long retval = IntUtils.factorial(marg0);
+
+    long expected = 87178291200L;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
   public void testIsPrime18() throws Exception {
     int marg0 = 167;
     boolean retval = IntUtils.isPrime(marg0);
@@ -507,17 +525,8 @@ public class IntUtilsTest {
   }
 
   @Test
-  public void testFactorial16() throws Exception {
-    int marg0 = 15;
-    long retval = IntUtils.factorial(marg0);
-
-    long expected = 1307674368000L;
-    Assertions.assertEquals(expected, retval);
-  }
-
-  @Test
   public void testIsPrime19() throws Exception {
-    int marg0 = 1289737553;
+    int marg0 = 247463957;
     boolean retval = IntUtils.isPrime(marg0);
 
     boolean expected = false;
@@ -534,20 +543,20 @@ public class IntUtilsTest {
   }
 
   @Test
+  public void testFactorial16() throws Exception {
+    int marg0 = 15;
+    long retval = IntUtils.factorial(marg0);
+
+    long expected = 1307674368000L;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
   public void testIsPrime20() throws Exception {
     int marg0 = 173;
     boolean retval = IntUtils.isPrime(marg0);
 
     boolean expected = true;
-    Assertions.assertEquals(expected, retval);
-  }
-
-  @Test
-  public void testFactorial17() throws Exception {
-    int marg0 = 16;
-    long retval = IntUtils.factorial(marg0);
-
-    long expected = 20922789888000L;
     Assertions.assertEquals(expected, retval);
   }
 
@@ -561,20 +570,29 @@ public class IntUtilsTest {
   }
 
   @Test
-  public void testFactorial18() throws Exception {
-    int marg0 = 17;
+  public void testFactorial17() throws Exception {
+    int marg0 = 16;
     long retval = IntUtils.factorial(marg0);
 
-    long expected = 355687428096000L;
+    long expected = 20922789888000L;
     Assertions.assertEquals(expected, retval);
   }
 
   @Test
   public void testIsPrime21() throws Exception {
-    int marg0 = 223;
+    int marg0 = 197;
     boolean retval = IntUtils.isPrime(marg0);
 
     boolean expected = true;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testFactorial18() throws Exception {
+    int marg0 = 17;
+    long retval = IntUtils.factorial(marg0);
+
+    long expected = 355687428096000L;
     Assertions.assertEquals(expected, retval);
   }
 
@@ -588,15 +606,6 @@ public class IntUtilsTest {
   }
 
   @Test
-  public void testFactorial19() throws Exception {
-    int marg0 = 18;
-    long retval = IntUtils.factorial(marg0);
-
-    long expected = 6402373705728000L;
-    Assertions.assertEquals(expected, retval);
-  }
-
-  @Test
   public void testIsPrime22() throws Exception {
     int marg0 = 241;
     boolean retval = IntUtils.isPrime(marg0);
@@ -606,11 +615,11 @@ public class IntUtilsTest {
   }
 
   @Test
-  public void testFactorial20() throws Exception {
-    int marg0 = 19;
+  public void testFactorial19() throws Exception {
+    int marg0 = 18;
     long retval = IntUtils.factorial(marg0);
 
-    long expected = 121645100408832000L;
+    long expected = 6402373705728000L;
     Assertions.assertEquals(expected, retval);
   }
 
@@ -633,17 +642,17 @@ public class IntUtilsTest {
   }
 
   @Test
-  public void testFactorial21() throws Exception {
-    int marg0 = 20;
+  public void testFactorial20() throws Exception {
+    int marg0 = 19;
     long retval = IntUtils.factorial(marg0);
 
-    long expected = 2432902008176640000L;
+    long expected = 121645100408832000L;
     Assertions.assertEquals(expected, retval);
   }
 
   @Test
   public void testIsPrime24() throws Exception {
-    int marg0 = 751571207;
+    int marg0 = 144145193;
     boolean retval = IntUtils.isPrime(marg0);
 
     boolean expected = false;
@@ -660,20 +669,20 @@ public class IntUtilsTest {
   }
 
   @Test
+  public void testFactorial21() throws Exception {
+    int marg0 = 20;
+    long retval = IntUtils.factorial(marg0);
+
+    long expected = 2432902008176640000L;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
   public void testIsPrime25() throws Exception {
     int marg0 = 293;
     boolean retval = IntUtils.isPrime(marg0);
 
     boolean expected = true;
-    Assertions.assertEquals(expected, retval);
-  }
-
-  @Test
-  public void testFactorial22() throws Exception {
-    int marg0 = 21;
-    long retval = IntUtils.factorial(marg0);
-
-    long expected = -4249290049419214848L;
     Assertions.assertEquals(expected, retval);
   }
 
@@ -687,17 +696,17 @@ public class IntUtilsTest {
   }
 
   @Test
-  public void testFactorial23() throws Exception {
-    int marg0 = 22;
+  public void testFactorial22() throws Exception {
+    int marg0 = 21;
     long retval = IntUtils.factorial(marg0);
 
-    long expected = -1250660718674968576L;
+    long expected = -4249290049419214848L;
     Assertions.assertEquals(expected, retval);
   }
 
   @Test
   public void testIsPrime26() throws Exception {
-    int marg0 = 331;
+    int marg0 = 349;
     boolean retval = IntUtils.isPrime(marg0);
 
     boolean expected = true;
@@ -723,17 +732,17 @@ public class IntUtilsTest {
   }
 
   @Test
-  public void testFactorial24() throws Exception {
-    int marg0 = 23;
+  public void testFactorial23() throws Exception {
+    int marg0 = 22;
     long retval = IntUtils.factorial(marg0);
 
-    long expected = 8128291617894825984L;
+    long expected = -1250660718674968576L;
     Assertions.assertEquals(expected, retval);
   }
 
   @Test
   public void testIsPrime28() throws Exception {
-    int marg0 = 373;
+    int marg0 = 383;
     boolean retval = IntUtils.isPrime(marg0);
 
     boolean expected = true;
@@ -741,11 +750,11 @@ public class IntUtilsTest {
   }
 
   @Test
-  public void testFactorial25() throws Exception {
-    int marg0 = 24;
+  public void testFactorial24() throws Exception {
+    int marg0 = 23;
     long retval = IntUtils.factorial(marg0);
 
-    long expected = -7835185981329244160L;
+    long expected = 8128291617894825984L;
     Assertions.assertEquals(expected, retval);
   }
 
@@ -768,11 +777,11 @@ public class IntUtilsTest {
   }
 
   @Test
-  public void testFactorial26() throws Exception {
-    int marg0 = 25;
+  public void testFactorial25() throws Exception {
+    int marg0 = 24;
     long retval = IntUtils.factorial(marg0);
 
-    long expected = 7034535277573963776L;
+    long expected = -7835185981329244160L;
     Assertions.assertEquals(expected, retval);
   }
 
@@ -795,11 +804,11 @@ public class IntUtilsTest {
   }
 
   @Test
-  public void testFactorial27() throws Exception {
-    int marg0 = 26;
+  public void testFactorial26() throws Exception {
+    int marg0 = 25;
     long retval = IntUtils.factorial(marg0);
 
-    long expected = -1569523520172457984L;
+    long expected = 7034535277573963776L;
     Assertions.assertEquals(expected, retval);
   }
 
@@ -813,17 +822,17 @@ public class IntUtilsTest {
   }
 
   @Test
-  public void testFactorial28() throws Exception {
-    int marg0 = 27;
+  public void testFactorial27() throws Exception {
+    int marg0 = 26;
     long retval = IntUtils.factorial(marg0);
 
-    long expected = -5483646897237262336L;
+    long expected = -1569523520172457984L;
     Assertions.assertEquals(expected, retval);
   }
 
   @Test
   public void testIsPrime31() throws Exception {
-    int marg0 = 487;
+    int marg0 = 491;
     boolean retval = IntUtils.isPrime(marg0);
 
     boolean expected = true;
@@ -832,7 +841,7 @@ public class IntUtilsTest {
 
   @Test
   public void testIsPrime32() throws Exception {
-    int marg0 = 1073742281;
+    int marg0 = 1073742097;
     boolean retval = IntUtils.isPrime(marg0);
 
     boolean expected = false;
@@ -849,11 +858,11 @@ public class IntUtilsTest {
   }
 
   @Test
-  public void testFactorial29() throws Exception {
-    int marg0 = 28;
+  public void testFactorial28() throws Exception {
+    int marg0 = 27;
     long retval = IntUtils.factorial(marg0);
 
-    long expected = -5968160532966932480L;
+    long expected = -5483646897237262336L;
     Assertions.assertEquals(expected, retval);
   }
 
@@ -867,20 +876,29 @@ public class IntUtilsTest {
   }
 
   @Test
-  public void testFactorial30() throws Exception {
-    int marg0 = 29;
-    long retval = IntUtils.factorial(marg0);
-
-    long expected = -7055958792655077376L;
-    Assertions.assertEquals(expected, retval);
-  }
-
-  @Test
   public void testFibonacci25() throws Exception {
     int marg0 = 23;
     int retval = IntUtils.fibonacci(marg0);
 
     int expected = 28657;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testFactorial29() throws Exception {
+    int marg0 = 28;
+    long retval = IntUtils.factorial(marg0);
+
+    long expected = -5968160532966932480L;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testIsPrime34() throws Exception {
+    int marg0 = 607;
+    boolean retval = IntUtils.isPrime(marg0);
+
+    boolean expected = true;
     Assertions.assertEquals(expected, retval);
   }
 }

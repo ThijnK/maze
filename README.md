@@ -177,18 +177,18 @@ These classes are likewise available in the [`nl.uu.maze.generated.benchmarks`](
 - [`BinaryTree`](/src/main/java/nl/uu/maze/benchmarks/BinaryTree.java): Provides a binary tree implementation and various traversal and utility methods (e.g., in-order, pre-order, post-order traversal, height calculation, finding certain values).
 - [`BitwiseManipulator`](/src/main/java/nl/uu/maze/benchmarks/BitwiseManipulator.java): Class that performs various bitwise operations on integers.
 - [`BracketBalancer`](/src/main/java/nl/uu/maze/benchmarks/BracketBalancer.java): Class that checks whether a string of brackets (represented as an array of characters) is balanced.
-- [`ConnectedComponents`](/src/main/java/nl/uu/maze/benchmarks/ConnectedComponents.java): Calculates the number of connected components in a graph represented as an adjacency matrix via DFS traversal.
+- [`ConnectedComponents`](/src/main/java/nl/uu/maze/benchmarks/ConnectedComponents.java): Calculates the number of connected components and detects components with cycles of a given length in a graph represented as an adjacency matrix.
 - [`Dijkstra`](/src/main/java/nl/uu/maze/benchmarks/Dijkstra.java): Implements Dijkstra's algorithm to find the shortest path in a graph represented as an adjacency matrix, as well as a DFS traversal method to check whether a particular node is reachable from another node.
 - [`GraphTraversal`](/src/main/java/nl/uu/maze/benchmarks/GraphTraversal.java): Implements DFS and BFS graph traversal algorithms on a graph represented as an adjacency matrix. The DFS algorithm is used by the `ConnectedComponents` class.
-- [`HeapSort`](/src/main/java/nl/uu/maze/benchmarks/HeapSort.java): Implementation of the heap sort algorithm on an integer array.
+- [`HeapSort`](/src/main/java/nl/uu/maze/benchmarks/HeapSort.java): Implementation of the heap sort algorithm on an array of floating-point numbers.
 - [`IntUtils`](/src/main/java/nl/uu/maze/benchmarks/IntUtils.java): Class that provides various utility methods for integers, such as calculating the GCD, LCM, and factorial.
 - [`StringPatternMatcher`](/src/main/java/nl/uu/maze/benchmarks/StringPatternMatcher.java): Implements a simple string pattern matching algorithm based on regex-like syntax.
-- [`StringUtils`](/src/main/java/nl/uu/maze/benchmarks/StringUtils.java): Class that provides various utility methods for strings, such as reversing a string, checking for palindromes, and trimming whitespace.
+- [`StringUtils`](/src/main/java/nl/uu/maze/benchmarks/StringUtils.java): Class that provides various utility methods for strings, such as reversing a string, checking for palindromes, and finding really specific substrings (e.g., alternating digits and letters).
 
 ### Example Output
 
 The output for each of the benchmark classes when run using **BFS** with a **10 second time budget** is available in the [src/test/java/nl/uu/maze/generated/benchmarks](/src/test/java/nl/uu/tests/maze/generated/benchmarks/) directory.
-These test cases achieve an overall 88% line coverage and 83% branch coverage for the benchmark set (see JaCoCo report after running the tests), but better coverage can be achieved using different search strategies and/or a larger time budget.
+These test cases achieve an overall 87% line coverage and 84% branch coverage for the benchmark set (see JaCoCo report after running the tests), but better coverage can be achieved using different search strategies and/or a larger time budget.
 
 ## Architecture
 
@@ -251,7 +251,7 @@ The engine also provides some predefined search strategies for probabilistic sea
   This is useful as a baseline or interleaved with other strategies to introduce some randomness.
 - **Coverage Optimized Search (COS)**:
   Based on KLEE's coverage-optimized search strategy, which is based on the distance to an uncovered instruction, the call stack of the state, and whether it recently covered new code.
-  In MAZE, this is translated to probabilistic search with the `DistanceToUnocovered`, `RecentCoverage`, and `SmallestCallDepth` heuristics.
+  In MAZE, this is translated to probabilistic search with the `DistanceToUnocvered`, `RecentCoverage`, and `SmallestCallDepth` heuristics.
   The strategy is designed to maximize code coverage by focusing on unexplored regions of the program.
 - **Feasibility Optimized Search (FOS)**:
   Strategy designed to prioritize states that are most feasible to solve (in reasonable time).
