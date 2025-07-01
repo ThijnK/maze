@@ -2,6 +2,7 @@
 package nl.uu.tests.maze.generated.benchmarks;
 
 import java.lang.Exception;
+import java.lang.NullPointerException;
 import nl.uu.maze.benchmarks.BitwiseManipulator;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -62,6 +63,13 @@ public class BitwiseManipulatorTest {
   }
 
   @Test
+  public void testConditionalArrayFlip1() throws Exception {
+    int[] marg0 = null;
+    int marg1 = 0;
+    Assertions.assertThrows(NullPointerException.class, () -> BitwiseManipulator.conditionalArrayFlip(marg0, marg1));
+  }
+
+  @Test
   public void testRotateRight1() throws Exception {
     int marg0 = 0;
     int marg1 = 0;
@@ -106,6 +114,13 @@ public class BitwiseManipulatorTest {
 
     int expected = 0;
     Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testConditionalArrayFlip2() throws Exception {
+    int[] marg0 = {};
+    int marg1 = 0;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
   }
 
   @Test
@@ -154,6 +169,15 @@ public class BitwiseManipulatorTest {
     int retval = BitwiseManipulator.lowestSetBit(marg0);
 
     int expected = 1;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop1() throws Exception {
+    int marg0 = 0;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 0;
     Assertions.assertEquals(expected, retval);
   }
 
@@ -233,6 +257,20 @@ public class BitwiseManipulatorTest {
   }
 
   @Test
+  public void testConditionalArrayFlip3() throws Exception {
+    int[] marg0 = { -3 };
+    int marg1 = -2;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip4() throws Exception {
+    int[] marg0 = { -1 };
+    int marg1 = 1;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
   public void testLowestSetBit5() throws Exception {
     int marg0 = 8;
     int retval = BitwiseManipulator.lowestSetBit(marg0);
@@ -257,6 +295,13 @@ public class BitwiseManipulatorTest {
 
     int expected = 1;
     Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testConditionalArrayFlip5() throws Exception {
+    int[] marg0 = { 1 };
+    int marg1 = -2;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
   }
 
   @Test
@@ -287,6 +332,15 @@ public class BitwiseManipulatorTest {
   }
 
   @Test
+  public void testBitwiseLoop2() throws Exception {
+    int marg0 = 1;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 0;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
   public void testCountSetBits9() throws Exception {
     int marg0 = 16;
     int retval = BitwiseManipulator.countSetBits(marg0);
@@ -302,6 +356,22 @@ public class BitwiseManipulatorTest {
 
     int expected = 5;
     Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop3() throws Exception {
+    int marg0 = 2;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 0;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testConditionalArrayFlip6() throws Exception {
+    int[] marg0 = { -8, -2052 };
+    int marg1 = -4;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
   }
 
   @Test
@@ -323,6 +393,27 @@ public class BitwiseManipulatorTest {
   }
 
   @Test
+  public void testConditionalArrayFlip7() throws Exception {
+    int[] marg0 = { -3, 2 };
+    int marg1 = -2;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip8() throws Exception {
+    int[] marg0 = { 1, -2 };
+    int marg1 = -3;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip9() throws Exception {
+    int[] marg0 = { -1, -1 };
+    int marg1 = 3;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
   public void testHighestSetBit8() throws Exception {
     int marg0 = 64;
     int retval = BitwiseManipulator.highestSetBit(marg0);
@@ -338,6 +429,43 @@ public class BitwiseManipulatorTest {
 
     int expected = 1;
     Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testConditionalArrayFlip10() throws Exception {
+    int[] marg0 = { -8, 0 };
+    int marg1 = -4;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip11() throws Exception {
+    int[] marg0 = { 0, -8 };
+    int marg1 = -4;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testBitwiseLoop4() throws Exception {
+    int marg0 = 4;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 0;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testConditionalArrayFlip12() throws Exception {
+    int[] marg0 = { 1, 0 };
+    int marg1 = -2;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip13() throws Exception {
+    int[] marg0 = { 0, 2 };
+    int marg1 = -3;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
   }
 
   @Test
@@ -359,11 +487,27 @@ public class BitwiseManipulatorTest {
   }
 
   @Test
+  public void testConditionalArrayFlip14() throws Exception {
+    int[] marg0 = { 0, 0 };
+    int marg1 = -4;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
   public void testCountSetBits12() throws Exception {
     int marg0 = 64;
     int retval = BitwiseManipulator.countSetBits(marg0);
 
     int expected = 1;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop5() throws Exception {
+    int marg0 = 8;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 0;
     Assertions.assertEquals(expected, retval);
   }
 
@@ -395,12 +539,70 @@ public class BitwiseManipulatorTest {
   }
 
   @Test
+  public void testConditionalArrayFlip15() throws Exception {
+    int[] marg0 = { -16, -16, -16 };
+    int marg1 = -8;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testBitwiseLoop6() throws Exception {
+    int marg0 = 3;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 3;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testConditionalArrayFlip16() throws Exception {
+    int[] marg0 = { -8, -8, 7 };
+    int marg1 = -4;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip17() throws Exception {
+    int[] marg0 = { -8, 7, -8 };
+    int marg1 = -6;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip18() throws Exception {
+    int[] marg0 = { 7, -8, -8 };
+    int marg1 = -7;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
   public void testCountSetBits14() throws Exception {
     int marg0 = 128;
     int retval = BitwiseManipulator.countSetBits(marg0);
 
     int expected = 1;
     Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testConditionalArrayFlip19() throws Exception {
+    int[] marg0 = { -3, 2, 2 };
+    int marg1 = -2;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip20() throws Exception {
+    int[] marg0 = { 1, -2, 1 };
+    int marg1 = -3;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip21() throws Exception {
+    int[] marg0 = { 1, 1, -2 };
+    int marg1 = -5;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
   }
 
   @Test
@@ -413,12 +615,139 @@ public class BitwiseManipulatorTest {
   }
 
   @Test
+  public void testBitwiseLoop7() throws Exception {
+    int marg0 = 16;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 0;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop8() throws Exception {
+    int marg0 = 6;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 6;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop9() throws Exception {
+    int marg0 = 5;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = -1;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testConditionalArrayFlip22() throws Exception {
+    int[] marg0 = { -16, -32776, 0 };
+    int marg1 = -8;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip23() throws Exception {
+    int[] marg0 = { -16, 0, -16 };
+    int marg1 = -8;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip24() throws Exception {
+    int[] marg0 = { 0, -8388616, -16 };
+    int marg1 = -8;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip25() throws Exception {
+    int[] marg0 = { -1, -1, -1 };
+    int marg1 = 7;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
   public void testLowestSetBit10() throws Exception {
     int marg0 = 256;
     int retval = BitwiseManipulator.lowestSetBit(marg0);
 
     int expected = 8;
     Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testConditionalArrayFlip26() throws Exception {
+    int[] marg0 = { -8, 0, 7 };
+    int marg1 = -4;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip27() throws Exception {
+    int[] marg0 = { -8, 5, 0 };
+    int marg1 = -6;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip28() throws Exception {
+    int[] marg0 = { 0, -8, 3 };
+    int marg1 = -4;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip29() throws Exception {
+    int[] marg0 = { 0, 7, -8 };
+    int marg1 = -6;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip30() throws Exception {
+    int[] marg0 = { 6, -8, 0 };
+    int marg1 = -7;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip31() throws Exception {
+    int[] marg0 = { 7, 0, -8 };
+    int marg1 = -7;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testBitwiseLoop10() throws Exception {
+    int marg0 = 12;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = -1;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testConditionalArrayFlip32() throws Exception {
+    int[] marg0 = { 1, 0, 0 };
+    int marg1 = -2;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip33() throws Exception {
+    int[] marg0 = { 0, 2, 0 };
+    int marg1 = -3;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip34() throws Exception {
+    int[] marg0 = { 0, 0, 4 };
+    int marg1 = -5;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
   }
 
   @Test
@@ -449,6 +778,75 @@ public class BitwiseManipulatorTest {
   }
 
   @Test
+  public void testConditionalArrayFlip35() throws Exception {
+    int[] marg0 = { -16, 0, 0 };
+    int marg1 = -8;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip36() throws Exception {
+    int[] marg0 = { 0, -16, 0 };
+    int marg1 = -8;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip37() throws Exception {
+    int[] marg0 = { 0, 0, -16 };
+    int marg1 = -8;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testBitwiseLoop11() throws Exception {
+    int marg0 = 32;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 0;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop12() throws Exception {
+    int marg0 = 10;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 10;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop13() throws Exception {
+    int marg0 = 9;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = -1;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testConditionalArrayFlip38() throws Exception {
+    int[] marg0 = { 0, 0, 3 };
+    int marg1 = -4;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip39() throws Exception {
+    int[] marg0 = { 0, 5, 0 };
+    int marg1 = -6;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip40() throws Exception {
+    int[] marg0 = { 6, 0, 0 };
+    int marg1 = -7;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
   public void testLowestSetBit11() throws Exception {
     int marg0 = 512;
     int retval = BitwiseManipulator.lowestSetBit(marg0);
@@ -467,12 +865,132 @@ public class BitwiseManipulatorTest {
   }
 
   @Test
+  public void testBitwiseLoop14() throws Exception {
+    int marg0 = 20;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = -1;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testConditionalArrayFlip41() throws Exception {
+    int[] marg0 = { -144, -32, -32, -32 };
+    int marg1 = -16;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip42() throws Exception {
+    int[] marg0 = { 0, 0, 0 };
+    int marg1 = -8;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
   public void testCountSetBits17() throws Exception {
     int marg0 = 512;
     int retval = BitwiseManipulator.countSetBits(marg0);
 
     int expected = 1;
     Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testConditionalArrayFlip43() throws Exception {
+    int[] marg0 = { -16, -72, -16, 15 };
+    int marg1 = -8;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip44() throws Exception {
+    int[] marg0 = { -28, -16, 15, -16 };
+    int marg1 = -12;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip45() throws Exception {
+    int[] marg0 = { -16, 15, -16, -16 };
+    int marg1 = -14;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip46() throws Exception {
+    int[] marg0 = { 15, -47, -16, -16 };
+    int marg1 = -15;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testBitwiseLoop15() throws Exception {
+    int marg0 = 64;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 0;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop16() throws Exception {
+    int marg0 = 18;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 18;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop17() throws Exception {
+    int marg0 = 17;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = -1;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testConditionalArrayFlip47() throws Exception {
+    int[] marg0 = { -8, -8, 7, 7 };
+    int marg1 = -4;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip48() throws Exception {
+    int[] marg0 = { -8, 7, -8, 7 };
+    int marg1 = -6;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip49() throws Exception {
+    int[] marg0 = { -12, 11, 11, -12 };
+    int marg1 = -10;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip50() throws Exception {
+    int[] marg0 = { 7, -8, -8, 7 };
+    int marg1 = -7;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip51() throws Exception {
+    int[] marg0 = { 11, -12, 11, -12 };
+    int marg1 = -11;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip52() throws Exception {
+    int[] marg0 = { 13, 13, -14, -14 };
+    int marg1 = -13;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
   }
 
   @Test
@@ -494,12 +1012,177 @@ public class BitwiseManipulatorTest {
   }
 
   @Test
+  public void testConditionalArrayFlip53() throws Exception {
+    int[] marg0 = { -32, -32, -32, 0 };
+    int marg1 = -16;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip54() throws Exception {
+    int[] marg0 = { -144, -32, 0, -32 };
+    int marg1 = -16;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip55() throws Exception {
+    int[] marg0 = { -144, 0, -32, -32 };
+    int marg1 = -16;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip56() throws Exception {
+    int[] marg0 = { -3, 2, 2, 2 };
+    int marg1 = -2;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip57() throws Exception {
+    int[] marg0 = { 0, -32, -32, -32 };
+    int marg1 = -16;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip58() throws Exception {
+    int[] marg0 = { 1, -2, 1, 1 };
+    int marg1 = -3;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip59() throws Exception {
+    int[] marg0 = { 1, 1, -2, 1 };
+    int marg1 = -5;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip60() throws Exception {
+    int[] marg0 = { 1, 1, 1, -2 };
+    int marg1 = -9;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testBitwiseLoop18() throws Exception {
+    int marg0 = 48;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = -1;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop19() throws Exception {
+    int marg0 = 7;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 21;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
   public void testCountSetBits18() throws Exception {
     long marg0 = 32L;
     int retval = BitwiseManipulator.countSetBits(marg0);
 
     int expected = 1;
     Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testConditionalArrayFlip61() throws Exception {
+    int[] marg0 = { -536870920, -16, 0, 7 };
+    int marg1 = -8;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip62() throws Exception {
+    int[] marg0 = { -16, -16, 15, 0 };
+    int marg1 = -12;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip63() throws Exception {
+    int[] marg0 = { -16, 0, -16, 15 };
+    int marg1 = -8;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip64() throws Exception {
+    int[] marg0 = { -16, 0, 15, -16 };
+    int marg1 = -12;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip65() throws Exception {
+    int[] marg0 = { -536870926, 15, -16, 0 };
+    int marg1 = -14;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip66() throws Exception {
+    int[] marg0 = { -16, 15, 0, -16 };
+    int marg1 = -14;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip67() throws Exception {
+    int[] marg0 = { 0, -16, -16, 15 };
+    int marg1 = -8;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip68() throws Exception {
+    int[] marg0 = { 0, -16, 15, -16 };
+    int marg1 = -12;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip69() throws Exception {
+    int[] marg0 = { 0, 15, -16, -16 };
+    int marg1 = -14;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip70() throws Exception {
+    int[] marg0 = { 30, -16, -31, 0 };
+    int marg1 = -15;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip71() throws Exception {
+    int[] marg0 = { 15, -16, 0, -16 };
+    int marg1 = -15;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip72() throws Exception {
+    int[] marg0 = { 15, 0, -16, -16 };
+    int marg1 = -15;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip73() throws Exception {
+    int[] marg0 = { -1, -1, -1, -1 };
+    int marg1 = 15;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
   }
 
   @Test
@@ -512,6 +1195,90 @@ public class BitwiseManipulatorTest {
   }
 
   @Test
+  public void testConditionalArrayFlip74() throws Exception {
+    int[] marg0 = { -8, 0, 7, 7 };
+    int marg1 = -4;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip75() throws Exception {
+    int[] marg0 = { -8, 5, 0, 5 };
+    int marg1 = -6;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip76() throws Exception {
+    int[] marg0 = { -12, 11, 11, 0 };
+    int marg1 = -10;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip77() throws Exception {
+    int[] marg0 = { 0, -8, 3, 3 };
+    int marg1 = -4;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip78() throws Exception {
+    int[] marg0 = { 0, 7, -8, 7 };
+    int marg1 = -6;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip79() throws Exception {
+    int[] marg0 = { 0, 9, 9, -12 };
+    int marg1 = -10;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip80() throws Exception {
+    int[] marg0 = { 6, -8, 0, 6 };
+    int marg1 = -7;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip81() throws Exception {
+    int[] marg0 = { 11, -12, 11, 0 };
+    int marg1 = -11;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip82() throws Exception {
+    int[] marg0 = { 7, 0, -8, 7 };
+    int marg1 = -7;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip83() throws Exception {
+    int[] marg0 = { 10, 0, 10, -12 };
+    int marg1 = -11;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip84() throws Exception {
+    int[] marg0 = { 13, 13, -14, 0 };
+    int marg1 = -13;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip85() throws Exception {
+    int[] marg0 = { 12, 12, 0, -14 };
+    int marg1 = -13;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
   public void testHighestSetBit15() throws Exception {
     int marg0 = 8192;
     int retval = BitwiseManipulator.highestSetBit(marg0);
@@ -521,12 +1288,298 @@ public class BitwiseManipulatorTest {
   }
 
   @Test
+  public void testBitwiseLoop20() throws Exception {
+    int marg0 = 128;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 0;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop21() throws Exception {
+    int marg0 = 34;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 34;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop22() throws Exception {
+    int marg0 = 33;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = -1;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop23() throws Exception {
+    int marg0 = 14;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 42;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop24() throws Exception {
+    int marg0 = 13;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 25;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop25() throws Exception {
+    int marg0 = 11;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 9;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testConditionalArrayFlip86() throws Exception {
+    int[] marg0 = { -32, -32, 0, 0 };
+    int marg1 = -16;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip87() throws Exception {
+    int[] marg0 = { -32, 0, -32, 0 };
+    int marg1 = -16;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip88() throws Exception {
+    int[] marg0 = { -144, 0, 0, -32 };
+    int marg1 = -16;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip89() throws Exception {
+    int[] marg0 = { 0, -32, -32, 0 };
+    int marg1 = -16;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip90() throws Exception {
+    int[] marg0 = { 0, -32, 0, -32 };
+    int marg1 = -16;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip91() throws Exception {
+    int[] marg0 = { 0, 0, -32, -32 };
+    int marg1 = -16;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip92() throws Exception {
+    int[] marg0 = { 1, 0, 0, 0 };
+    int marg1 = -2;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip93() throws Exception {
+    int[] marg0 = { 0, 2, 0, 0 };
+    int marg1 = -3;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip94() throws Exception {
+    int[] marg0 = { 0, 0, 4100, 0 };
+    int marg1 = -4101;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip95() throws Exception {
+    int[] marg0 = { 0, 0, 0, 8 };
+    int marg1 = -9;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
   public void testLowestSetBit13() throws Exception {
     int marg0 = 2048;
     int retval = BitwiseManipulator.lowestSetBit(marg0);
 
     int expected = 11;
     Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testConditionalArrayFlip96() throws Exception {
+    int[] marg0 = { -16, 0, 0, 7 };
+    int marg1 = -8;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip97() throws Exception {
+    int[] marg0 = { -16, 0, 11, 0 };
+    int marg1 = -12;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip98() throws Exception {
+    int[] marg0 = { -16, 13, 0, 0 };
+    int marg1 = -14;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip99() throws Exception {
+    int[] marg0 = { 0, -16, 0, 7 };
+    int marg1 = -8;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip100() throws Exception {
+    int[] marg0 = { 0, -16, 11, 0 };
+    int marg1 = -12;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip101() throws Exception {
+    int[] marg0 = { 0, 0, -16, 7 };
+    int marg1 = -8;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip102() throws Exception {
+    int[] marg0 = { 0, 0, 11, -16 };
+    int marg1 = -12;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip103() throws Exception {
+    int[] marg0 = { 0, 13, -16, 0 };
+    int marg1 = -14;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip104() throws Exception {
+    int[] marg0 = { 0, 13, 0, -16 };
+    int marg1 = -14;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip105() throws Exception {
+    int[] marg0 = { 14, -16, 0, 0 };
+    int marg1 = -15;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip106() throws Exception {
+    int[] marg0 = { 14, 0, -16, 0 };
+    int marg1 = -15;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip107() throws Exception {
+    int[] marg0 = { 14, 0, 0, -16 };
+    int marg1 = -15;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testBitwiseLoop26() throws Exception {
+    int marg0 = 72;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = -1;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop27() throws Exception {
+    int marg0 = 28;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 55;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop28() throws Exception {
+    int marg0 = 26;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 24;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop29() throws Exception {
+    int marg0 = 25;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = -3;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testConditionalArrayFlip108() throws Exception {
+    int[] marg0 = { 0, 0, 3, 3 };
+    int marg1 = -4;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip109() throws Exception {
+    int[] marg0 = { 0, 2053, 0, 2053 };
+    int marg1 = -2054;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip110() throws Exception {
+    int[] marg0 = { 0, 9, 9, 0 };
+    int marg1 = -10;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip111() throws Exception {
+    int[] marg0 = { 6, 0, 0, 6 };
+    int marg1 = -7;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip112() throws Exception {
+    int[] marg0 = { 10, 0, 10, 0 };
+    int marg1 = -11;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip113() throws Exception {
+    int[] marg0 = { 33554444, 33554444, 0, 0 };
+    int marg1 = -33554445;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
   }
 
   @Test
@@ -548,6 +1601,167 @@ public class BitwiseManipulatorTest {
   }
 
   @Test
+  public void testConditionalArrayFlip114() throws Exception {
+    int[] marg0 = { 2147483616, -64, -64, -64, -64 };
+    int marg1 = -32;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip115() throws Exception {
+    int[] marg0 = { -32, 0, 0, 0 };
+    int marg1 = -16;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip116() throws Exception {
+    int[] marg0 = { 0, -4194320, 0, 0 };
+    int marg1 = -16;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip117() throws Exception {
+    int[] marg0 = { 0, 0, -32, 0 };
+    int marg1 = -16;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip118() throws Exception {
+    int[] marg0 = { 0, 0, 0, -32 };
+    int marg1 = -16;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testBitwiseLoop30() throws Exception {
+    int marg0 = 256;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 0;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop31() throws Exception {
+    int marg0 = 66;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 66;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop32() throws Exception {
+    int marg0 = 65;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = -1;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop33() throws Exception {
+    int marg0 = 56;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = -3;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop34() throws Exception {
+    int marg0 = 22;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 66;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop35() throws Exception {
+    int marg0 = 21;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 41;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop36() throws Exception {
+    int marg0 = 19;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 17;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testConditionalArrayFlip119() throws Exception {
+    int[] marg0 = { -32, -32, -32, -32, 31 };
+    int marg1 = -16;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip120() throws Exception {
+    int[] marg0 = { -32, -32, -32, 31, -32 };
+    int marg1 = -24;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip121() throws Exception {
+    int[] marg0 = { -32, -32, 31, -32, -32 };
+    int marg1 = -28;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip122() throws Exception {
+    int[] marg0 = { -32, 31, -32, -32, -32 };
+    int marg1 = -30;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip123() throws Exception {
+    int[] marg0 = { 0, 0, 0, 7 };
+    int marg1 = -8;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip124() throws Exception {
+    int[] marg0 = { 0, 0, 11, 0 };
+    int marg1 = -12;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip125() throws Exception {
+    int[] marg0 = { 0, 13, 0, 0 };
+    int marg1 = -14;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip126() throws Exception {
+    int[] marg0 = { 31, -32, -32, -32, -32 };
+    int marg1 = -31;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip127() throws Exception {
+    int[] marg0 = { 14, 0, 0, 0 };
+    int marg1 = -15;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
   public void testLowestSetBit14() throws Exception {
     int marg0 = 4096;
     int retval = BitwiseManipulator.lowestSetBit(marg0);
@@ -566,6 +1780,76 @@ public class BitwiseManipulatorTest {
   }
 
   @Test
+  public void testConditionalArrayFlip128() throws Exception {
+    int[] marg0 = { -16, -16, -16, 15, 15 };
+    int marg1 = -8;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip129() throws Exception {
+    int[] marg0 = { -16, -16, 15, -16, 15 };
+    int marg1 = -12;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip130() throws Exception {
+    int[] marg0 = { -24, -24, 23, 23, -24 };
+    int marg1 = -20;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip131() throws Exception {
+    int[] marg0 = { -16, 15, -4110, -16, 15 };
+    int marg1 = -14;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip132() throws Exception {
+    int[] marg0 = { -24, 23, -4118, 23, -24 };
+    int marg1 = -22;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip133() throws Exception {
+    int[] marg0 = { -28, 27, 27, -28, -28 };
+    int marg1 = -26;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip134() throws Exception {
+    int[] marg0 = { 15, -16, -16, -16, 15 };
+    int marg1 = -15;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip135() throws Exception {
+    int[] marg0 = { 23, -24, -24, 23, -24 };
+    int marg1 = -23;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip136() throws Exception {
+    int[] marg0 = { 27, -28, 27, -4123, -28 };
+    int marg1 = -27;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip137() throws Exception {
+    int[] marg0 = { 29, 29, -30, -30, -30 };
+    int marg1 = -29;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
   public void testHighestSetBit17() throws Exception {
     int marg0 = 32768;
     int retval = BitwiseManipulator.highestSetBit(marg0);
@@ -575,12 +1859,615 @@ public class BitwiseManipulatorTest {
   }
 
   @Test
+  public void testBitwiseLoop37() throws Exception {
+    int marg0 = 136;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = -1;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop38() throws Exception {
+    int marg0 = 44;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 87;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop39() throws Exception {
+    int marg0 = 42;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 40;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop40() throws Exception {
+    int marg0 = 41;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = -3;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testConditionalArrayFlip138() throws Exception {
+    int[] marg0 = { -64, -64, -64, -64, 0 };
+    int marg1 = -32;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip139() throws Exception {
+    int[] marg0 = { 2147483616, -64, -64, 0, -64 };
+    int marg1 = -32;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip140() throws Exception {
+    int[] marg0 = { 2147483616, -64, 0, -64, -64 };
+    int marg1 = -32;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip141() throws Exception {
+    int[] marg0 = { -8, -32772, 7, 7, 7 };
+    int marg1 = -4;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip142() throws Exception {
+    int[] marg0 = { 2147483616, 0, -64, -64, -64 };
+    int marg1 = -32;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip143() throws Exception {
+    int[] marg0 = { -8, 7, -8, 7, 7 };
+    int marg1 = -6;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip144() throws Exception {
+    int[] marg0 = { -12, 11, 11, -12, 11 };
+    int marg1 = -10;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip145() throws Exception {
+    int[] marg0 = { -20, 19, 19, 19, -20 };
+    int marg1 = -18;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip146() throws Exception {
+    int[] marg0 = { 0, -64, -64, -64, -64 };
+    int marg1 = -32;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip147() throws Exception {
+    int[] marg0 = { 0, 0, 0, 0 };
+    int marg1 = -16;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip148() throws Exception {
+    int[] marg0 = { 7, -8, -8, 7, 7 };
+    int marg1 = -7;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip149() throws Exception {
+    int[] marg0 = { 11, -12, 11, -12, 11 };
+    int marg1 = -11;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip150() throws Exception {
+    int[] marg0 = { 19, -20, 19, 19, -20 };
+    int marg1 = -19;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip151() throws Exception {
+    int[] marg0 = { 13, 13, -14, -14, 13 };
+    int marg1 = -13;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip152() throws Exception {
+    int[] marg0 = { 21, 21, -22, 21, -22 };
+    int marg1 = -21;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip153() throws Exception {
+    int[] marg0 = { 25, 25, 25, -27, -26 };
+    int marg1 = -25;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
   public void testCountSetBits22() throws Exception {
     int marg0 = 4096;
     int retval = BitwiseManipulator.countSetBits(marg0);
 
     int expected = 1;
     Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testConditionalArrayFlip154() throws Exception {
+    int[] marg0 = { -32, -32, -32, 0, 31 };
+    int marg1 = -16;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip155() throws Exception {
+    int[] marg0 = { -32, -65560, -32, 31, 0 };
+    int marg1 = -24;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip156() throws Exception {
+    int[] marg0 = { -32, -32, 0, -32, 31 };
+    int marg1 = -16;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip157() throws Exception {
+    int[] marg0 = { -32, -32, 0, 31, -32 };
+    int marg1 = -24;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip158() throws Exception {
+    int[] marg0 = { -32, -32, 31, -32, 0 };
+    int marg1 = -28;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip159() throws Exception {
+    int[] marg0 = { -32, -65564, 31, 0, -32 };
+    int marg1 = -28;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip160() throws Exception {
+    int[] marg0 = { -65568, 0, -65568, -65568, 65567 };
+    int marg1 = -65552;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip161() throws Exception {
+    int[] marg0 = { -65568, 0, -65568, 65567, -65568 };
+    int marg1 = -65560;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip162() throws Exception {
+    int[] marg0 = { -32, 0, 31, -32, -32 };
+    int marg1 = -28;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip163() throws Exception {
+    int[] marg0 = { -32, 31, -32, -32, 0 };
+    int marg1 = -30;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip164() throws Exception {
+    int[] marg0 = { -32, 31, -32, 0, -32 };
+    int marg1 = -30;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip165() throws Exception {
+    int[] marg0 = { -32, 31, 0, -32, -32 };
+    int marg1 = -30;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip166() throws Exception {
+    int[] marg0 = { -3, 2, 2, 2, 2 };
+    int marg1 = -2;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip167() throws Exception {
+    int[] marg0 = { 0, -32, -32, -32, 31 };
+    int marg1 = -16;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip168() throws Exception {
+    int[] marg0 = { 0, -32, -32, 31, -32 };
+    int marg1 = -24;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip169() throws Exception {
+    int[] marg0 = { 0, -32, 31, -32, -32 };
+    int marg1 = -28;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip170() throws Exception {
+    int[] marg0 = { 0, 31, -32, -32, -32 };
+    int marg1 = -30;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip171() throws Exception {
+    int[] marg0 = { 31, -32, -32, -32, 0 };
+    int marg1 = -31;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip172() throws Exception {
+    int[] marg0 = { 31, -32, -32, 0, -32 };
+    int marg1 = -31;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip173() throws Exception {
+    int[] marg0 = { 31, -32, 0, -32, -32 };
+    int marg1 = -31;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip174() throws Exception {
+    int[] marg0 = { 1, -2, 1, 1, 1 };
+    int marg1 = -3;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip175() throws Exception {
+    int[] marg0 = { 31, 0, -32, -32, -32 };
+    int marg1 = -31;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip176() throws Exception {
+    int[] marg0 = { 1, 1, -2, 1, 1 };
+    int marg1 = -5;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip177() throws Exception {
+    int[] marg0 = { 1, 1, 1, -2, 1 };
+    int marg1 = -9;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip178() throws Exception {
+    int[] marg0 = { 1, 1, 1, 1, -2 };
+    int marg1 = -17;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testBitwiseLoop41() throws Exception {
+    int marg0 = 512;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 0;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop42() throws Exception {
+    int marg0 = 130;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 130;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop43() throws Exception {
+    int marg0 = 129;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = -1;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop44() throws Exception {
+    int marg0 = 104;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = -3;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop45() throws Exception {
+    int marg0 = 38;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 114;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop46() throws Exception {
+    int marg0 = 37;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 73;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop47() throws Exception {
+    int marg0 = 35;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 33;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testConditionalArrayFlip179() throws Exception {
+    int[] marg0 = { -16, -4194312, 0, 7, 7 };
+    int marg1 = -8;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip180() throws Exception {
+    int[] marg0 = { -16, -16, 15, 0, 15 };
+    int marg1 = -12;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip181() throws Exception {
+    int[] marg0 = { -24, -24, 23, 23, 0 };
+    int marg1 = -20;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip182() throws Exception {
+    int[] marg0 = { -16, 0, -16, 15, 15 };
+    int marg1 = -8;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip183() throws Exception {
+    int[] marg0 = { -536870928, 0, 536870927, -536870928, 536870927 };
+    int marg1 = -536870924;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip184() throws Exception {
+    int[] marg0 = { -24, 0, 23, 23, -24 };
+    int marg1 = -20;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip185() throws Exception {
+    int[] marg0 = { -16, 131085, -131086, 0, 131085 };
+    int marg1 = -14;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip186() throws Exception {
+    int[] marg0 = { -24, 23, -24, 23, 0 };
+    int marg1 = -22;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip187() throws Exception {
+    int[] marg0 = { -16, 15, 0, -16, 15 };
+    int marg1 = -14;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip188() throws Exception {
+    int[] marg0 = { -131096, 131095, 0, 131095, -131096 };
+    int marg1 = -131094;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip189() throws Exception {
+    int[] marg0 = { -28, 27, 27, -28, 0 };
+    int marg1 = -26;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip190() throws Exception {
+    int[] marg0 = { -28, 27, 27, 0, -28 };
+    int marg1 = -26;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip191() throws Exception {
+    int[] marg0 = { 0, -4194312, -16, 15, 15 };
+    int marg1 = -8;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip192() throws Exception {
+    int[] marg0 = { 0, -16, 15, -16, 15 };
+    int marg1 = -12;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip193() throws Exception {
+    int[] marg0 = { 0, -24, 23, 23, -24 };
+    int marg1 = -20;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip194() throws Exception {
+    int[] marg0 = { 0, 131085, -131086, -16, 131085 };
+    int marg1 = -14;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip195() throws Exception {
+    int[] marg0 = { 0, 1045, -1046, 1045, -24 };
+    int marg1 = -22;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip196() throws Exception {
+    int[] marg0 = { 0, 27, 27, -28, -28 };
+    int marg1 = -26;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip197() throws Exception {
+    int[] marg0 = { 15, -16, -16, 0, 15 };
+    int marg1 = -15;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip198() throws Exception {
+    int[] marg0 = { 23, -24, -24, 23, 0 };
+    int marg1 = -23;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip199() throws Exception {
+    int[] marg0 = { 131087, -131088, 0, -131088, 131087 };
+    int marg1 = -131087;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip200() throws Exception {
+    int[] marg0 = { 16777239, -16777240, 0, 16777239, -16777240 };
+    int marg1 = -16777239;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip201() throws Exception {
+    int[] marg0 = { 27, -28, 27, -28, 0 };
+    int marg1 = -27;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip202() throws Exception {
+    int[] marg0 = { 27, -28, 27, 0, -28 };
+    int marg1 = -27;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip203() throws Exception {
+    int[] marg0 = { 1038, 0, -1039, -16, 1038 };
+    int marg1 = -15;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip204() throws Exception {
+    int[] marg0 = { 131094, 0, -131095, 131094, -24 };
+    int marg1 = -23;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip205() throws Exception {
+    int[] marg0 = { 27, 0, 27, -28, -28 };
+    int marg1 = -27;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip206() throws Exception {
+    int[] marg0 = { 29, 29, -30, -30, 0 };
+    int marg1 = -29;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip207() throws Exception {
+    int[] marg0 = { 29, 29, -30, 0, -30 };
+    int marg1 = -29;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip208() throws Exception {
+    int[] marg0 = { 29, 29, 0, -30, -30 };
+    int marg1 = -29;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip209() throws Exception {
+    int[] marg0 = { -1, -1, -1, -1, -1 };
+    int marg1 = 31;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
   }
 
   @Test
@@ -602,6 +2489,506 @@ public class BitwiseManipulatorTest {
   }
 
   @Test
+  public void testConditionalArrayFlip210() throws Exception {
+    int[] marg0 = { -64, -64, -64, 0, 0 };
+    int marg1 = -32;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip211() throws Exception {
+    int[] marg0 = { -64, -64, 0, -64, 0 };
+    int marg1 = -32;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip212() throws Exception {
+    int[] marg0 = { 2147483616, -64, 0, 0, -64 };
+    int marg1 = -32;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip213() throws Exception {
+    int[] marg0 = { -64, 0, -64, -64, 0 };
+    int marg1 = -32;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip214() throws Exception {
+    int[] marg0 = { 2147483616, 0, -64, 0, -64 };
+    int marg1 = -32;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip215() throws Exception {
+    int[] marg0 = { 2147483616, 0, 0, -64, -64 };
+    int marg1 = -32;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip216() throws Exception {
+    int[] marg0 = { -8, 0, 7, 7, 7 };
+    int marg1 = -4;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip217() throws Exception {
+    int[] marg0 = { -8, 5, 0, 5, 5 };
+    int marg1 = -6;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip218() throws Exception {
+    int[] marg0 = { -12, 11, 11, 0, 11 };
+    int marg1 = -10;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip219() throws Exception {
+    int[] marg0 = { -20, 17, 17, 17, 0 };
+    int marg1 = -18;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip220() throws Exception {
+    int[] marg0 = { 0, -64, -64, -64, 0 };
+    int marg1 = -32;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip221() throws Exception {
+    int[] marg0 = { 0, -64, -64, 0, -64 };
+    int marg1 = -32;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip222() throws Exception {
+    int[] marg0 = { 0, -64, 0, -64, -64 };
+    int marg1 = -32;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip223() throws Exception {
+    int[] marg0 = { 0, -8, 3, 3, 3 };
+    int marg1 = -4;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip224() throws Exception {
+    int[] marg0 = { 0, 0, -64, -64, -64 };
+    int marg1 = -32;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip225() throws Exception {
+    int[] marg0 = { 0, 7, -8, 7, 7 };
+    int marg1 = -6;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip226() throws Exception {
+    int[] marg0 = { 0, 9, 9, -12, 9 };
+    int marg1 = -10;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip227() throws Exception {
+    int[] marg0 = { 0, 19, 19, 19, -20 };
+    int marg1 = -18;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip228() throws Exception {
+    int[] marg0 = { 6, -8, 0, 6, 6 };
+    int marg1 = -7;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip229() throws Exception {
+    int[] marg0 = { 11, -12, 11, 0, 11 };
+    int marg1 = -11;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip230() throws Exception {
+    int[] marg0 = { 18, -20, 18, 18, 0 };
+    int marg1 = -19;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip231() throws Exception {
+    int[] marg0 = { 7, 0, -8, 7, 7 };
+    int marg1 = -7;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip232() throws Exception {
+    int[] marg0 = { 10, 0, 10, -12, 10 };
+    int marg1 = -11;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip233() throws Exception {
+    int[] marg0 = { 19, 0, 19, 19, -20 };
+    int marg1 = -19;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip234() throws Exception {
+    int[] marg0 = { 13, 13, -14, 0, 13 };
+    int marg1 = -13;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip235() throws Exception {
+    int[] marg0 = { 21, 21, -22, 21, 0 };
+    int marg1 = -21;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip236() throws Exception {
+    int[] marg0 = { 12, 12, 0, -14, 12 };
+    int marg1 = -13;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip237() throws Exception {
+    int[] marg0 = { 20, 20, 0, 20, -22 };
+    int marg1 = -21;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip238() throws Exception {
+    int[] marg0 = { 24, 24, 24, -26, 0 };
+    int marg1 = -25;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip239() throws Exception {
+    int[] marg0 = { 25, 25, 25, 0, -26 };
+    int marg1 = -25;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testBitwiseLoop48() throws Exception {
+    int marg0 = 264;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = -1;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop49() throws Exception {
+    int marg0 = 100;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 199;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop50() throws Exception {
+    int marg0 = 98;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 96;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop51() throws Exception {
+    int marg0 = 97;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = -3;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop52() throws Exception {
+    int marg0 = 15;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 90;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testConditionalArrayFlip240() throws Exception {
+    int[] marg0 = { -32, -32, 0, 0, 31 };
+    int marg1 = -16;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip241() throws Exception {
+    int[] marg0 = { -32, -32, 0, 23, 0 };
+    int marg1 = -24;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip242() throws Exception {
+    int[] marg0 = { -32, -32, 31, 0, 0 };
+    int marg1 = -28;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip243() throws Exception {
+    int[] marg0 = { -32, 0, -1040, 0, 15 };
+    int marg1 = -16;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip244() throws Exception {
+    int[] marg0 = { -32, 0, -32, 31, 0 };
+    int marg1 = -24;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip245() throws Exception {
+    int[] marg0 = { -32, 0, 0, -48, 15 };
+    int marg1 = -16;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip246() throws Exception {
+    int[] marg0 = { -32, 0, 0, 31, -32 };
+    int marg1 = -24;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip247() throws Exception {
+    int[] marg0 = { -32, 0, 27, -284, 0 };
+    int marg1 = -28;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip248() throws Exception {
+    int[] marg0 = { -32, 0, 31, 0, -32 };
+    int marg1 = -28;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip249() throws Exception {
+    int[] marg0 = { -32, 31, -32, 0, 0 };
+    int marg1 = -30;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip250() throws Exception {
+    int[] marg0 = { -32, 29, 0, -32, 0 };
+    int marg1 = -30;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip251() throws Exception {
+    int[] marg0 = { -32, 31, 0, 0, -32 };
+    int marg1 = -30;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip252() throws Exception {
+    int[] marg0 = { 0, -64, -64, 0, 63 };
+    int marg1 = -48;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip253() throws Exception {
+    int[] marg0 = { 0, -32, -32, 23, 0 };
+    int marg1 = -24;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip254() throws Exception {
+    int[] marg0 = { 0, -32, 0, -131088, 15 };
+    int marg1 = -16;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip255() throws Exception {
+    int[] marg0 = { 0, -32, 0, 23, -32 };
+    int marg1 = -24;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip256() throws Exception {
+    int[] marg0 = { 0, -32, 27, -32, 0 };
+    int marg1 = -28;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip257() throws Exception {
+    int[] marg0 = { 0, -32, 31, 0, -32 };
+    int marg1 = -28;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip258() throws Exception {
+    int[] marg0 = { 0, 0, -32, -48, 15 };
+    int marg1 = -16;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip259() throws Exception {
+    int[] marg0 = { 0, 0, -32, 31, -32 };
+    int marg1 = -24;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip260() throws Exception {
+    int[] marg0 = { 0, 0, 27, -32, -32 };
+    int marg1 = -28;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip261() throws Exception {
+    int[] marg0 = { 0, 29, -32, -32, 0 };
+    int marg1 = -30;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip262() throws Exception {
+    int[] marg0 = { 0, 31, -32, 0, -32 };
+    int marg1 = -30;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip263() throws Exception {
+    int[] marg0 = { 0, 29, 0, -32, -32 };
+    int marg1 = -30;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip264() throws Exception {
+    int[] marg0 = { 1, 0, 0, 0, 0 };
+    int marg1 = -2;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip265() throws Exception {
+    int[] marg0 = { 31, -32, -32, 0, 0 };
+    int marg1 = -31;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip266() throws Exception {
+    int[] marg0 = { 30, -32, 0, -287, 0 };
+    int marg1 = -31;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip267() throws Exception {
+    int[] marg0 = { 31, -32, 0, 0, -32 };
+    int marg1 = -31;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip268() throws Exception {
+    int[] marg0 = { 30, 0, -32, -32, 0 };
+    int marg1 = -31;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip269() throws Exception {
+    int[] marg0 = { 31, 0, -32, 0, -32 };
+    int marg1 = -31;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip270() throws Exception {
+    int[] marg0 = { 30, 0, 0, -32, -32 };
+    int marg1 = -31;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip271() throws Exception {
+    int[] marg0 = { 0, 2, 0, 0, 0 };
+    int marg1 = -3;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip272() throws Exception {
+    int[] marg0 = { 0, 0, 4, 0, 0 };
+    int marg1 = -5;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip273() throws Exception {
+    int[] marg0 = { 0, 0, 0, 8, 0 };
+    int marg1 = -9;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip274() throws Exception {
+    int[] marg0 = { 0, 0, 0, 0, 16 };
+    int marg1 = -17;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
   public void testCountSetBits23() throws Exception {
     int marg0 = 8192;
     int retval = BitwiseManipulator.countSetBits(marg0);
@@ -611,11 +2998,320 @@ public class BitwiseManipulatorTest {
   }
 
   @Test
+  public void testConditionalArrayFlip275() throws Exception {
+    int[] marg0 = { -16, 0, 0, 7, 7 };
+    int marg1 = -8;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip276() throws Exception {
+    int[] marg0 = { -16, 0, 11, 0, 11 };
+    int marg1 = -12;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip277() throws Exception {
+    int[] marg0 = { -24, 0, 19, 19, 0 };
+    int marg1 = -20;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip278() throws Exception {
+    int[] marg0 = { -16, 13, 0, 0, 13 };
+    int marg1 = -14;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip279() throws Exception {
+    int[] marg0 = { -24, 21, 0, 21, 0 };
+    int marg1 = -22;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip280() throws Exception {
+    int[] marg0 = { -28, 25, 25, 0, 0 };
+    int marg1 = -26;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip281() throws Exception {
+    int[] marg0 = { 0, -16, 0, 7, 7 };
+    int marg1 = -8;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip282() throws Exception {
+    int[] marg0 = { 0, -16, 11, 0, 11 };
+    int marg1 = -12;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip283() throws Exception {
+    int[] marg0 = { 0, -24, 19, 19, 0 };
+    int marg1 = -20;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip284() throws Exception {
+    int[] marg0 = { 0, 0, -16, 7, 7 };
+    int marg1 = -8;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip285() throws Exception {
+    int[] marg0 = { 0, 0, 11, -16, 11 };
+    int marg1 = -12;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip286() throws Exception {
+    int[] marg0 = { 0, 0, 19, 19, -24 };
+    int marg1 = -20;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip287() throws Exception {
+    int[] marg0 = { 0, 13, -16, 0, 13 };
+    int marg1 = -14;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip288() throws Exception {
+    int[] marg0 = { 0, 21, -24, 21, 0 };
+    int marg1 = -22;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip289() throws Exception {
+    int[] marg0 = { 0, 13, 0, -16, 13 };
+    int marg1 = -14;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip290() throws Exception {
+    int[] marg0 = { 0, 21, 0, 21, -24 };
+    int marg1 = -22;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip291() throws Exception {
+    int[] marg0 = { 0, 25, 25, -28, 0 };
+    int marg1 = -26;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip292() throws Exception {
+    int[] marg0 = { 0, 25, 25, 0, -28 };
+    int marg1 = -26;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip293() throws Exception {
+    int[] marg0 = { 14, -16, 0, 0, 14 };
+    int marg1 = -15;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip294() throws Exception {
+    int[] marg0 = { 22, -24, 0, 22, 0 };
+    int marg1 = -23;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip295() throws Exception {
+    int[] marg0 = { 26, -28, 26, 0, 0 };
+    int marg1 = -27;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip296() throws Exception {
+    int[] marg0 = { 14, 0, -16, 0, 14 };
+    int marg1 = -15;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip297() throws Exception {
+    int[] marg0 = { 22, 0, -24, 22, 0 };
+    int marg1 = -23;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip298() throws Exception {
+    int[] marg0 = { 14, 0, 0, -16, 14 };
+    int marg1 = -15;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip299() throws Exception {
+    int[] marg0 = { 22, 0, 0, 22, -24 };
+    int marg1 = -23;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip300() throws Exception {
+    int[] marg0 = { 26, 0, 26, -28, 0 };
+    int marg1 = -27;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip301() throws Exception {
+    int[] marg0 = { 26, 0, 26, 0, -28 };
+    int marg1 = -27;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip302() throws Exception {
+    int[] marg0 = { 28, 28, -30, 0, 0 };
+    int marg1 = -29;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip303() throws Exception {
+    int[] marg0 = { 28, 28, 0, -30, 0 };
+    int marg1 = -29;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip304() throws Exception {
+    int[] marg0 = { 28, 28, 0, 0, -30 };
+    int marg1 = -29;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
   public void testHighestSetBit19() throws Exception {
     int marg0 = 131072;
     int retval = BitwiseManipulator.highestSetBit(marg0);
 
     int expected = 17;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop53() throws Exception {
+    int marg0 = 1024;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 0;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop54() throws Exception {
+    int marg0 = 258;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 258;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop55() throws Exception {
+    int marg0 = 257;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = -1;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop56() throws Exception {
+    int marg0 = 200;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = -3;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop57() throws Exception {
+    int marg0 = 70;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 210;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop58() throws Exception {
+    int marg0 = 69;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 137;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop59() throws Exception {
+    int marg0 = 67;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 65;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop60() throws Exception {
+    int marg0 = 30;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 180;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop61() throws Exception {
+    int marg0 = 29;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 144;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop62() throws Exception {
+    int marg0 = 27;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 106;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop63() throws Exception {
+    int marg0 = 23;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 66;
     Assertions.assertEquals(expected, retval);
   }
 
@@ -629,12 +3325,606 @@ public class BitwiseManipulatorTest {
   }
 
   @Test
+  public void testConditionalArrayFlip305() throws Exception {
+    int[] marg0 = { -128, -128, -128, -128, -128, -128 };
+    int marg1 = -64;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip306() throws Exception {
+    int[] marg0 = { -64, -64, 0, 0, 0 };
+    int marg1 = -32;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip307() throws Exception {
+    int[] marg0 = { -64, 0, -64, 0, 0 };
+    int marg1 = -32;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip308() throws Exception {
+    int[] marg0 = { -64, 0, 0, -64, 0 };
+    int marg1 = -32;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip309() throws Exception {
+    int[] marg0 = { 2147483616, 0, 0, 0, -64 };
+    int marg1 = -32;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip310() throws Exception {
+    int[] marg0 = { 0, -64, -64, 0, 0 };
+    int marg1 = -32;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip311() throws Exception {
+    int[] marg0 = { 0, -64, 0, -64, 0 };
+    int marg1 = -32;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip312() throws Exception {
+    int[] marg0 = { 0, -64, 0, 0, -64 };
+    int marg1 = -32;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip313() throws Exception {
+    int[] marg0 = { 0, 0, -64, -64, 0 };
+    int marg1 = -32;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip314() throws Exception {
+    int[] marg0 = { 0, 0, -64, 0, -64 };
+    int marg1 = -32;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip315() throws Exception {
+    int[] marg0 = { 0, 0, 0, -64, -64 };
+    int marg1 = -32;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip316() throws Exception {
+    int[] marg0 = { 0, 0, 3, 3, 3 };
+    int marg1 = -4;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip317() throws Exception {
+    int[] marg0 = { 0, 37, 0, 37, 37 };
+    int marg1 = -38;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip318() throws Exception {
+    int[] marg0 = { 0, 9, 9, 0, 9 };
+    int marg1 = -10;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip319() throws Exception {
+    int[] marg0 = { 0, 17, 17, 17, 0 };
+    int marg1 = -18;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip320() throws Exception {
+    int[] marg0 = { 6, 0, 0, 6, 6 };
+    int marg1 = -7;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip321() throws Exception {
+    int[] marg0 = { 10, 0, 10, 0, 10 };
+    int marg1 = -11;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip322() throws Exception {
+    int[] marg0 = { 18, 0, 18, 18, 0 };
+    int marg1 = -19;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip323() throws Exception {
+    int[] marg0 = { 12, 12, 0, 0, 12 };
+    int marg1 = -13;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip324() throws Exception {
+    int[] marg0 = { 20, 20, 0, 20, 0 };
+    int marg1 = -21;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip325() throws Exception {
+    int[] marg0 = { 24, 24, 24, 0, 0 };
+    int marg1 = -25;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
   public void testLowestSetBit16() throws Exception {
     int marg0 = 16384;
     int retval = BitwiseManipulator.lowestSetBit(marg0);
 
     int expected = 14;
     Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testConditionalArrayFlip326() throws Exception {
+    int[] marg0 = { -64, -64, -64, -64, -64, 63 };
+    int marg1 = -32;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip327() throws Exception {
+    int[] marg0 = { -64, -64, -64, -64, 63, -64 };
+    int marg1 = -48;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip328() throws Exception {
+    int[] marg0 = { -64, -64, -64, 63, -64, -64 };
+    int marg1 = -56;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip329() throws Exception {
+    int[] marg0 = { -64, -64, 63, -64, -64, -64 };
+    int marg1 = -60;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip330() throws Exception {
+    int[] marg0 = { -32, 0, 0, 0, 15 };
+    int marg1 = -16;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip331() throws Exception {
+    int[] marg0 = { -32, 0, 0, 23, 0 };
+    int marg1 = -24;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip332() throws Exception {
+    int[] marg0 = { -32, 0, 27, 0, 0 };
+    int marg1 = -28;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip333() throws Exception {
+    int[] marg0 = { -64, 63, -64, -64, -64, -64 };
+    int marg1 = -62;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip334() throws Exception {
+    int[] marg0 = { -32, 29, 0, 0, 0 };
+    int marg1 = -30;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip335() throws Exception {
+    int[] marg0 = { 0, -32, 0, 0, 15 };
+    int marg1 = -16;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip336() throws Exception {
+    int[] marg0 = { 0, -32, 0, 23, 0 };
+    int marg1 = -24;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip337() throws Exception {
+    int[] marg0 = { 0, -32, 27, 0, 0 };
+    int marg1 = -28;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip338() throws Exception {
+    int[] marg0 = { 0, 0, -32, 0, 15 };
+    int marg1 = -16;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip339() throws Exception {
+    int[] marg0 = { 0, 0, -32, 23, 0 };
+    int marg1 = -24;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip340() throws Exception {
+    int[] marg0 = { 0, 0, 0, -32, 15 };
+    int marg1 = -16;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip341() throws Exception {
+    int[] marg0 = { 0, 0, 0, 23, -32 };
+    int marg1 = -24;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip342() throws Exception {
+    int[] marg0 = { 0, 0, 27, -32, 0 };
+    int marg1 = -28;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip343() throws Exception {
+    int[] marg0 = { 0, 0, 27, 0, -32 };
+    int marg1 = -28;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip344() throws Exception {
+    int[] marg0 = { 0, 29, -32, 0, 0 };
+    int marg1 = -30;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip345() throws Exception {
+    int[] marg0 = { 0, 29, 0, -32, 0 };
+    int marg1 = -30;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip346() throws Exception {
+    int[] marg0 = { 0, 29, 0, 0, -32 };
+    int marg1 = -30;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip347() throws Exception {
+    int[] marg0 = { 63, -64, -64, -64, -64, -64 };
+    int marg1 = -63;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip348() throws Exception {
+    int[] marg0 = { 30, -32, 0, 0, 0 };
+    int marg1 = -31;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip349() throws Exception {
+    int[] marg0 = { 30, 0, -63, 0, 0 };
+    int marg1 = -31;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip350() throws Exception {
+    int[] marg0 = { 30, 0, 0, -32, 0 };
+    int marg1 = -31;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip351() throws Exception {
+    int[] marg0 = { 30, 0, 0, 0, -32 };
+    int marg1 = -31;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testBitwiseLoop64() throws Exception {
+    int marg0 = 576;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = -1;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop65() throws Exception {
+    int marg0 = 140;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 279;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop66() throws Exception {
+    int marg0 = 138;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 136;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop67() throws Exception {
+    int marg0 = 137;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = -3;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop68() throws Exception {
+    int marg0 = 60;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 299;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop69() throws Exception {
+    int marg0 = 58;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 230;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop70() throws Exception {
+    int marg0 = 54;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 159;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop71() throws Exception {
+    int marg0 = 57;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 168;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop72() throws Exception {
+    int marg0 = 53;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 102;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop73() throws Exception {
+    int marg0 = 51;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 46;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testConditionalArrayFlip352() throws Exception {
+    int[] marg0 = { -32, -32, -32, -32, 31, 31 };
+    int marg1 = -16;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip353() throws Exception {
+    int[] marg0 = { -32, -32, -32, 31, -32, 31 };
+    int marg1 = -24;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip354() throws Exception {
+    int[] marg0 = { -48, -48, -48, 47, 47, -48 };
+    int marg1 = -40;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip355() throws Exception {
+    int[] marg0 = { -32, -32, 31, -32, -32, 31 };
+    int marg1 = -28;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip356() throws Exception {
+    int[] marg0 = { -48, -48, 47, -48, 47, -48 };
+    int marg1 = -44;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip357() throws Exception {
+    int[] marg0 = { -56, -56, 55, 55, -56, -56 };
+    int marg1 = -52;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip358() throws Exception {
+    int[] marg0 = { -32, 31, -32, -32, -32, 31 };
+    int marg1 = -30;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip359() throws Exception {
+    int[] marg0 = { -48, 47, -48, -48, 47, -48 };
+    int marg1 = -46;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip360() throws Exception {
+    int[] marg0 = { -56, 55, -56, 55, -56, -56 };
+    int marg1 = -54;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip361() throws Exception {
+    int[] marg0 = { -60, 59, 59, -60, -60, -60 };
+    int marg1 = -58;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip362() throws Exception {
+    int[] marg0 = { 0, 0, 0, 7, 7 };
+    int marg1 = -8;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip363() throws Exception {
+    int[] marg0 = { 0, 0, 11, 0, 11 };
+    int marg1 = -12;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip364() throws Exception {
+    int[] marg0 = { 0, 0, 19, 19, 0 };
+    int marg1 = -20;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip365() throws Exception {
+    int[] marg0 = { 0, 13, 0, 0, 13 };
+    int marg1 = -14;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip366() throws Exception {
+    int[] marg0 = { 0, 21, 0, 21, 0 };
+    int marg1 = -22;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip367() throws Exception {
+    int[] marg0 = { 0, 25, 25, 0, 0 };
+    int marg1 = -26;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip368() throws Exception {
+    int[] marg0 = { 31, -32, -32, -32, -32, 31 };
+    int marg1 = -31;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip369() throws Exception {
+    int[] marg0 = { 47, -48, -48, -48, 47, -48 };
+    int marg1 = -47;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip370() throws Exception {
+    int[] marg0 = { 55, -56, -56, 55, -56, -56 };
+    int marg1 = -55;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip371() throws Exception {
+    int[] marg0 = { 59, -60, 59, -60, -60, -60 };
+    int marg1 = -59;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip372() throws Exception {
+    int[] marg0 = { 14, 0, 0, 0, 14 };
+    int marg1 = -15;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip373() throws Exception {
+    int[] marg0 = { 22, 0, 0, 22, 0 };
+    int marg1 = -23;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip374() throws Exception {
+    int[] marg0 = { 26, 0, 26, 0, 0 };
+    int marg1 = -27;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip375() throws Exception {
+    int[] marg0 = { 61, 61, -62, -62, -62, -62 };
+    int marg1 = -61;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip376() throws Exception {
+    int[] marg0 = { 28, 28, 0, 0, 0 };
+    int marg1 = -29;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
   }
 
   @Test
@@ -656,332 +3946,743 @@ public class BitwiseManipulatorTest {
   }
 
   @Test
-  public void testLowestSetBit17() throws Exception {
-    int marg0 = 32768;
-    int retval = BitwiseManipulator.lowestSetBit(marg0);
+  public void testConditionalArrayFlip377() throws Exception {
+    int[] marg0 = { -128, -128, -128, -128, -128, 0 };
+    int marg1 = -64;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
 
-    int expected = 15;
-    Assertions.assertEquals(expected, retval);
+  @Test
+  public void testConditionalArrayFlip378() throws Exception {
+    int[] marg0 = { -128, -128, -128, -128, 0, -128 };
+    int marg1 = -64;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip379() throws Exception {
+    int[] marg0 = { -128, -128, -128, 0, -128, -128 };
+    int marg1 = -64;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip380() throws Exception {
+    int[] marg0 = { -16, -16, -16, 15, 15, 15 };
+    int marg1 = -8;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip381() throws Exception {
+    int[] marg0 = { -128, -128, 0, -128, -128, -128 };
+    int marg1 = -64;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip382() throws Exception {
+    int[] marg0 = { -16, -16, 15, -16, 15, 15 };
+    int marg1 = -12;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip383() throws Exception {
+    int[] marg0 = { -24, -24, 23, 23, -24, 23 };
+    int marg1 = -20;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip384() throws Exception {
+    int[] marg0 = { -40, -40, 39, 39, 39, -40 };
+    int marg1 = -36;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip385() throws Exception {
+    int[] marg0 = { -128, 0, -128, -128, -128, -128 };
+    int marg1 = -64;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip386() throws Exception {
+    int[] marg0 = { -64, 0, 0, 0, 0 };
+    int marg1 = -32;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip387() throws Exception {
+    int[] marg0 = { -16, 15, -16, -16, 15, 15 };
+    int marg1 = -14;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip388() throws Exception {
+    int[] marg0 = { -24, 23, -24, 23, -24, 23 };
+    int marg1 = -22;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip389() throws Exception {
+    int[] marg0 = { -40, 39, -40, 39, 39, -40 };
+    int marg1 = -38;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip390() throws Exception {
+    int[] marg0 = { -28, 27, 27, -28, -28, 27 };
+    int marg1 = -26;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip391() throws Exception {
+    int[] marg0 = { -44, 43, 43, -44, 43, -44 };
+    int marg1 = -42;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip392() throws Exception {
+    int[] marg0 = { -52, 51, 51, 51, -52, -52 };
+    int marg1 = -50;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip393() throws Exception {
+    int[] marg0 = { 0, -128, -128, -128, -128, -128 };
+    int marg1 = -64;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip394() throws Exception {
+    int[] marg0 = { 0, -64, 0, 0, 0 };
+    int marg1 = -32;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip395() throws Exception {
+    int[] marg0 = { 0, 0, -64, 0, 0 };
+    int marg1 = -32;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip396() throws Exception {
+    int[] marg0 = { 0, 0, 0, -64, 0 };
+    int marg1 = -32;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip397() throws Exception {
+    int[] marg0 = { 0, 0, 0, 0, -64 };
+    int marg1 = -32;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip398() throws Exception {
+    int[] marg0 = { 15, -16, -16, -16, 15, 15 };
+    int marg1 = -15;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip399() throws Exception {
+    int[] marg0 = { 23, -24, -24, 23, -24, 23 };
+    int marg1 = -23;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip400() throws Exception {
+    int[] marg0 = { 39, -40, -40, 39, 39, -40 };
+    int marg1 = -39;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip401() throws Exception {
+    int[] marg0 = { 27, -28, 27, -28, -28, 27 };
+    int marg1 = -27;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip402() throws Exception {
+    int[] marg0 = { 43, -44, 43, -44, 43, -44 };
+    int marg1 = -43;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip403() throws Exception {
+    int[] marg0 = { 51, -52, 51, 51, -52, -52 };
+    int marg1 = -51;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip404() throws Exception {
+    int[] marg0 = { 29, 29, -30, -30, -30, 29 };
+    int marg1 = -29;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip405() throws Exception {
+    int[] marg0 = { 29, 29, -30, -30, 0, 29, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30 };
+    int marg1 = -29;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip406() throws Exception {
+    int[] marg0 = { 45, 45, -46, -46, 45, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46 };
+    int marg1 = -45;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip407() throws Exception {
+    int[] marg0 = { 45, 45, -46, -46, 45, -46 };
+    int marg1 = -45;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip408() throws Exception {
+    int[] marg0 = { 45, 45, -46, -46, 45, 0, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46 };
+    int marg1 = -45;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip409() throws Exception {
+    int[] marg0 = { 13, 13, -14, -14, 13, 13, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14 };
+    int marg1 = -13;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip410() throws Exception {
+    int[] marg0 = { 13, 13, -14, -14, 13, 13 };
+    int marg1 = -13;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip411() throws Exception {
+    int[] marg0 = { 61, 61, -62, 0, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62 };
+    int marg1 = -61;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip412() throws Exception {
+    int[] marg0 = { 60, 60, -62, 0, -63, -61, -61, -61, -61, -61, -61, -61, -61, -61, -61, -61, -61, -61, -61, -61, -61, -61, -61, -61, -61, -61, -61, -61, -61, -61, -61, -61, -61, -61, -61 };
+    int marg1 = -61;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip413() throws Exception {
+    int[] marg0 = { 29, 29, -30, 0, -30, 29, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30 };
+    int marg1 = -29;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip414() throws Exception {
+    int[] marg0 = { 60, 60, -62, 0, 0, -61, -61, -61, -61, -61, -61, -61, -61, -61, -61, -61, -61, -61, -61, -61, -61, -61, -61, -61, -61, -61, -61, -61, -61, -61, -61, -61, -61, -61, -61 };
+    int marg1 = -61;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip415() throws Exception {
+    int[] marg0 = { 28, 28, -30, 0, 0, -29, -29, -29, -29, -29, -29, -29, -29, -29, -29, -29, -29, -29, -29, -29, -29, -29, -29, -29, -29, -29, -29, -29, -29, -29, -29, -29, -29, -29, -29 };
+    int marg1 = -29;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip416() throws Exception {
+    int[] marg0 = { 45, 45, -46, 0, 45, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46 };
+    int marg1 = -45;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip417() throws Exception {
+    int[] marg0 = { 44, 44, -46, 0, 44, -45, -45, -45, -45, -45, -45, -45, -45, -45, -45, -45, -45, -45, -45, -45, -45, -45, -45, -45, -45, -45, -45, -45, -45, -45, -45, -45, -45, -45, -45 };
+    int marg1 = -45;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip418() throws Exception {
+    int[] marg0 = { 13, 13, -14, 0, 13, 13, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14 };
+    int marg1 = -13;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip419() throws Exception {
+    int[] marg0 = { 53, 53, -54, 53, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54 };
+    int marg1 = -53;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip420() throws Exception {
+    int[] marg0 = { 53, 53, -54, 53, -54, -54 };
+    int marg1 = -53;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip421() throws Exception {
+    int[] marg0 = { 53, 53, -54, 53, -54, 0, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54 };
+    int marg1 = -53;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip422() throws Exception {
+    int[] marg0 = { 21, 21, -22, 21, -22, 21, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22 };
+    int marg1 = -21;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip423() throws Exception {
+    int[] marg0 = { 21, 21, -22, 21, -22, 21 };
+    int marg1 = -21;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip424() throws Exception {
+    int[] marg0 = { 53, 53, -54, 53, 0, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54 };
+    int marg1 = -53;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip425() throws Exception {
+    int[] marg0 = { 52, 52, -54, 52, 0, -53, -53, -53, -53, -53, -53, -53, -53, -53, -53, -53, -53, -53, -53, -53, -53, -53, -53, -53, -53, -53, -53, -53, -53, -53, -53, -53, -53, -53, -53 };
+    int marg1 = -53;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip426() throws Exception {
+    int[] marg0 = { 21, 21, -22, 21, 0, 21, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22 };
+    int marg1 = -21;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip427() throws Exception {
+    int[] marg0 = { 37, 37, -38, 37, 37, -38, -38, -38, -38, -38, -38, -38, -38, -38, -38, -38, -38, -38, -38, -38, -38, -38, -38, -38, -38, -38, -38, -38, -38, -38, -38, -38, -38, -38, -38 };
+    int marg1 = -37;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip428() throws Exception {
+    int[] marg0 = { 37, 37, -38, 37, 37, -38 };
+    int marg1 = -37;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip429() throws Exception {
+    int[] marg0 = { 37, 37, -38, 37, 37, 0, -38, -38, -38, -38, -38, -38, -38, -38, -38, -38, -38, -38, -38, -38, -38, -38, -38, -38, -38, -38, -38, -38, -38, -38, -38, -38, -38, -38, -38 };
+    int marg1 = -37;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip430() throws Exception {
+    int[] marg0 = { 1, 1, -2, 1, 1, 1, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2 };
+    int marg1 = -5;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip431() throws Exception {
+    int[] marg0 = { 61, 61, 0, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62 };
+    int marg1 = -61;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip432() throws Exception {
+    int[] marg0 = { 60, 60, 0, -62, -62, -61, -61, -61, -61, -61, -61, -61, -61, -61, -61, -61, -61, -61, -61, -61, -61, -61, -61, -61, -61, -61, -61, -61, -61, -61, -61, -61, -61, -61, -61 };
+    int marg1 = -61;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip433() throws Exception {
+    int[] marg0 = { 29, 29, 0, -30, -30, 29, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30 };
+    int marg1 = -29;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip434() throws Exception {
+    int[] marg0 = { 60, 60, 0, -62, 0, -61, -61, -61, -61, -61, -61, -61, -61, -61, -61, -61, -61, -61, -61, -61, -61, -61, -61, -61, -61, -61, -61, -61, -61, -61, -61, -61, -61, -61, -61 };
+    int marg1 = -61;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip435() throws Exception {
+    int[] marg0 = { 28, 28, 0, -30, 0, -29, -29, -29, -29, -29, -29, -29, -29, -29, -29, -29, -29, -29, -29, -29, -29, -29, -29, -29, -29, -29, -29, -29, -29, -29, -29, -29, -29, -29, -29 };
+    int marg1 = -29;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip436() throws Exception {
+    int[] marg0 = { 45, 45, 0, -46, 45, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46 };
+    int marg1 = -45;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip437() throws Exception {
+    int[] marg0 = { 44, 44, 0, -46, 44, -45, -45, -45, -45, -45, -45, -45, -45, -45, -45, -45, -45, -45, -45, -45, -45, -45, -45, -45, -45, -45, -45, -45, -45, -45, -45, -45, -45, -45, -45 };
+    int marg1 = -45;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip438() throws Exception {
+    int[] marg0 = { 12, 12, 0, -14, 12, 12, -13, -13, -13, -13, -13, -13, -13, -13, -13, -13, -13, -13, -13, -13, -13, -13, -13, -13, -13, -13, -13, -13, -13, -13, -13, -13, -13, -13, -13 };
+    int marg1 = -13;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip439() throws Exception {
+    int[] marg0 = { 60, 60, 0, 0, -62, -61, -61, -61, -61, -61, -61, -61, -61, -61, -61, -61, -61, -61, -61, -61, -61, -61, -61, -61, -61, -61, -61, -61, -61, -61, -61, -61, -61, -61, -61 };
+    int marg1 = -61;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip440() throws Exception {
+    int[] marg0 = { 28, 28, 0, 0, -30, -29, -29, -29, -29, -29, -29, -29, -29, -29, -29, -29, -29, -29, -29, -29, -29, -29, -29, -29, -29, -29, -29, -29, -29, -29, -29, -29, -29, -29, -29 };
+    int marg1 = -29;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip441() throws Exception {
+    int[] marg0 = { 28, 28, 0, 0, 0, -29, -29, -29, -29, -29, -29, -29, -29, -29, -29, -29, -29, -29, -29, -29, -29, -29, -29, -29, -29, -29, -29, -29, -29, -29, -29, -29, -29, -29, -29 };
+    int marg1 = -29;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip442() throws Exception {
+    int[] marg0 = { 8388652, 8388652, 0, 0, 8388652, -8388653, -8388653, -8388653, -8388653, -8388653, -8388653, -8388653, -8388653, -8388653, -8388653, -8388653, -8388653, -8388653, -8388653, -8388653, -8388653, -8388653, -8388653, -8388653, -8388653, -8388653, -8388653, -8388653, -8388653, -8388653, -8388653, -8388653, -8388653, -8388653, -8388653 };
+    int marg1 = -8388653;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip443() throws Exception {
+    int[] marg0 = { 12, 12, 0, 0, 12, -13, -13, -13, -13, -13, -13, -13, -13, -13, -13, -13, -13, -13, -13, -13, -13, -13, -13, -13, -13, -13, -13, -13, -13, -13, -13, -13, -13, -13, -13 };
+    int marg1 = -13;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip444() throws Exception {
+    int[] marg0 = { 53, 53, 0, 53, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54 };
+    int marg1 = -53;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip445() throws Exception {
+    int[] marg0 = { 52, 52, 0, 52, -54, -53, -53, -53, -53, -53, -53, -53, -53, -53, -53, -53, -53, -53, -53, -53, -53, -53, -53, -53, -53, -53, -53, -53, -53, -53, -53, -53, -53, -53, -53 };
+    int marg1 = -53;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip446() throws Exception {
+    int[] marg0 = { 20, 20, 0, 20, -22, 20, -21, -21, -21, -21, -21, -21, -21, -21, -21, -21, -21, -21, -21, -21, -21, -21, -21, -21, -21, -21, -21, -21, -21, -21, -21, -21, -21, -21, -21 };
+    int marg1 = -21;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip447() throws Exception {
+    int[] marg0 = { 52, 52, 0, 52, 0, -53, -53, -53, -53, -53, -53, -53, -53, -53, -53, -53, -53, -53, -53, -53, -53, -53, -53, -53, -53, -53, -53, -53, -53, -53, -53, -53, -53, -53, -53 };
+    int marg1 = -53;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip448() throws Exception {
+    int[] marg0 = { 20, 20, 0, 20, 0, -21, -21, -21, -21, -21, -21, -21, -21, -21, -21, -21, -21, -21, -21, -21, -21, -21, -21, -21, -21, -21, -21, -21, -21, -21, -21, -21, -21, -21, -21 };
+    int marg1 = -21;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip449() throws Exception {
+    int[] marg0 = { 36, 36, 0, 36, 36, -38, -37, -37, -37, -37, -37, -37, -37, -37, -37, -37, -37, -37, -37, -37, -37, -37, -37, -37, -37, -37, -37, -37, -37, -37, -37, -37, -37, -37, -37 };
+    int marg1 = -37;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip450() throws Exception {
+    int[] marg0 = { 36, 36, 0, 36, 36, -37, -37, -37, -37, -37, -37, -37, -37, -37, -37, -37, -37, -37, -37, -37, -37, -37, -37, -37, -37, -37, -37, -37, -37, -37, -37, -37, -37, -37, -37 };
+    int marg1 = -37;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip451() throws Exception {
+    int[] marg0 = { 0, 0, 4, 0, 0, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+    int marg1 = -5;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip452() throws Exception {
+    int[] marg0 = { 57, 57, 57, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58 };
+    int marg1 = -57;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip453() throws Exception {
+    int[] marg0 = { 57, 57, 57, -58, -58, -58 };
+    int marg1 = -57;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip454() throws Exception {
+    int[] marg0 = { 57, 57, 57, -8388665, -58, 0, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58 };
+    int marg1 = -57;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip455() throws Exception {
+    int[] marg0 = { 25, 25, 25, -26, -26, 25, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26 };
+    int marg1 = -25;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip456() throws Exception {
+    int[] marg0 = { 25, 25, 25, -26, -26, 25 };
+    int marg1 = -25;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip457() throws Exception {
+    int[] marg0 = { 56, 56, 56, -8388665, 0, -58, -57, -57, -57, -57, -57, -57, -57, -57, -57, -57, -57, -57, -57, -57, -57, -57, -57, -57, -57, -57, -57, -57, -57, -57, -57, -57, -57, -57, -57 };
+    int marg1 = -57;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip458() throws Exception {
+    int[] marg0 = { 56, 56, 56, -58, 0, -57, -57, -57, -57, -57, -57, -57, -57, -57, -57, -57, -57, -57, -57, -57, -57, -57, -57, -57, -57, -57, -57, -57, -57, -57, -57, -57, -57, -57, -57 };
+    int marg1 = -57;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip459() throws Exception {
+    int[] marg0 = { 24, 24, 24, -26, 0, 24, -25, -25, -25, -25, -25, -25, -25, -25, -25, -25, -25, -25, -25, -25, -25, -25, -25, -25, -25, -25, -25, -25, -25, -25, -25, -25, -25, -25, -25 };
+    int marg1 = -25;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip460() throws Exception {
+    int[] marg0 = { 41, 41, 41, -42, 41, -42, -42, -42, -42, -42, -42, -42, -42, -42, -42, -42, -42, -42, -42, -42, -42, -42, -42, -42, -42, -42, -42, -42, -42, -42, -42, -42, -42, -42, -42 };
+    int marg1 = -41;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip461() throws Exception {
+    int[] marg0 = { 41, 41, 41, -42, 41, -42 };
+    int marg1 = -41;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip462() throws Exception {
+    int[] marg0 = { 40, 40, 40, -42, 40, 0, -41, -41, -41, -41, -41, -41, -41, -41, -41, -41, -41, -41, -41, -41, -41, -41, -41, -41, -41, -41, -41, -41, -41, -41, -41, -41, -41, -41, -41 };
+    int marg1 = -41;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip463() throws Exception {
+    int[] marg0 = { 1, 1, 1, -2, 1, 1, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2 };
+    int marg1 = -9;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip464() throws Exception {
+    int[] marg0 = { 1073741881, 1073741881, 1073741881, 0, -1073741882, -1073741882, -1073741882, -1073741882, -1073741882, -1073741882, -1073741882, -1073741882, -1073741882, -1073741882, -1073741882, -1073741882, -1073741882, -1073741882, -1073741882, -1073741882, -1073741882, -1073741882, -1073741882, -1073741882, -1073741882, -1073741882, -1073741882, -1073741882, -1073741882, -1073741882, -1073741882, -1073741882, -1073741882, -1073741882, -1073741882 };
+    int marg1 = -1073741881;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip465() throws Exception {
+    int[] marg0 = { 56, 56, 56, 0, -58, -57, -57, -57, -57, -57, -57, -57, -57, -57, -57, -57, -57, -57, -57, -57, -57, -57, -57, -57, -57, -57, -57, -57, -57, -57, -57, -57, -57, -57, -57 };
+    int marg1 = -57;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip466() throws Exception {
+    int[] marg0 = { 25, 25, 25, 0, -26, 25, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26 };
+    int marg1 = -25;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip467() throws Exception {
+    int[] marg0 = { 56, 56, 56, 0, 0, -57, -57, -57, -57, -57, -57, -57, -57, -57, -57, -57, -57, -57, -57, -57, -57, -57, -57, -57, -57, -57, -57, -57, -57, -57, -57, -57, -57, -57, -57 };
+    int marg1 = -57;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip468() throws Exception {
+    int[] marg0 = { 24, 24, 24, 0, 0, -25, -25, -25, -25, -25, -25, -25, -25, -25, -25, -25, -25, -25, -25, -25, -25, -25, -25, -25, -25, -25, -25, -25, -25, -25, -25, -25, -25, -25, -25 };
+    int marg1 = -25;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip469() throws Exception {
+    int[] marg0 = { 41, 41, 41, 0, 41, -42, -42, -42, -42, -42, -42, -42, -42, -42, -42, -42, -42, -42, -42, -42, -42, -42, -42, -42, -42, -42, -42, -42, -42, -42, -42, -42, -42, -42, -42 };
+    int marg1 = -41;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip470() throws Exception {
+    int[] marg0 = { 40, 40, 40, 0, 40, -41, -41, -41, -41, -41, -41, -41, -41, -41, -41, -41, -41, -41, -41, -41, -41, -41, -41, -41, -41, -41, -41, -41, -41, -41, -41, -41, -41, -41, -41 };
+    int marg1 = -41;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip471() throws Exception {
+    int[] marg0 = { 0, 0, 0, 8, 0, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+    int marg1 = -9;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip472() throws Exception {
+    int[] marg0 = { 49, 49, 49, 49, -50, -50, -50, -50, -50, -50, -50, -50, -50, -50, -50, -50, -50, -50, -50, -50, -50, -50, -50, -50, -50, -50, -50, -50, -50, -50, -50, -50, -50, -50, -50 };
+    int marg1 = -49;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip473() throws Exception {
+    int[] marg0 = { 49, 49, 49, 49, -50, -50 };
+    int marg1 = -49;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip474() throws Exception {
+    int[] marg0 = { 49, 49, 49, 49, -50, 0, -50, -50, -50, -50, -50, -50, -50, -50, -50, -50, -50, -50, -50, -50, -50, -50, -50, -50, -50, -50, -50, -50, -50, -50, -50, -50, -50, -50, -50 };
+    int marg1 = -49;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip475() throws Exception {
+    int[] marg0 = { 1, 1, 1, 1, -2, 1, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2 };
+    int marg1 = -17;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip476() throws Exception {
+    int[] marg0 = { 48, 48, 48, 48, 0, -50, -49, -49, -49, -49, -49, -49, -49, -49, -49, -49, -49, -49, -49, -49, -49, -49, -49, -49, -49, -49, -49, -49, -49, -49, -49, -49, -49, -49, -49 };
+    int marg1 = -49;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip477() throws Exception {
+    int[] marg0 = { 48, 48, 48, 48, 0, -49, -49, -49, -49, -49, -49, -49, -49, -49, -49, -49, -49, -49, -49, -49, -49, -49, -49, -49, -49, -49, -49, -49, -49, -49, -49, -49, -49, -49, -49 };
+    int marg1 = -49;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip478() throws Exception {
+    int[] marg0 = { 0, 0, 0, 0, 16, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+    int marg1 = -17;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip479() throws Exception {
+    int[] marg0 = { 1, 1, 1, 1, 1, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2 };
+    int marg1 = -33;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip480() throws Exception {
+    int[] marg0 = { 0, 0, 0, 0, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+    int marg1 = -33;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip481() throws Exception {
+    int[] marg0 = { -1, -1, -1, -1, -1, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+    int marg1 = 63;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
   }
 
   @Test
   public void testHighestSetBit21() throws Exception {
-    int marg0 = 524288;
-    int retval = BitwiseManipulator.highestSetBit(marg0);
-
-    int expected = 19;
-    Assertions.assertEquals(expected, retval);
-  }
-
-  @Test
-  public void testCountSetBits26() throws Exception {
-    int marg0 = 32768;
-    int retval = BitwiseManipulator.countSetBits(marg0);
-
-    int expected = 1;
-    Assertions.assertEquals(expected, retval);
-  }
-
-  @Test
-  public void testCountSetBits27() throws Exception {
-    long marg0 = 256L;
-    int retval = BitwiseManipulator.countSetBits(marg0);
-
-    int expected = 1;
-    Assertions.assertEquals(expected, retval);
-  }
-
-  @Test
-  public void testHighestSetBit22() throws Exception {
-    int marg0 = 1048576;
-    int retval = BitwiseManipulator.highestSetBit(marg0);
-
-    int expected = 20;
-    Assertions.assertEquals(expected, retval);
-  }
-
-  @Test
-  public void testLowestSetBit18() throws Exception {
-    int marg0 = 65536;
-    int retval = BitwiseManipulator.lowestSetBit(marg0);
-
-    int expected = 16;
-    Assertions.assertEquals(expected, retval);
-  }
-
-  @Test
-  public void testCountSetBits28() throws Exception {
-    int marg0 = 65536;
-    int retval = BitwiseManipulator.countSetBits(marg0);
-
-    int expected = 1;
-    Assertions.assertEquals(expected, retval);
-  }
-
-  @Test
-  public void testHighestSetBit23() throws Exception {
-    int marg0 = 2097152;
-    int retval = BitwiseManipulator.highestSetBit(marg0);
-
-    int expected = 21;
-    Assertions.assertEquals(expected, retval);
-  }
-
-  @Test
-  public void testLowestSetBit19() throws Exception {
-    int marg0 = 131072;
-    int retval = BitwiseManipulator.lowestSetBit(marg0);
-
-    int expected = 17;
-    Assertions.assertEquals(expected, retval);
-  }
-
-  @Test
-  public void testCountSetBits29() throws Exception {
-    long marg0 = 512L;
-    int retval = BitwiseManipulator.countSetBits(marg0);
-
-    int expected = 1;
-    Assertions.assertEquals(expected, retval);
-  }
-
-  @Test
-  public void testHighestSetBit24() throws Exception {
-    int marg0 = 4194304;
-    int retval = BitwiseManipulator.highestSetBit(marg0);
-
-    int expected = 22;
-    Assertions.assertEquals(expected, retval);
-  }
-
-  @Test
-  public void testCountSetBits30() throws Exception {
-    int marg0 = 131072;
-    int retval = BitwiseManipulator.countSetBits(marg0);
-
-    int expected = 1;
-    Assertions.assertEquals(expected, retval);
-  }
-
-  @Test
-  public void testLowestSetBit20() throws Exception {
-    int marg0 = 262144;
-    int retval = BitwiseManipulator.lowestSetBit(marg0);
-
-    int expected = 18;
-    Assertions.assertEquals(expected, retval);
-  }
-
-  @Test
-  public void testHighestSetBit25() throws Exception {
-    int marg0 = 8388608;
-    int retval = BitwiseManipulator.highestSetBit(marg0);
-
-    int expected = 23;
-    Assertions.assertEquals(expected, retval);
-  }
-
-  @Test
-  public void testCountSetBits31() throws Exception {
-    int marg0 = 262144;
-    int retval = BitwiseManipulator.countSetBits(marg0);
-
-    int expected = 1;
-    Assertions.assertEquals(expected, retval);
-  }
-
-  @Test
-  public void testHighestSetBit26() throws Exception {
-    int marg0 = 16777216;
-    int retval = BitwiseManipulator.highestSetBit(marg0);
-
-    int expected = 24;
-    Assertions.assertEquals(expected, retval);
-  }
-
-  @Test
-  public void testLowestSetBit21() throws Exception {
-    int marg0 = 524288;
-    int retval = BitwiseManipulator.lowestSetBit(marg0);
-
-    int expected = 19;
-    Assertions.assertEquals(expected, retval);
-  }
-
-  @Test
-  public void testCountSetBits32() throws Exception {
-    long marg0 = 1024L;
-    int retval = BitwiseManipulator.countSetBits(marg0);
-
-    int expected = 1;
-    Assertions.assertEquals(expected, retval);
-  }
-
-  @Test
-  public void testCountSetBits33() throws Exception {
-    int marg0 = 524288;
-    int retval = BitwiseManipulator.countSetBits(marg0);
-
-    int expected = 1;
-    Assertions.assertEquals(expected, retval);
-  }
-
-  @Test
-  public void testHighestSetBit27() throws Exception {
-    int marg0 = 33554432;
-    int retval = BitwiseManipulator.highestSetBit(marg0);
-
-    int expected = 25;
-    Assertions.assertEquals(expected, retval);
-  }
-
-  @Test
-  public void testLowestSetBit22() throws Exception {
-    int marg0 = 1048576;
-    int retval = BitwiseManipulator.lowestSetBit(marg0);
-
-    int expected = 20;
-    Assertions.assertEquals(expected, retval);
-  }
-
-  @Test
-  public void testHighestSetBit28() throws Exception {
-    int marg0 = 67108864;
-    int retval = BitwiseManipulator.highestSetBit(marg0);
-
-    int expected = 26;
-    Assertions.assertEquals(expected, retval);
-  }
-
-  @Test
-  public void testCountSetBits34() throws Exception {
-    int marg0 = 1048576;
-    int retval = BitwiseManipulator.countSetBits(marg0);
-
-    int expected = 1;
-    Assertions.assertEquals(expected, retval);
-  }
-
-  @Test
-  public void testCountSetBits35() throws Exception {
-    long marg0 = 2048L;
-    int retval = BitwiseManipulator.countSetBits(marg0);
-
-    int expected = 1;
-    Assertions.assertEquals(expected, retval);
-  }
-
-  @Test
-  public void testLowestSetBit23() throws Exception {
-    int marg0 = 2097152;
-    int retval = BitwiseManipulator.lowestSetBit(marg0);
-
-    int expected = 21;
-    Assertions.assertEquals(expected, retval);
-  }
-
-  @Test
-  public void testHighestSetBit29() throws Exception {
-    int marg0 = 134217728;
-    int retval = BitwiseManipulator.highestSetBit(marg0);
-
-    int expected = 27;
-    Assertions.assertEquals(expected, retval);
-  }
-
-  @Test
-  public void testCountSetBits36() throws Exception {
-    int marg0 = 2097152;
-    int retval = BitwiseManipulator.countSetBits(marg0);
-
-    int expected = 1;
-    Assertions.assertEquals(expected, retval);
-  }
-
-  @Test
-  public void testHighestSetBit30() throws Exception {
-    int marg0 = 268435456;
-    int retval = BitwiseManipulator.highestSetBit(marg0);
-
-    int expected = 28;
-    Assertions.assertEquals(expected, retval);
-  }
-
-  @Test
-  public void testLowestSetBit24() throws Exception {
-    int marg0 = 4194304;
-    int retval = BitwiseManipulator.lowestSetBit(marg0);
-
-    int expected = 22;
-    Assertions.assertEquals(expected, retval);
-  }
-
-  @Test
-  public void testCountSetBits37() throws Exception {
-    int marg0 = 4194304;
-    int retval = BitwiseManipulator.countSetBits(marg0);
-
-    int expected = 1;
-    Assertions.assertEquals(expected, retval);
-  }
-
-  @Test
-  public void testCountSetBits38() throws Exception {
-    long marg0 = 4096L;
-    int retval = BitwiseManipulator.countSetBits(marg0);
-
-    int expected = 1;
-    Assertions.assertEquals(expected, retval);
-  }
-
-  @Test
-  public void testHighestSetBit31() throws Exception {
-    int marg0 = 536870912;
-    int retval = BitwiseManipulator.highestSetBit(marg0);
-
-    int expected = 29;
-    Assertions.assertEquals(expected, retval);
-  }
-
-  @Test
-  public void testLowestSetBit25() throws Exception {
-    int marg0 = 8388608;
-    int retval = BitwiseManipulator.lowestSetBit(marg0);
-
-    int expected = 23;
-    Assertions.assertEquals(expected, retval);
-  }
-
-  @Test
-  public void testHighestSetBit32() throws Exception {
-    int marg0 = 1073741824;
-    int retval = BitwiseManipulator.highestSetBit(marg0);
-
-    int expected = 30;
-    Assertions.assertEquals(expected, retval);
-  }
-
-  @Test
-  public void testCountSetBits39() throws Exception {
-    int marg0 = 8388608;
-    int retval = BitwiseManipulator.countSetBits(marg0);
-
-    int expected = 1;
-    Assertions.assertEquals(expected, retval);
-  }
-
-  @Test
-  public void testLowestSetBit26() throws Exception {
-    int marg0 = 16777216;
-    int retval = BitwiseManipulator.lowestSetBit(marg0);
-
-    int expected = 24;
-    Assertions.assertEquals(expected, retval);
-  }
-
-  @Test
-  public void testHighestSetBit33() throws Exception {
-    int marg0 = -2147483648;
+    int marg0 = -3;
     int retval = BitwiseManipulator.highestSetBit(marg0);
 
     int expected = 31;
@@ -989,65 +4690,11 @@ public class BitwiseManipulatorTest {
   }
 
   @Test
-  public void testCountSetBits40() throws Exception {
-    long marg0 = 8192L;
-    int retval = BitwiseManipulator.countSetBits(marg0);
+  public void testHighestSetBit22() throws Exception {
+    int marg0 = 524288;
+    int retval = BitwiseManipulator.highestSetBit(marg0);
 
-    int expected = 1;
-    Assertions.assertEquals(expected, retval);
-  }
-
-  @Test
-  public void testCountSetBits41() throws Exception {
-    int marg0 = 16777216;
-    int retval = BitwiseManipulator.countSetBits(marg0);
-
-    int expected = 1;
-    Assertions.assertEquals(expected, retval);
-  }
-
-  @Test
-  public void testLowestSetBit27() throws Exception {
-    int marg0 = 33554432;
-    int retval = BitwiseManipulator.lowestSetBit(marg0);
-
-    int expected = 25;
-    Assertions.assertEquals(expected, retval);
-  }
-
-  @Test
-  public void testCountSetBits42() throws Exception {
-    int marg0 = 33554432;
-    int retval = BitwiseManipulator.countSetBits(marg0);
-
-    int expected = 1;
-    Assertions.assertEquals(expected, retval);
-  }
-
-  @Test
-  public void testLowestSetBit28() throws Exception {
-    int marg0 = 67108864;
-    int retval = BitwiseManipulator.lowestSetBit(marg0);
-
-    int expected = 26;
-    Assertions.assertEquals(expected, retval);
-  }
-
-  @Test
-  public void testCountSetBits43() throws Exception {
-    long marg0 = 16384L;
-    int retval = BitwiseManipulator.countSetBits(marg0);
-
-    int expected = 1;
-    Assertions.assertEquals(expected, retval);
-  }
-
-  @Test
-  public void testCountSetBits44() throws Exception {
-    int marg0 = 67108864;
-    int retval = BitwiseManipulator.countSetBits(marg0);
-
-    int expected = 1;
+    int expected = 19;
     Assertions.assertEquals(expected, retval);
   }
 
@@ -1062,200 +4709,11 @@ public class BitwiseManipulatorTest {
   }
 
   @Test
-  public void testLowestSetBit29() throws Exception {
-    int marg0 = 134217728;
-    int retval = BitwiseManipulator.lowestSetBit(marg0);
-
-    int expected = 27;
-    Assertions.assertEquals(expected, retval);
-  }
-
-  @Test
-  public void testCountSetBits45() throws Exception {
-    int marg0 = 134217728;
+  public void testCountSetBits26() throws Exception {
+    int marg0 = -301989889;
     int retval = BitwiseManipulator.countSetBits(marg0);
-
-    int expected = 1;
-    Assertions.assertEquals(expected, retval);
-  }
-
-  @Test
-  public void testCountSetBits46() throws Exception {
-    long marg0 = 32768L;
-    int retval = BitwiseManipulator.countSetBits(marg0);
-
-    int expected = 1;
-    Assertions.assertEquals(expected, retval);
-  }
-
-  @Test
-  public void testLowestSetBit30() throws Exception {
-    int marg0 = 268435456;
-    int retval = BitwiseManipulator.lowestSetBit(marg0);
-
-    int expected = 28;
-    Assertions.assertEquals(expected, retval);
-  }
-
-  @Test
-  public void testCountSetBits47() throws Exception {
-    int marg0 = 268435456;
-    int retval = BitwiseManipulator.countSetBits(marg0);
-
-    int expected = 1;
-    Assertions.assertEquals(expected, retval);
-  }
-
-  @Test
-  public void testLowestSetBit31() throws Exception {
-    int marg0 = 536870912;
-    int retval = BitwiseManipulator.lowestSetBit(marg0);
-
-    int expected = 29;
-    Assertions.assertEquals(expected, retval);
-  }
-
-  @Test
-  public void testCountSetBits48() throws Exception {
-    int marg0 = 536870912;
-    int retval = BitwiseManipulator.countSetBits(marg0);
-
-    int expected = 1;
-    Assertions.assertEquals(expected, retval);
-  }
-
-  @Test
-  public void testCountSetBits49() throws Exception {
-    long marg0 = 65536L;
-    int retval = BitwiseManipulator.countSetBits(marg0);
-
-    int expected = 1;
-    Assertions.assertEquals(expected, retval);
-  }
-
-  @Test
-  public void testLowestSetBit32() throws Exception {
-    int marg0 = 1073741824;
-    int retval = BitwiseManipulator.lowestSetBit(marg0);
 
     int expected = 30;
-    Assertions.assertEquals(expected, retval);
-  }
-
-  @Test
-  public void testCountSetBits50() throws Exception {
-    int marg0 = 1073741824;
-    int retval = BitwiseManipulator.countSetBits(marg0);
-
-    int expected = 1;
-    Assertions.assertEquals(expected, retval);
-  }
-
-  @Test
-  public void testLowestSetBit33() throws Exception {
-    int marg0 = -2147483648;
-    int retval = BitwiseManipulator.lowestSetBit(marg0);
-
-    int expected = 31;
-    Assertions.assertEquals(expected, retval);
-  }
-
-  @Test
-  public void testCountSetBits51() throws Exception {
-    long marg0 = 131072L;
-    int retval = BitwiseManipulator.countSetBits(marg0);
-
-    int expected = 1;
-    Assertions.assertEquals(expected, retval);
-  }
-
-  @Test
-  public void testCountSetBits52() throws Exception {
-    int marg0 = -2147483648;
-    int retval = BitwiseManipulator.countSetBits(marg0);
-
-    int expected = 1;
-    Assertions.assertEquals(expected, retval);
-  }
-
-  @Test
-  public void testCountSetBits53() throws Exception {
-    long marg0 = 262144L;
-    int retval = BitwiseManipulator.countSetBits(marg0);
-
-    int expected = 1;
-    Assertions.assertEquals(expected, retval);
-  }
-
-  @Test
-  public void testCountSetBits54() throws Exception {
-    long marg0 = 524288L;
-    int retval = BitwiseManipulator.countSetBits(marg0);
-
-    int expected = 1;
-    Assertions.assertEquals(expected, retval);
-  }
-
-  @Test
-  public void testCountSetBits55() throws Exception {
-    long marg0 = 1048576L;
-    int retval = BitwiseManipulator.countSetBits(marg0);
-
-    int expected = 1;
-    Assertions.assertEquals(expected, retval);
-  }
-
-  @Test
-  public void testCountSetBits56() throws Exception {
-    long marg0 = 2097152L;
-    int retval = BitwiseManipulator.countSetBits(marg0);
-
-    int expected = 1;
-    Assertions.assertEquals(expected, retval);
-  }
-
-  @Test
-  public void testCountSetBits57() throws Exception {
-    long marg0 = 4194304L;
-    int retval = BitwiseManipulator.countSetBits(marg0);
-
-    int expected = 1;
-    Assertions.assertEquals(expected, retval);
-  }
-
-  @Test
-  public void testCountSetBits58() throws Exception {
-    long marg0 = 8388608L;
-    int retval = BitwiseManipulator.countSetBits(marg0);
-
-    int expected = 1;
-    Assertions.assertEquals(expected, retval);
-  }
-
-  @Test
-  public void testCountSetBits59() throws Exception {
-    long marg0 = 16777216L;
-    int retval = BitwiseManipulator.countSetBits(marg0);
-
-    int expected = 1;
-    Assertions.assertEquals(expected, retval);
-  }
-
-  @Test
-  public void testCountSetBits60() throws Exception {
-    long marg0 = 33554432L;
-    int retval = BitwiseManipulator.countSetBits(marg0);
-
-    int expected = 1;
-    Assertions.assertEquals(expected, retval);
-  }
-
-  @Test
-  public void testCountSetBits61() throws Exception {
-    long marg0 = 67108864L;
-    int retval = BitwiseManipulator.countSetBits(marg0);
-
-    int expected = 1;
     Assertions.assertEquals(expected, retval);
   }
 
@@ -1269,11 +4727,5611 @@ public class BitwiseManipulatorTest {
   }
 
   @Test
-  public void testCountSetBits62() throws Exception {
+  public void testBitwiseLoop74() throws Exception {
+    int marg0 = -4194305;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = -1858077137;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop75() throws Exception {
+    int marg0 = 16384;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 0;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop76() throws Exception {
+    int marg0 = 8192;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 0;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop77() throws Exception {
+    int marg0 = 4096;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 0;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop78() throws Exception {
+    int marg0 = 4097;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = -1;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop79() throws Exception {
+    int marg0 = 2558;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 92088;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop80() throws Exception {
+    int marg0 = 2048;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 0;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop81() throws Exception {
+    int marg0 = 4023;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 144819;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop82() throws Exception {
+    int marg0 = 1532;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 41363;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop83() throws Exception {
+    int marg0 = 1254;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 10025;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop84() throws Exception {
+    int marg0 = 1537;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = -3;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop85() throws Exception {
+    int marg0 = 1311;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 13099;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop86() throws Exception {
+    int marg0 = 632;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 4421;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop87() throws Exception {
+    int marg0 = 988;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 14814;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop88() throws Exception {
+    int marg0 = 758;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 13641;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop89() throws Exception {
+    int marg0 = 514;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 514;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop90() throws Exception {
+    int marg0 = 629;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 6915;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop91() throws Exception {
+    int marg0 = 513;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = -1;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop92() throws Exception {
+    int marg0 = 811;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 7293;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop93() throws Exception {
+    int marg0 = 376;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 2629;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop94() throws Exception {
+    int marg0 = 296;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = -3;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop95() throws Exception {
+    int marg0 = 452;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 900;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop96() throws Exception {
+    int marg0 = 450;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 445;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop97() throws Exception {
+    int marg0 = 406;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 2839;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop98() throws Exception {
+    int marg0 = 449;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = -6;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop99() throws Exception {
+    int marg0 = 493;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 7883;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop100() throws Exception {
+    int marg0 = 395;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 1574;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop101() throws Exception {
+    int marg0 = 487;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 6811;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop102() throws Exception {
+    int marg0 = 240;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = -6;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop103() throws Exception {
+    int marg0 = 184;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 549;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop104() throws Exception {
+    int marg0 = 180;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 356;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop105() throws Exception {
+    int marg0 = 252;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 3527;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop106() throws Exception {
+    int marg0 = 178;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 173;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop107() throws Exception {
+    int marg0 = 186;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 1486;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop108() throws Exception {
+    int marg0 = 174;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 1040;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop109() throws Exception {
+    int marg0 = 134;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 402;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop110() throws Exception {
+    int marg0 = 177;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = -6;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop111() throws Exception {
+    int marg0 = 153;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 456;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop112() throws Exception {
+    int marg0 = 157;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 1412;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop113() throws Exception {
+    int marg0 = 133;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 265;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop114() throws Exception {
+    int marg0 = 155;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 1238;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop115() throws Exception {
+    int marg0 = 131;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 129;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop116() throws Exception {
+    int marg0 = 191;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 2859;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop117() throws Exception {
+    int marg0 = 120;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 357;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop118() throws Exception {
+    int marg0 = 116;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 228;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop119() throws Exception {
+    int marg0 = 108;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 539;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop120() throws Exception {
+    int marg0 = 114;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 109;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop121() throws Exception {
+    int marg0 = 90;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 358;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop122() throws Exception {
+    int marg0 = 86;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 255;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop123() throws Exception {
+    int marg0 = 94;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 940;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop124() throws Exception {
+    int marg0 = 113;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = -6;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop125() throws Exception {
+    int marg0 = 89;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 264;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop126() throws Exception {
+    int marg0 = 85;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 166;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop127() throws Exception {
+    int marg0 = 93;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 836;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop128() throws Exception {
+    int marg0 = 99;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 94;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop129() throws Exception {
+    int marg0 = 91;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 726;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop130() throws Exception {
+    int marg0 = 87;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 606;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop131() throws Exception {
+    int marg0 = 79;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 470;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop132() throws Exception {
+    int marg0 = 62;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 620;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop133() throws Exception {
+    int marg0 = 46;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 276;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop134() throws Exception {
+    int marg0 = 61;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 548;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop135() throws Exception {
+    int marg0 = 45;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 224;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop136() throws Exception {
+    int marg0 = 59;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 470;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop137() throws Exception {
+    int marg0 = 43;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 170;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop138() throws Exception {
+    int marg0 = 55;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 382;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop139() throws Exception {
+    int marg0 = 39;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 114;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop140() throws Exception {
+    int marg0 = 47;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 278;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testBitwiseLoop141() throws Exception {
+    int marg0 = 31;
+    int retval = BitwiseManipulator.bitwiseLoop(marg0);
+
+    int expected = 310;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testLowestSetBit17() throws Exception {
+    int marg0 = -65536;
+    int retval = BitwiseManipulator.lowestSetBit(marg0);
+
+    int expected = 16;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testLowestSetBit18() throws Exception {
+    int marg0 = 32768;
+    int retval = BitwiseManipulator.lowestSetBit(marg0);
+
+    int expected = 15;
+    Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testCountSetBits27() throws Exception {
     long marg0 = -1L;
     int retval = BitwiseManipulator.countSetBits(marg0);
 
     int expected = 64;
     Assertions.assertEquals(expected, retval);
+  }
+
+  @Test
+  public void testConditionalArrayFlip482() throws Exception {
+    int[] marg0 = { -256, -256, -256, -256, -256, -256, -256, -256, -256, -256, -256, -256, -256, -256, -256, -256, -256, -256, -256, -256, -256, -256, -256, -256, -256, -256, -256, -256, -256, -256, -256, -256, -256, -256, -256 };
+    int marg1 = -128;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip483() throws Exception {
+    int[] marg0 = { -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128 };
+    int marg1 = -64;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip484() throws Exception {
+    int[] marg0 = { -128, -128, -128, -128, -128, 0, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128 };
+    int marg1 = -64;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip485() throws Exception {
+    int[] marg0 = { -128, -128, -128, -128, -128, 127, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128 };
+    int marg1 = -96;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip486() throws Exception {
+    int[] marg0 = { -64, -64, -64, -64, -64, 63, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -32;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip487() throws Exception {
+    int[] marg0 = { -128, -128, -128, -128, 0, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128 };
+    int marg1 = -64;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip488() throws Exception {
+    int[] marg0 = { -128, -128, -128, -128, 0, 0, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128 };
+    int marg1 = -64;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip489() throws Exception {
+    int[] marg0 = { -64, -64, -64, -64, 0, 63, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -32;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip490() throws Exception {
+    int[] marg0 = { -64, -64, -64, -64, 0, 63 };
+    int marg1 = -32;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip491() throws Exception {
+    int[] marg0 = { -128, -128, -128, -128, 127, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128 };
+    int marg1 = -112;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip492() throws Exception {
+    int[] marg0 = { -64, -64, -64, -64, 63, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -48;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip493() throws Exception {
+    int[] marg0 = { -64, -64, -64, -64, 63, 0, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -48;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip494() throws Exception {
+    int[] marg0 = { -64, -64, -64, -64, 63, 0 };
+    int marg1 = -48;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip495() throws Exception {
+    int[] marg0 = { -96, -96, -96, -96, 95, 95, -96, -96, -96, -96, -96, -96, -96, -96, -96, -96, -96, -96, -96, -96, -96, -96, -96, -96, -96, -96, -96, -96, -96, -96, -96, -96, -96, -96, -96 };
+    int marg1 = -80;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip496() throws Exception {
+    int[] marg0 = { -32, -32, -32, -32, 31, 31, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32 };
+    int marg1 = -16;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip497() throws Exception {
+    int[] marg0 = { -128, -128, -128, 0, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128 };
+    int marg1 = -64;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip498() throws Exception {
+    int[] marg0 = { -128, -128, -128, 0, -128, 0, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128 };
+    int marg1 = -64;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip499() throws Exception {
+    int[] marg0 = { -64, -64, -64, 0, -64, 63, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -32;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip500() throws Exception {
+    int[] marg0 = { -64, -64, -64, 0, -64, 63 };
+    int marg1 = -32;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip501() throws Exception {
+    int[] marg0 = { -128, -128, -128, 0, 0, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128 };
+    int marg1 = -64;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip502() throws Exception {
+    int[] marg0 = { -128, -128, -128, 0, 0, -64, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128 };
+    int marg1 = -64;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip503() throws Exception {
+    int[] marg0 = { -64, -64, -64, 0, 0, 63, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -32;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip504() throws Exception {
+    int[] marg0 = { -64, -64, -64, 0, 63, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -48;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip505() throws Exception {
+    int[] marg0 = { -64, -64, -64, 0, 63, -64 };
+    int marg1 = -48;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip506() throws Exception {
+    int[] marg0 = { -64, -64, -64, 0, 63, 0, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -48;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip507() throws Exception {
+    int[] marg0 = { -32, -32, -32, 0, 31, 31, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32 };
+    int marg1 = -16;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip508() throws Exception {
+    int[] marg0 = { -32, -32, -32, 0, 31, 31 };
+    int marg1 = -16;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip509() throws Exception {
+    int[] marg0 = { -128, -128, -128, 127, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128 };
+    int marg1 = -120;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip510() throws Exception {
+    int[] marg0 = { -64, -64, -64, 63, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -56;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip511() throws Exception {
+    int[] marg0 = { -64, -64, -64, 63, -64, 0, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -56;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip512() throws Exception {
+    int[] marg0 = { -64, -64, -64, 63, -64, 0 };
+    int marg1 = -56;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip513() throws Exception {
+    int[] marg0 = { -96, -96, -96, 95, -96, 95, -96, -96, -96, -96, -96, -96, -96, -96, -96, -96, -96, -96, -96, -96, -96, -96, -96, -96, -96, -96, -96, -96, -96, -96, -96, -96, -96, -96, -96 };
+    int marg1 = -88;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip514() throws Exception {
+    int[] marg0 = { -32, -32, -32, 31, -32, 31, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32 };
+    int marg1 = -24;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip515() throws Exception {
+    int[] marg0 = { -64, -64, -64, 63, 0, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -56;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip516() throws Exception {
+    int[] marg0 = { -64, -64, -64, 63, 0, -64 };
+    int marg1 = -56;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip517() throws Exception {
+    int[] marg0 = { -64, -64, -64, 63, 0, 0, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -56;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip518() throws Exception {
+    int[] marg0 = { -32, -32, -32, 31, 0, 31, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32 };
+    int marg1 = -24;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip519() throws Exception {
+    int[] marg0 = { -32, -32, -32, 31, 0, 31 };
+    int marg1 = -24;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip520() throws Exception {
+    int[] marg0 = { -112, -112, -112, 111, 111, -112, -112, -112, -112, -112, -112, -112, -112, -112, -112, -112, -112, -112, -112, -112, -112, -112, -112, -112, -112, -112, -112, -112, -112, -112, -112, -112, -112, -112, -112 };
+    int marg1 = -104;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip521() throws Exception {
+    int[] marg0 = { -48, -48, -48, 47, 47, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48 };
+    int marg1 = -40;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip522() throws Exception {
+    int[] marg0 = { -48, -48, -48, 47, 47, 0, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48 };
+    int marg1 = -40;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip523() throws Exception {
+    int[] marg0 = { -48, -48, -48, 47, 47, 0 };
+    int marg1 = -40;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip524() throws Exception {
+    int[] marg0 = { -16, -16, -16, 15, 15, 15, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16 };
+    int marg1 = -8;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip525() throws Exception {
+    int[] marg0 = { -128, -128, 0, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128 };
+    int marg1 = -64;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip526() throws Exception {
+    int[] marg0 = { -128, -128, 0, -128, -128, 0, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128 };
+    int marg1 = -64;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip527() throws Exception {
+    int[] marg0 = { -64, -64, 0, -64, -64, 63, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -32;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip528() throws Exception {
+    int[] marg0 = { -64, -64, 0, -64, -64, 63 };
+    int marg1 = -32;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip529() throws Exception {
+    int[] marg0 = { -128, -128, 0, -128, 0, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128 };
+    int marg1 = -64;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip530() throws Exception {
+    int[] marg0 = { -128, -128, 0, -128, 0, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -64;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip531() throws Exception {
+    int[] marg0 = { -64, -64, 0, -64, 0, 63, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -32;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip532() throws Exception {
+    int[] marg0 = { -64, -64, 0, -64, 63, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -48;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip533() throws Exception {
+    int[] marg0 = { -64, -64, 0, -64, 63, -64 };
+    int marg1 = -48;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip534() throws Exception {
+    int[] marg0 = { -64, -64, 0, -64, 63, 0, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -48;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip535() throws Exception {
+    int[] marg0 = { -32, -32, 0, -32, 31, 31, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32 };
+    int marg1 = -16;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip536() throws Exception {
+    int[] marg0 = { -32, -32, 0, -32, 31, 31 };
+    int marg1 = -16;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip537() throws Exception {
+    int[] marg0 = { -128, -128, 0, 0, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128 };
+    int marg1 = -64;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip538() throws Exception {
+    int[] marg0 = { -128, -128, 0, 0, -128, -64, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128 };
+    int marg1 = -64;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip539() throws Exception {
+    int[] marg0 = { -64, -64, 0, 0, -64, 63, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -32;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip540() throws Exception {
+    int[] marg0 = { -128, -128, 0, 0, 0, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -64;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip541() throws Exception {
+    int[] marg0 = { -64, -64, 0, 0, 0, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32 };
+    int marg1 = -32;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip542() throws Exception {
+    int[] marg0 = { -64, -64, 0, 0, 63, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -48;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip543() throws Exception {
+    int[] marg0 = { -64, -64, 0, 0, 47, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48 };
+    int marg1 = -48;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip544() throws Exception {
+    int[] marg0 = { -32, -32, 0, 0, 31, 31, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32 };
+    int marg1 = -16;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip545() throws Exception {
+    int[] marg0 = { -64, -64, 0, 63, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -56;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip546() throws Exception {
+    int[] marg0 = { -64, -64, 0, 63, -64, -64 };
+    int marg1 = -56;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip547() throws Exception {
+    int[] marg0 = { -64, -64, 0, 63, -64, 0, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -56;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip548() throws Exception {
+    int[] marg0 = { -32, -32, 0, 31, -32, 31, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32 };
+    int marg1 = -24;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip549() throws Exception {
+    int[] marg0 = { -32, -32, 0, 31, -32, 31 };
+    int marg1 = -24;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip550() throws Exception {
+    int[] marg0 = { -64, -64, 0, 63, 0, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -56;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip551() throws Exception {
+    int[] marg0 = { -64, -64, 0, 55, 0, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56 };
+    int marg1 = -56;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip552() throws Exception {
+    int[] marg0 = { -32, -32, 0, 23, 0, 23, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24 };
+    int marg1 = -24;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip553() throws Exception {
+    int[] marg0 = { -48, -48, 0, 47, 47, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48 };
+    int marg1 = -40;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip554() throws Exception {
+    int[] marg0 = { -48, -48, 0, 47, 47, -48 };
+    int marg1 = -40;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip555() throws Exception {
+    int[] marg0 = { -48, -48, 0, 39, 39, 0, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40 };
+    int marg1 = -40;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip556() throws Exception {
+    int[] marg0 = { -16, -4194312, 0, 7, 7, 7, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8 };
+    int marg1 = -8;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip557() throws Exception {
+    int[] marg0 = { -128, -128, 127, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128 };
+    int marg1 = -124;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip558() throws Exception {
+    int[] marg0 = { -64, -64, 63, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -60;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip559() throws Exception {
+    int[] marg0 = { -64, -64, 63, -64, -64, 0, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -60;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip560() throws Exception {
+    int[] marg0 = { -64, -64, 63, -64, -64, 0 };
+    int marg1 = -60;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip561() throws Exception {
+    int[] marg0 = { -96, -96, 95, -96, -96, 95, -96, -96, -96, -96, -96, -96, -96, -96, -96, -96, -96, -96, -96, -96, -96, -96, -96, -96, -96, -96, -96, -96, -96, -96, -96, -96, -96, -96, -96 };
+    int marg1 = -92;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip562() throws Exception {
+    int[] marg0 = { -32, -32, 31, -32, -32, 31, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32 };
+    int marg1 = -28;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip563() throws Exception {
+    int[] marg0 = { -64, -64, 63, -64, 0, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -60;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip564() throws Exception {
+    int[] marg0 = { -64, -64, 63, -64, 0, -64 };
+    int marg1 = -60;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip565() throws Exception {
+    int[] marg0 = { -64, -64, 63, -64, 0, 0, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -60;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip566() throws Exception {
+    int[] marg0 = { -32, -32, 31, -32, 0, 31, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32 };
+    int marg1 = -28;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip567() throws Exception {
+    int[] marg0 = { -32, -32, 31, -32, 0, 31 };
+    int marg1 = -28;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip568() throws Exception {
+    int[] marg0 = { -112, -112, 111, -112, 111, -112, -112, -112, -112, -112, -112, -112, -112, -112, -112, -112, -112, -112, -112, -112, -112, -112, -112, -112, -112, -112, -112, -112, -112, -112, -112, -112, -112, -112, -112 };
+    int marg1 = -108;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip569() throws Exception {
+    int[] marg0 = { -48, -48, 47, -48, 47, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48 };
+    int marg1 = -44;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip570() throws Exception {
+    int[] marg0 = { -48, -48, 47, -48, 47, 0, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48 };
+    int marg1 = -44;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip571() throws Exception {
+    int[] marg0 = { -48, -48, 47, -48, 47, 0 };
+    int marg1 = -44;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip572() throws Exception {
+    int[] marg0 = { -16, -16, 15, -16, 15, 15, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16 };
+    int marg1 = -12;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip573() throws Exception {
+    int[] marg0 = { -64, -64, 63, 0, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -60;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip574() throws Exception {
+    int[] marg0 = { -64, -64, 63, 0, -64, -64 };
+    int marg1 = -60;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip575() throws Exception {
+    int[] marg0 = { -64, -64, 63, 0, -64, 0, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -60;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip576() throws Exception {
+    int[] marg0 = { -32, -32, 31, 0, -32, 31, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32 };
+    int marg1 = -28;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip577() throws Exception {
+    int[] marg0 = { -32, -32, 31, 0, -32, 31 };
+    int marg1 = -28;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip578() throws Exception {
+    int[] marg0 = { -64, -64, 63, 0, 0, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -60;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip579() throws Exception {
+    int[] marg0 = { -64, -64, 59, 0, 0, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60 };
+    int marg1 = -60;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip580() throws Exception {
+    int[] marg0 = { -32, -32, 31, 0, 0, 31, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32 };
+    int marg1 = -28;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip581() throws Exception {
+    int[] marg0 = { -48, -48, 47, 0, 47, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48 };
+    int marg1 = -44;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip582() throws Exception {
+    int[] marg0 = { -48, -48, 47, 0, 47, -48 };
+    int marg1 = -44;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip583() throws Exception {
+    int[] marg0 = { -48, -48, 47, 0, 47, 0, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48 };
+    int marg1 = -44;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip584() throws Exception {
+    int[] marg0 = { -16, -16, 15, 0, 15, 15, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16 };
+    int marg1 = -12;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip585() throws Exception {
+    int[] marg0 = { -120, -120, 119, 119, -120, -120, -120, -120, -120, -120, -120, -120, -120, -120, -120, -120, -120, -120, -120, -120, -120, -120, -120, -120, -120, -120, -120, -120, -120, -120, -120, -120, -120, -120, -120 };
+    int marg1 = -116;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip586() throws Exception {
+    int[] marg0 = { -56, -56, 55, 55, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56 };
+    int marg1 = -52;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip587() throws Exception {
+    int[] marg0 = { -56, -56, 55, 55, -56, 0, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56 };
+    int marg1 = -52;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip588() throws Exception {
+    int[] marg0 = { -56, -56, 55, 55, -56, 0 };
+    int marg1 = -52;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip589() throws Exception {
+    int[] marg0 = { -24, -24, 23, 23, -24, 23, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24 };
+    int marg1 = -20;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip590() throws Exception {
+    int[] marg0 = { -56, -56, 55, 55, 0, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56 };
+    int marg1 = -52;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip591() throws Exception {
+    int[] marg0 = { -56, -56, 55, 55, 0, -56 };
+    int marg1 = -52;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip592() throws Exception {
+    int[] marg0 = { -56, -56, 51, 51, 0, 0, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52 };
+    int marg1 = -52;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip593() throws Exception {
+    int[] marg0 = { -24, -24, 23, 23, 0, 23, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24 };
+    int marg1 = -20;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip594() throws Exception {
+    int[] marg0 = { -40, -40, 39, 39, 39, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40 };
+    int marg1 = -36;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip595() throws Exception {
+    int[] marg0 = { -40, -4194340, 39, 39, 39, 0, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40 };
+    int marg1 = -36;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip596() throws Exception {
+    int[] marg0 = { -8, -8, 7, 7, 7, 7, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8 };
+    int marg1 = -4;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip597() throws Exception {
+    int[] marg0 = { -8, -8, 7, 7, 7, 7 };
+    int marg1 = -4;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip598() throws Exception {
+    int[] marg0 = { -128, 0, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128 };
+    int marg1 = -64;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip599() throws Exception {
+    int[] marg0 = { -128, 0, -128, -128, -128, 0, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128 };
+    int marg1 = -64;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip600() throws Exception {
+    int[] marg0 = { -64, 0, -64, -64, -64, 63, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -32;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip601() throws Exception {
+    int[] marg0 = { -64, 0, -64, -64, -64, 63 };
+    int marg1 = -32;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip602() throws Exception {
+    int[] marg0 = { -128, 0, -128, -128, 0, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128 };
+    int marg1 = -64;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip603() throws Exception {
+    int[] marg0 = { -128, 0, -128, -128, 0, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -64;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip604() throws Exception {
+    int[] marg0 = { -64, 0, -64, -64, 0, 63, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -32;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip605() throws Exception {
+    int[] marg0 = { -64, 0, -64, -64, 63, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -48;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip606() throws Exception {
+    int[] marg0 = { -64, 0, -64, -64, 63, -64 };
+    int marg1 = -48;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip607() throws Exception {
+    int[] marg0 = { -64, 0, -64, -64, 63, 0, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -48;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip608() throws Exception {
+    int[] marg0 = { -32, 0, -32, -32, 31, 31, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32 };
+    int marg1 = -16;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip609() throws Exception {
+    int[] marg0 = { -32, 0, -32, -32, 31, 31 };
+    int marg1 = -16;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip610() throws Exception {
+    int[] marg0 = { -128, 0, -128, 0, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128 };
+    int marg1 = -64;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip611() throws Exception {
+    int[] marg0 = { -128, 0, -128, 0, -128, -64, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128 };
+    int marg1 = -64;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip612() throws Exception {
+    int[] marg0 = { -64, 0, -64, 0, -64, 63, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -32;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip613() throws Exception {
+    int[] marg0 = { -128, 0, -128, 0, 0, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -64;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip614() throws Exception {
+    int[] marg0 = { -64, 0, -64, 0, 0, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32 };
+    int marg1 = -32;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip615() throws Exception {
+    int[] marg0 = { -64, 0, -64, 0, 63, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -48;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip616() throws Exception {
+    int[] marg0 = { -64, 0, -64, 0, 47, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48 };
+    int marg1 = -48;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip617() throws Exception {
+    int[] marg0 = { -32, 0, -32, 0, 31, 31, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32 };
+    int marg1 = -16;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip618() throws Exception {
+    int[] marg0 = { -64, 0, -64, 63, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -56;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip619() throws Exception {
+    int[] marg0 = { -64, 0, -64, 63, -64, -64 };
+    int marg1 = -56;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip620() throws Exception {
+    int[] marg0 = { -64, 0, -64, 63, -64, 0, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -56;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip621() throws Exception {
+    int[] marg0 = { -32, 0, -32, 31, -32, 31, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32 };
+    int marg1 = -24;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip622() throws Exception {
+    int[] marg0 = { -32, 0, -32, 31, -32, 31 };
+    int marg1 = -24;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip623() throws Exception {
+    int[] marg0 = { -64, 0, -64, 63, 0, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -56;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip624() throws Exception {
+    int[] marg0 = { -64, 0, -64, 55, 0, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56 };
+    int marg1 = -56;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip625() throws Exception {
+    int[] marg0 = { -32, 0, -1048, 23, 0, 23, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24 };
+    int marg1 = -24;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip626() throws Exception {
+    int[] marg0 = { -48, 0, -48, 47, 47, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48 };
+    int marg1 = -40;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip627() throws Exception {
+    int[] marg0 = { -48, 0, -48, 47, 47, -48 };
+    int marg1 = -40;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip628() throws Exception {
+    int[] marg0 = { -48, 0, -48, 47, 47, 0, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48 };
+    int marg1 = -40;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip629() throws Exception {
+    int[] marg0 = { -16, 0, -16, 15, 15, 15, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16 };
+    int marg1 = -8;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip630() throws Exception {
+    int[] marg0 = { -128, 0, 0, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128 };
+    int marg1 = -64;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip631() throws Exception {
+    int[] marg0 = { -128, 0, 0, -128, -128, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -64;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip632() throws Exception {
+    int[] marg0 = { -64, 0, 0, -64, -64, 63, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -32;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip633() throws Exception {
+    int[] marg0 = { -128, 0, 0, -128, 0, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -64;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip634() throws Exception {
+    int[] marg0 = { -64, 0, 0, -64, 0, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32 };
+    int marg1 = -32;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip635() throws Exception {
+    int[] marg0 = { -64, 0, 0, -64, 63, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -48;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip636() throws Exception {
+    int[] marg0 = { -64, 0, 0, -64, 47, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48 };
+    int marg1 = -48;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip637() throws Exception {
+    int[] marg0 = { -32, 0, 0, -32, 15, 15, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16 };
+    int marg1 = -16;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip638() throws Exception {
+    int[] marg0 = { -128, 0, 0, 0, -128, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -64;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip639() throws Exception {
+    int[] marg0 = { -64, 0, 0, 0, -64, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32 };
+    int marg1 = -32;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip640() throws Exception {
+    int[] marg0 = { -64, 0, 0, 0, 0, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32 };
+    int marg1 = -32;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip641() throws Exception {
+    int[] marg0 = { -64, 0, 0, 0, 47, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48 };
+    int marg1 = -48;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip642() throws Exception {
+    int[] marg0 = { -32, 0, 0, 0, 15, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16 };
+    int marg1 = -16;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip643() throws Exception {
+    int[] marg0 = { -64, 0, 0, 63, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -56;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip644() throws Exception {
+    int[] marg0 = { -64, 0, 0, 55, -64, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56 };
+    int marg1 = -56;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip645() throws Exception {
+    int[] marg0 = { -32, 0, 0, 31, -32, 31, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32 };
+    int marg1 = -24;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip646() throws Exception {
+    int[] marg0 = { -64, 0, 0, 55, 0, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56 };
+    int marg1 = -56;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip647() throws Exception {
+    int[] marg0 = { -32, 0, 0, 23, 0, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24 };
+    int marg1 = -24;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip648() throws Exception {
+    int[] marg0 = { -48, 0, 0, 47, 47, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48 };
+    int marg1 = -40;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip649() throws Exception {
+    int[] marg0 = { -48, 0, 0, 39, 39, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40 };
+    int marg1 = -40;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip650() throws Exception {
+    int[] marg0 = { -16, 0, 0, 7, 7, 7, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8 };
+    int marg1 = -8;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip651() throws Exception {
+    int[] marg0 = { -64, 0, 63, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -60;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip652() throws Exception {
+    int[] marg0 = { -64, 0, 63, -64, -64, -64 };
+    int marg1 = -60;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip653() throws Exception {
+    int[] marg0 = { -64, 0, 63, -64, -64, 0, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -60;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip654() throws Exception {
+    int[] marg0 = { -32, 0, 31, -32, -32, 31, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32 };
+    int marg1 = -28;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip655() throws Exception {
+    int[] marg0 = { -32, 0, 31, -32, -32, 31 };
+    int marg1 = -28;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip656() throws Exception {
+    int[] marg0 = { -64, 0, 63, -64, 0, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -60;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip657() throws Exception {
+    int[] marg0 = { -64, 0, 59, -64, 0, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60 };
+    int marg1 = -60;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip658() throws Exception {
+    int[] marg0 = { -32, 0, 27, -32, 0, 27, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28 };
+    int marg1 = -28;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip659() throws Exception {
+    int[] marg0 = { -48, 0, 47, -48, 47, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48 };
+    int marg1 = -44;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip660() throws Exception {
+    int[] marg0 = { -48, 0, 47, -48, 47, -48 };
+    int marg1 = -44;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip661() throws Exception {
+    int[] marg0 = { -48, 0, 43, -48, 43, 0, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44 };
+    int marg1 = -44;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip662() throws Exception {
+    int[] marg0 = { -28, 0, 27, -16, 27, 27, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28 };
+    int marg1 = -12;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip663() throws Exception {
+    int[] marg0 = { -64, 0, 63, 0, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -60;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip664() throws Exception {
+    int[] marg0 = { -64, 0, 59, 0, -64, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60 };
+    int marg1 = -60;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip665() throws Exception {
+    int[] marg0 = { -32, 0, 31, 0, -32, 31, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32 };
+    int marg1 = -28;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip666() throws Exception {
+    int[] marg0 = { -64, 0, 59, 0, 0, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60 };
+    int marg1 = -60;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip667() throws Exception {
+    int[] marg0 = { -32, 0, 27, 0, 0, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28 };
+    int marg1 = -28;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip668() throws Exception {
+    int[] marg0 = { -48, 0, 47, 0, 47, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48 };
+    int marg1 = -44;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip669() throws Exception {
+    int[] marg0 = { -48, 0, 43, 0, 43, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44 };
+    int marg1 = -44;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip670() throws Exception {
+    int[] marg0 = { -16, 0, 11, 0, 11, 11, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12 };
+    int marg1 = -12;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip671() throws Exception {
+    int[] marg0 = { -56, 0, 55, 55, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56 };
+    int marg1 = -52;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip672() throws Exception {
+    int[] marg0 = { -56, 0, 55, 55, -56, -56 };
+    int marg1 = -52;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip673() throws Exception {
+    int[] marg0 = { -56, 0, 55, 55, -56, 0, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56 };
+    int marg1 = -52;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip674() throws Exception {
+    int[] marg0 = { -24, 0, 23, 23, -24, 23, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24 };
+    int marg1 = -20;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip675() throws Exception {
+    int[] marg0 = { -56, 0, 55, 55, 0, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56 };
+    int marg1 = -52;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip676() throws Exception {
+    int[] marg0 = { -56, 0, 51, 51, 0, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52 };
+    int marg1 = -52;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip677() throws Exception {
+    int[] marg0 = { -24, 0, 19, 19, 0, 19, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20 };
+    int marg1 = -20;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip678() throws Exception {
+    int[] marg0 = { -296, 0, 295, 295, 295, -296, -296, -296, -296, -296, -296, -296, -296, -296, -296, -296, -296, -296, -296, -296, -296, -296, -296, -296, -296, -296, -296, -296, -296, -296, -296, -296, -296, -296, -296 };
+    int marg1 = -292;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip679() throws Exception {
+    int[] marg0 = { -40, 0, 35, 35, 35, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36 };
+    int marg1 = -36;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip680() throws Exception {
+    int[] marg0 = { -8, 0, 7, 7, 7, 7, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8 };
+    int marg1 = -4;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip681() throws Exception {
+    int[] marg0 = { -128, 127, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128 };
+    int marg1 = -126;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip682() throws Exception {
+    int[] marg0 = { -64, 63, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -62;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip683() throws Exception {
+    int[] marg0 = { -64, 63, -64, -64, -64, 0, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -62;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip684() throws Exception {
+    int[] marg0 = { -64, 63, -64, -64, -64, 0 };
+    int marg1 = -62;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip685() throws Exception {
+    int[] marg0 = { -96, 95, -96, -96, -96, 95, -96, -96, -96, -96, -96, -96, -96, -96, -96, -96, -96, -96, -96, -96, -96, -96, -96, -96, -96, -96, -96, -96, -96, -96, -96, -96, -96, -96, -96 };
+    int marg1 = -94;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip686() throws Exception {
+    int[] marg0 = { -32, 31, -32, -32, -32, 31, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32 };
+    int marg1 = -30;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip687() throws Exception {
+    int[] marg0 = { -64, 63, -64, -64, 0, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -62;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip688() throws Exception {
+    int[] marg0 = { -64, 63, -64, -64, 0, -64 };
+    int marg1 = -62;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip689() throws Exception {
+    int[] marg0 = { -64, 63, -64, -64, 0, 0, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -62;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip690() throws Exception {
+    int[] marg0 = { -32, 31, -32, -32, 0, 31, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32 };
+    int marg1 = -30;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip691() throws Exception {
+    int[] marg0 = { -32, 31, -32, -32, 0, 31 };
+    int marg1 = -30;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip692() throws Exception {
+    int[] marg0 = { -112, 111, -112, -112, 111, -112, -112, -112, -112, -112, -112, -112, -112, -112, -112, -112, -112, -112, -112, -112, -112, -112, -112, -112, -112, -112, -112, -112, -112, -112, -112, -112, -112, -112, -112 };
+    int marg1 = -110;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip693() throws Exception {
+    int[] marg0 = { -48, 47, -48, -48, 47, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48 };
+    int marg1 = -46;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip694() throws Exception {
+    int[] marg0 = { -48, 47, -48, -48, 47, 0, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48 };
+    int marg1 = -46;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip695() throws Exception {
+    int[] marg0 = { -48, 47, -48, -48, 47, 0 };
+    int marg1 = -46;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip696() throws Exception {
+    int[] marg0 = { -16, 15, -16, -16, 15, 15, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16 };
+    int marg1 = -14;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip697() throws Exception {
+    int[] marg0 = { -64, 63, -64, 0, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -62;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip698() throws Exception {
+    int[] marg0 = { -64, 63, -64, 0, -64, -64 };
+    int marg1 = -62;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip699() throws Exception {
+    int[] marg0 = { -64, 63, -64, 0, -64, 0, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -62;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip700() throws Exception {
+    int[] marg0 = { -32, 31, -32, 0, -32, 31, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32 };
+    int marg1 = -30;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip701() throws Exception {
+    int[] marg0 = { -32, 31, -32, 0, -32, 31 };
+    int marg1 = -30;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip702() throws Exception {
+    int[] marg0 = { -64, 63, -64, 0, 0, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -62;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip703() throws Exception {
+    int[] marg0 = { -64, 61, -64, 0, 0, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62 };
+    int marg1 = -62;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip704() throws Exception {
+    int[] marg0 = { -32, 31, -32, 0, 0, 31, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32 };
+    int marg1 = -30;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip705() throws Exception {
+    int[] marg0 = { -48, 47, -48, 0, 47, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48 };
+    int marg1 = -46;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip706() throws Exception {
+    int[] marg0 = { -48, 47, -48, 0, 47, -48 };
+    int marg1 = -46;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip707() throws Exception {
+    int[] marg0 = { -48, 47, -48, 0, 47, 0, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48 };
+    int marg1 = -46;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip708() throws Exception {
+    int[] marg0 = { -16, 15, -16, 0, 15, 15, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16 };
+    int marg1 = -14;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip709() throws Exception {
+    int[] marg0 = { -120, 119, -120, 119, -120, -120, -120, -120, -120, -120, -120, -120, -120, -120, -120, -120, -120, -120, -120, -120, -120, -120, -120, -120, -120, -120, -120, -120, -120, -120, -120, -120, -120, -120, -120 };
+    int marg1 = -118;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip710() throws Exception {
+    int[] marg0 = { -56, 55, -56, 55, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56 };
+    int marg1 = -54;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip711() throws Exception {
+    int[] marg0 = { -56, 55, -56, 55, -56, 0, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56 };
+    int marg1 = -54;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip712() throws Exception {
+    int[] marg0 = { -56, 55, -56, 55, -56, 0 };
+    int marg1 = -54;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip713() throws Exception {
+    int[] marg0 = { -24, 23, -24, 23, -24, 23, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24 };
+    int marg1 = -22;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip714() throws Exception {
+    int[] marg0 = { -56, 55, -56, 55, 0, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56 };
+    int marg1 = -54;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip715() throws Exception {
+    int[] marg0 = { -56, 55, -56, 55, 0, -56 };
+    int marg1 = -54;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip716() throws Exception {
+    int[] marg0 = { -67108920, 67108919, -67108920, 67108919, 0, 0, -67108920, -67108920, -67108920, -67108920, -67108920, -67108920, -67108920, -67108920, -67108920, -67108920, -67108920, -67108920, -67108920, -67108920, -67108920, -67108920, -67108920, -67108920, -67108920, -67108920, -67108920, -67108920, -67108920, -67108920, -67108920, -67108920, -67108920, -67108920, -67108920 };
+    int marg1 = -67108918;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip717() throws Exception {
+    int[] marg0 = { -24, 23, -24, 23, 0, 23, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24 };
+    int marg1 = -22;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip718() throws Exception {
+    int[] marg0 = { -40, 39, -40, 39, 39, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40 };
+    int marg1 = -38;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip719() throws Exception {
+    int[] marg0 = { -40, 39, -40, 39, 39, 0, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40 };
+    int marg1 = -38;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip720() throws Exception {
+    int[] marg0 = { -8, 7, -8, 7, 7, 7, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8 };
+    int marg1 = -6;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip721() throws Exception {
+    int[] marg0 = { -8, 7, -8, 7, 7, 7 };
+    int marg1 = -6;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip722() throws Exception {
+    int[] marg0 = { -64, 63, 0, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -62;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip723() throws Exception {
+    int[] marg0 = { -64, 63, 0, -64, -64, -64 };
+    int marg1 = -62;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip724() throws Exception {
+    int[] marg0 = { -64, 63, 0, -64, -64, 0, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -62;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip725() throws Exception {
+    int[] marg0 = { -32, 31, 0, -32, -32, 31, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32 };
+    int marg1 = -30;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip726() throws Exception {
+    int[] marg0 = { -32, 31, 0, -32, -32, 31 };
+    int marg1 = -30;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip727() throws Exception {
+    int[] marg0 = { -64, 63, 0, -64, 0, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -62;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip728() throws Exception {
+    int[] marg0 = { -64, 61, 0, -32830, 0, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62 };
+    int marg1 = -62;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip729() throws Exception {
+    int[] marg0 = { -32, 29, 0, -32, 0, 29, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30 };
+    int marg1 = -30;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip730() throws Exception {
+    int[] marg0 = { -48, 47, 0, -48, 47, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48 };
+    int marg1 = -46;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip731() throws Exception {
+    int[] marg0 = { -48, 47, 0, -48, 47, -48 };
+    int marg1 = -46;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip732() throws Exception {
+    int[] marg0 = { -48, 45, 0, -48, 45, 0, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46 };
+    int marg1 = -46;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip733() throws Exception {
+    int[] marg0 = { -16, 15, 0, -16, 15, 15, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16 };
+    int marg1 = -14;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip734() throws Exception {
+    int[] marg0 = { -64, 63, 0, 0, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -62;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip735() throws Exception {
+    int[] marg0 = { -64, 61, 0, 0, -64, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62 };
+    int marg1 = -62;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip736() throws Exception {
+    int[] marg0 = { -32, 31, 0, 0, -32, 31, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32 };
+    int marg1 = -30;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip737() throws Exception {
+    int[] marg0 = { -64, 61, 0, 0, 0, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62 };
+    int marg1 = -62;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip738() throws Exception {
+    int[] marg0 = { -32, 29, 0, 0, 0, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30 };
+    int marg1 = -30;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip739() throws Exception {
+    int[] marg0 = { -48, 47, 0, 0, 47, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48 };
+    int marg1 = -46;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip740() throws Exception {
+    int[] marg0 = { -48, 45, 0, 0, 45, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46 };
+    int marg1 = -46;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip741() throws Exception {
+    int[] marg0 = { -16, 13, 0, 0, 13, 13, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14 };
+    int marg1 = -14;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip742() throws Exception {
+    int[] marg0 = { -56, 55, 0, 55, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56 };
+    int marg1 = -54;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip743() throws Exception {
+    int[] marg0 = { -56, 55, 0, 55, -56, -56 };
+    int marg1 = -54;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip744() throws Exception {
+    int[] marg0 = { -56, 55, 0, 55, -56, 0, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56 };
+    int marg1 = -54;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip745() throws Exception {
+    int[] marg0 = { -24, 23, 0, 23, -24, 23, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24 };
+    int marg1 = -22;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip746() throws Exception {
+    int[] marg0 = { -56, 53, 0, 53, 0, -56, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54 };
+    int marg1 = -54;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip747() throws Exception {
+    int[] marg0 = { -56, 53, 0, 53, 0, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54 };
+    int marg1 = -54;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip748() throws Exception {
+    int[] marg0 = { -24, 21, 0, 21, 0, 21, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22 };
+    int marg1 = -22;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip749() throws Exception {
+    int[] marg0 = { -40, 39, 0, 39, 39, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40 };
+    int marg1 = -38;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip750() throws Exception {
+    int[] marg0 = { -40, 37, 0, 37, 37, -38, -38, -38, -38, -38, -38, -38, -38, -38, -38, -38, -38, -38, -38, -38, -38, -38, -38, -38, -38, -38, -38, -38, -38, -38, -38, -38, -38, -38, -38 };
+    int marg1 = -38;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip751() throws Exception {
+    int[] marg0 = { -8, 5, 0, 5, 5, 5, -6, -6, -6, -6, -6, -6, -6, -6, -6, -6, -6, -6, -6, -6, -6, -6, -6, -6, -6, -6, -6, -6, -6, -6, -6, -6, -6, -6, -6 };
+    int marg1 = -6;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip752() throws Exception {
+    int[] marg0 = { -124, 123, 123, -124, -124, -124, -124, -124, -124, -124, -124, -124, -124, -124, -124, -124, -124, -124, -124, -124, -124, -124, -124, -124, -124, -124, -124, -124, -124, -124, -124, -124, -124, -124, -124 };
+    int marg1 = -122;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip753() throws Exception {
+    int[] marg0 = { -60, 59, 59, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60 };
+    int marg1 = -58;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip754() throws Exception {
+    int[] marg0 = { -60, 59, 59, -60, -60, 0, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60 };
+    int marg1 = -58;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip755() throws Exception {
+    int[] marg0 = { -60, 59, 59, -60, -60, 0 };
+    int marg1 = -58;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip756() throws Exception {
+    int[] marg0 = { -28, 27, 27, -28, -28, 27, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28 };
+    int marg1 = -26;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip757() throws Exception {
+    int[] marg0 = { -60, 59, 59, -60, 0, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60 };
+    int marg1 = -58;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip758() throws Exception {
+    int[] marg0 = { -60, 59, 59, -60, 0, -60 };
+    int marg1 = -58;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip759() throws Exception {
+    int[] marg0 = { -67108924, 67108921, 67108921, -67108924, 0, 0, -67108922, -67108922, -67108922, -67108922, -67108922, -67108922, -67108922, -67108922, -67108922, -67108922, -67108922, -67108922, -67108922, -67108922, -67108922, -67108922, -67108922, -67108922, -67108922, -67108922, -67108922, -67108922, -67108922, -67108922, -67108922, -67108922, -67108922, -67108922, -67108922 };
+    int marg1 = -67108922;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip760() throws Exception {
+    int[] marg0 = { -28, 27, 27, -28, 0, 27, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28 };
+    int marg1 = -26;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip761() throws Exception {
+    int[] marg0 = { -44, 43, 43, -44, 43, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44 };
+    int marg1 = -42;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip762() throws Exception {
+    int[] marg0 = { -44, 43, 43, -44, 43, 0, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44 };
+    int marg1 = -42;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip763() throws Exception {
+    int[] marg0 = { -12, 11, 11, -12, 11, 11, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12 };
+    int marg1 = -10;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip764() throws Exception {
+    int[] marg0 = { -12, 11, 11, -12, 11, 11 };
+    int marg1 = -10;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip765() throws Exception {
+    int[] marg0 = { -60, 59, 59, 0, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60 };
+    int marg1 = -58;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip766() throws Exception {
+    int[] marg0 = { -60, 59, 59, 0, -60, -60 };
+    int marg1 = -58;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip767() throws Exception {
+    int[] marg0 = { -60, 59, 59, 0, -60, 0, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60 };
+    int marg1 = -58;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip768() throws Exception {
+    int[] marg0 = { -28, 27, 27, 0, -28, 27, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28 };
+    int marg1 = -26;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip769() throws Exception {
+    int[] marg0 = { -60, 59, 59, 0, 0, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60 };
+    int marg1 = -58;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip770() throws Exception {
+    int[] marg0 = { -60, 57, 57, 0, 0, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58 };
+    int marg1 = -58;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip771() throws Exception {
+    int[] marg0 = { -28, 25, 25, 0, 0, 25, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26 };
+    int marg1 = -26;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip772() throws Exception {
+    int[] marg0 = { -44, 43, 43, 0, 43, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44 };
+    int marg1 = -42;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip773() throws Exception {
+    int[] marg0 = { -44, 41, 41, 0, 41, -42, -42, -42, -42, -42, -42, -42, -42, -42, -42, -42, -42, -42, -42, -42, -42, -42, -42, -42, -42, -42, -42, -42, -42, -42, -42, -42, -42, -42, -42 };
+    int marg1 = -42;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip774() throws Exception {
+    int[] marg0 = { -12, 11, 11, 0, 11, 11, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12 };
+    int marg1 = -10;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip775() throws Exception {
+    int[] marg0 = { -52, 51, 51, 51, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52 };
+    int marg1 = -50;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip776() throws Exception {
+    int[] marg0 = { -52, 51, 51, 51, -52, 0, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52 };
+    int marg1 = -50;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip777() throws Exception {
+    int[] marg0 = { -20, 19, 19, 19, -20, 19, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20 };
+    int marg1 = -18;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip778() throws Exception {
+    int[] marg0 = { -20, 19, 19, 19, -20, 19 };
+    int marg1 = -18;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip779() throws Exception {
+    int[] marg0 = { -52, 51, 51, 51, 0, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52 };
+    int marg1 = -50;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip780() throws Exception {
+    int[] marg0 = { -52, 49, 49, 49, 0, -50, -50, -50, -50, -50, -50, -50, -50, -50, -50, -50, -50, -50, -50, -50, -50, -50, -50, -50, -50, -50, -50, -50, -50, -50, -50, -50, -50, -50, -50 };
+    int marg1 = -50;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip781() throws Exception {
+    int[] marg0 = { -20, 17, 17, 17, 0, 17, -18, -18, -18, -18, -18, -18, -18, -18, -18, -18, -18, -18, -18, -18, -18, -18, -18, -18, -18, -18, -18, -18, -18, -18, -18, -18, -18, -18, -18 };
+    int marg1 = -18;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip782() throws Exception {
+    int[] marg0 = { -36, 35, 35, 35, 35, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36 };
+    int marg1 = -34;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip783() throws Exception {
+    int[] marg0 = { -36, 35, 35, 35, 35, -36 };
+    int marg1 = -34;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip784() throws Exception {
+    int[] marg0 = { -36, 35, 35, 35, 35, 0, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36 };
+    int marg1 = -34;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip785() throws Exception {
+    int[] marg0 = { -3, 2, 2, 2, 2, 2, -3, -3, -3, -3, -3, -3, -3, -3, -3, -3, -3, -3, -3, -3, -3, -3, -3, -3, -3, -3, -3, -3, -3, -3, -3, -3, -3, -3, -3 };
+    int marg1 = -2;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip786() throws Exception {
+    int[] marg0 = { -3, 2, 2, 2, 2, 2 };
+    int marg1 = -2;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip787() throws Exception {
+    int[] marg0 = { 0, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128 };
+    int marg1 = -64;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip788() throws Exception {
+    int[] marg0 = { 0, -128, -128, -128, -128, 0, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128 };
+    int marg1 = -64;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip789() throws Exception {
+    int[] marg0 = { 0, -64, -64, -64, -64, 63, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -32;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip790() throws Exception {
+    int[] marg0 = { 0, -64, -64, -64, -64, 63 };
+    int marg1 = -32;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip791() throws Exception {
+    int[] marg0 = { 0, -128, -128, -128, 0, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128 };
+    int marg1 = -64;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip792() throws Exception {
+    int[] marg0 = { 0, -128, -128, -128, 0, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -64;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip793() throws Exception {
+    int[] marg0 = { 0, -64, -64, -64, 0, 63, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -32;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip794() throws Exception {
+    int[] marg0 = { 0, -64, -64, -64, 63, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -48;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip795() throws Exception {
+    int[] marg0 = { 0, -64, -64, -64, 63, -64 };
+    int marg1 = -48;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip796() throws Exception {
+    int[] marg0 = { 0, -64, -64, -64, 63, 0, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -48;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip797() throws Exception {
+    int[] marg0 = { 0, -32, -32, -32, 31, 31, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32 };
+    int marg1 = -16;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip798() throws Exception {
+    int[] marg0 = { 0, -32, -32, -32, 31, 31 };
+    int marg1 = -16;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip799() throws Exception {
+    int[] marg0 = { 0, -128, -128, 0, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128 };
+    int marg1 = -64;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip800() throws Exception {
+    int[] marg0 = { 0, -128, -128, 0, -128, -64, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128 };
+    int marg1 = -64;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip801() throws Exception {
+    int[] marg0 = { 0, -64, -64, 0, -64, 63, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -32;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip802() throws Exception {
+    int[] marg0 = { 0, -128, -128, 0, 0, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -64;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip803() throws Exception {
+    int[] marg0 = { 0, -64, -64, 0, 0, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32 };
+    int marg1 = -32;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip804() throws Exception {
+    int[] marg0 = { 0, -64, -64, 0, 63, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -48;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip805() throws Exception {
+    int[] marg0 = { 0, -64, -64, 0, 47, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48 };
+    int marg1 = -48;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip806() throws Exception {
+    int[] marg0 = { 0, -32, -32, 0, 31, 31, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32 };
+    int marg1 = -16;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip807() throws Exception {
+    int[] marg0 = { 0, -64, -64, 63, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -56;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip808() throws Exception {
+    int[] marg0 = { 0, -64, -64, 63, -64, -64 };
+    int marg1 = -56;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip809() throws Exception {
+    int[] marg0 = { 0, -64, -64, 63, -64, 0, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -56;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip810() throws Exception {
+    int[] marg0 = { 0, -32, -32, 31, -32, 31, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32 };
+    int marg1 = -24;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip811() throws Exception {
+    int[] marg0 = { 0, -32, -32, 31, -32, 31 };
+    int marg1 = -24;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip812() throws Exception {
+    int[] marg0 = { 0, -64, -64, 63, 0, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -56;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip813() throws Exception {
+    int[] marg0 = { 0, -64, -64, 55, 0, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56 };
+    int marg1 = -56;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip814() throws Exception {
+    int[] marg0 = { 0, -32, -32, 23, 0, 23, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24 };
+    int marg1 = -24;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip815() throws Exception {
+    int[] marg0 = { 0, -48, -48, 47, 47, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48 };
+    int marg1 = -40;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip816() throws Exception {
+    int[] marg0 = { 0, -48, -48, 47, 47, -48 };
+    int marg1 = -40;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip817() throws Exception {
+    int[] marg0 = { 0, -48, -48, 39, 39, 0, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40 };
+    int marg1 = -40;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip818() throws Exception {
+    int[] marg0 = { 0, -264, -16, 15, 15, 15, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16 };
+    int marg1 = -8;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip819() throws Exception {
+    int[] marg0 = { 0, -128, 0, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128 };
+    int marg1 = -64;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip820() throws Exception {
+    int[] marg0 = { 0, -128, 0, -128, -128, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -64;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip821() throws Exception {
+    int[] marg0 = { 0, -64, 0, -64, -64, 63, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -32;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip822() throws Exception {
+    int[] marg0 = { 0, -128, 0, -128, 0, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -64;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip823() throws Exception {
+    int[] marg0 = { 0, -64, 0, -64, 0, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32 };
+    int marg1 = -32;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip824() throws Exception {
+    int[] marg0 = { 0, -64, 0, -64, 63, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -48;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip825() throws Exception {
+    int[] marg0 = { 0, -64, 0, -64, 47, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48 };
+    int marg1 = -48;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip826() throws Exception {
+    int[] marg0 = { 0, -32, 0, -32, 15, 15, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16 };
+    int marg1 = -16;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip827() throws Exception {
+    int[] marg0 = { 0, -128, 0, 0, -128, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -64;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip828() throws Exception {
+    int[] marg0 = { 0, -64, 0, 0, -64, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32 };
+    int marg1 = -32;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip829() throws Exception {
+    int[] marg0 = { 0, -64, 0, 0, 0, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32 };
+    int marg1 = -32;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip830() throws Exception {
+    int[] marg0 = { 0, -64, 0, 0, 47, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48 };
+    int marg1 = -48;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip831() throws Exception {
+    int[] marg0 = { 0, -32, 0, 0, 15, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16 };
+    int marg1 = -16;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip832() throws Exception {
+    int[] marg0 = { 0, -64, 0, 63, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -56;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip833() throws Exception {
+    int[] marg0 = { 0, -64, 0, 55, -64, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56 };
+    int marg1 = -56;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip834() throws Exception {
+    int[] marg0 = { 0, -32, 0, 23, -32, 23, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24 };
+    int marg1 = -24;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip835() throws Exception {
+    int[] marg0 = { 0, -64, 0, 55, 0, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56 };
+    int marg1 = -56;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip836() throws Exception {
+    int[] marg0 = { 0, -32, 0, 23, 0, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24 };
+    int marg1 = -24;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip837() throws Exception {
+    int[] marg0 = { 0, -48, 0, 39, 39, -48, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40 };
+    int marg1 = -40;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip838() throws Exception {
+    int[] marg0 = { 0, -48, 0, 39, 39, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40 };
+    int marg1 = -40;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip839() throws Exception {
+    int[] marg0 = { 0, -16, 0, 7, 7, 7, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8 };
+    int marg1 = -8;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip840() throws Exception {
+    int[] marg0 = { 0, -64, 63, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -60;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip841() throws Exception {
+    int[] marg0 = { 0, -64, 63, -64, -64, -64 };
+    int marg1 = -60;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip842() throws Exception {
+    int[] marg0 = { 0, -64, 63, -64, -64, 0, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -60;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip843() throws Exception {
+    int[] marg0 = { 0, -32, 31, -32, -32, 31, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32 };
+    int marg1 = -28;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip844() throws Exception {
+    int[] marg0 = { 0, -32, 31, -32, -32, 31 };
+    int marg1 = -28;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip845() throws Exception {
+    int[] marg0 = { 0, -64, 63, -64, 0, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -60;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip846() throws Exception {
+    int[] marg0 = { 0, -64, 59, -64, 0, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60 };
+    int marg1 = -60;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip847() throws Exception {
+    int[] marg0 = { 0, -32, 27, -32, 0, 27, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28 };
+    int marg1 = -28;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip848() throws Exception {
+    int[] marg0 = { 0, -48, 47, -48, 47, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48 };
+    int marg1 = -44;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip849() throws Exception {
+    int[] marg0 = { 0, -48, 47, -48, 47, -48 };
+    int marg1 = -44;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip850() throws Exception {
+    int[] marg0 = { 0, -48, 43, -48, 43, 0, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44 };
+    int marg1 = -44;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip851() throws Exception {
+    int[] marg0 = { 0, -32780, 11, -16, 11, 11, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12 };
+    int marg1 = -12;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip852() throws Exception {
+    int[] marg0 = { 0, -64, 63, 0, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -60;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip853() throws Exception {
+    int[] marg0 = { 0, -64, 59, 0, -64, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60 };
+    int marg1 = -60;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip854() throws Exception {
+    int[] marg0 = { 0, -32, 31, 0, -32, 31, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32 };
+    int marg1 = -28;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip855() throws Exception {
+    int[] marg0 = { 0, -64, 59, 0, 0, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60 };
+    int marg1 = -60;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip856() throws Exception {
+    int[] marg0 = { 0, -32, 27, 0, 0, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28 };
+    int marg1 = -28;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip857() throws Exception {
+    int[] marg0 = { 0, -48, 47, 0, 47, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48 };
+    int marg1 = -44;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip858() throws Exception {
+    int[] marg0 = { 0, -48, 43, 0, 43, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44 };
+    int marg1 = -44;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip859() throws Exception {
+    int[] marg0 = { 0, -16, 11, 0, 11, 11, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12 };
+    int marg1 = -12;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip860() throws Exception {
+    int[] marg0 = { 0, -56, 55, 55, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56 };
+    int marg1 = -52;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip861() throws Exception {
+    int[] marg0 = { 0, -56, 55, 55, -56, -56 };
+    int marg1 = -52;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip862() throws Exception {
+    int[] marg0 = { 0, -56, 51, 51, -60, 0, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52 };
+    int marg1 = -52;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip863() throws Exception {
+    int[] marg0 = { 0, -4194324, 23, 23, -24, 23, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24 };
+    int marg1 = -20;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip864() throws Exception {
+    int[] marg0 = { 0, -56, 51, 51, 0, -56, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52 };
+    int marg1 = -52;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip865() throws Exception {
+    int[] marg0 = { 0, -56, 51, 51, 0, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52 };
+    int marg1 = -52;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip866() throws Exception {
+    int[] marg0 = { 0, -24, 19, 19, 0, 19, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20 };
+    int marg1 = -20;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip867() throws Exception {
+    int[] marg0 = { 0, -4194340, 35, 35, 35, -40, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36 };
+    int marg1 = -36;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip868() throws Exception {
+    int[] marg0 = { 0, -40, 35, 35, 35, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36 };
+    int marg1 = -36;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip869() throws Exception {
+    int[] marg0 = { 0, -8, 3, 3, 3, 3, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4 };
+    int marg1 = -4;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip870() throws Exception {
+    int[] marg0 = { 0, 0, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128 };
+    int marg1 = -64;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip871() throws Exception {
+    int[] marg0 = { 0, 0, -128, -128, -128, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -64;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip872() throws Exception {
+    int[] marg0 = { 0, 0, -64, -64, -64, 63, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -32;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip873() throws Exception {
+    int[] marg0 = { 0, 0, -128, -128, 0, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -64;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip874() throws Exception {
+    int[] marg0 = { 0, 0, -64, -64, 0, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32 };
+    int marg1 = -32;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip875() throws Exception {
+    int[] marg0 = { 0, 0, -64, -64, 63, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -48;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip876() throws Exception {
+    int[] marg0 = { 0, 0, -64, -64, 47, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48 };
+    int marg1 = -48;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip877() throws Exception {
+    int[] marg0 = { 0, 0, -1040, -32, 15, 15, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16 };
+    int marg1 = -16;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip878() throws Exception {
+    int[] marg0 = { 0, 0, -128, 0, -128, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -64;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip879() throws Exception {
+    int[] marg0 = { 0, 0, -64, 0, -64, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32 };
+    int marg1 = -32;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip880() throws Exception {
+    int[] marg0 = { 0, 0, -64, 0, 0, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32 };
+    int marg1 = -32;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip881() throws Exception {
+    int[] marg0 = { 0, 0, -64, 0, 47, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48 };
+    int marg1 = -48;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip882() throws Exception {
+    int[] marg0 = { 0, 0, -32, 0, 15, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16 };
+    int marg1 = -16;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip883() throws Exception {
+    int[] marg0 = { 0, 0, -64, 63, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -56;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip884() throws Exception {
+    int[] marg0 = { 0, 0, -64, 55, -64, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56 };
+    int marg1 = -56;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip885() throws Exception {
+    int[] marg0 = { 0, 0, -32, 31, -32, 31, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32 };
+    int marg1 = -24;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip886() throws Exception {
+    int[] marg0 = { 0, 0, -64, 55, 0, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56 };
+    int marg1 = -56;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip887() throws Exception {
+    int[] marg0 = { 0, 0, -32, 23, 0, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24 };
+    int marg1 = -24;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip888() throws Exception {
+    int[] marg0 = { 0, 0, -48, 47, 47, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48 };
+    int marg1 = -40;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip889() throws Exception {
+    int[] marg0 = { 0, 0, -48, 39, 39, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40 };
+    int marg1 = -40;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip890() throws Exception {
+    int[] marg0 = { 0, 0, -16, 7, 7, 7, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8 };
+    int marg1 = -8;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip891() throws Exception {
+    int[] marg0 = { 0, 0, 0, -128, -128, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -64;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip892() throws Exception {
+    int[] marg0 = { 0, 0, 0, -268435488, -64, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32 };
+    int marg1 = -32;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip893() throws Exception {
+    int[] marg0 = { 0, 0, 0, -64, 0, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32 };
+    int marg1 = -32;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip894() throws Exception {
+    int[] marg0 = { 0, 0, 0, -64, 47, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48 };
+    int marg1 = -48;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip895() throws Exception {
+    int[] marg0 = { 0, 0, 0, -32, 15, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16 };
+    int marg1 = -16;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip896() throws Exception {
+    int[] marg0 = { 0, 0, 0, 0, -64, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32 };
+    int marg1 = -32;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip897() throws Exception {
+    int[] marg0 = { 0, 0, 0, 0, 0, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32 };
+    int marg1 = -32;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip898() throws Exception {
+    int[] marg0 = { 0, 0, 0, 0, 15, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16 };
+    int marg1 = -16;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip899() throws Exception {
+    int[] marg0 = { 0, 0, 0, 0, 15 };
+    int marg1 = -16;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip900() throws Exception {
+    int[] marg0 = { 0, 0, 0, 55, -64, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56 };
+    int marg1 = -56;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip901() throws Exception {
+    int[] marg0 = { 0, 0, 0, 23, -32, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24 };
+    int marg1 = -24;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip902() throws Exception {
+    int[] marg0 = { 0, 0, 0, 23, 0, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24 };
+    int marg1 = -24;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip903() throws Exception {
+    int[] marg0 = { 0, 0, 0, 23, 0 };
+    int marg1 = -24;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip904() throws Exception {
+    int[] marg0 = { 0, 0, 0, 39, 39, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40 };
+    int marg1 = -40;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip905() throws Exception {
+    int[] marg0 = { 0, 0, 0, 7, 7, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8 };
+    int marg1 = -8;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip906() throws Exception {
+    int[] marg0 = { 0, 0, 63, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -60;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip907() throws Exception {
+    int[] marg0 = { 0, 0, 59, -64, -64, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60 };
+    int marg1 = -60;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip908() throws Exception {
+    int[] marg0 = { 0, 0, 27, -32, -32, 27, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28 };
+    int marg1 = -28;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip909() throws Exception {
+    int[] marg0 = { 0, 0, 59, -64, 0, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60 };
+    int marg1 = -60;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip910() throws Exception {
+    int[] marg0 = { 0, 0, 27, -32, 0, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28 };
+    int marg1 = -28;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip911() throws Exception {
+    int[] marg0 = { 0, 0, 43, -48, 43, -48, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44 };
+    int marg1 = -44;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip912() throws Exception {
+    int[] marg0 = { 0, 0, 43, -48, 43, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44 };
+    int marg1 = -44;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip913() throws Exception {
+    int[] marg0 = { 0, 0, 11, -16, 11, 11, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12 };
+    int marg1 = -12;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip914() throws Exception {
+    int[] marg0 = { 0, 0, 59, 0, -64, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60 };
+    int marg1 = -60;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip915() throws Exception {
+    int[] marg0 = { 0, 0, 27, 0, -32, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28 };
+    int marg1 = -28;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip916() throws Exception {
+    int[] marg0 = { 0, 0, 27, 0, 0, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28 };
+    int marg1 = -28;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip917() throws Exception {
+    int[] marg0 = { 0, 0, 27, 0, 0 };
+    int marg1 = -28;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip918() throws Exception {
+    int[] marg0 = { 0, 0, 43, 0, 43, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44 };
+    int marg1 = -44;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip919() throws Exception {
+    int[] marg0 = { 0, 0, 11, 0, 11, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12 };
+    int marg1 = -12;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip920() throws Exception {
+    int[] marg0 = { 0, 0, 51, 51, -67108916, -56, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52 };
+    int marg1 = -52;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip921() throws Exception {
+    int[] marg0 = { 0, 0, 51, 51, -56, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52 };
+    int marg1 = -52;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip922() throws Exception {
+    int[] marg0 = { 0, 0, 19, 19, -24, 19, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20 };
+    int marg1 = -20;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip923() throws Exception {
+    int[] marg0 = { 0, 0, 51, 51, 0, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52 };
+    int marg1 = -52;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip924() throws Exception {
+    int[] marg0 = { 0, 0, 19, 19, 0, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20 };
+    int marg1 = -20;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip925() throws Exception {
+    int[] marg0 = { 0, 0, 35, 35, 35, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36 };
+    int marg1 = -36;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip926() throws Exception {
+    int[] marg0 = { 0, 0, 3, 3, 3, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4 };
+    int marg1 = -4;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip927() throws Exception {
+    int[] marg0 = { 0, 63, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -62;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip928() throws Exception {
+    int[] marg0 = { 0, 63, -64, -64, -64, -64 };
+    int marg1 = -62;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip929() throws Exception {
+    int[] marg0 = { 0, 63, -64, -64, -64, 0, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -62;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip930() throws Exception {
+    int[] marg0 = { 0, 31, -32, -32, -32, 31, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32 };
+    int marg1 = -30;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip931() throws Exception {
+    int[] marg0 = { 0, 31, -32, -32, -32, 31 };
+    int marg1 = -30;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip932() throws Exception {
+    int[] marg0 = { 0, 63, -64, -64, 0, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -62;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip933() throws Exception {
+    int[] marg0 = { 0, 61, -64, -64, 0, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62 };
+    int marg1 = -62;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip934() throws Exception {
+    int[] marg0 = { 0, 29, -32, -32, 0, 29, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30 };
+    int marg1 = -30;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip935() throws Exception {
+    int[] marg0 = { 0, 47, -48, -48, 47, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48 };
+    int marg1 = -46;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip936() throws Exception {
+    int[] marg0 = { 0, 47, -48, -48, 47, -48 };
+    int marg1 = -46;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip937() throws Exception {
+    int[] marg0 = { 0, 45, -48, -48, 45, 0, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46 };
+    int marg1 = -46;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip938() throws Exception {
+    int[] marg0 = { 0, 15, -16, -16, 15, 15, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16 };
+    int marg1 = -14;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip939() throws Exception {
+    int[] marg0 = { 0, 63, -64, 0, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -62;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip940() throws Exception {
+    int[] marg0 = { 0, 61, -64, 0, -64, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62 };
+    int marg1 = -62;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip941() throws Exception {
+    int[] marg0 = { 0, 31, -32, 0, -32, 31, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32 };
+    int marg1 = -30;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip942() throws Exception {
+    int[] marg0 = { 0, 61, -64, 0, 0, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62 };
+    int marg1 = -62;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip943() throws Exception {
+    int[] marg0 = { 0, 29, -32, 0, 0, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30 };
+    int marg1 = -30;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip944() throws Exception {
+    int[] marg0 = { 0, 47, -48, 0, 47, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48 };
+    int marg1 = -46;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip945() throws Exception {
+    int[] marg0 = { 0, 45, -48, 0, 45, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46 };
+    int marg1 = -46;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip946() throws Exception {
+    int[] marg0 = { 0, 13, -16, 0, 13, 13, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14 };
+    int marg1 = -14;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip947() throws Exception {
+    int[] marg0 = { 0, 55, -56, 55, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56 };
+    int marg1 = -54;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip948() throws Exception {
+    int[] marg0 = { 0, 55, -56, 55, -56, -56 };
+    int marg1 = -54;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip949() throws Exception {
+    int[] marg0 = { 0, 53, -131126, 53, -56, 0, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54 };
+    int marg1 = -54;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip950() throws Exception {
+    int[] marg0 = { 0, 23, -24, 23, -24, 23, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24 };
+    int marg1 = -22;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip951() throws Exception {
+    int[] marg0 = { 0, 53, -56, 53, 0, -56, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54 };
+    int marg1 = -54;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip952() throws Exception {
+    int[] marg0 = { 0, 53, -56, 53, 0, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54 };
+    int marg1 = -54;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip953() throws Exception {
+    int[] marg0 = { 0, 21, -24, 21, 0, 21, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22 };
+    int marg1 = -22;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip954() throws Exception {
+    int[] marg0 = { 0, 39, -40, 39, 39, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40 };
+    int marg1 = -38;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip955() throws Exception {
+    int[] marg0 = { 0, 37, -40, 37, 37, -38, -38, -38, -38, -38, -38, -38, -38, -38, -38, -38, -38, -38, -38, -38, -38, -38, -38, -38, -38, -38, -38, -38, -38, -38, -38, -38, -38, -38, -38 };
+    int marg1 = -38;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip956() throws Exception {
+    int[] marg0 = { 0, 7, -8, 7, 7, 7, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8 };
+    int marg1 = -6;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip957() throws Exception {
+    int[] marg0 = { 0, 63, 0, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -62;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip958() throws Exception {
+    int[] marg0 = { 0, 61, 0, -64, -64, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62 };
+    int marg1 = -62;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip959() throws Exception {
+    int[] marg0 = { 0, 29, 0, -32, -32, 29, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30 };
+    int marg1 = -30;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip960() throws Exception {
+    int[] marg0 = { 0, 61, 0, -64, 0, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62 };
+    int marg1 = -62;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip961() throws Exception {
+    int[] marg0 = { 0, 29, 0, -32, 0, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30 };
+    int marg1 = -30;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip962() throws Exception {
+    int[] marg0 = { 0, 45, 0, -48, 45, -48, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46 };
+    int marg1 = -46;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip963() throws Exception {
+    int[] marg0 = { 0, 45, 0, -48, 45, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46 };
+    int marg1 = -46;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip964() throws Exception {
+    int[] marg0 = { 0, 13, 0, -16, 13, 13, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14 };
+    int marg1 = -14;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip965() throws Exception {
+    int[] marg0 = { 0, 61, 0, 0, -64, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62 };
+    int marg1 = -62;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip966() throws Exception {
+    int[] marg0 = { 0, 29, 0, 0, -32, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30 };
+    int marg1 = -30;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip967() throws Exception {
+    int[] marg0 = { 0, 29, 0, 0, 0, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30 };
+    int marg1 = -30;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip968() throws Exception {
+    int[] marg0 = { 0, 29, 0, 0, 0 };
+    int marg1 = -30;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip969() throws Exception {
+    int[] marg0 = { 0, 45, 0, 0, 45, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46, -46 };
+    int marg1 = -46;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip970() throws Exception {
+    int[] marg0 = { 0, 13, 0, 0, 13, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14, -14 };
+    int marg1 = -14;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip971() throws Exception {
+    int[] marg0 = { 0, 53, 0, 53, -56, -56, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54 };
+    int marg1 = -54;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip972() throws Exception {
+    int[] marg0 = { 0, 53, 0, 53, -56, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54 };
+    int marg1 = -54;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip973() throws Exception {
+    int[] marg0 = { 0, 21, 0, 21, -24, 21, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22 };
+    int marg1 = -22;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip974() throws Exception {
+    int[] marg0 = { 0, 53, 0, 53, 0, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54, -54 };
+    int marg1 = -54;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip975() throws Exception {
+    int[] marg0 = { 0, 21, 0, 21, 0, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22, -22 };
+    int marg1 = -22;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip976() throws Exception {
+    int[] marg0 = { 0, 37, 0, 37, 37, -38, -38, -38, -38, -38, -38, -38, -38, -38, -38, -38, -38, -38, -38, -38, -38, -38, -38, -38, -38, -38, -38, -38, -38, -38, -38, -38, -38, -38, -38 };
+    int marg1 = -38;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip977() throws Exception {
+    int[] marg0 = { 0, 5, 0, 5, 5, -6, -6, -6, -6, -6, -6, -6, -6, -6, -6, -6, -6, -6, -6, -6, -6, -6, -6, -6, -6, -6, -6, -6, -6, -6, -6, -6, -6, -6, -6 };
+    int marg1 = -6;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip978() throws Exception {
+    int[] marg0 = { 0, 59, 59, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60 };
+    int marg1 = -58;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip979() throws Exception {
+    int[] marg0 = { 0, 59, 59, -60, -60, -60 };
+    int marg1 = -58;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip980() throws Exception {
+    int[] marg0 = { 0, 57, 57, -60, -60, 0, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58 };
+    int marg1 = -58;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip981() throws Exception {
+    int[] marg0 = { 0, 27, 27, -28, -28, 27, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28 };
+    int marg1 = -26;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip982() throws Exception {
+    int[] marg0 = { 0, 57, 57, -60, 0, -60, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58 };
+    int marg1 = -58;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip983() throws Exception {
+    int[] marg0 = { 0, 57, 57, -60, 0, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58 };
+    int marg1 = -58;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip984() throws Exception {
+    int[] marg0 = { 0, 25, 25, -28, 0, 25, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26 };
+    int marg1 = -26;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip985() throws Exception {
+    int[] marg0 = { 0, 43, 43, -44, 43, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44 };
+    int marg1 = -42;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip986() throws Exception {
+    int[] marg0 = { 0, 41, 41, -44, 41, -42, -42, -42, -42, -42, -42, -42, -42, -42, -42, -42, -42, -42, -42, -42, -42, -42, -42, -42, -42, -42, -42, -42, -42, -42, -42, -42, -42, -42, -42 };
+    int marg1 = -42;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip987() throws Exception {
+    int[] marg0 = { 0, 9, 9, -12, 9, 9, -10, -10, -10, -10, -10, -10, -10, -10, -10, -10, -10, -10, -10, -10, -10, -10, -10, -10, -10, -10, -10, -10, -10, -10, -10, -10, -10, -10, -10 };
+    int marg1 = -10;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip988() throws Exception {
+    int[] marg0 = { 0, 57, 57, 0, -67108922, -60, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58 };
+    int marg1 = -58;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip989() throws Exception {
+    int[] marg0 = { 0, 57, 57, 0, -60, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58 };
+    int marg1 = -58;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip990() throws Exception {
+    int[] marg0 = { 0, 25, 25, 0, -28, 25, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26 };
+    int marg1 = -26;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip991() throws Exception {
+    int[] marg0 = { 0, 57, 57, 0, 0, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58, -58 };
+    int marg1 = -58;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip992() throws Exception {
+    int[] marg0 = { 0, 25, 25, 0, 0, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26, -26 };
+    int marg1 = -26;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip993() throws Exception {
+    int[] marg0 = { 0, 41, 41, 0, 41, -42, -42, -42, -42, -42, -42, -42, -42, -42, -42, -42, -42, -42, -42, -42, -42, -42, -42, -42, -42, -42, -42, -42, -42, -42, -42, -42, -42, -42, -42 };
+    int marg1 = -42;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip994() throws Exception {
+    int[] marg0 = { 0, 9, 9, 0, 9, -10, -10, -10, -10, -10, -10, -10, -10, -10, -10, -10, -10, -10, -10, -10, -10, -10, -10, -10, -10, -10, -10, -10, -10, -10, -10, -10, -10, -10, -10 };
+    int marg1 = -10;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip995() throws Exception {
+    int[] marg0 = { 0, 51, 51, 51, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52 };
+    int marg1 = -50;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip996() throws Exception {
+    int[] marg0 = { 0, 49, 49, 49, -52, -50, -50, -50, -50, -50, -50, -50, -50, -50, -50, -50, -50, -50, -50, -50, -50, -50, -50, -50, -50, -50, -50, -50, -50, -50, -50, -50, -50, -50, -50 };
+    int marg1 = -50;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip997() throws Exception {
+    int[] marg0 = { 0, 19, 19, 19, -20, 19, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20 };
+    int marg1 = -18;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip998() throws Exception {
+    int[] marg0 = { 0, 49, 49, 49, 0, -50, -50, -50, -50, -50, -50, -50, -50, -50, -50, -50, -50, -50, -50, -50, -50, -50, -50, -50, -50, -50, -50, -50, -50, -50, -50, -50, -50, -50, -50 };
+    int marg1 = -50;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip999() throws Exception {
+    int[] marg0 = { 0, 17, 17, 17, 0, -18, -18, -18, -18, -18, -18, -18, -18, -18, -18, -18, -18, -18, -18, -18, -18, -18, -18, -18, -18, -18, -18, -18, -18, -18, -18, -18, -18, -18, -18 };
+    int marg1 = -18;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1000() throws Exception {
+    int[] marg0 = { 0, 33, 33, 33, 33, -36, -34, -34, -34, -34, -34, -34, -34, -34, -34, -34, -34, -34, -34, -34, -34, -34, -34, -34, -34, -34, -34, -34, -34, -34, -34, -34, -34, -34, -34 };
+    int marg1 = -34;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1001() throws Exception {
+    int[] marg0 = { 0, 33, 33, 33, 33, -34, -34, -34, -34, -34, -34, -34, -34, -34, -34, -34, -34, -34, -34, -34, -34, -34, -34, -34, -34, -34, -34, -34, -34, -34, -34, -34, -34, -34, -34 };
+    int marg1 = -34;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1002() throws Exception {
+    int[] marg0 = { 1, 0, 0, 0, 0, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+    int marg1 = -2;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1003() throws Exception {
+    int[] marg0 = { 127, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128 };
+    int marg1 = -127;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1004() throws Exception {
+    int[] marg0 = { 63, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -63;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1005() throws Exception {
+    int[] marg0 = { 63, -64, -64, -64, -64, 0, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -63;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1006() throws Exception {
+    int[] marg0 = { 63, -64, -64, -64, -64, 0 };
+    int marg1 = -63;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1007() throws Exception {
+    int[] marg0 = { 95, -96, -96, -96, -96, 95, -96, -96, -96, -96, -96, -96, -96, -96, -96, -96, -96, -96, -96, -96, -96, -96, -96, -96, -96, -96, -96, -96, -96, -96, -96, -96, -96, -96, -96 };
+    int marg1 = -95;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1008() throws Exception {
+    int[] marg0 = { 31, -32, -32, -32, -32, 31, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32 };
+    int marg1 = -31;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1009() throws Exception {
+    int[] marg0 = { 63, -64, -64, -64, 0, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -63;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1010() throws Exception {
+    int[] marg0 = { 63, -64, -64, -64, 0, -64 };
+    int marg1 = -63;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1011() throws Exception {
+    int[] marg0 = { 63, -64, -64, -64, 0, 0, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -63;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1012() throws Exception {
+    int[] marg0 = { 31, -32, -32, -32, 0, 31, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32 };
+    int marg1 = -31;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1013() throws Exception {
+    int[] marg0 = { 31, -32, -32, -32, 0, 31 };
+    int marg1 = -31;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1014() throws Exception {
+    int[] marg0 = { 111, -112, -112, -112, 111, -112, -112, -112, -112, -112, -112, -112, -112, -112, -112, -112, -112, -112, -112, -112, -112, -112, -112, -112, -112, -112, -112, -112, -112, -112, -112, -112, -112, -112, -112 };
+    int marg1 = -111;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1015() throws Exception {
+    int[] marg0 = { 47, -48, -48, -48, 47, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48 };
+    int marg1 = -47;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1016() throws Exception {
+    int[] marg0 = { 47, -48, -48, -48, 47, 0, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48 };
+    int marg1 = -47;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1017() throws Exception {
+    int[] marg0 = { 47, -48, -48, -48, 47, 0 };
+    int marg1 = -47;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1018() throws Exception {
+    int[] marg0 = { 15, -16, -16, -16, 15, 15, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16 };
+    int marg1 = -15;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1019() throws Exception {
+    int[] marg0 = { 63, -64, -64, 0, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -63;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1020() throws Exception {
+    int[] marg0 = { 63, -64, -64, 0, -64, -64 };
+    int marg1 = -63;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1021() throws Exception {
+    int[] marg0 = { 63, -64, -64, 0, -64, 0, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -63;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1022() throws Exception {
+    int[] marg0 = { 31, -32, -32, 0, -32, 31, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32 };
+    int marg1 = -31;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1023() throws Exception {
+    int[] marg0 = { 31, -32, -32, 0, -32, 31 };
+    int marg1 = -31;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1024() throws Exception {
+    int[] marg0 = { 63, -64, -64, 0, 0, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -63;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1025() throws Exception {
+    int[] marg0 = { 62, -64, -64, 0, 0, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63 };
+    int marg1 = -63;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1026() throws Exception {
+    int[] marg0 = { 31, -32, -32, 0, 0, 31, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32 };
+    int marg1 = -31;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1027() throws Exception {
+    int[] marg0 = { 47, -48, -48, 0, 47, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48 };
+    int marg1 = -47;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1028() throws Exception {
+    int[] marg0 = { 47, -48, -48, 0, 47, -48 };
+    int marg1 = -47;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1029() throws Exception {
+    int[] marg0 = { 46, -48, -131119, 0, 46, 0, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47 };
+    int marg1 = -47;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1030() throws Exception {
+    int[] marg0 = { 15, -16, -16, 0, 15, 15, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16 };
+    int marg1 = -15;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1031() throws Exception {
+    int[] marg0 = { 119, -120, -120, 119, -120, -120, -120, -120, -120, -120, -120, -120, -120, -120, -120, -120, -120, -120, -120, -120, -120, -120, -120, -120, -120, -120, -120, -120, -120, -120, -120, -120, -120, -120, -120 };
+    int marg1 = -119;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1032() throws Exception {
+    int[] marg0 = { 55, -56, -56, 55, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56 };
+    int marg1 = -55;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1033() throws Exception {
+    int[] marg0 = { 55, -56, -56, 55, -56, 0, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56 };
+    int marg1 = -55;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1034() throws Exception {
+    int[] marg0 = { 55, -56, -56, 55, -56, 0 };
+    int marg1 = -55;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1035() throws Exception {
+    int[] marg0 = { 23, -24, -24, 23, -24, 23, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24 };
+    int marg1 = -23;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1036() throws Exception {
+    int[] marg0 = { 55, -56, -56, 55, 0, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56 };
+    int marg1 = -55;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1037() throws Exception {
+    int[] marg0 = { 55, -56, -56, 55, 0, -56 };
+    int marg1 = -55;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1038() throws Exception {
+    int[] marg0 = { 54, -56, -56, 54, 0, 0, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55 };
+    int marg1 = -55;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1039() throws Exception {
+    int[] marg0 = { 23, -24, -24, 23, 0, 23, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24 };
+    int marg1 = -23;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1040() throws Exception {
+    int[] marg0 = { 39, -40, -40, 39, 39, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40 };
+    int marg1 = -39;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1041() throws Exception {
+    int[] marg0 = { 39, -40, -40, 39, 39, 0, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40 };
+    int marg1 = -39;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1042() throws Exception {
+    int[] marg0 = { 7, -8, -8, 7, 7, 7, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8 };
+    int marg1 = -7;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1043() throws Exception {
+    int[] marg0 = { 7, -8, -8, 7, 7, 7 };
+    int marg1 = -7;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1044() throws Exception {
+    int[] marg0 = { 63, -64, 0, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -63;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1045() throws Exception {
+    int[] marg0 = { 63, -64, 0, -64, -64, -64 };
+    int marg1 = -63;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1046() throws Exception {
+    int[] marg0 = { 63, -64, 0, -64, -64, 0, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -63;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1047() throws Exception {
+    int[] marg0 = { 31, -32, 0, -32, -32, 31, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32 };
+    int marg1 = -31;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1048() throws Exception {
+    int[] marg0 = { 31, -32, 0, -32, -32, 31 };
+    int marg1 = -31;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1049() throws Exception {
+    int[] marg0 = { 63, -64, 0, -64, 0, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -63;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1050() throws Exception {
+    int[] marg0 = { 62, -64, 0, -32831, 0, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63 };
+    int marg1 = -63;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1051() throws Exception {
+    int[] marg0 = { 30, -32, 0, -32, 0, 30, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31 };
+    int marg1 = -31;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1052() throws Exception {
+    int[] marg0 = { 47, -48, 0, -48, 47, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48 };
+    int marg1 = -47;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1053() throws Exception {
+    int[] marg0 = { 47, -48, 0, -48, 47, -48 };
+    int marg1 = -47;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1054() throws Exception {
+    int[] marg0 = { 46, -48, 0, -48, 46, 0, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47 };
+    int marg1 = -47;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1055() throws Exception {
+    int[] marg0 = { 15, -16, 0, -16, 15, 15, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16 };
+    int marg1 = -15;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1056() throws Exception {
+    int[] marg0 = { 63, -64, 0, 0, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -63;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1057() throws Exception {
+    int[] marg0 = { 62, -64, 0, 0, -64, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63 };
+    int marg1 = -63;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1058() throws Exception {
+    int[] marg0 = { 31, -32, 0, 0, -32, 31, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32 };
+    int marg1 = -31;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1059() throws Exception {
+    int[] marg0 = { 62, -64, 0, 0, 0, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63 };
+    int marg1 = -63;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1060() throws Exception {
+    int[] marg0 = { 30, -32, 0, 0, 0, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31 };
+    int marg1 = -31;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1061() throws Exception {
+    int[] marg0 = { 47, -48, 0, 0, 47, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48 };
+    int marg1 = -47;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1062() throws Exception {
+    int[] marg0 = { 46, -48, 0, 0, 46, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47 };
+    int marg1 = -47;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1063() throws Exception {
+    int[] marg0 = { 14, -16, 0, 0, 14, 14, -15, -15, -15, -15, -15, -15, -15, -15, -15, -15, -15, -15, -15, -15, -15, -15, -15, -15, -15, -15, -15, -15, -15, -15, -15, -15, -15, -15, -15 };
+    int marg1 = -15;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1064() throws Exception {
+    int[] marg0 = { 55, -56, 0, 55, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56 };
+    int marg1 = -55;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1065() throws Exception {
+    int[] marg0 = { 55, -56, 0, 55, -56, -56 };
+    int marg1 = -55;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1066() throws Exception {
+    int[] marg0 = { 54, -56, 0, 54, -56, 0, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55 };
+    int marg1 = -55;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1067() throws Exception {
+    int[] marg0 = { 23, -24, 0, 23, -24, 23, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24 };
+    int marg1 = -23;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1068() throws Exception {
+    int[] marg0 = { 54, -56, 0, 54, 0, -56, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55 };
+    int marg1 = -55;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1069() throws Exception {
+    int[] marg0 = { 54, -56, 0, 54, 0, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55 };
+    int marg1 = -55;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1070() throws Exception {
+    int[] marg0 = { 22, -24, 0, 22, 0, 22, -23, -23, -23, -23, -23, -23, -23, -23, -23, -23, -23, -23, -23, -23, -23, -23, -23, -23, -23, -23, -23, -23, -23, -23, -23, -23, -23, -23, -23 };
+    int marg1 = -23;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1071() throws Exception {
+    int[] marg0 = { 39, -40, 0, 39, 39, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40 };
+    int marg1 = -39;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1072() throws Exception {
+    int[] marg0 = { 38, -40, 0, 38, 38, -39, -39, -39, -39, -39, -39, -39, -39, -39, -39, -39, -39, -39, -39, -39, -39, -39, -39, -39, -39, -39, -39, -39, -39, -39, -39, -39, -39, -39, -39 };
+    int marg1 = -39;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1073() throws Exception {
+    int[] marg0 = { 6, -8, 0, 6, 6, 6, -7, -7, -7, -7, -7, -7, -7, -7, -7, -7, -7, -7, -7, -7, -7, -7, -7, -7, -7, -7, -7, -7, -7, -7, -7, -7, -7, -7, -7 };
+    int marg1 = -7;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1074() throws Exception {
+    int[] marg0 = { 123, -124, 123, -124, -124, -124, -124, -124, -124, -124, -124, -124, -124, -124, -124, -124, -124, -124, -124, -124, -124, -124, -124, -124, -124, -124, -124, -124, -124, -124, -124, -124, -124, -124, -124 };
+    int marg1 = -123;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1075() throws Exception {
+    int[] marg0 = { 59, -60, 59, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60 };
+    int marg1 = -59;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1076() throws Exception {
+    int[] marg0 = { 59, -60, 59, -60, -60, 0, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60 };
+    int marg1 = -59;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1077() throws Exception {
+    int[] marg0 = { 59, -60, 59, -60, -60, 0 };
+    int marg1 = -59;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1078() throws Exception {
+    int[] marg0 = { 27, -28, 27, -28, -28, 27, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28 };
+    int marg1 = -27;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1079() throws Exception {
+    int[] marg0 = { 59, -60, 59, -60, 0, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60 };
+    int marg1 = -59;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1080() throws Exception {
+    int[] marg0 = { 59, -60, 59, -60, 0, -60 };
+    int marg1 = -59;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1081() throws Exception {
+    int[] marg0 = { 58, -60, 58, -60, 0, 0, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59 };
+    int marg1 = -59;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1082() throws Exception {
+    int[] marg0 = { 27, -28, 27, -28, 0, 27, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28 };
+    int marg1 = -27;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1083() throws Exception {
+    int[] marg0 = { 43, -44, 43, -44, 43, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44 };
+    int marg1 = -43;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1084() throws Exception {
+    int[] marg0 = { 43, -44, 43, -44, 43, 0, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44 };
+    int marg1 = -43;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1085() throws Exception {
+    int[] marg0 = { 11, -12, 11, -12, 11, 11, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12 };
+    int marg1 = -11;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1086() throws Exception {
+    int[] marg0 = { 11, -12, 11, -12, 11, 11 };
+    int marg1 = -11;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1087() throws Exception {
+    int[] marg0 = { 59, -60, 59, 0, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60 };
+    int marg1 = -59;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1088() throws Exception {
+    int[] marg0 = { 59, -60, 59, 0, -60, -60 };
+    int marg1 = -59;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1089() throws Exception {
+    int[] marg0 = { 59, -60, 59, 0, -60, 0, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60 };
+    int marg1 = -59;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1090() throws Exception {
+    int[] marg0 = { 27, -28, 27, 0, -28, 27, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28 };
+    int marg1 = -27;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1091() throws Exception {
+    int[] marg0 = { 59, -60, 59, 0, 0, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60 };
+    int marg1 = -59;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1092() throws Exception {
+    int[] marg0 = { 58, -60, 58, 0, 0, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59 };
+    int marg1 = -59;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1093() throws Exception {
+    int[] marg0 = { 26, -28, 26, 0, 0, 26, -27, -27, -27, -27, -27, -27, -27, -27, -27, -27, -27, -27, -27, -27, -27, -27, -27, -27, -27, -27, -27, -27, -27, -27, -27, -27, -27, -27, -27 };
+    int marg1 = -27;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1094() throws Exception {
+    int[] marg0 = { 43, -44, 43, 0, 43, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44 };
+    int marg1 = -43;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1095() throws Exception {
+    int[] marg0 = { 42, -44, 42, 0, 42, -43, -43, -43, -43, -43, -43, -43, -43, -43, -43, -43, -43, -43, -43, -43, -43, -43, -43, -43, -43, -43, -43, -43, -43, -43, -43, -43, -43, -43, -43 };
+    int marg1 = -43;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1096() throws Exception {
+    int[] marg0 = { 11, -12, 11, 0, 11, 11, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12, -12 };
+    int marg1 = -11;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1097() throws Exception {
+    int[] marg0 = { 51, -52, 51, 51, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52 };
+    int marg1 = -51;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1098() throws Exception {
+    int[] marg0 = { 51, -52, 51, 51, -52, 0, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52 };
+    int marg1 = -51;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1099() throws Exception {
+    int[] marg0 = { 19, -20, 19, 19, -20, 19, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20 };
+    int marg1 = -19;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1100() throws Exception {
+    int[] marg0 = { 19, -20, 19, 19, -20, 19 };
+    int marg1 = -19;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1101() throws Exception {
+    int[] marg0 = { 51, -52, 51, 51, 0, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52 };
+    int marg1 = -51;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1102() throws Exception {
+    int[] marg0 = { 50, -52, 50, 50, 0, -51, -51, -51, -51, -51, -51, -51, -51, -51, -51, -51, -51, -51, -51, -51, -51, -51, -51, -51, -51, -51, -51, -51, -51, -51, -51, -51, -51, -51, -51 };
+    int marg1 = -51;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1103() throws Exception {
+    int[] marg0 = { 18, -20, 18, 18, 0, 18, -19, -19, -19, -19, -19, -19, -19, -19, -19, -19, -19, -19, -19, -19, -19, -19, -19, -19, -19, -19, -19, -19, -19, -19, -19, -19, -19, -19, -19 };
+    int marg1 = -19;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1104() throws Exception {
+    int[] marg0 = { 35, -36, 35, 35, 35, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36 };
+    int marg1 = -35;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1105() throws Exception {
+    int[] marg0 = { 35, -39, 35, 35, 35, -36 };
+    int marg1 = -35;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1106() throws Exception {
+    int[] marg0 = { 34, -36, 34, 34, 34, 0, -35, -35, -35, -35, -35, -35, -35, -35, -35, -35, -35, -35, -35, -35, -35, -35, -35, -35, -35, -35, -35, -35, -35, -35, -35, -35, -35, -35, -35 };
+    int marg1 = -35;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1107() throws Exception {
+    int[] marg0 = { 1, -2, 1, 1, 1, 1, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2 };
+    int marg1 = -3;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1108() throws Exception {
+    int[] marg0 = { 1, -2, 1, 1, 1, 1 };
+    int marg1 = -3;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1109() throws Exception {
+    int[] marg0 = { 63, 0, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -63;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1110() throws Exception {
+    int[] marg0 = { 63, 0, -64, -64, -64, -64 };
+    int marg1 = -63;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1111() throws Exception {
+    int[] marg0 = { 63, 0, -64, -64, -64, 0, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -63;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1112() throws Exception {
+    int[] marg0 = { 31, 0, -32, -32, -32, 31, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32 };
+    int marg1 = -31;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1113() throws Exception {
+    int[] marg0 = { 31, 0, -32, -32, -32, 31 };
+    int marg1 = -31;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1114() throws Exception {
+    int[] marg0 = { 63, 0, -64, -64, 0, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -63;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1115() throws Exception {
+    int[] marg0 = { 62, 0, -64, -64, 0, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63 };
+    int marg1 = -63;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1116() throws Exception {
+    int[] marg0 = { 30, 0, -32, -32, 0, 30, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31 };
+    int marg1 = -31;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1117() throws Exception {
+    int[] marg0 = { 47, 0, -48, -48, 47, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48 };
+    int marg1 = -47;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1118() throws Exception {
+    int[] marg0 = { 47, 0, -48, -48, 47, -48 };
+    int marg1 = -47;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1119() throws Exception {
+    int[] marg0 = { 46, 0, -131119, -48, 46, 0, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47 };
+    int marg1 = -47;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1120() throws Exception {
+    int[] marg0 = { 15, 0, -16, -16, 15, 15, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16, -16 };
+    int marg1 = -15;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1121() throws Exception {
+    int[] marg0 = { 63, 0, -64, 0, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -63;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1122() throws Exception {
+    int[] marg0 = { 62, 0, -64, 0, -64, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63 };
+    int marg1 = -63;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1123() throws Exception {
+    int[] marg0 = { 31, 0, -32, 0, -32, 31, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32, -32 };
+    int marg1 = -31;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1124() throws Exception {
+    int[] marg0 = { 62, 0, -64, 0, 0, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63 };
+    int marg1 = -63;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1125() throws Exception {
+    int[] marg0 = { 30, 0, -32, 0, 0, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31 };
+    int marg1 = -31;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1126() throws Exception {
+    int[] marg0 = { 47, 0, -48, 0, 47, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48, -48 };
+    int marg1 = -47;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1127() throws Exception {
+    int[] marg0 = { 46, 0, -48, 0, 46, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47 };
+    int marg1 = -47;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1128() throws Exception {
+    int[] marg0 = { 14, 0, -16, 0, 14, 14, -15, -15, -15, -15, -15, -15, -15, -15, -15, -15, -15, -15, -15, -15, -15, -15, -15, -15, -15, -15, -15, -15, -15, -15, -15, -15, -15, -15, -15 };
+    int marg1 = -15;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1129() throws Exception {
+    int[] marg0 = { 55, 0, -56, 55, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56 };
+    int marg1 = -55;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1130() throws Exception {
+    int[] marg0 = { 55, 0, -56, 55, -56, -56 };
+    int marg1 = -55;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1131() throws Exception {
+    int[] marg0 = { 55, 0, -56, 55, -56, 0, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56 };
+    int marg1 = -55;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1132() throws Exception {
+    int[] marg0 = { 30, 0, -31, 30, -24, 30, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31 };
+    int marg1 = -23;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1133() throws Exception {
+    int[] marg0 = { 55, 0, -56, 55, 0, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56 };
+    int marg1 = -55;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1134() throws Exception {
+    int[] marg0 = { 54, 0, -56, 54, 0, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55 };
+    int marg1 = -55;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1135() throws Exception {
+    int[] marg0 = { 22, 0, -24, 22, 0, 22, -23, -23, -23, -23, -23, -23, -23, -23, -23, -23, -23, -23, -23, -23, -23, -23, -23, -23, -23, -23, -23, -23, -23, -23, -23, -23, -23, -23, -23 };
+    int marg1 = -23;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1136() throws Exception {
+    int[] marg0 = { 39, 0, -40, 39, 39, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40, -40 };
+    int marg1 = -39;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1137() throws Exception {
+    int[] marg0 = { 38, 0, -40, 38, 38, -39, -39, -39, -39, -39, -39, -39, -39, -39, -39, -39, -39, -39, -39, -39, -39, -39, -39, -39, -39, -39, -39, -39, -39, -39, -39, -39, -39, -39, -39 };
+    int marg1 = -39;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1138() throws Exception {
+    int[] marg0 = { 7, 0, -8, 7, 7, 7, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8, -8 };
+    int marg1 = -7;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1139() throws Exception {
+    int[] marg0 = { 63, 0, 0, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64, -64 };
+    int marg1 = -63;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1140() throws Exception {
+    int[] marg0 = { 62, 0, 0, -64, -64, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63 };
+    int marg1 = -63;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1141() throws Exception {
+    int[] marg0 = { 30, 0, 0, -32, -32, 30, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31 };
+    int marg1 = -31;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1142() throws Exception {
+    int[] marg0 = { 62, 0, 0, -64, 0, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63 };
+    int marg1 = -63;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1143() throws Exception {
+    int[] marg0 = { 30, 0, 0, -32, 0, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31 };
+    int marg1 = -31;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1144() throws Exception {
+    int[] marg0 = { 46, 0, 0, -48, 46, -48, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47 };
+    int marg1 = -47;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1145() throws Exception {
+    int[] marg0 = { 46, 0, 0, -48, 46, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47 };
+    int marg1 = -47;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1146() throws Exception {
+    int[] marg0 = { 14, 0, 0, -16, 14, 14, -15, -15, -15, -15, -15, -15, -15, -15, -15, -15, -15, -15, -15, -15, -15, -15, -15, -15, -15, -15, -15, -15, -15, -15, -15, -15, -15, -15, -15 };
+    int marg1 = -15;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1147() throws Exception {
+    int[] marg0 = { 62, 0, 0, 0, -64, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63, -63 };
+    int marg1 = -63;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1148() throws Exception {
+    int[] marg0 = { 30, 0, 0, 0, -32, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31 };
+    int marg1 = -31;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1149() throws Exception {
+    int[] marg0 = { 30, 0, 0, 0, 0, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31, -31 };
+    int marg1 = -31;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1150() throws Exception {
+    int[] marg0 = { 30, 0, 0, 0, 0 };
+    int marg1 = -31;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1151() throws Exception {
+    int[] marg0 = { 46, 0, 0, 0, 46, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47, -47 };
+    int marg1 = -47;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1152() throws Exception {
+    int[] marg0 = { 14, 0, 0, 0, 14, -15, -15, -15, -15, -15, -15, -15, -15, -15, -15, -15, -15, -15, -15, -15, -15, -15, -15, -15, -15, -15, -15, -15, -15, -15, -15, -15, -15, -15, -15 };
+    int marg1 = -15;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1153() throws Exception {
+    int[] marg0 = { 55, 0, 0, 55, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56, -56 };
+    int marg1 = -55;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1154() throws Exception {
+    int[] marg0 = { 54, 0, 0, 54, -56, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55 };
+    int marg1 = -55;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1155() throws Exception {
+    int[] marg0 = { 22, 0, 0, 22, -24, 22, -23, -23, -23, -23, -23, -23, -23, -23, -23, -23, -23, -23, -23, -23, -23, -23, -23, -23, -23, -23, -23, -23, -23, -23, -23, -23, -23, -23, -23 };
+    int marg1 = -23;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1156() throws Exception {
+    int[] marg0 = { 54, 0, 0, 54, 0, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55, -55 };
+    int marg1 = -55;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1157() throws Exception {
+    int[] marg0 = { 22, 0, 0, 22, 0, -23, -23, -23, -23, -23, -23, -23, -23, -23, -23, -23, -23, -23, -23, -23, -23, -23, -23, -23, -23, -23, -23, -23, -23, -23, -23, -23, -23, -23, -23 };
+    int marg1 = -23;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1158() throws Exception {
+    int[] marg0 = { 38, 0, 0, 38, 38, -39, -39, -39, -39, -39, -39, -39, -39, -39, -39, -39, -39, -39, -39, -39, -39, -39, -39, -39, -39, -39, -39, -39, -39, -39, -39, -39, -39, -39, -39 };
+    int marg1 = -39;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1159() throws Exception {
+    int[] marg0 = { 6, 0, 0, 6, 6, -7, -7, -7, -7, -7, -7, -7, -7, -7, -7, -7, -7, -7, -7, -7, -7, -7, -7, -7, -7, -7, -7, -7, -7, -7, -7, -7, -7, -7, -7 };
+    int marg1 = -7;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1160() throws Exception {
+    int[] marg0 = { 59, 0, 59, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60 };
+    int marg1 = -59;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1161() throws Exception {
+    int[] marg0 = { 59, 0, 59, -60, -60, -60 };
+    int marg1 = -59;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1162() throws Exception {
+    int[] marg0 = { 58, 0, 58, -60, -67108923, 0, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59 };
+    int marg1 = -59;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1163() throws Exception {
+    int[] marg0 = { 27, 0, 27, -28, -28, 27, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28, -28 };
+    int marg1 = -27;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1164() throws Exception {
+    int[] marg0 = { 58, 0, 58, -60, 0, -60, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59 };
+    int marg1 = -59;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1165() throws Exception {
+    int[] marg0 = { 58, 0, 58, -63, 0, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59 };
+    int marg1 = -59;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1166() throws Exception {
+    int[] marg0 = { 26, 0, 26, -28, 0, 26, -27, -27, -27, -27, -27, -27, -27, -27, -27, -27, -27, -27, -27, -27, -27, -27, -27, -27, -27, -27, -27, -27, -27, -27, -27, -27, -27, -27, -27 };
+    int marg1 = -27;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1167() throws Exception {
+    int[] marg0 = { 43, 0, 43, -44, 43, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44, -44 };
+    int marg1 = -43;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1168() throws Exception {
+    int[] marg0 = { 42, 0, 42, -44, 42, -43, -43, -43, -43, -43, -43, -43, -43, -43, -43, -43, -43, -43, -43, -43, -43, -43, -43, -43, -43, -43, -43, -43, -43, -43, -43, -43, -43, -43, -43 };
+    int marg1 = -43;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1169() throws Exception {
+    int[] marg0 = { 10, 0, 10, -12, 10, 10, -11, -11, -11, -11, -11, -11, -11, -11, -11, -11, -11, -11, -11, -11, -11, -11, -11, -11, -11, -11, -11, -11, -11, -11, -11, -11, -11, -11, -11 };
+    int marg1 = -11;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1170() throws Exception {
+    int[] marg0 = { 59, 0, 59, 0, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60 };
+    int marg1 = -59;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1171() throws Exception {
+    int[] marg0 = { 58, 0, 58, 0, -60, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59 };
+    int marg1 = -59;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1172() throws Exception {
+    int[] marg0 = { 26, 0, 26, 0, -28, 26, -27, -27, -27, -27, -27, -27, -27, -27, -27, -27, -27, -27, -27, -27, -27, -27, -27, -27, -27, -27, -27, -27, -27, -27, -27, -27, -27, -27, -27 };
+    int marg1 = -27;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1173() throws Exception {
+    int[] marg0 = { 58, 0, 58, 0, 0, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59, -59 };
+    int marg1 = -59;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1174() throws Exception {
+    int[] marg0 = { 26, 0, 26, 0, 0, -27, -27, -27, -27, -27, -27, -27, -27, -27, -27, -27, -27, -27, -27, -27, -27, -27, -27, -27, -27, -27, -27, -27, -27, -27, -27, -27, -27, -27, -27 };
+    int marg1 = -27;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1175() throws Exception {
+    int[] marg0 = { 42, 0, 42, 0, 42, -43, -43, -43, -43, -43, -43, -43, -43, -43, -43, -43, -43, -43, -43, -43, -43, -43, -43, -43, -43, -43, -43, -43, -43, -43, -43, -43, -43, -43, -43 };
+    int marg1 = -43;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1176() throws Exception {
+    int[] marg0 = { 10, 0, 10, 0, 10, -11, -11, -11, -11, -11, -11, -11, -11, -11, -11, -11, -11, -11, -11, -11, -11, -11, -11, -11, -11, -11, -11, -11, -11, -11, -11, -11, -11, -11, -11 };
+    int marg1 = -11;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1177() throws Exception {
+    int[] marg0 = { 51, 0, 51, 51, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52, -52 };
+    int marg1 = -51;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1178() throws Exception {
+    int[] marg0 = { 50, 0, 50, 50, -52, -51, -51, -51, -51, -51, -51, -51, -51, -51, -51, -51, -51, -51, -51, -51, -51, -51, -51, -51, -51, -51, -51, -51, -51, -51, -51, -51, -51, -51, -51 };
+    int marg1 = -51;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1179() throws Exception {
+    int[] marg0 = { 19, 0, 19, 19, -20, 19, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20, -20 };
+    int marg1 = -19;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1180() throws Exception {
+    int[] marg0 = { 50, 0, 50, 50, 0, -51, -51, -51, -51, -51, -51, -51, -51, -51, -51, -51, -51, -51, -51, -51, -51, -51, -51, -51, -51, -51, -51, -51, -51, -51, -51, -51, -51, -51, -51 };
+    int marg1 = -51;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1181() throws Exception {
+    int[] marg0 = { 18, 0, 18, 18, 0, -19, -19, -19, -19, -19, -19, -19, -19, -19, -19, -19, -19, -19, -19, -19, -19, -19, -19, -19, -19, -19, -19, -19, -19, -19, -19, -19, -19, -19, -19 };
+    int marg1 = -19;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1182() throws Exception {
+    int[] marg0 = { 35, 0, 35, 35, 35, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36, -36 };
+    int marg1 = -35;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1183() throws Exception {
+    int[] marg0 = { 34, 0, 34, 34, 34, -35, -35, -35, -35, -35, -35, -35, -35, -35, -35, -35, -35, -35, -35, -35, -35, -35, -35, -35, -35, -35, -35, -35, -35, -35, -35, -35, -35, -35, -35 };
+    int marg1 = -35;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1184() throws Exception {
+    int[] marg0 = { 0, 2, 0, 0, 0, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+    int marg1 = -3;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1185() throws Exception {
+    int[] marg0 = { 125, 125, -126, -126, -126, -126, -126, -126, -126, -126, -126, -126, -126, -126, -126, -126, -126, -126, -126, -126, -126, -126, -126, -126, -126, -126, -126, -126, -126, -126, -126, -126, -126, -126, -126 };
+    int marg1 = -125;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1186() throws Exception {
+    int[] marg0 = { 61, 61, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62 };
+    int marg1 = -61;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1187() throws Exception {
+    int[] marg0 = { 61, 61, -62, -62, -62, 0, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62 };
+    int marg1 = -61;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1188() throws Exception {
+    int[] marg0 = { 61, 61, -62, -62, -62, 0 };
+    int marg1 = -61;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1189() throws Exception {
+    int[] marg0 = { 29, 29, -30, -30, -30, 29, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30, -30 };
+    int marg1 = -29;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1190() throws Exception {
+    int[] marg0 = { 61, 61, -62, -62, 0, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62, -62 };
+    int marg1 = -61;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
+  }
+
+  @Test
+  public void testConditionalArrayFlip1191() throws Exception {
+    int[] marg0 = { 61, 61, -62, -62, 0, -62 };
+    int marg1 = -61;
+    BitwiseManipulator.conditionalArrayFlip(marg0, marg1);
   }
 }

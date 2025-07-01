@@ -119,4 +119,33 @@ public class BitwiseManipulator {
         int mask = ((1 << len) - 1) << start;
         return (value & ~mask) | ((fieldValue << start) & mask);
     }
+
+    /**
+     * Loop whose number of iterations depends on the number of set bits in v.
+     */
+    public static int bitwiseLoop(int value) {
+        int count = countSetBits(value);
+        int sum = 0;
+        for (int i = 0; i < count; i++) {
+            if (((value >> i) & 1) == 1) {
+                sum += i * value;
+            } else {
+                sum -= i;
+            }
+        }
+        return sum;
+    }
+
+    /**
+     * Conditionally flips elements in an array based on the mask's bits.
+     */
+    public static void conditionalArrayFlip(int[] arr, int mask) {
+        for (int i = 0; i < arr.length; i++) {
+            if (((mask >> i) & 1) == 1) {
+                arr[i] = ~arr[i];
+            } else if ((arr[i] & mask) == mask) {
+                arr[i] = arr[i] ^ mask;
+            }
+        }
+    }
 }
