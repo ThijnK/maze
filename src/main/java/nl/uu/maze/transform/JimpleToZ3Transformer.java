@@ -184,11 +184,22 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
         return expr;
     }
 
-    /** Coerce a floating point number to the given sort by rounding. */
+    /** Coerce a floating point number to the given floating point sort by rounding. */
     private FPExpr coerceToSort(FPExpr expr, FPSort sort) {
         int sizeExpr = expr.getSort().getEBits() + expr.getSort().getSBits();
         int sizeSort = sort.getEBits() + sort.getSBits();
         return sizeExpr != sizeSort ? ctx.mkFPToFP(ctx.mkFPRoundNearestTiesToEven(), expr, sort) : expr;
+    }
+    
+    /** 
+     * Coerce a floating point number to a bit vector sort. It applies toward-zero rounding. This is
+     * as in Java when we cast a float number to an integral number. E.g. (int) 3.99 gives 3 int.
+     */
+    private BitVecExpr coerceToSort(FPExpr expr, boolean signed, BitVecSort sort) {
+    	// WP note... so this does not take into account if the exponent part already exceeds
+    	// the target bv sort (it the fp is bigger or smaller than the max/min value of the
+    	// bv sort. Wonder if Z3 FPToBV takes care of this internally.
+    	return ctx.mkFPToBV(ctx.mkFPRoundTowardZero(), expr, sort.getSize(), signed) ;
     }
 
     /** Coerce a bit vector to the given sort. */
@@ -348,7 +359,14 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
 
     @Override
     public void caseDoubleConstant(@Nonnull DoubleConstant constant) {
-        setResult(ctx.mkFP(constant.getValue(), sorts.getDoubleSort()));
+    	double x = constant.getValue() ;
+    	if (Double.isNaN(x)) {
+    		System.out.println(">>> " + x) ;
+    	}
+    	if (x == Double.POSITIVE_INFINITY) {
+    		System.out.println(">>>> " + x);
+    	}
+    	setResult(ctx.mkFP(x, sorts.getDoubleSort()));    	
     }
 
     @Override
@@ -481,7 +499,13 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
                 setResult(coerceToSort((FPExpr) innerExpr, (FPSort) sort));
             } else if (innerExpr instanceof BitVecExpr && sort instanceof BitVecSort) {
                 setResult(coerceToSort((BitVecExpr) innerExpr, (BitVecSort) sort));
-            } else {
+            } 
+            // WP: adding a case for casting float-expr to bit-vec:
+            else if (innerExpr instanceof FPExpr && sort instanceof BitVecSort) {
+            	boolean signed = true ; // all integral types in Java are signed
+            	setResult(coerceToSort((FPExpr) innerExpr, signed, (BitVecSort) sort));
+            }
+            else {
                 throw new UnsupportedOperationException("Unsupported cast from " + innerExpr.getSort() + " to " + sort);
             }
         } else {

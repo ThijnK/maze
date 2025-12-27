@@ -63,11 +63,16 @@
         </dependency>
 
         <!-- Z3 (local install) -->
+        <!--
+            TODO:
+            temporarily disabling this for working locally in my Eclipse IDE, 
+            linking explicitly to the jar
         <dependency>
             <groupId>com.microsoft</groupId>
             <artifactId>z3</artifactId>
             <version>4.13.3</version>
         </dependency>
+        -->
 
         <!-- Logback for logging -->
         <dependency>

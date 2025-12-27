@@ -79,9 +79,32 @@ mvn install:install-file -Dfile="C:\Program Files\z3\bin\com.microsoft.z3.jar" -
 
 Replace the path and version number in the command above with the correct values for your system and the version of Z3 you downloaded.
 
-**Note**: It is possible that Z3 will not work after installing it this way, in which case your best bet is to build Z3 from source as described below.
+#### Notes on installing Z3 for Maze in Mac (and maybe also Linux)
 
-#### Building Z3 from source
+In case you get `z3 java java.lang.UnsatisfiedLinkError: no libz3java in java.library.path` error.
+
+  * Set the environment variable `Z3_HOME` as mentioned above. So, it should point to the z3-root where you unzipped it.
+  * Set the environment variable `DYLD_LIBRARY_PATH` to `your-z3-root/bin`. Or append the path, if you already have the variable defined.
+  * Possibly also pass this JVM option when running maze: `-Djava.library.path=your-z3-root/bin`
+
+#### Notes in running Maze from Eclipse
+
+Sometimes useful to just run Maze from an IDE (I use Eclipse):
+
+  * The Main is the class  `nl.uu.maze.main.Application`. Or else create a new Main-class that call to this main.
+
+  * You can set the run-configuration of that Main-class:
+     * Add the above mentioned `Z3_HOME` and `DYLD_LIBRARY_PATH` to the environment variables of your run-configuration.
+     * Pass the extra JVM option `-Djava.library.path=...` mentioned above.
+
+  * You can now run Maze from IDE, with the above configuration.
+
+
+
+
+#### Building Z3 from source, if needed
+
+It is possible that Z3 will not work after installing it the above way, in which case your best bet is to build Z3 from source as described below.
 
 Clone or download the Z3 repository from https://github.com/Z3Prover/z3, and run the following command in the Z3 repo:
 
