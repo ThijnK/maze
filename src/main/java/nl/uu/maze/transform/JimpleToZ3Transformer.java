@@ -196,18 +196,31 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
      * as in Java when we cast a float number to an integral number. E.g. (int) 3.99 gives 3 int.
      */
     private BitVecExpr coerceToSort(FPExpr expr, boolean signed, BitVecSort sort) {
-    	// WP note... so this does not take into account if the exponent part already exceeds
-    	// the target bv sort (it the fp is bigger or smaller than the max/min value of the
-    	// bv sort. Wonder if Z3 FPToBV takes care of this internally.
+    	// WP note... so this may not take into account that the exponent part already exceeds
+    	// the target bv sort (if the fp is bigger or smaller than the max/min value of the
+    	// bv sort. Wonder if Z3 FPToBV takes care of this internally.)
     	return ctx.mkFPToBV(ctx.mkFPRoundTowardZero(), expr, sort.getSize(), signed) ;
     }
 
     /** Coerce a bit vector to the given sort. */
     private FPExpr coerceToSort(BitVecExpr expr, FPSort sort) {
-        int sizeSort = sort.getEBits() + sort.getSBits();
-        return ctx.mkFPToFP(coerceToSize(expr, sizeSort), sort);
+        // WP note:
+    	// Below is the Maze original code, this conversions leads to z3 having
+    	// difficulty in solving constraints over casting e.g. int to float,
+    	// e.g. (float i) < 10
+    	//
+    	// The problem is probably caused by the use of mkFPToFP there, which for
+    	// that signature it expects the bitvec expr to be a bitvec of a floating 
+    	// number, rather than an integral number obtained from coerceToSize.
+    	//
+    	//int sizeSort = sort.getEBits() + sort.getSBits();
+        //return ctx.mkFPToFP(coerceToSize(expr, sizeSort), sort);
+   
+    	// WP: new code, using the following to convert:
+    	boolean signed = true ; 
+	    return ctx.mkFPToFP(ctx.mkFPRoundTowardZero(), expr, sort, signed) ;
     }
-
+    
     /** Coerce a bit vector to the given sort. */
     private BitVecExpr coerceToSort(BitVecExpr expr, BitVecSort sort) {
         return coerceToSize(expr, sort.getSize());
