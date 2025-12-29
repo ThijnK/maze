@@ -1,14 +1,19 @@
-package nl.uu.maze.main;
+package nl.uu.tests.coba;
 
+import nl.uu.maze.main.Application;
+import org.junit.jupiter.api.Test;
+
+// Just for trying out Maze-application, for convenience, invoked from here
 public class CobaMaze {
 	
-	public static void main(String[] args) {
+	@Test
+	void coba_Maze() {
 		
 		String[] args_ = { "--help" } ;
 		
 		String cobabenchPath = "../my_simple_bench" ;
-		//String CUT = "cobabench.TriangleClassifier2" ;
-		String CUT = "cobabench.TriangleClassifier3" ;
+		String CUT = "cobabench.TriangleClassifier2" ;
+		//String CUT = "cobabench.TriangleClassifier3" ;
 		//String CUT = "cobabench.CobaBranches" ;
 		String sp = " " ;
 
@@ -17,7 +22,9 @@ public class CobaMaze {
 				      + sp + "--output-path=" + cobabenchPath + "/src/test/java/"
 				      //+ sp + "-s=RPS -u=UH " 
 				      + sp + "-s=BFS"
-				      + sp + "-b=240 ";
+				      + sp + "-b=240"
+				      + sp + "--constrain-FP-params-to-normal-numbers=true "
+				      ;
 
 		args_ = argz.split(" ") ;
 		

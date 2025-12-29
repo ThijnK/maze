@@ -8,6 +8,7 @@ import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.Level;
 
 import nl.uu.maze.execution.DSEController;
+import nl.uu.maze.execution.EngineConfiguration;
 import nl.uu.maze.main.cli.converters.*;
 import nl.uu.maze.search.heuristic.SearchHeuristicFactory.ValidSearchHeuristic;
 import nl.uu.maze.search.strategy.SearchStrategy;
@@ -80,6 +81,9 @@ public class MazeCLI implements Callable<Integer> {
     @Option(names = { "-C",
             "--concrete-driven" }, description = "Use concrete-driven DSE instead of symbolic-driven DSE (default: ${DEFAULT-VALUE})", defaultValue = "false", paramLabel = "<true|false>")
     private boolean concreteDriven;
+    
+    @Option(names = { "--constrain-FP-params-to-normal-numbers" }, description = "When true will constrain the symbolic solver to generate normal numbers for floating-point-like methods parameters (default: ${DEFAULT-VALUE})", defaultValue = "false", paramLabel = "<true|false>")
+    private boolean constrainFPNumberParametersToNormalNumbers ;
 
     @Override
     public Integer call() {
@@ -87,6 +91,9 @@ public class MazeCLI implements Callable<Integer> {
             // Set logging level
             Logger rootLogger = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
             rootLogger.setLevel(logLevel);
+            
+            EngineConfiguration.getInstance().constrainFPNumberParametersToNormalNumbers = this.constrainFPNumberParametersToNormalNumbers ;
+            
             timeBudget *= 1000L; // Convert to milliseconds
             testTimeout *= 1000L; // Convert to milliseconds
 

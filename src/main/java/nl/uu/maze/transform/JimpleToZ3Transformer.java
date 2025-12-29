@@ -8,7 +8,9 @@ import com.microsoft.z3.*;
 import com.microsoft.z3.Expr;
 
 import nl.uu.maze.execution.ArgMap;
+import nl.uu.maze.execution.EngineConfiguration;
 import nl.uu.maze.execution.symbolic.*;
+import nl.uu.maze.execution.symbolic.PathConstraint.SingleConstraint;
 import nl.uu.maze.util.*;
 import sootup.core.jimple.visitor.AbstractValueVisitor;
 import sootup.core.signatures.*;
@@ -373,12 +375,14 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
     @Override
     public void caseDoubleConstant(@Nonnull DoubleConstant constant) {
     	double x = constant.getValue() ;
+    	/*
     	if (Double.isNaN(x)) {
     		System.out.println(">>> " + x) ;
     	}
     	if (x == Double.POSITIVE_INFINITY) {
     		System.out.println(">>>> " + x);
     	}
+    	*/
     	setResult(ctx.mkFP(x, sorts.getDoubleSort()));    	
     }
 
@@ -569,7 +573,23 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
             param = state.heap.allocateObject(var, ref.getType());
         } else {
             // Create a new variable for the parameter
-            param = ctx.mkConst(var, sorts.determineSort(sootType));
+        	Sort sort = sorts.determineSort(sootType) ;
+            param = ctx.mkConst(var,sort);
+            
+            // WP adding new behavior:
+            // When the parameter is floating-point like, we add a constrain that it should be
+            // a normal number (e.g. not NaN nor inf). This is only added if the engine-configuration
+            // says it is to be added.
+            //
+            // Note that integral type like int has no NaN nor inf, so we don't have to add an
+            // additional constrain for that.
+            //
+            if (sort instanceof FPSort && EngineConfiguration.getInstance().constrainFPNumberParametersToNormalNumbers) {
+            	BoolExpr insistNormalValue = ctx.mkFPIsNormal((FPExpr) param) ;
+            	System.out.println(">>>> creating extra domain constraint for " + var);
+            	state.getEngineConstraints().add(new SingleConstraint(state,insistNormalValue)) ;
+            }
+            
         }
 
         setResult(param);

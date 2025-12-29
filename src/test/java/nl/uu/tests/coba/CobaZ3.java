@@ -11,7 +11,7 @@ import sootup.core.types.PrimitiveType.IntType;
 
 public class CobaZ3 {
 	
-	//@Test
+	@Test
 	// For trying out the treatment of special FP values, namely NaN and infinity.
 	//
 	void coba_FP_specialvalues() {
