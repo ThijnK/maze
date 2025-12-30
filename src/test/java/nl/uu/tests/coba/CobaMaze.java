@@ -20,6 +20,7 @@ public class CobaMaze {
 		String argz =   "--classpath=" + cobabenchPath + "/target/classes"
 				      + sp + "--classname=" + CUT 
 				      + sp + "--output-path=" + cobabenchPath + "/src/test/java/"
+				     // + sp + "-j=JUnit4"
 				      //+ sp + "-s=RPS -u=UH " 
 				      + sp + "-s=BFS"
 				      + sp + "-b=240"

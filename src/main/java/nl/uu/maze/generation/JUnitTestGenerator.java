@@ -55,6 +55,13 @@ public class JUnitTestGenerator {
 
     private final Set<Class<?>> primitiveWrappers = Set.of(Boolean.class, Byte.class, Short.class, Integer.class,
             Long.class, Float.class, Double.class, Character.class);
+    
+    /**
+     * A counter for the number of violation detected. For example, when test throws 
+     * an unexpected exception, this counts as a violation. In the current version of
+     * Maze, this is the only type of violation detected.
+     */
+    private int countNumberOfViolationFound = 0 ;
 
     public JUnitTestGenerator(boolean targetJUnit4, JavaAnalyzer analyzer, ConcreteExecutor executor, long testTimeout,
             String packageName) {
@@ -100,6 +107,15 @@ public class JUnitTestGenerator {
         setFieldAdded = false;
     }
 
+    /**
+     * A counter for the number of violation detected. For example, when test throws 
+     * an unexpected exception, this counts as a violation. In the current version of
+     * Maze, this is the only type of violation detected.
+     */
+    public int getCountNumberOfViolationFound() {
+    	return this.countNumberOfViolationFound ;
+    }
+    
     /**
      * Generates a single JUnit test case for a method under test, passing the given
      * parameter values as arguments to the method invocation.
@@ -147,6 +163,18 @@ public class JUnitTestGenerator {
             return;
         }
         boolean isVoid = method.getReturnType().toString().equals("void");
+        
+        if (result.isException()
+        	&& ((forCtor || result.thrownByCtor()) ?
+        		  ! isExpectdedException(result.getTargetExceptionClass(), ctor) :
+        		  ! isExpectdedException(result.getTargetExceptionClass(), method))) {
+        	// violation, unexpected exception
+        	this.countNumberOfViolationFound ++ ;
+        	logger.warn("a test for " + method.getName() + "(..,) throws an unexpected exception.");
+        }
+        				
+        	
+        	
 
         AnnotationSpec.Builder testAnnotation = AnnotationSpec
                 .builder(targetJUnit4 ? org.junit.Test.class : Test.class);
@@ -154,27 +182,33 @@ public class JUnitTestGenerator {
         // The method name TEMP will be replaced with the actual test name later
         MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder("TEMP")
                 .addModifiers(Modifier.PUBLIC)
-                .addAnnotation(testAnnotation.build())
+                //.addAnnotation(testAnnotation.build())
                 .addException(Exception.class)
                 .returns(void.class);
-
+        
+        
         // ---- adding regression ORACLE part, for thrown exception and junit4
         // For JUnit 4, add expected exception to the @Test annotation
         if (result.isException() && targetJUnit4) {
         	
-        	boolean isExpectedException = isExpectdedException(result.getTargetExceptionClass(), ctor) ;
+        	boolean isExpectedException = 
+        			(forCtor || result.thrownByCtor()) ?
+        				isExpectdedException(result.getTargetExceptionClass(), ctor) :
+        				isExpectdedException(result.getTargetExceptionClass(), method) 			
+        				;
         	
         	if (isExpectedException || 
         			(!EngineConfiguration.getInstance().surpressRegressionOracles 
         					&& ! EngineConfiguration.getInstance().propagateUnexpectedExceptions)) {
-        		
-        		testAnnotation.addMember("expected", "$T.class", result.getTargetExceptionClass());
-        		
+        		//System.out.println(">>>>  adding test annotagion") ;
+        		testAnnotation.addMember("expected", "$T.class", result.getTargetExceptionClass());        
         	}
         	else {
         		methodBuilder.addComment("This throws $T", result.getTargetExceptionClass()) ;
         	}
         }
+        
+        methodBuilder.addAnnotation(testAnnotation.build()) ;   
         
         Class<?> returnType = analyzer.tryGetJavaClass(method.getReturnType()).orElse(Object.class);
 
