@@ -13,6 +13,7 @@ import java.lang.reflect.InvocationTargetException;
  * with {@link ObjectInstantiation}.
  */
 public record ExecutionResult(Object retval, Exception exception, boolean thrownByCtor) {
+	
     public boolean isException() {
         return exception != null;
     }

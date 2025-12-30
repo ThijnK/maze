@@ -23,6 +23,7 @@ import com.palantir.javapoet.*;
 import nl.uu.maze.analysis.JavaAnalyzer;
 import nl.uu.maze.execution.ArgMap;
 import nl.uu.maze.execution.ArgMap.*;
+import nl.uu.maze.execution.EngineConfiguration;
 import nl.uu.maze.execution.concrete.*;
 import nl.uu.maze.execution.MethodType;
 
@@ -149,11 +150,7 @@ public class JUnitTestGenerator {
 
         AnnotationSpec.Builder testAnnotation = AnnotationSpec
                 .builder(targetJUnit4 ? org.junit.Test.class : Test.class);
-        // For JUnit 4, add expected exception to the @Test annotation
-        if (result.isException() && targetJUnit4) {
-            testAnnotation.addMember("expected", "$T.class", result.getTargetExceptionClass());
-        }
-
+        
         // The method name TEMP will be replaced with the actual test name later
         MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder("TEMP")
                 .addModifiers(Modifier.PUBLIC)
@@ -161,6 +158,24 @@ public class JUnitTestGenerator {
                 .addException(Exception.class)
                 .returns(void.class);
 
+        // ---- adding regression ORACLE part, for thrown exception and junit4
+        // For JUnit 4, add expected exception to the @Test annotation
+        if (result.isException() && targetJUnit4) {
+        	
+        	boolean isExpectedException = isExpectdedException(result.getTargetExceptionClass(), ctor) ;
+        	
+        	if (isExpectedException || 
+        			(!EngineConfiguration.getInstance().surpressRegressionOracles 
+        					&& ! EngineConfiguration.getInstance().propagateUnexpectedExceptions)) {
+        		
+        		testAnnotation.addMember("expected", "$T.class", result.getTargetExceptionClass());
+        		
+        	}
+        	else {
+        		methodBuilder.addComment("This throws $T", result.getTargetExceptionClass()) ;
+        	}
+        }
+        
         Class<?> returnType = analyzer.tryGetJavaClass(method.getReturnType()).orElse(Object.class);
 
         // For static methods, just call the method without an instance
@@ -178,13 +193,38 @@ public class JUnitTestGenerator {
             // Add variable definitions for the ctor parameters
             List<String> ctorParams = addParamDefinitions(methodBuilder, ctor.getParameterTypes(), argMap,
                     MethodType.CTOR);
+            // ---- adding regression ORACLE part, for thrown exception
             // Assert throws for constructor call if it threw an exception
             if (result.thrownByCtor() && !targetJUnit4) {
                 // For JUnit 5, use assertThrows to check for exceptions
                 // For JUnit 4, the expected exception is added to the @Test annotation, so we
                 // just call the ctor below
-                methodBuilder.addStatement("$T.assertThrows($T.class, () -> new $T($L))", Assertions.class,
-                        result.getTargetExceptionClass(), clazz, String.join(", ", ctorParams));
+            	
+            	boolean isExpectedException = isExpectdedException(result.getTargetExceptionClass(), ctor) ;
+            	
+            	if (isExpectedException) {
+            		// if the exeception is expected, we assert it anyway:
+            		methodBuilder.addComment("This throws $T, though such exception is expected:", result.getTargetExceptionClass()) ;
+            		methodBuilder.addStatement("$T.assertThrows($T.class, () -> new $T($L))", Assertions.class,
+                            result.getTargetExceptionClass(), clazz, String.join(", ", ctorParams));
+            	}
+            	else {
+            		// if regression  oracle is asked, and the configuration does not ask for unexpected exception
+            		// to be propagated, we assert it:
+            		if (! EngineConfiguration.getInstance().surpressRegressionOracles && ! EngineConfiguration.getInstance().propagateUnexpectedExceptions) {
+            			methodBuilder.addComment("This throws $T, which is actually unexpected and could be an error:", result.getTargetExceptionClass()) ;	
+                		methodBuilder.addStatement("$T.assertThrows($T.class, () -> new $T($L))", Assertions.class,
+                                result.getTargetExceptionClass(), clazz, String.join(", ", ctorParams)); 
+            		}
+            		else {
+            			// else we propagate the exception (that is, we call the method, and it will throw the exception
+            			// in the test case.
+                		methodBuilder.addComment("$T.assertThrows($T.class, () -> new $T($L))", Assertions.class,
+                                result.getTargetExceptionClass(), clazz, String.join(", ", ctorParams)); 
+            			methodBuilder.addComment("This throws $T, which is unexpected:", result.getTargetExceptionClass()) ;	
+                		methodBuilder.addStatement("new $T($L)", clazz, String.join(", ", ctorParams));
+            		}
+            	}                
             } else {
                 if (forCtor) {
                     methodBuilder.addStatement("new $T($L)", clazz, String.join(", ", ctorParams));
@@ -198,13 +238,21 @@ public class JUnitTestGenerator {
             }
         }
 
+        // ---- adding regression ORACLE part
+        //
         // Add an assert statement for the return value if the method is not void
+        @SuppressWarnings("rawtypes")
+		Class AssertClass = targetJUnit4 ? org.junit.Assert.class : Assertions.class ;
         Object retval = result.retval();
         if (!result.isException() && !isVoid) {
             methodBuilder.addCode("\n"); // White space between method call and assert
             if (retval == null) {
-                methodBuilder.addStatement("$T.assertNull(retval)",
-                        targetJUnit4 ? org.junit.Assert.class : Assertions.class);
+                //methodBuilder.addStatement("$T.assertNull(retval)",
+                //        targetJUnit4 ? org.junit.Assert.class : Assertions.class);
+                addStatementOrComment(methodBuilder, 
+            			EngineConfiguration.getInstance().surpressRegressionOracles,
+            			"$T.assertNull(retval)",
+            			AssertClass) ;
             } else {
                 // Check if return value is a reference to an input parameter
                 boolean isReference = false;
@@ -243,18 +291,30 @@ public class JUnitTestGenerator {
                     }
                 }
 
-                // Use assertArrayEquals for arrays, otherwise use assertEquals
+                // Use assertArrayEquals for arrays, otherwise use assertEquals    
                 if (isArray) {
-                    methodBuilder.addStatement("$T.assertArrayEquals(expected, retval)",
-                            targetJUnit4 ? org.junit.Assert.class : Assertions.class);
+                    //methodBuilder.addStatement("$T.assertArrayEquals(expected, retval)",
+                    //        targetJUnit4 ? org.junit.Assert.class : Assertions.class);
+                    addStatementOrComment(methodBuilder, 
+                			EngineConfiguration.getInstance().surpressRegressionOracles,
+                			"$T.assertArrayEquals(expected, retval)",
+                			AssertClass) ;
                 } else {
                     // For JUnit 4, assertEquals on float and double values requires a delta
                     if (targetJUnit4 && (retval instanceof Float || retval instanceof Double)) {
-                        methodBuilder.addStatement("$T.assertEquals(expected, retval, 0.0001)",
-                                targetJUnit4 ? org.junit.Assert.class : Assertions.class);
+                        //methodBuilder.addStatement("$T.assertEquals(expected, retval, 0.0001)",
+                        //       targetJUnit4 ? org.junit.Assert.class : Assertions.class);
+                        addStatementOrComment(methodBuilder, 
+                    			EngineConfiguration.getInstance().surpressRegressionOracles,
+                    			"$T.assertEquals(expected, retval, 0.0001)",
+                    			AssertClass) ;
                     } else {
-                        methodBuilder.addStatement("$T.assertEquals(expected, retval)",
-                                targetJUnit4 ? org.junit.Assert.class : Assertions.class);
+                        //methodBuilder.addStatement("$T.assertEquals(expected, retval)",
+                        //        targetJUnit4 ? org.junit.Assert.class : Assertions.class);
+                    	addStatementOrComment(methodBuilder, 
+                    			EngineConfiguration.getInstance().surpressRegressionOracles,
+                    			"$T.assertEquals(expected, retval)",
+                    			AssertClass) ;
                     }
                 }
             }
@@ -272,6 +332,22 @@ public class JUnitTestGenerator {
         methodBuilder.setName(createTestName(method.getName()));
         classBuilder.addMethod(methodBuilder.build());
     }
+    
+    /**
+     * Build a statement, or add the statement as a comment.
+     */
+    private MethodSpec.Builder addStatementOrComment(MethodSpec.Builder methodBuilder,
+    		boolean asComment,
+    		String format,
+    		Object... args) {
+    	
+    	if (asComment) {
+    		return methodBuilder.addComment(format, args) ;
+    	}
+    	else {
+    		return methodBuilder.addStatement(format, args) ;
+    	}
+    }
 
     /**
      * Creates an appropriate name for a test case based on the method name.
@@ -282,6 +358,24 @@ public class JUnitTestGenerator {
         int count = methodCount.compute(methodName, (k, v) -> v == null ? 1 : v + 1);
         return "test" + capitalizeFirstLetter(methodName) + count;
     }
+    
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+	private boolean isExpectdedException(Class thrownException, JavaSootMethod methodUnderTest) {
+    	//System.out.println(">>> checking thrown exception: " + thrownException.getName()) ;
+    	if (IllegalArgumentException.class.isAssignableFrom(thrownException))
+    		return true ;
+    	for (ClassType D : methodUnderTest.getExceptionSignatures()) {
+    		try {
+    			Class D_ = Class.forName(D.getFullyQualifiedName()) ;
+    		    //System.out.println(">>> decl exception: " + D_.getName() + ", " + D_.isAssignableFrom(thrownException)) ;
+    			if (D_.isAssignableFrom(thrownException))
+    				return true ;
+    		}
+    		catch(Exception e) { }
+    		
+    	}
+    	return false ;
+    }
 
     /**
      * Adds a method call to the given method builder, wrapping it in an assert
@@ -291,21 +385,78 @@ public class JUnitTestGenerator {
      */
     private void addMethodCall(MethodSpec.Builder methodBuilder, Class<?> clazz, Class<?> returnType,
             JavaSootMethod method, List<String> params, ExecutionResult result, boolean isVoid) {
+    	
+    	
+    	
         // For JUnit 5, use assertThrows to check for exceptions
         // For JUnit 4, the expected exception is added to the @Test annotation earlier
         if (result.isException() && !targetJUnit4) {
-            if (method.isStatic())
-                methodBuilder.addStatement("$T.assertThrows($T.class, () -> $T.$L($L))", Assertions.class,
-                        result.getTargetExceptionClass(), clazz, method.getName(), String.join(", ", params));
-            else
-                methodBuilder.addStatement("$T.assertThrows($T.class, () -> cut.$L($L))", Assertions.class,
-                        result.getTargetExceptionClass(), method.getName(), String.join(", ", params));
+        	
+        	boolean isExpectedException = isExpectdedException(result.getTargetExceptionClass(), method) ;
+        	
+        	// ---- adding regression ORACLE part for thrown exception, if the configuration asks for it
+            if (method.isStatic()) {
+            	if (isExpectedException) {
+            		// if the exeception is expected, we assert it anyway:
+            		methodBuilder.addComment("This throws $T, though such exception is expected:", result.getTargetExceptionClass()) ;
+            		methodBuilder.addStatement("$T.assertThrows($T.class, () -> $T.$L($L))", Assertions.class,
+                            result.getTargetExceptionClass(), clazz, method.getName(), String.join(", ", params));
+
+            	}
+            	else {
+            		// if regression  oracle is asked, and the configuration does not ask for unexpected exception
+            		// to be propagated, we assert it:
+            		if (! EngineConfiguration.getInstance().surpressRegressionOracles && ! EngineConfiguration.getInstance().propagateUnexpectedExceptions) {
+            			methodBuilder.addComment("This throws $T, which is actually unexpected and could be an error:", result.getTargetExceptionClass()) ;	
+                 		methodBuilder.addStatement("$T.assertThrows($T.class, () -> $T.$L($L))", Assertions.class,
+                                result.getTargetExceptionClass(), clazz, method.getName(), String.join(", ", params));     	
+            		}
+            		else {
+            			// else we propagate the exception (that is, we call the method, and it will throw the exception
+            			// in the test case.
+            			methodBuilder.addComment("$T.assertThrows($T.class, () -> $T.$L($L))", Assertions.class,
+                                result.getTargetExceptionClass(), clazz, method.getName(), String.join(", ", params));
+            			methodBuilder.addComment("This throws $T, which is unexpected:", result.getTargetExceptionClass()) ;	
+                		methodBuilder.addStatement("$T.$L($L)", clazz, method.getName(), String.join(", ", params));		
+            		}
+            	}
+            	
+            }
+            else { // method is non-static
+            	if (isExpectedException) {
+            		// if the exeception is expected, we assert it anyway:
+            		methodBuilder.addComment("This throws $T, though such exception is expected:", result.getTargetExceptionClass()) ;
+            		methodBuilder.addStatement("$T.assertThrows($T.class, () -> cut.$L($L))", Assertions.class,
+                            result.getTargetExceptionClass(), method.getName(), String.join(", ", params));
+
+            	} else {
+            		// if regression  oracle is asked, and the configuration does not ask for unexpected exception
+            		// to be propagated, we assert it:
+            		if (! EngineConfiguration.getInstance().surpressRegressionOracles && ! EngineConfiguration.getInstance().propagateUnexpectedExceptions) {
+            			methodBuilder.addComment("This throws $T, which is actually unexpected and could be an error:", result.getTargetExceptionClass()) ;	
+            			methodBuilder.addStatement("$T.assertThrows($T.class, () -> cut.$L($L))", Assertions.class,
+                                result.getTargetExceptionClass(), method.getName(), String.join(", ", params));
+            		}
+            		else {
+            			// else we propagate the exception (that is, we call the method, and it will throw the exception
+            			// in the test case.
+            			methodBuilder.addComment("$T.assertThrows($T.class, () -> cut.$L($L))", Assertions.class,
+                                result.getTargetExceptionClass(), method.getName(), String.join(", ", params));
+            			methodBuilder.addComment("This throws $T, which is unexpected:", result.getTargetExceptionClass()) ;	
+                		methodBuilder.addStatement("cut.$L($L)", method.getName(), String.join(", ", params));
+            		}
+            	}  
+            }
         } else if (isVoid || (targetJUnit4 && result.isException())) {
+        	if (result.isException() && EngineConfiguration.getInstance().surpressRegressionOracles) {
+        		methodBuilder.addComment("This throws $T:", result.getTargetExceptionClass()) ;
+        	}
             if (method.isStatic())
                 methodBuilder.addStatement("$T.$L($L)", clazz, method.getName(), String.join(", ", params));
             else
                 methodBuilder.addStatement("cut.$L($L)", method.getName(), String.join(", ", params));
         } else {
+        	// this is the case when no exception is thrown, and there is a return value to inspect
             if (method.isStatic())
                 methodBuilder.addStatement("$T retval = $T.$L($L)", returnType, clazz, method.getName(),
                         String.join(", ", params));

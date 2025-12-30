@@ -84,6 +84,12 @@ public class MazeCLI implements Callable<Integer> {
     
     @Option(names = { "--constrain-FP-params-to-normal-numbers" }, description = "When true will constrain the symbolic solver to generate normal numbers for floating-point-like methods parameters (default: ${DEFAULT-VALUE})", defaultValue = "false", paramLabel = "<true|false>")
     private boolean constrainFPNumberParametersToNormalNumbers ;
+    
+    @Option(names = { "--surpress-regression-oracles" }, description = "When true generated regression oracles in the test-cases will be commented out (default: ${DEFAULT-VALUE})", defaultValue = "false", paramLabel = "<true|false>")
+    private boolean surpressRegressionOracles ;
+    
+    @Option(names = { "--propagate-unexpected-exceptions" }, description = "When true, when a test throws an exception that is not declared as expected exception by the method under test will be propagated. So, it will not be asserted as an expected exception by the test oracle. Note that this means the test will then fail (a potential bug is found by Maze) (default: ${DEFAULT-VALUE})", defaultValue = "false", paramLabel = "<true|false>")
+    private boolean propagateUnexpectedExceptions ;
 
     @Override
     public Integer call() {
@@ -92,7 +98,13 @@ public class MazeCLI implements Callable<Integer> {
             Logger rootLogger = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
             rootLogger.setLevel(logLevel);
             
+            // first copy options that need to be inspected during DSE runs to a dedicated configuration
+            // info (acting like global vars).
             EngineConfiguration.getInstance().constrainFPNumberParametersToNormalNumbers = this.constrainFPNumberParametersToNormalNumbers ;
+            EngineConfiguration.getInstance().surpressRegressionOracles = this.surpressRegressionOracles ;
+            EngineConfiguration.getInstance().propagateUnexpectedExceptions = this.propagateUnexpectedExceptions ;
+            
+            // dealing with the rest of the options:
             
             timeBudget *= 1000L; // Convert to milliseconds
             testTimeout *= 1000L; // Convert to milliseconds

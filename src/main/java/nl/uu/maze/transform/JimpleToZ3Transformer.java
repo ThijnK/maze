@@ -190,6 +190,8 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
     private FPExpr coerceToSort(FPExpr expr, FPSort sort) {
         int sizeExpr = expr.getSort().getEBits() + expr.getSort().getSBits();
         int sizeSort = sort.getEBits() + sort.getSBits();
+        // maybe the rounding mode should be towards-zero?, this is FP to FP, so a bit more complicated
+        // need to check this 
         return sizeExpr != sizeSort ? ctx.mkFPToFP(ctx.mkFPRoundNearestTiesToEven(), expr, sort) : expr;
     }
     
@@ -586,7 +588,7 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
             //
             if (sort instanceof FPSort && EngineConfiguration.getInstance().constrainFPNumberParametersToNormalNumbers) {
             	BoolExpr insistNormalValue = ctx.mkFPIsNormal((FPExpr) param) ;
-            	System.out.println(">>>> creating extra domain constraint for " + var);
+            	//System.out.println(">>>> creating extra domain constraint for " + var);
             	state.getEngineConstraints().add(new SingleConstraint(state,insistNormalValue)) ;
             }
             

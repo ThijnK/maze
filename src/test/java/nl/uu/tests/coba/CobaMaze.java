@@ -23,7 +23,10 @@ public class CobaMaze {
 				      //+ sp + "-s=RPS -u=UH " 
 				      + sp + "-s=BFS"
 				      + sp + "-b=240"
-				      + sp + "--constrain-FP-params-to-normal-numbers=true "
+				      + sp + "--constrain-FP-params-to-normal-numbers=true"
+				      + sp + "--surpress-regression-oracles=false"
+				      + sp + "--propagate-unexpected-exceptions=true"
+				      + sp
 				      ;
 
 		args_ = argz.split(" ") ;
