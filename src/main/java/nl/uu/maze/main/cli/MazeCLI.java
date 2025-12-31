@@ -88,7 +88,7 @@ public class MazeCLI implements Callable<Integer> {
     @Option(names = { "--surpress-regression-oracles" }, description = "When true generated regression oracles in the test-cases will be commented out (default: ${DEFAULT-VALUE})", defaultValue = "false", paramLabel = "<true|false>")
     private boolean surpressRegressionOracles ;
     
-    @Option(names = { "--propagate-unexpected-exceptions" }, description = "When true, when a test throws an exception that is not declared as expected exception by the method under test will be propagated. So, it will not be asserted as an expected exception by the test oracle. Note that this means the test will then fail (a potential bug is found by Maze) (default: ${DEFAULT-VALUE})", defaultValue = "false", paramLabel = "<true|false>")
+    @Option(names = { "--propagate-unexpected-exceptions" }, description = "When true, when a test throws an exception that is not declared as expected exception by the method under test, it will be propagated. So, it will not be asserted as an expected exception by the test oracle. Note that this means the test will then fail (a potential bug is found by Maze) (default: ${DEFAULT-VALUE})", defaultValue = "false", paramLabel = "<true|false>")
     private boolean propagateUnexpectedExceptions ;
 
     @Override

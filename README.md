@@ -148,6 +148,10 @@ MAZE provides the following command-line options:
 | `--test-timeout`    | `-t`  | Timeout to apply to generated test cases (in seconds)                      | No       | No timeout  |
 | `--junit-version`   | `-j`  | JUnit version to target for generated test cases (JUnit4, JUnit5)          | No       | `JUnit5`    |
 | `--concrete-driven` | `-C`  | Use concrete-driven DSE instead of symbolic-driven                         | No       | `false`     |
+| `--constrain-FP-params-to-normal-numbers` | | Constrain the symbolic solver to generate normal numbers for floating-point-like methods parameters | No | `false` |
+| `--surpress-regression-oracles` | | Generated regression oracles will be commented out | No | `false` |
+| `--propagate-unexpected-exceptions` | | When a test throws an exception that is not declared as expected exception, it will be propagated | | `false` |
+
 
 ## Project Structure
 
@@ -309,6 +313,40 @@ MAZE supports the following search heuristics:
   The waiting time is based on the iterations, so the number of times the target was not selected for execution in the search strategy.
   This heuristic can be configured to prefer either long-waiting targets or short-waiting targets, depending on the desired behavior.
   Preferring long-waiting targets would result in behavior similar to a breadth-first search, while preferring short-waiting targets would result in behavior similar to a depth-first search.
+
+## Oracles
+
+By default MAZE also adds oracles in the test cases it generates. Note however that these are _regression oracles_. For example when a test case invokes a method _m(x)_ and it returns a value 0, an oracles that asserts this is added. This of course assumes that 0 is a correct return value of m for that test case. Generally, regression oracles _assume_ the Class Under Test (CUT) to be correct. These oracles are useful to check if future modifications on the CUT keep the functionality of the CUT unchanged.
+
+You can use regression oracles to check the intrinsic correctness of the CUT, but you have to inspect them first, and manually validate them that they are correct.
+
+Two types of oracles are generated:
+
+   * _Return-value-oracles_:  asserting the value returned by the methods tested by the test cases.
+   * _Exception-oracles_: if a method throws an exception, an oracle asserting the type of the thrown exception is 'also generated'. More on this is said below.
+
+#### Supressing oracles generation
+
+Use the option `--surpress-regression-oracles=true`. Though, oracles asserting expected exceptions are always generated.
+
+#### Exception-oracles
+
+When a method m(x) throws an exception, we call it an _expected exception_ if:
+
+  * m itself declares that it can throw such an exception (this is declared in m's header e.g. as in `m(x) throws IOExpcetion`).
+  * or, the thrown exception is an instance of `IllegalArgumentException`, which by intent means that m has been called with argument/s that are not allowed.
+
+The thrown exception is _unexpected_ if it is not expected.
+
+_Oracles for expected exceptions are always generated_. So, suppose a test case _tc_ targets a method m(x). So, _tc_ invokes _m_ with some arguments. Suppose _m_ throws an expected exception. An oracle asserting that this will happen is always added into _tc_. In other words, MAZE consider the exception as expected behavior, and is not an error.
+
+Thrown _unexpected_ exception may signal an error, so it makes sense that a test case such propagate such as exception rather than asserting it (as an oracle) as an expected behavior.
+
+Whether or not unexpected exceptions are propagated is controlled by the options `--propagate-unexpected-exceptions` and `--surpress-regression-oracles`.
+
+   * If either `--propagate-unexpected-exceptions=true` or `--surpress-regression-oracles=true`, test cases will propagate unexpected exceptions. So, when you run the tests, the tests will fail.
+
+   * Otherwise, thrown unexpected exceptions will be turned into oracles, as if they are expected behavior. So, when you run the tests, the tests won't fail. Comments will be added to warn you.
 
 ## Troubleshooting
 
