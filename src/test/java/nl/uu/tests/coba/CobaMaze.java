@@ -1,6 +1,9 @@
 package nl.uu.tests.coba;
 
 import nl.uu.maze.main.Application;
+import nl.uu.maze.main.cli.MazeCLI;
+import picocli.CommandLine;
+
 import org.junit.jupiter.api.Test;
 
 // Just for trying out Maze-application, for convenience, invoked from here
@@ -32,7 +35,10 @@ public class CobaMaze {
 
 		args_ = argz.split(" ") ;
 		
-		Application.main(args_);
+		// Application.main(args_);  --> this call System.exit() which causes Maven test runner to crash
+		
+		// we'll do this instead, which is what the main() above does:
+        int exitCode = new CommandLine(new MazeCLI()).execute(args_);
     }
 
 }

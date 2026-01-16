@@ -201,9 +201,10 @@ public class DSEController {
         try {
             run();
         } finally {
-            generator.writeToFile(outPath);
-            if (generator.getCountNumberOfViolationFound() > 0) {
-            	logger.info("there were " + generator.getCountNumberOfViolationFound() + " test/s that threw an unexpected exception. They may be errors.") ;
+            generator.writeToFile(outPath); 
+            logger.info("#generated test-cases: {}", generator.getNumberOfGeneratedTestCases()) ;
+            if (generator.getNumberOfViolationFound() > 0) {
+            	logger.info("There were {} test/s that threw an unexpected exception. They may be errors.",  generator.getNumberOfViolationFound()) ;
             }
             
         }
