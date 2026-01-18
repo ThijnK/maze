@@ -15,7 +15,8 @@ public class CobaMaze {
 		String[] args_ = { "--help" } ;
 		
 		String cobabenchPath = "../my_simple_bench" ;
-		String CUT = "cobabench.TriangleClassifier2" ;
+		//String CUT = "cobabench.TriangleClassifier2" ;
+		String CUT = "cobabench.CobaUnexpectedExceptionDetection" ;
 		//String CUT = "cobabench.TriangleClassifier3" ;
 		//String CUT = "cobabench.CobaBranches" ;
 		String sp = " " ;
