@@ -42,7 +42,7 @@ import sootup.java.core.JavaSootMethod;
  * </p>
  */
 public class SymbolicState implements SearchTarget {
-    private static final Context ctx = Z3ContextProvider.getContext();
+    private static final Context ctx() { return Z3ContextProvider.getContext(); }
     private static final CoverageTracker coverageTracker = CoverageTracker.getInstance();
 
     private JavaSootMethod method;
@@ -459,7 +459,7 @@ public class SymbolicState implements SearchTarget {
                 .concat(Stream.of(Z3Sorts.getInstance().getNullConst()), heap.getAllConcreteRefs().stream())
                 .toArray(Expr<?>[]::new);
         if (conRefs.length > 1) {
-            engineConstraints.add(new SingleConstraint(this, ctx.mkDistinct(conRefs)));
+            engineConstraints.add(new SingleConstraint(this, ctx().mkDistinct(conRefs)));
         }
         return engineConstraints;
     }

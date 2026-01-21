@@ -29,7 +29,7 @@ import sootup.core.jimple.javabytecode.stmt.JSwitchStmt;
 public class SymbolicExecutor {
     private static final Logger logger = LoggerFactory.getLogger(SymbolicExecutor.class);
     private static final Z3Sorts sorts = Z3Sorts.getInstance();
-    private static final Context ctx = Z3ContextProvider.getContext();
+    private static final Context ctx() { return Z3ContextProvider.getContext() ; }
 
     private final MethodInvoker methodInvoker;
     private final SymbolicStateValidator validator;
@@ -182,7 +182,7 @@ public class SymbolicExecutor {
 
         Expr<?>[] values = new Expr<?>[cases.size()];
         for (int i = 0; i < cases.size(); i++) {
-            values[i] = ctx.mkBV(cases.get(i).getValue(), sorts.getIntBitSize());
+            values[i] = ctx().mkBV(cases.get(i).getValue(), sorts.getIntBitSize());
         }
 
         // If replaying a trace, follow the branch indicated by the trace
@@ -300,28 +300,28 @@ public class SymbolicExecutor {
 
                 // If the entry value is 1, inside bounds, otherwise out of bounds
                 if (entry.getValue() == 0) {
-                    state.addPathConstraint(ctx.mkOr(ctx.mkBVSLT(index, ctx.mkBV(0, sorts.getIntBitSize())),
-                            ctx.mkBVSGE(index, len)));
+                    state.addPathConstraint(ctx().mkOr(ctx().mkBVSLT(index, ctx().mkBV(0, sorts.getIntBitSize())),
+                            ctx().mkBVSGE(index, len)));
                     state.setExceptionThrown();
                     return handleOtherStmts(state, true);
                 } else {
-                    state.addPathConstraint(ctx.mkAnd(ctx.mkBVSGE(index, ctx.mkBV(0, sorts.getIntBitSize())),
-                            ctx.mkBVSLT(index, len)));
+                    state.addPathConstraint(ctx().mkAnd(ctx().mkBVSGE(index, ctx().mkBV(0, sorts.getIntBitSize())),
+                            ctx().mkBVSLT(index, len)));
                 }
             } else {
                 // If not replaying a trace, split the state into one where the index is out of
                 // bounds and one where it is not
                 SymbolicState outOfBoundsState = state.clone();
                 outOfBoundsState
-                        .addPathConstraint(ctx.mkOr(ctx.mkBVSLT(index, ctx.mkBV(0, sorts.getIntBitSize())),
-                                ctx.mkBVSGE(index, len)));
+                        .addPathConstraint(ctx().mkOr(ctx().mkBVSLT(index, ctx().mkBV(0, sorts.getIntBitSize())),
+                                ctx().mkBVSGE(index, len)));
                 outOfBoundsState.setExceptionThrown();
                 // The handleOtherStmts method will take care of finding a catch block if there
                 // is one to catch the exception, and otherwise will just return the state
                 newStates.addAll(handleOtherStmts(outOfBoundsState, false));
                 // The other state is the one where the index is in bounds
-                state.addPathConstraint(ctx.mkAnd(ctx.mkBVSGE(index, ctx.mkBV(0, sorts.getIntBitSize())),
-                        ctx.mkBVSLT(index, len)));
+                state.addPathConstraint(ctx().mkAnd(ctx().mkBVSGE(index, ctx().mkBV(0, sorts.getIntBitSize())),
+                        ctx().mkBVSLT(index, len)));
             }
         }
 

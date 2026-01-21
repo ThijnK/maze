@@ -17,7 +17,7 @@ import sootup.java.core.types.JavaClassType;
  */
 public class Z3Sorts {
     private static Z3Sorts instance;
-    private static final Context ctx = Z3ContextProvider.getContext();
+    private static final Context ctx() { return Z3ContextProvider.getContext(); }
 
     private final Sort refSort;
     /** Null constant, used for null comparisons etc. */
@@ -31,15 +31,15 @@ public class Z3Sorts {
     private final FPSort doubleSort;
 
     private Z3Sorts() {
-        refSort = ctx.mkUninterpretedSort("Ref");
-        nullConst = ctx.mkConst("null", refSort);
-        voidSort = ctx.mkUninterpretedSort("Void");
-        stringSort = ctx.mkStringSort();
+        refSort = ctx().mkUninterpretedSort("Ref");
+        nullConst = ctx().mkConst("null", refSort);
+        voidSort = ctx().mkUninterpretedSort("Void");
+        stringSort = ctx().mkStringSort();
 
-        intSort = ctx.mkBitVecSort(getIntBitSize());
-        longSort = ctx.mkBitVecSort(getLongBitSize());
-        floatSort = ctx.mkFPSort32();
-        doubleSort = ctx.mkFPSort64();
+        intSort = ctx().mkBitVecSort(getIntBitSize());
+        longSort = ctx().mkBitVecSort(getLongBitSize());
+        floatSort = ctx().mkFPSort32();
+        doubleSort = ctx().mkFPSort64();
     }
 
     public static Z3Sorts getInstance() {
@@ -131,7 +131,7 @@ public class Z3Sorts {
             return getFloatSort();
         } else if (sootType instanceof ArrayType) {
             Sort elementSort = determineSort(((ArrayType) sootType).getElementType());
-            return ctx.mkArraySort(getIntSort(), elementSort);
+            return ctx().mkArraySort(getIntSort(), elementSort);
         } else if (sootType instanceof ClassType) {
             if (sootType.toString().equals("java.lang.String")) {
                 return getStringSort();
@@ -265,11 +265,11 @@ public class Z3Sorts {
      */
     public Expr<?> getDefaultValue(Type sootType) {
         if (Type.isIntLikeType(sootType)) {
-            return ctx.mkBV(0, getBitSize(sootType));
+            return ctx().mkBV(0, getBitSize(sootType));
         } else if (sootType instanceof FloatType) {
-            return ctx.mkFP(0.0f, getFloatSort());
+            return ctx().mkFP(0.0f, getFloatSort());
         } else if (sootType instanceof DoubleType) {
-            return ctx.mkFP(0.0, getDoubleSort());
+            return ctx().mkFP(0.0, getDoubleSort());
         } else if (sootType instanceof ArrayType || sootType instanceof ClassType || sootType instanceof NullType) {
             return getNullConst();
         } else {
@@ -281,6 +281,6 @@ public class Z3Sorts {
      * Get a default integer value as a Z3 expression.
      */
     public BitVecExpr getDefaultInt() {
-        return ctx.mkBV(0, getIntBitSize());
+        return ctx().mkBV(0, getIntBitSize());
     }
 }

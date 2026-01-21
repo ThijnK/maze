@@ -79,6 +79,7 @@ public class FloatNormalAndSpecialValuesGenerationTest {
 		
 		// remove the output-test-file produced by MAZE:
 		TestUtils.removeFile(Path.of(outputDir, CUT.getSimpleName() + "Test.java"));
+		
 	}
 	
 	//@AfterAll  

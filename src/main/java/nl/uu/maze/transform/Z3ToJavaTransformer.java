@@ -24,7 +24,7 @@ import sootup.core.types.PrimitiveType.*;
  */
 public class Z3ToJavaTransformer {
     private static final Z3Sorts sorts = Z3Sorts.getInstance();
-    private static final Context ctx = Z3ContextProvider.getContext();
+    private static final Context ctx() { return Z3ContextProvider.getContext(); }
 
     /** Transform a Z3 expression to a Java object. */
     public Object transformExpr(Expr<?> expr, Type type) {
@@ -157,7 +157,7 @@ public class Z3ToJavaTransformer {
             // All dimensions filled, evaluate element at flattened index
             BitVecExpr[] idxExprs = new BitVecExpr[lengths.length];
             for (int i = 0; i < lengths.length; i++) {
-                idxExprs[i] = ctx.mkBV(indices[i], sorts.getIntBitSize());
+                idxExprs[i] = ctx().mkBV(indices[i], sorts.getIntBitSize());
             }
             Expr<?> element = model.eval(arrObj.getElem(idxExprs), true);
             return transformArrayElem(element, elemType, arrRef, refValues);
