@@ -56,7 +56,15 @@ public class JavaAnalyzer {
         throw new IllegalStateException(
                 "JavaAnalyzer already initialized. Use getInstance() to access the existing instance.");
     }
-
+    
+    /**
+     * Drop the current instance of JavaAnalyzer. This is done by setting {@link #instance} to null.
+     * This is only used to facilitate testing of MAZE.
+     */
+    public static void dropInstance() {
+    	instance = null ;
+    }
+    
     /**
      * Returns the singleton instance of the JavaAnalyzer.
      */

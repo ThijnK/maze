@@ -4,6 +4,8 @@ import nl.uu.maze.main.Application;
 import nl.uu.maze.main.cli.MazeCLI;
 import picocli.CommandLine;
 
+import java.nio.file.Files;
+
 import org.junit.jupiter.api.Test;
 
 // Just for trying out Maze-application, for convenience, invoked from here
@@ -11,7 +13,7 @@ public class CobaMaze {
 	
 	@Test
 	void coba_Maze() {
-		
+				
 		String[] args_ = { "--help" } ;
 		
 		String cobabenchPath = "../my_simple_bench" ;

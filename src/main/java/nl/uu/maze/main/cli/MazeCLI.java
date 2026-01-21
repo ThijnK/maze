@@ -24,6 +24,7 @@ import picocli.CommandLine.Option;
  */
 @Command(name = "maze", mixinStandardHelpOptions = true, version = "maze 1.0", descriptionHeading = "%nDescription:%n", description = "Generate tests for the specified Java class using dynamic symbolic execution (DSE).", optionListHeading = "%nOptions:%n", sortOptions = false)
 public class MazeCLI implements Callable<Integer> {
+	
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(MazeCLI.class);
 
     @Option(names = { "-c",
@@ -90,7 +91,10 @@ public class MazeCLI implements Callable<Integer> {
     
     @Option(names = { "--propagate-unexpected-exceptions" }, description = "When true, when a test throws an exception that is not declared as expected exception by the method under test, it will be propagated. So, it will not be asserted as an expected exception by the test oracle. Note that this means the test will then fail (a potential bug is found by Maze) (default: ${DEFAULT-VALUE})", defaultValue = "false", paramLabel = "<true|false>")
     private boolean propagateUnexpectedExceptions ;
-
+    
+    @Option(names = { "--do-not-close-z3-context" }, description = "When true, will not close internal z3 context. Only used for testing MAZE. (default: ${DEFAULT-VALUE})", defaultValue = "false", paramLabel = "<true|false>")
+    private boolean leaveZ3ContextOpen ;
+    
     @Override
     public Integer call() {
         try {
@@ -128,7 +132,8 @@ public class MazeCLI implements Callable<Integer> {
             logger.error("Error stack trace: ", e);
             return 1;
         } finally {
-            Z3ContextProvider.close();
+            if (!leaveZ3ContextOpen) 
+            	Z3ContextProvider.close();
         }
     }
 }

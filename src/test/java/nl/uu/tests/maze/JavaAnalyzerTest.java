@@ -21,6 +21,10 @@ public class JavaAnalyzerTest {
 
     @BeforeAll
     public static void setUp() throws Exception {
+    	// WP: make the JavaAnalyzer to drop its current instance, to force a fresh one
+    	// to be created:
+    	JavaAnalyzer.dropInstance();
+    	
         analyzer = JavaAnalyzer.initialize(classPath, JavaAnalyzerTest.class.getClassLoader());
     }
 
