@@ -22,7 +22,7 @@ import sootup.core.jimple.common.stmt.Stmt;
 
 public class SymbolicAliasResolver {
     private static final Z3Sorts sorts = Z3Sorts.getInstance();
-    private static final Context ctx = Z3ContextProvider.getContext();
+    private static final Context ctx() { return Z3ContextProvider.getContext(); }
 
     private static final SymbolicRefExtractor refExtractor = new SymbolicRefExtractor();
 
@@ -77,12 +77,12 @@ public class SymbolicAliasResolver {
                     String arrRef = elemsExpr.toString().substring(0, elemsExpr.toString().indexOf("_"));
                     HeapObject heapObj = state.heap.get(arrRef);
                     if (heapObj instanceof ArrayObject arrObj && arrObj.isSymbolic) {
-                        state.addPathConstraint(ctx.mkEq(ref, alias));
+                        state.addPathConstraint(ctx().mkEq(ref, alias));
                         continue;
                     }
                 }
 
-                state.addEngineConstraint(ctx.mkEq(ref, alias));
+                state.addEngineConstraint(ctx().mkEq(ref, alias));
             }
             return List.of();
         }

@@ -87,3 +87,5 @@ nb-configuration.xml
 ##############################
 *.log
 logs/
+libz3.dylib
+libz3java.dylib

@@ -23,7 +23,7 @@ import sootup.java.core.types.JavaClassType;
 
 public class HeapObjects {
     public static final Z3Sorts sorts = Z3Sorts.getInstance();
-    private static final Context ctx = Z3ContextProvider.getContext();
+    private static final Context ctx() { return Z3ContextProvider.getContext(); }
 
     /**
      * Represents a field in an object on the heap.
@@ -133,15 +133,15 @@ public class HeapObjects {
         }
 
         public <E extends Sort> Expr<E> getElem(int index) {
-            return ctx.mkSelect(getElems(), ctx.mkBV(index, sorts.getIntBitSize()));
+            return ctx().mkSelect(getElems(), ctx().mkBV(index, sorts.getIntBitSize()));
         }
 
         public <E extends Sort> Expr<E> getElem(BitVecExpr index) {
-            return ctx.mkSelect(getElems(), index);
+            return ctx().mkSelect(getElems(), index);
         }
 
         public <E extends Sort> void setElem(BitVecExpr index, Expr<E> value) {
-            setField("elems", ctx.mkStore(getElems(), index, value), type);
+            setField("elems", ctx().mkStore(getElems(), index, value), type);
         }
 
         public Expr<?> getLength() {
@@ -171,8 +171,8 @@ public class HeapObjects {
          */
         @SuppressWarnings("unchecked")
         public Expr<BitVecSort> getLength(int index) {
-            BitVecExpr indexExpr = ctx.mkBV(index, sorts.getIntBitSize());
-            return ctx.mkSelect((ArrayExpr<BitVecSort, BitVecSort>) getLength(), indexExpr);
+            BitVecExpr indexExpr = ctx().mkBV(index, sorts.getIntBitSize());
+            return ctx().mkSelect((ArrayExpr<BitVecSort, BitVecSort>) getLength(), indexExpr);
         }
 
         private BitVecExpr calcIndex(BitVecExpr... indices) {
@@ -184,9 +184,9 @@ public class HeapObjects {
             for (int i = dim - 2; i >= 0; i--) {
                 Expr<BitVecSort> prod = getLength(i);
                 for (int j = i + 2; j < dim; j++) {
-                    prod = ctx.mkBVMul(prod, getLength(j));
+                    prod = ctx().mkBVMul(prod, getLength(j));
                 }
-                flatIndex = ctx.mkBVAdd(ctx.mkBVMul(indices[i], prod), flatIndex);
+                flatIndex = ctx().mkBVAdd(ctx().mkBVMul(indices[i], prod), flatIndex);
             }
             return flatIndex;
         }
@@ -206,7 +206,7 @@ public class HeapObjects {
         public <E extends Sort> Expr<E> getElem(int... indices) {
             BitVecExpr[] idxExprs = new BitVecExpr[indices.length];
             for (int i = 0; i < indices.length; i++) {
-                idxExprs[i] = ctx.mkBV(indices[i], sorts.getIntBitSize());
+                idxExprs[i] = ctx().mkBV(indices[i], sorts.getIntBitSize());
             }
             return getElem(idxExprs);
         }

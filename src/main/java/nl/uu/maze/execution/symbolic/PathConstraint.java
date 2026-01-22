@@ -176,7 +176,7 @@ public abstract class PathConstraint {
      * </p>
      */
     public static class CompositeConstraint extends PathConstraint {
-        protected static final Context ctx = Z3ContextProvider.getContext();
+        protected static final Context ctx() { return Z3ContextProvider.getContext(); }
 
         protected final Expr<?> expr;
         protected final Expr<?>[] values;
@@ -234,9 +234,9 @@ public abstract class PathConstraint {
             if (index == -1) {
                 List<Expr<?>> exprs = new ArrayList<>(List.of(values));
                 exprs.add(expr);
-                constraint = ctx.mkDistinct(exprs.toArray(Expr<?>[]::new));
+                constraint = ctx().mkDistinct(exprs.toArray(Expr<?>[]::new));
             } else {
-                constraint = ctx.mkEq(expr, values[index]);
+                constraint = ctx().mkEq(expr, values[index]);
             }
 
             return constraint;

@@ -41,7 +41,7 @@ import sootup.java.core.JavaSootMethod;
 public class MethodInvoker {
     private static final Logger logger = LoggerFactory.getLogger(MethodInvoker.class);
     private static final Z3Sorts sorts = Z3Sorts.getInstance();
-    private static final Context ctx = Z3ContextProvider.getContext();
+    private static final Context ctx() { return Z3ContextProvider.getContext(); }
 
     private final ConcreteExecutor executor;
     private final SymbolicStateValidator validator;
@@ -307,7 +307,7 @@ public class MethodInvoker {
     private void addConcretizationConstraints(SymbolicState state, Expr<?> arg, Object value) {
         Expr<?> valueExpr = javaToZ3.transform(value, state);
         if (valueExpr != null) {
-            state.addEngineConstraint(ctx.mkEq(arg, valueExpr));
+            state.addEngineConstraint(ctx().mkEq(arg, valueExpr));
         }
     }
 
@@ -318,7 +318,7 @@ public class MethodInvoker {
     private void addConcretizationConstraints(SymbolicState state, HeapObject heapObj, Object object, Expr<?> symRef) {
         if (object == null) {
             // If the object is null, we need to set the symbolic reference to null
-            state.addEngineConstraint(ctx.mkEq(symRef, sorts.getNullConst()));
+            state.addEngineConstraint(ctx().mkEq(symRef, sorts.getNullConst()));
             return;
         }
 
@@ -341,7 +341,7 @@ public class MethodInvoker {
                     Expr<?> arrElemExpr = javaToZ3.transform(arrElem, state);
                     Expr<?> arrSelectExpr = arrObj.getElem(i);
                     if (arrElemExpr.getSort().equals(arrSelectExpr.getSort())) {
-                        state.addEngineConstraint(ctx.mkEq(arrSelectExpr, arrElemExpr));
+                        state.addEngineConstraint(ctx().mkEq(arrSelectExpr, arrElemExpr));
                     }
                 }
             }
@@ -366,7 +366,7 @@ public class MethodInvoker {
                     // Convert the field value to a symbolic expression
                     Expr<?> fieldExpr = javaToZ3.transform(fieldOpt.get(), state);
                     // Add a constraint that the field value must equal the symbolic value
-                    state.addEngineConstraint(ctx.mkEq(fieldValue, fieldExpr));
+                    state.addEngineConstraint(ctx().mkEq(fieldValue, fieldExpr));
                 }
             }
         }
@@ -383,7 +383,7 @@ public class MethodInvoker {
             Expr<?> arrElemExpr = javaToZ3.transform(object, state);
             Expr<?> arrSelectExpr = multiArrObj.getElem(indices);
             if (arrElemExpr.getSort().equals(arrSelectExpr.getSort())) {
-                state.addEngineConstraint(ctx.mkEq(arrSelectExpr, arrElemExpr));
+                state.addEngineConstraint(ctx().mkEq(arrSelectExpr, arrElemExpr));
             }
         } else {
             // Recursively traverse the array

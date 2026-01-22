@@ -18,7 +18,8 @@ import com.microsoft.z3.enumerations.Z3_decl_kind;
  * Provides utility methods for working with Z3.
  */
 public class Z3Utils {
-    private static final Context ctx = Z3ContextProvider.getContext();
+  
+	private static final Context ctx() { return  Z3ContextProvider.getContext(); }
 
     /**
      * Negates the given boolean expression, avoiding double negation by wrapping it
@@ -28,7 +29,7 @@ public class Z3Utils {
      * @return The negated expression
      */
     public static BoolExpr negate(BoolExpr expr) {
-        return expr.isNot() ? (BoolExpr) expr.getArgs()[0] : ctx.mkNot(expr);
+        return expr.isNot() ? (BoolExpr) expr.getArgs()[0] : ctx().mkNot(expr);
     }
 
     /**

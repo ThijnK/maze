@@ -8,7 +8,9 @@ import com.microsoft.z3.*;
 import com.microsoft.z3.Expr;
 
 import nl.uu.maze.execution.ArgMap;
+import nl.uu.maze.execution.EngineConfiguration;
 import nl.uu.maze.execution.symbolic.*;
+import nl.uu.maze.execution.symbolic.PathConstraint.SingleConstraint;
 import nl.uu.maze.util.*;
 import sootup.core.jimple.visitor.AbstractValueVisitor;
 import sootup.core.signatures.*;
@@ -23,7 +25,7 @@ import sootup.core.types.*;
  */
 public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
     private static final Z3Sorts sorts = Z3Sorts.getInstance();
-    private static final Context ctx = Z3ContextProvider.getContext();
+    private static final Context ctx() { return Z3ContextProvider.getContext(); }
 
     private SymbolicState state;
     private String lhs;
@@ -89,10 +91,10 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
             // strings, so instead strings are never null
             if ((sorts.isString(r) && sorts.isNull(l)) || (sorts.isString(l) && sorts.isNull(r))) {
                 // Return dummy equality that evaluates to false
-                return ctx.mkEq(ctx.mkBV(0, 1), ctx.mkBV(1, 1));
+                return ctx().mkEq(ctx().mkBV(0, 1), ctx().mkBV(1, 1));
             }
 
-            return ctx.mkEq(l, r);
+            return ctx().mkEq(l, r);
         }
 
         // Handle arithmetic operations
@@ -126,12 +128,12 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
     private Expr<?> transformFloatCmp(AbstractBinopExpr expr, int valueIfNaN) {
         FPExpr op1 = (FPExpr) transform(expr.getOp1());
         FPExpr op2 = (FPExpr) transform(expr.getOp2());
-        BoolExpr isNaN1 = ctx.mkFPIsNaN(op1);
-        BoolExpr isNaN2 = ctx.mkFPIsNaN(op2);
+        BoolExpr isNaN1 = ctx().mkFPIsNaN(op1);
+        BoolExpr isNaN2 = ctx().mkFPIsNaN(op2);
 
-        // Result: 1 if either is NaN, otherwise use ctx.mkFPSub
-        return ctx.mkITE(ctx.mkOr(isNaN1, isNaN2), ctx.mkFP(valueIfNaN, op1.getSort()),
-                ctx.mkFPSub(ctx.mkFPRoundNearestTiesToEven(), op1, op2));
+        // Result: 1 if either is NaN, otherwise use ctx().mkFPSub
+        return ctx().mkITE(ctx().mkOr(isNaN1, isNaN2), ctx().mkFP(valueIfNaN, op1.getSort()),
+                ctx().mkFPSub(ctx().mkFPRoundNearestTiesToEven(), op1, op2));
     }
 
     /**
@@ -143,9 +145,9 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
         int sizeR = r.getSortSize();
 
         if (sizeL > sizeR) {
-            r = ctx.mkSignExt(sizeL - sizeR, r);
+            r = ctx().mkSignExt(sizeL - sizeR, r);
         } else if (sizeR > sizeL) {
-            l = ctx.mkSignExt(sizeR - sizeL, l);
+            l = ctx().mkSignExt(sizeR - sizeL, l);
         }
         return new Pair<>(l, r);
     }
@@ -161,13 +163,13 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
 
         if (sizeL > sizeR) {
             // Coerce the floating point number to the same size as the bit vector
-            expectedSort = ctx.mkFPSort(sizeL - sortR.getSBits(), sortR.getSBits());
-            r = ctx.mkFPToFP(ctx.mkFPRoundNearestTiesToEven(), r, expectedSort);
+            expectedSort = ctx().mkFPSort(sizeL - sortR.getSBits(), sortR.getSBits());
+            r = ctx().mkFPToFP(ctx().mkFPRoundNearestTiesToEven(), r, expectedSort);
         } else if (sizeR > sizeL) {
             // Sign extend the bit vector to match the size of the floating point number
-            l = ctx.mkSignExt(sizeR - sizeL, l);
+            l = ctx().mkSignExt(sizeR - sizeL, l);
         }
-        FPExpr lFP = ctx.mkFPToFP(l, expectedSort);
+        FPExpr lFP = ctx().mkFPToFP(l, expectedSort);
         return new Pair<>(lFP, r);
     }
 
@@ -177,26 +179,52 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
      */
     private BitVecExpr coerceToSize(BitVecExpr expr, int size) {
         if (size > expr.getSortSize()) {
-            return ctx.mkSignExt(size - expr.getSortSize(), expr);
+            return ctx().mkSignExt(size - expr.getSortSize(), expr);
         } else if (size < expr.getSortSize()) {
-            return ctx.mkExtract(size - 1, 0, expr);
+            return ctx().mkExtract(size - 1, 0, expr);
         }
         return expr;
     }
 
-    /** Coerce a floating point number to the given sort by rounding. */
+    /** Coerce a floating point number to the given floating point sort by rounding. */
     private FPExpr coerceToSort(FPExpr expr, FPSort sort) {
         int sizeExpr = expr.getSort().getEBits() + expr.getSort().getSBits();
         int sizeSort = sort.getEBits() + sort.getSBits();
-        return sizeExpr != sizeSort ? ctx.mkFPToFP(ctx.mkFPRoundNearestTiesToEven(), expr, sort) : expr;
+        // maybe the rounding mode should be towards-zero?, this is FP to FP, so a bit more complicated
+        // need to check this 
+        return sizeExpr != sizeSort ? ctx().mkFPToFP(ctx().mkFPRoundNearestTiesToEven(), expr, sort) : expr;
+    }
+    
+    /** 
+     * Coerce a floating point number to a bit vector sort. It applies toward-zero rounding. This is
+     * as in Java when we cast a float number to an integral number. E.g. (int) 3.99 gives 3 int.
+     */
+    private BitVecExpr coerceToSort(FPExpr expr, boolean signed, BitVecSort sort) {
+    	// WP note... so this may not take into account that the exponent part already exceeds
+    	// the target bv sort (if the fp is bigger or smaller than the max/min value of the
+    	// bv sort. Wonder if Z3 FPToBV takes care of this internally.)
+    	return ctx().mkFPToBV(ctx().mkFPRoundTowardZero(), expr, sort.getSize(), signed) ;
     }
 
     /** Coerce a bit vector to the given sort. */
     private FPExpr coerceToSort(BitVecExpr expr, FPSort sort) {
-        int sizeSort = sort.getEBits() + sort.getSBits();
-        return ctx.mkFPToFP(coerceToSize(expr, sizeSort), sort);
+        // WP note:
+    	// Below is the Maze original code, this conversions leads to z3 having
+    	// difficulty in solving constraints over casting e.g. int to float,
+    	// e.g. (float i) < 10
+    	//
+    	// The problem is probably caused by the use of mkFPToFP there, which for
+    	// that signature it expects the bitvec expr to be a bitvec of a floating 
+    	// number, rather than an integral number obtained from coerceToSize.
+    	//
+    	//int sizeSort = sort.getEBits() + sort.getSBits();
+        //return ctx().mkFPToFP(coerceToSize(expr, sizeSort), sort);
+   
+    	// WP: new code, using the following to convert:
+    	boolean signed = true ; 
+	    return ctx().mkFPToFP(ctx().mkFPRoundTowardZero(), expr, sort, signed) ;
     }
-
+    
     /** Coerce a bit vector to the given sort. */
     private BitVecExpr coerceToSort(BitVecExpr expr, BitVecSort sort) {
         return coerceToSize(expr, sort.getSize());
@@ -206,32 +234,32 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
     // #region Logic
     @Override
     public void caseEqExpr(@Nonnull JEqExpr expr) {
-        setResult(transformArithExpr(expr, ctx::mkEq, ctx::mkFPEq));
+        setResult(transformArithExpr(expr, ctx()::mkEq, ctx()::mkFPEq));
     }
 
     @Override
     public void caseNeExpr(@Nonnull JNeExpr expr) {
-        setResult(ctx.mkNot((BoolExpr) transformArithExpr(expr, ctx::mkEq, ctx::mkFPEq)));
+        setResult(ctx().mkNot((BoolExpr) transformArithExpr(expr, ctx()::mkEq, ctx()::mkFPEq)));
     }
 
     @Override
     public void caseGeExpr(@Nonnull JGeExpr expr) {
-        setResult(transformArithExpr(expr, ctx::mkBVSGE, ctx::mkFPGEq));
+        setResult(transformArithExpr(expr, ctx()::mkBVSGE, ctx()::mkFPGEq));
     }
 
     @Override
     public void caseGtExpr(@Nonnull JGtExpr expr) {
-        setResult(transformArithExpr(expr, ctx::mkBVSGT, ctx::mkFPGt));
+        setResult(transformArithExpr(expr, ctx()::mkBVSGT, ctx()::mkFPGt));
     }
 
     @Override
     public void caseLeExpr(@Nonnull JLeExpr expr) {
-        setResult(transformArithExpr(expr, ctx::mkBVSLE, ctx::mkFPLEq));
+        setResult(transformArithExpr(expr, ctx()::mkBVSLE, ctx()::mkFPLEq));
     }
 
     @Override
     public void caseLtExpr(@Nonnull JLtExpr expr) {
-        setResult(transformArithExpr(expr, ctx::mkBVSLT, ctx::mkFPLt));
+        setResult(transformArithExpr(expr, ctx()::mkBVSLT, ctx()::mkFPLt));
     }
 
     @Override
@@ -239,9 +267,9 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
         // Appears when you negate a non-literal value (e.g. -x)
         Expr<?> innerExpr = transform(expr.getOp());
         if (innerExpr instanceof BitVecExpr) {
-            setResult(ctx.mkBVNeg((BitVecExpr) innerExpr));
+            setResult(ctx().mkBVNeg((BitVecExpr) innerExpr));
         } else if (innerExpr instanceof FPExpr) {
-            setResult(ctx.mkFPNeg((FPExpr) innerExpr));
+            setResult(ctx().mkFPNeg((FPExpr) innerExpr));
         } else {
             throw new UnsupportedOperationException("Unsupported operand type: " + innerExpr.getSort());
         }
@@ -250,71 +278,71 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
     @Override
     public void caseAndExpr(@Nonnull JAndExpr expr) {
         // Note: no logical AND for floating point numbers
-        setResult(transformArithExpr(expr, ctx::mkBVAND, null));
+        setResult(transformArithExpr(expr, ctx()::mkBVAND, null));
     }
 
     @Override
     public void caseOrExpr(@Nonnull JOrExpr expr) {
-        setResult(transformArithExpr(expr, ctx::mkBVOR, null));
+        setResult(transformArithExpr(expr, ctx()::mkBVOR, null));
     }
 
     @Override
     public void caseXorExpr(@Nonnull JXorExpr expr) {
-        setResult(transformArithExpr(expr, ctx::mkBVXOR, null));
+        setResult(transformArithExpr(expr, ctx()::mkBVXOR, null));
     }
     // #endregion
 
     // #region Arithmetic
     @Override
     public void caseRemExpr(@Nonnull JRemExpr expr) {
-        setResult(transformArithExpr(expr, ctx::mkBVSRem, ctx::mkFPRem));
+        setResult(transformArithExpr(expr, ctx()::mkBVSRem, ctx()::mkFPRem));
     }
 
     @Override
     public void caseAddExpr(@Nonnull JAddExpr expr) {
         setResult(
-                transformArithExpr(expr, ctx::mkBVAdd, (l, r) -> ctx.mkFPAdd(ctx.mkFPRoundNearestTiesToEven(), l, r)));
+                transformArithExpr(expr, ctx()::mkBVAdd, (l, r) -> ctx().mkFPAdd(ctx().mkFPRoundNearestTiesToEven(), l, r)));
     }
 
     @Override
     public void caseSubExpr(@Nonnull JSubExpr expr) {
         setResult(
-                transformArithExpr(expr, ctx::mkBVSub, (l, r) -> ctx.mkFPSub(ctx.mkFPRoundNearestTiesToEven(), l, r)));
+                transformArithExpr(expr, ctx()::mkBVSub, (l, r) -> ctx().mkFPSub(ctx().mkFPRoundNearestTiesToEven(), l, r)));
     }
 
     @Override
     public void caseMulExpr(@Nonnull JMulExpr expr) {
         setResult(
-                transformArithExpr(expr, ctx::mkBVMul, (l, r) -> ctx.mkFPMul(ctx.mkFPRoundNearestTiesToEven(), l, r)));
+                transformArithExpr(expr, ctx()::mkBVMul, (l, r) -> ctx().mkFPMul(ctx().mkFPRoundNearestTiesToEven(), l, r)));
     }
 
     @Override
     public void caseDivExpr(@Nonnull JDivExpr expr) {
         setResult(
-                transformArithExpr(expr, ctx::mkBVSDiv, (l, r) -> ctx.mkFPDiv(ctx.mkFPRoundNearestTiesToEven(), l, r)));
+                transformArithExpr(expr, ctx()::mkBVSDiv, (l, r) -> ctx().mkFPDiv(ctx().mkFPRoundNearestTiesToEven(), l, r)));
     }
 
     @Override
     public void caseShlExpr(@Nonnull JShlExpr expr) {
-        setResult(transformArithExpr(expr, ctx::mkBVSHL, null));
+        setResult(transformArithExpr(expr, ctx()::mkBVSHL, null));
     }
 
     @Override
     public void caseShrExpr(@Nonnull JShrExpr expr) {
         // Signed (arithmetic) shift right
-        setResult(transformArithExpr(expr, ctx::mkBVASHR, null));
+        setResult(transformArithExpr(expr, ctx()::mkBVASHR, null));
     }
 
     @Override
     public void caseUshrExpr(@Nonnull JUshrExpr expr) {
         // Unsigned (logical) shift right
-        setResult(transformArithExpr(expr, ctx::mkBVLSHR, null));
+        setResult(transformArithExpr(expr, ctx()::mkBVLSHR, null));
     }
 
     @Override
     public void caseCmpExpr(@Nonnull JCmpExpr expr) {
         // Implement cmp operator as subtraction
-        setResult(transformArithExpr(expr, ctx::mkBVSub, null));
+        setResult(transformArithExpr(expr, ctx()::mkBVSub, null));
     }
 
     // Cmpg is for floating point comparison and returns 1 if either operand is NaN
@@ -333,27 +361,36 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
     // #region Constants
     @Override
     public void caseIntConstant(@Nonnull IntConstant constant) {
-        setResult(ctx.mkBV(constant.getValue(), sorts.getIntBitSize()));
+        setResult(ctx().mkBV(constant.getValue(), sorts.getIntBitSize()));
     }
 
     @Override
     public void caseLongConstant(@Nonnull LongConstant constant) {
-        setResult(ctx.mkBV(constant.getValue(), sorts.getLongBitSize()));
+        setResult(ctx().mkBV(constant.getValue(), sorts.getLongBitSize()));
     }
 
     @Override
     public void caseFloatConstant(@Nonnull FloatConstant constant) {
-        setResult(ctx.mkFP(constant.getValue(), sorts.getFloatSort()));
+        setResult(ctx().mkFP(constant.getValue(), sorts.getFloatSort()));
     }
 
     @Override
     public void caseDoubleConstant(@Nonnull DoubleConstant constant) {
-        setResult(ctx.mkFP(constant.getValue(), sorts.getDoubleSort()));
+    	double x = constant.getValue() ;
+    	/*
+    	if (Double.isNaN(x)) {
+    		System.out.println(">>> " + x) ;
+    	}
+    	if (x == Double.POSITIVE_INFINITY) {
+    		System.out.println(">>>> " + x);
+    	}
+    	*/
+    	setResult(ctx().mkFP(x, sorts.getDoubleSort()));    	
     }
 
     @Override
     public void caseStringConstant(@Nonnull StringConstant constant) {
-        setResult(ctx.mkString(constant.getValue()));
+        setResult(ctx().mkString(constant.getValue()));
     }
 
     @Override
@@ -415,7 +452,7 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
             } else if (type instanceof ClassType && !type.toString().equals("java.lang.String")) {
                 setResult(state.heap.allocateObject(state.heap.newRefKey(), ref.getType()));
             } else {
-                setResult(ctx.mkConst(ref.toString(), sorts.determineSort(type)));
+                setResult(ctx().mkConst(ref.toString(), sorts.determineSort(type)));
             }
         } else {
             setResult(expr);
@@ -481,7 +518,13 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
                 setResult(coerceToSort((FPExpr) innerExpr, (FPSort) sort));
             } else if (innerExpr instanceof BitVecExpr && sort instanceof BitVecSort) {
                 setResult(coerceToSort((BitVecExpr) innerExpr, (BitVecSort) sort));
-            } else {
+            } 
+            // WP: adding a case for casting float-expr to bit-vec:
+            else if (innerExpr instanceof FPExpr && sort instanceof BitVecSort) {
+            	boolean signed = true ; // all integral types in Java are signed
+            	setResult(coerceToSort((FPExpr) innerExpr, signed, (BitVecSort) sort));
+            }
+            else {
                 throw new UnsupportedOperationException("Unsupported cast from " + innerExpr.getSort() + " to " + sort);
             }
         } else {
@@ -495,7 +538,7 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
         // Create a symbolic value that we can later use to derive whether the operand
         // is an instance of the given type
         Expr<?> op = transform(expr.getOp());
-        Expr<?> instof = ctx.mkConst(op + "_instof_" + expr.getCheckType(), sorts.getIntSort());
+        Expr<?> instof = ctx().mkConst(op + "_instof_" + expr.getCheckType(), sorts.getIntSort());
         setResult(instof);
     }
     // #endregion
@@ -532,7 +575,23 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
             param = state.heap.allocateObject(var, ref.getType());
         } else {
             // Create a new variable for the parameter
-            param = ctx.mkConst(var, sorts.determineSort(sootType));
+        	Sort sort = sorts.determineSort(sootType) ;
+            param = ctx().mkConst(var,sort);
+            
+            // WP adding new behavior:
+            // When the parameter is floating-point like, we add a constrain that it should be
+            // a normal number (e.g. not NaN nor inf). This is only added if the engine-configuration
+            // says it is to be added.
+            //
+            // Note that integral type like int has no NaN nor inf, so we don't have to add an
+            // additional constrain for that.
+            //
+            if (sort instanceof FPSort && EngineConfiguration.getInstance().constrainFPNumberParametersToNormalNumbers) {
+            	BoolExpr insistNormalValue = ctx().mkFPIsNormal((FPExpr) param) ;
+            	//System.out.println(">>>> creating extra domain constraint for " + var);
+            	state.getEngineConstraints().add(new SingleConstraint(state,insistNormalValue)) ;
+            }
+            
         }
 
         setResult(param);

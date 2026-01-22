@@ -27,7 +27,7 @@ public class SymbolicHeap {
      */
     private static final int MAX_ARRAY_LENGTH = 100;
     public static final Z3Sorts sorts = Z3Sorts.getInstance();
-    private static final Context ctx = Z3ContextProvider.getContext();
+    private static final Context ctx() { return Z3ContextProvider.getContext(); }
 
     private final SymbolicState state;
 
@@ -114,7 +114,7 @@ public class SymbolicHeap {
     }
 
     public Expr<?> newRef(String key) {
-        return ctx.mkConst(key, sorts.getRefSort());
+        return ctx().mkConst(key, sorts.getRefSort());
     }
 
     public Expr<?> newSymRef() {
@@ -285,7 +285,7 @@ public class SymbolicHeap {
      */
     public Expr<?> allocateArray(ArrayType type, Expr<?> size, Type elemType) {
         // Create an array constant with default value depending on the element sort
-        ArrayExpr<BitVecSort, ?> arr = ctx.mkConstArray(sorts.getIntSort(), sorts.getDefaultValue(elemType));
+        ArrayExpr<BitVecSort, ?> arr = ctx().mkConstArray(sorts.getIntSort(), sorts.getDefaultValue(elemType));
         ArrayObject arrObj = new ArrayObject(type, arr, size);
         Expr<?> symRef = newSymRef();
         allocateHeapObject(symRef, newConRef(), arrObj);
@@ -301,12 +301,12 @@ public class SymbolicHeap {
     public Expr<?> allocateArray(String key, ArrayType type, Type elemType) {
         // Create symbolic variable for the size of the array
         String conKey = newObjKey();
-        Expr<BitVecSort> size = ctx.mkConst(conKey + "_len", sorts.getIntSort());
+        Expr<BitVecSort> size = ctx().mkConst(conKey + "_len", sorts.getIntSort());
         // Make sure array size is non-negative and does not exceed the max length
-        state.addEngineConstraint(ctx.mkBVSGE(size, ctx.mkBV(0, sorts.getIntBitSize())));
-        state.addEngineConstraint(ctx.mkBVSLT(size, ctx.mkBV(MAX_ARRAY_LENGTH, sorts.getIntBitSize())));
+        state.addEngineConstraint(ctx().mkBVSGE(size, ctx().mkBV(0, sorts.getIntBitSize())));
+        state.addEngineConstraint(ctx().mkBVSLT(size, ctx().mkBV(MAX_ARRAY_LENGTH, sorts.getIntBitSize())));
 
-        ArrayExpr<BitVecSort, ?> arr = ctx.mkArrayConst(conKey + "_elems", sorts.getIntSort(),
+        ArrayExpr<BitVecSort, ?> arr = ctx().mkArrayConst(conKey + "_elems", sorts.getIntSort(),
                 sorts.determineSort(elemType));
         ArrayObject arrObj = new ArrayObject(type, arr, size);
         Expr<?> symRef = newRef(key);
@@ -327,10 +327,10 @@ public class SymbolicHeap {
                     "Expected " + type.getDimension() + " sizes, got " + (sizes != null ? sizes.length : null));
         }
 
-        ArrayExpr<BitVecSort, ?> arr = ctx.mkConstArray(sorts.getIntSort(), sorts.getDefaultValue(elemType));
-        ArrayExpr<BitVecSort, BitVecSort> size = ctx.mkConstArray(sorts.getIntSort(), sorts.getDefaultInt());
+        ArrayExpr<BitVecSort, ?> arr = ctx().mkConstArray(sorts.getIntSort(), sorts.getDefaultValue(elemType));
+        ArrayExpr<BitVecSort, BitVecSort> size = ctx().mkConstArray(sorts.getIntSort(), sorts.getDefaultInt());
         for (int i = 0; i < type.getDimension(); i++) {
-            size = ctx.mkStore(size, ctx.mkBV(i, sorts.getIntBitSize()), sizes[i]);
+            size = ctx().mkStore(size, ctx().mkBV(i, sorts.getIntBitSize()), sizes[i]);
         }
         MultiArrayObject arrObj = new MultiArrayObject(type, arr, size);
         Expr<?> symRef = newSymRef();
@@ -349,17 +349,17 @@ public class SymbolicHeap {
     public Expr<?> allocateMultiArray(String key, ArrayType type, Type elemType) {
         String conKey = newObjKey();
         // Create symbolic lengths for each dimension of the array
-        ArrayExpr<BitVecSort, BitVecSort> size = ctx.mkConstArray(sorts.getIntSort(), sorts.getDefaultInt());
+        ArrayExpr<BitVecSort, BitVecSort> size = ctx().mkConstArray(sorts.getIntSort(), sorts.getDefaultInt());
         for (int i = 0; i < type.getDimension(); i++) {
-            Expr<BitVecSort> len = ctx.mkConst(conKey + "_len" + i, sorts.getIntSort());
+            Expr<BitVecSort> len = ctx().mkConst(conKey + "_len" + i, sorts.getIntSort());
             // Make sure array size is non-negative and does not exceed the max length
-            state.addEngineConstraint(ctx.mkBVSGE(len, ctx.mkBV(0, sorts.getIntBitSize())));
-            state.addEngineConstraint(ctx.mkBVSLT(len, ctx.mkBV(MAX_ARRAY_LENGTH, sorts.getIntBitSize())));
+            state.addEngineConstraint(ctx().mkBVSGE(len, ctx().mkBV(0, sorts.getIntBitSize())));
+            state.addEngineConstraint(ctx().mkBVSLT(len, ctx().mkBV(MAX_ARRAY_LENGTH, sorts.getIntBitSize())));
 
-            size = ctx.mkStore(size, ctx.mkBV(i, sorts.getIntBitSize()), len);
+            size = ctx().mkStore(size, ctx().mkBV(i, sorts.getIntBitSize()), len);
         }
 
-        ArrayExpr<BitVecSort, ?> arr = ctx.mkArrayConst(conKey + "_elems", sorts.getIntSort(),
+        ArrayExpr<BitVecSort, ?> arr = ctx().mkArrayConst(conKey + "_elems", sorts.getIntSort(),
                 sorts.determineSort(elemType));
         MultiArrayObject arrObj = new MultiArrayObject(type, arr, size);
         Expr<?> symRef = newRef(key);
@@ -528,7 +528,7 @@ public class SymbolicHeap {
                 }
             } else {
                 // Create a symbolic value for the field
-                newValue = ctx.mkConst(varName + "_" + fieldName, sorts.determineSort(fieldType));
+                newValue = ctx().mkConst(varName + "_" + fieldName, sorts.determineSort(fieldType));
             }
             // Set the field to the new value
             obj.setField(fieldName, newValue, fieldType);

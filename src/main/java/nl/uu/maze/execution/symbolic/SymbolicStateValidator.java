@@ -29,7 +29,7 @@ import sootup.core.types.Type;
 public class SymbolicStateValidator {
     private static final Logger logger = LoggerFactory.getLogger(SymbolicStateValidator.class);
     private static final Z3Sorts sorts = Z3Sorts.getInstance();
-    private static final Context ctx = Z3ContextProvider.getContext();
+    private static final Context ctx() { return Z3ContextProvider.getContext(); }
 
     private final Solver solver;
     private final Z3ToJavaTransformer transformer;
@@ -37,7 +37,7 @@ public class SymbolicStateValidator {
     private Model model;
 
     public SymbolicStateValidator() {
-        this.solver = ctx.mkSolver();
+        this.solver = ctx().mkSolver();
         this.transformer = new Z3ToJavaTransformer();
     }
 

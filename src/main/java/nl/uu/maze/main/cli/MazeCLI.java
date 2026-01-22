@@ -8,6 +8,7 @@ import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.Level;
 
 import nl.uu.maze.execution.DSEController;
+import nl.uu.maze.execution.EngineConfiguration;
 import nl.uu.maze.main.cli.converters.*;
 import nl.uu.maze.search.heuristic.SearchHeuristicFactory.ValidSearchHeuristic;
 import nl.uu.maze.search.strategy.SearchStrategy;
@@ -23,6 +24,7 @@ import picocli.CommandLine.Option;
  */
 @Command(name = "maze", mixinStandardHelpOptions = true, version = "maze 1.0", descriptionHeading = "%nDescription:%n", description = "Generate tests for the specified Java class using dynamic symbolic execution (DSE).", optionListHeading = "%nOptions:%n", sortOptions = false)
 public class MazeCLI implements Callable<Integer> {
+	
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(MazeCLI.class);
 
     @Option(names = { "-c",
@@ -80,13 +82,34 @@ public class MazeCLI implements Callable<Integer> {
     @Option(names = { "-C",
             "--concrete-driven" }, description = "Use concrete-driven DSE instead of symbolic-driven DSE (default: ${DEFAULT-VALUE})", defaultValue = "false", paramLabel = "<true|false>")
     private boolean concreteDriven;
-
+    
+    @Option(names = { "--constrain-FP-params-to-normal-numbers" }, description = "When true will constrain the symbolic solver to generate normal numbers for floating-point-like methods parameters (default: ${DEFAULT-VALUE})", defaultValue = "false", paramLabel = "<true|false>")
+    private boolean constrainFPNumberParametersToNormalNumbers ;
+    
+    @Option(names = { "--surpress-regression-oracles" }, description = "When true generated regression oracles in the test-cases will be commented out (default: ${DEFAULT-VALUE})", defaultValue = "false", paramLabel = "<true|false>")
+    private boolean surpressRegressionOracles ;
+    
+    @Option(names = { "--propagate-unexpected-exceptions" }, description = "When true, when a test throws an exception that is not declared as expected exception by the method under test, it will be propagated. So, it will not be asserted as an expected exception by the test oracle. Note that this means the test will then fail (a potential bug is found by Maze) (default: ${DEFAULT-VALUE})", defaultValue = "false", paramLabel = "<true|false>")
+    private boolean propagateUnexpectedExceptions ;
+    
+    @Option(names = { "--do-not-close-z3-context" }, description = "When true, will not close internal z3 context. Only used for testing MAZE. (default: ${DEFAULT-VALUE})", defaultValue = "false", paramLabel = "<true|false>")
+    private boolean leaveZ3ContextOpen ;
+    
     @Override
     public Integer call() {
         try {
             // Set logging level
             Logger rootLogger = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
             rootLogger.setLevel(logLevel);
+            
+            // first copy options that need to be inspected during DSE runs to a dedicated configuration
+            // info (acting like global vars).
+            EngineConfiguration.getInstance().constrainFPNumberParametersToNormalNumbers = this.constrainFPNumberParametersToNormalNumbers ;
+            EngineConfiguration.getInstance().surpressRegressionOracles = this.surpressRegressionOracles ;
+            EngineConfiguration.getInstance().propagateUnexpectedExceptions = this.propagateUnexpectedExceptions ;
+            
+            // dealing with the rest of the options:
+            
             timeBudget *= 1000L; // Convert to milliseconds
             testTimeout *= 1000L; // Convert to milliseconds
 
@@ -109,7 +132,8 @@ public class MazeCLI implements Callable<Integer> {
             logger.error("Error stack trace: ", e);
             return 1;
         } finally {
-            Z3ContextProvider.close();
+            if (!leaveZ3ContextOpen) 
+            	Z3ContextProvider.close();
         }
     }
 }

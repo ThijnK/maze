@@ -188,7 +188,11 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
+                <!-- 8.12 supports java 22 -->
                 <version>0.8.12</version>
+                <!--   use to 8.13, or higher for java 24
+                <version>0.8.13</version>
+                -->
                 <executions>
                     <execution>
                         <id>default-prepare-agent</id>

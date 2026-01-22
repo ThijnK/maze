@@ -201,7 +201,12 @@ public class DSEController {
         try {
             run();
         } finally {
-            generator.writeToFile(outPath);
+            generator.writeToFile(outPath); 
+            logger.info("#generated test-cases: {}", generator.getNumberOfGeneratedTestCases()) ;
+            if (generator.getNumberOfViolationFound() > 0) {
+            	logger.info("There were {} test/s that threw an unexpected exception. They may be errors.",  generator.getNumberOfViolationFound()) ;
+            }
+            
         }
     }
 
@@ -397,6 +402,8 @@ public class DSEController {
                         else {
                             for (int i = 0; i < nonStaticMuts.size(); i++) {
                                 JavaSootMethod target = nonStaticMuts.get(i);
+                                
+                                target.getExceptionSignatures() ;
                                 // Clone state, except for the last one
                                 SymbolicState newState = i == nonStaticMuts.size() - 1 ? state : state.clone();
                                 newState.setMethod(target, analyzer.getCFG(target));
