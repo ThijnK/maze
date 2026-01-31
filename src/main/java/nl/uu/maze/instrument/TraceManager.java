@@ -34,7 +34,11 @@ public class TraceManager {
      * </p>
      */
     public enum BranchType {
-        IF, SWITCH, ARRAY, ALIAS;
+        IF, SWITCH, 
+        ARRAY,  // for tracing array access (could throw invalid-index exception)
+        ALIAS, 
+        DIVorREMOP   // for tracing division and remainder (/ and %) operators (could through div-by-zero exception)
+        ;
 
         @Override
         public String toString() {
@@ -207,6 +211,10 @@ public class TraceManager {
 
         public boolean isArrayAccess() {
             return branchType == BranchType.ARRAY;
+        }
+        
+        public boolean isDivisionOrRemainderOperation() {
+        	return branchType == BranchType.DIVorREMOP ;
         }
 
         public boolean isAliasResolution() {

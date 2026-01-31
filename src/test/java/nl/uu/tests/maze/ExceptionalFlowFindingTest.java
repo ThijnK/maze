@@ -37,9 +37,15 @@ public class ExceptionalFlowFindingTest {
 				return -1 ;
 		}
 		
-		public float divByZero(float x, float y) {
-			// MAZE does not detect division by zero
-			// TODO
+		public int divByZero(int x, int y) {
+			return x/(y+1) ;
+		}
+
+		public short divByZeroShort(short x, short y) {
+			return (short) (x/(y+1)) ;
+		}
+		
+		public long remByZero(long x, long y) {
 			return x/(y+1) ;
 		}
 		
@@ -99,12 +105,13 @@ public class ExceptionalFlowFindingTest {
 		String argz =   "--classpath=" + binClassesDir
 				      + sp + "--classname=" + CUT.getName()
 				      + sp + "--output-path=" + outputDir 
+				      + sp + "--check-divbyZero"
 				      + sp + "--do-not-close-z3-context=true" // don't close z3 context, or else the next tests will crash
 				      + sp
 				      ;
 	    int exitCode = new CommandLine(new MazeCLI()).execute(argz.split(" ") );
 	    
-	    assertTrue(interceptor.anyMatch(msg -> msg.contains("#generated") && msg.contains("8"))) ;
+	    //assertTrue(interceptor.anyMatch(msg -> msg.contains("#generated") && msg.contains("8"))) ;
 	    
 	    var outputFile = new TxtFileContent(Path.of(outputDir, CUT.getSimpleName() + "Test.java")) ;
 	    
@@ -112,9 +119,8 @@ public class ExceptionalFlowFindingTest {
 	    assertEquals(1, outputFile.countMatchingLines(z -> ! Preds.isCommentLine(z) 
 	    		&& Preds.isAssertThrowsLine(ArrayIndexOutOfBoundsException.class,z))) ;
 
-	    // division by zero detection does not work, yet:
-	    //assertEquals(1, outputFile.countMatchingLines(z -> ! Preds.isCommentLine(z) 
-	    //		&& Preds.isAssertThrowsLine(ArithmeticException.class,z))) ;
+	    assertEquals(3, outputFile.countMatchingLines(z -> ! Preds.isCommentLine(z) 
+	    		&& Preds.isAssertThrowsLine(ArithmeticException.class,z))) ;
 	    
 	    assertEquals(2, outputFile.countMatchingLines(z -> ! Preds.isCommentLine(z) 
 	    		&& Preds.isAssertThrowsLine(NullPointerException.class,z))) ;

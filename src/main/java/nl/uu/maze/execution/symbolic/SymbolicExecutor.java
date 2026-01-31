@@ -10,18 +10,23 @@ import org.slf4j.LoggerFactory;
 import com.microsoft.z3.*;
 
 import nl.uu.maze.analysis.JavaAnalyzer;
+import nl.uu.maze.execution.EngineConfiguration;
 import nl.uu.maze.execution.concrete.ConcreteExecutor;
 import nl.uu.maze.execution.symbolic.PathConstraint.*;
 import nl.uu.maze.instrument.TraceManager;
 import nl.uu.maze.instrument.TraceManager.TraceEntry;
+import nl.uu.maze.main.cli.MazeCLI;
 import nl.uu.maze.transform.JimpleToZ3Transformer;
 import nl.uu.maze.util.*;
 import sootup.core.jimple.basic.*;
 import sootup.core.jimple.common.constant.IntConstant;
 import sootup.core.jimple.common.expr.AbstractInvokeExpr;
+import sootup.core.jimple.common.expr.JDivExpr;
+import sootup.core.jimple.common.expr.JRemExpr;
 import sootup.core.jimple.common.ref.*;
 import sootup.core.jimple.common.stmt.*;
 import sootup.core.jimple.javabytecode.stmt.JSwitchStmt;
+import sootup.core.types.Type;
 
 /**
  * Provides symbolic execution capabilities.
@@ -323,6 +328,64 @@ public class SymbolicExecutor {
                 state.addPathConstraint(ctx().mkAnd(ctx().mkBVSGE(index, ctx().mkBV(0, sorts.getIntBitSize())),
                         ctx().mkBVSLT(index, len)));
             }
+        }
+        
+        // ok adding logic to handle division and remainder operator. At the bytecode level, there
+        // are only DIV and REM for int, long, float, and double. Only DIV and REM on int and long
+        // can cause error to be thrown.
+        if ((rightOp instanceof JDivExpr || rightOp instanceof JRemExpr)	
+        	 && EngineConfiguration.getInstance().enableDivisionByZeroChecking) {
+        	Immediate divisor =  rightOp instanceof JDivExpr ?
+        			((JDivExpr) rightOp).getOp2() 
+        			: 
+        			((JRemExpr) rightOp).getOp2() 
+        			;
+        	Type sootTy = divisor.getType() ;
+        	
+        	try {
+        		Sort z3Sort = sorts.determineSort(sootTy) ;
+            	if (z3Sort instanceof BitVecSort) { ;
+            		// only integral type can cause div (or rem) by zero exception
+            		BitVecNum zero      = ctx().mkBV(0,sorts.getBitSize(sootTy)) ;
+            		BitVecExpr divisor_ = (BitVecExpr) jimpleToZ3.transform(divisor, state);
+            		BoolExpr divisorIsZeroCond = ctx().mkEq(divisor_, zero) ;
+            		BoolExpr divisorIsNotZeroCond = ctx().mkNot(divisorIsZeroCond) ;
+            		if (replay) {
+            			TraceEntry entry;
+                        // If end of trace is reached or not a division  (or rem) operation, something is wrong
+                        if (!TraceManager.hasEntries(state.getMethodSignature())
+                                || !(entry = TraceManager.consumeEntry(state.getMethodSignature())).isDivisionOrRemainderOperation()) {
+                            state.setExceptionThrown();
+                            return List.of(state);
+                        }
+
+                        // If the entry value is 1, the division (or rem) is ok, else it throws an exception
+                        if (entry.getValue() == 0) {
+                            state.addPathConstraint(divisorIsZeroCond);
+                            state.setExceptionThrown();
+                            return handleOtherStmts(state, true);
+                        } else {
+                            state.addPathConstraint(divisorIsNotZeroCond);
+                        }
+                	}
+                	else {
+                		// If not replaying a trace, split the state into one where the divisor is zero,
+                        // and one where it is not
+                        SymbolicState divisorfIsZeroState = state.clone();
+                        divisorfIsZeroState.addPathConstraint(divisorIsZeroCond);
+                        divisorfIsZeroState.setExceptionThrown();
+                        // The handleOtherStmts method will take care of finding a catch block if there
+                        // is one to catch the exception, and otherwise will just return the state
+                        newStates.addAll(handleOtherStmts(divisorfIsZeroState, false));
+                        // The other state is the one where the division is safe
+                        state.addPathConstraint(divisorIsNotZeroCond);
+                	}
+            	} 
+
+        	}
+        	catch(UnsupportedOperationException e) {
+        		logger.warn("MAZE cannot check division or remainder by zero of {}; MAZE can't handle type {} yet.", rightOp.toString(), sootTy.toString()) ;
+        	}
         }
 
         switch (leftOp) {

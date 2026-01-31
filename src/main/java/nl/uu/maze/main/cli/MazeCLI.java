@@ -95,6 +95,9 @@ public class MazeCLI implements Callable<Integer> {
     @Option(names = { "--do-not-close-z3-context" }, description = "When true, will not close internal z3 context. Only used for testing MAZE. (default: ${DEFAULT-VALUE})", defaultValue = "false", paramLabel = "<true|false>")
     private boolean leaveZ3ContextOpen ;
     
+    @Option(names = { "--check-divbyZero" }, description = "When true, MAZE will actively check expressions of the form x/y and x%y, whether a division or remainder by zero error can occur. (default: ${DEFAULT-VALUE})", defaultValue = "false", paramLabel = "<true|false>")
+    private boolean enableDivisionByZeroChecking ;
+    
     @Override
     public Integer call() {
         try {
@@ -107,6 +110,7 @@ public class MazeCLI implements Callable<Integer> {
             EngineConfiguration.getInstance().constrainFPNumberParametersToNormalNumbers = this.constrainFPNumberParametersToNormalNumbers ;
             EngineConfiguration.getInstance().surpressRegressionOracles = this.surpressRegressionOracles ;
             EngineConfiguration.getInstance().propagateUnexpectedExceptions = this.propagateUnexpectedExceptions ;
+            EngineConfiguration.getInstance().enableDivisionByZeroChecking = this.enableDivisionByZeroChecking ;
             
             // dealing with the rest of the options:
             

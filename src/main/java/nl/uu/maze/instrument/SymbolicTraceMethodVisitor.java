@@ -3,12 +3,14 @@ package nl.uu.maze.instrument;
 import org.objectweb.asm.*;
 import org.objectweb.asm.commons.AdviceAdapter;
 
+import nl.uu.maze.execution.EngineConfiguration;
 import nl.uu.maze.instrument.TraceManager.BranchType;
 
 /**
  * ASM method visitor that instruments the method to record symbolic traces.
  */
 public class SymbolicTraceMethodVisitor extends AdviceAdapter {
+	
     private static final String TRACE_MANAGER_PATH = TraceManager.class.getName().replace('.', '/');
     private static final String BRANCH_TYPE_PATH = BranchType.class.getName().replace('.', '/');
 
@@ -239,6 +241,16 @@ public class SymbolicTraceMethodVisitor extends AdviceAdapter {
     private boolean isArrayStore(int opcode) {
         return opcode >= Opcodes.IASTORE && opcode <= Opcodes.SASTORE;
     }
+    
+    /**
+     * Check if the opcode is an integral division or remainder operation (on int or long).
+     */
+    private boolean isIntegralDivisionOrRemainderOperation(int opcode) {
+    	// there are only IDIV, LDIV, FDIV, and DDIV, for int, long, float, and double in Java bytecode...
+    	// so i suppose you can't do DIV on e.g. short.
+    	return opcode == Opcodes.IDIV || opcode == Opcodes.LDIV 
+    			|| opcode == Opcodes.IREM || opcode == Opcodes.LREM ;
+    }
 
     // Instrument array access instructions to record whether index is in bounds
     @Override
@@ -246,13 +258,18 @@ public class SymbolicTraceMethodVisitor extends AdviceAdapter {
         if (isArrayLoad(opcode)) {
             // For array load, stack is [array, index]
             instrumentArrayBoundsCheck();
-        } else if (isArrayStore(opcode)) {
+        } 
+        else if (isArrayStore(opcode)) {
             // For array store, stack is [array, index, value]
             int valueVar = storeValueForArrayStore(opcode);
             // Now stack is [array, index]
             instrumentArrayBoundsCheck();
             // Restore the value for the original store instruction
             restoreValueForArrayStore(opcode, valueVar);
+        }
+        else if (isIntegralDivisionOrRemainderOperation(opcode) && EngineConfiguration.getInstance().enableDivisionByZeroChecking) {
+        	// for division x/y the stack is [x,y] with y as the divisor
+        	instrumentIntegralDivisionOrRemainderOperation();
         }
         super.visitInsn(opcode);
     }
@@ -290,6 +307,34 @@ public class SymbolicTraceMethodVisitor extends AdviceAdapter {
         mv.visitLabel(outOfBounds);
         instrumentTraceLog(BranchType.ARRAY, 0); // 0 indicates out-of-bounds
         mv.visitLabel(continueLabel);
+    }
+    
+    /**
+     * Instrument x/y or x%y operation, to check possible division or remainder by zero. 
+     * Only div (or rem) by zero on an integral type (int or long) can cause an exception.
+     * It assumed that the operation instrumented here is an integral div or rem.
+     */
+    private void instrumentIntegralDivisionOrRemainderOperation() {
+    	// Assumes the top of the stack is [x,y] with y being the divisor.
+    	// duplicate y on the stack:
+        mv.visitInsn(Opcodes.DUP);
+        
+        Label divisorIsZero = new Label();
+        Label continueLabel = new Label();
+        
+        // if divisor y is zero, jump
+        mv.visitJumpInsn(Opcodes.IFEQ, divisorIsZero);
+        
+        // case when y is NOT zero:
+        instrumentTraceLog(BranchType.DIVorREMOP, 1); // 1 indicates the division (or remainder) is safe
+        mv.visitJumpInsn(Opcodes.GOTO, continueLabel);
+        
+        // case when y is ZERO
+        mv.visitLabel(divisorIsZero);
+        instrumentTraceLog(BranchType.DIVorREMOP, 0); // 0 indicates the division (or remainder) will crash due to div by zero
+  
+        mv.visitLabel(continueLabel);
+        // from this on, we continue to execute the original div (or rem) operation        
     }
 
     /**
