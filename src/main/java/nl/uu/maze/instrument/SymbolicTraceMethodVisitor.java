@@ -243,13 +243,19 @@ public class SymbolicTraceMethodVisitor extends AdviceAdapter {
     }
     
     /**
-     * Check if the opcode is an integral division or remainder operation (on int or long).
+     * Check if the opcode is an integral division or remainder operation on int.
      */
-    private boolean isIntegralDivisionOrRemainderOperation(int opcode) {
+    private boolean isIntDivisionOrRemainderOperation(int opcode) {
     	// there are only IDIV, LDIV, FDIV, and DDIV, for int, long, float, and double in Java bytecode...
-    	// so i suppose you can't do DIV on e.g. short.
-    	return opcode == Opcodes.IDIV || opcode == Opcodes.LDIV 
-    			|| opcode == Opcodes.IREM || opcode == Opcodes.LREM ;
+    	// so you can't do DIV on e.g. short.
+    	return opcode == Opcodes.IDIV || opcode == Opcodes.IREM  ;
+    }
+
+    /**
+     * Check if the opcode is an integral division or remainder operation on long.
+     */
+    private boolean isLongDivisionOrRemainderOperation(int opcode) {
+    	return opcode == Opcodes.LDIV || opcode == Opcodes.LREM ;
     }
 
     // Instrument array access instructions to record whether index is in bounds
@@ -267,9 +273,10 @@ public class SymbolicTraceMethodVisitor extends AdviceAdapter {
             // Restore the value for the original store instruction
             restoreValueForArrayStore(opcode, valueVar);
         }
-        else if (isIntegralDivisionOrRemainderOperation(opcode) && EngineConfiguration.getInstance().enableDivisionByZeroChecking) {
+        else if ((isIntDivisionOrRemainderOperation(opcode) || isLongDivisionOrRemainderOperation(opcode)) 
+        		&& EngineConfiguration.getInstance().enableDivisionByZeroChecking) {
         	// for division x/y the stack is [x,y] with y as the divisor
-        	instrumentIntegralDivisionOrRemainderOperation();
+        	instrumentIntegralDivisionOrRemainderOperation(opcode);
         }
         super.visitInsn(opcode);
     }
@@ -314,15 +321,28 @@ public class SymbolicTraceMethodVisitor extends AdviceAdapter {
      * Only div (or rem) by zero on an integral type (int or long) can cause an exception.
      * It assumed that the operation instrumented here is an integral div or rem.
      */
-    private void instrumentIntegralDivisionOrRemainderOperation() {
+    private void instrumentIntegralDivisionOrRemainderOperation(int opcode) {
     	// Assumes the top of the stack is [x,y] with y being the divisor.
     	// duplicate y on the stack:
-        mv.visitInsn(Opcodes.DUP);
+    	if (isLongDivisionOrRemainderOperation(opcode)) {
+    		// long type takes two places!
+    		mv.visitInsn(Opcodes.DUP2);
+    	}
+    	else {
+    		mv.visitInsn(Opcodes.DUP);
+    	}
         
         Label divisorIsZero = new Label();
         Label continueLabel = new Label();
         
-        // if divisor y is zero, jump
+        // check if the divisor is zero
+        if (isLongDivisionOrRemainderOperation(opcode)) {
+        	// the div or rem operation is on long type; we can't directly use IFEQ to check
+        	// if divisor is zero:
+        	mv.visitInsn(Opcodes.LCONST_0);
+        	mv.visitInsn(Opcodes.LCMP);
+        }
+    	// if divisor y is zero, jump
         mv.visitJumpInsn(Opcodes.IFEQ, divisorIsZero);
         
         // case when y is NOT zero:
