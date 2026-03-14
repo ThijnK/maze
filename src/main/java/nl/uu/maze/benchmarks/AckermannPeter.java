@@ -12,6 +12,10 @@ package nl.uu.maze.benchmarks;
  */
 public class AckermannPeter {
     public static long compute(long m, long n) {
+    	// WP adding guards to reject negative numbers:
+    	if (m<0 || n<0)
+    		throw new IllegalArgumentException("Only natural numbers are allowed!") ;
+        
         if (m == 0) {
             return n + 1;
         } else if (n == 0) {
