@@ -34,6 +34,20 @@ public class EngineConfiguration {
      * <p>default: false.
      */
     public boolean propagateUnexpectedExceptions = false ;
+    
+    /**
+     * When true, MAZE will actively check expressions of the form x/y and x%y, whether a
+     * division or remainder by zero error is possible. 
+     * 
+     * <p>Note that such an error can only happen on
+     * types int or long. In Java, x/0 in float results in Infinity or NaN (when x is 0)
+     * when the types are float-like.
+     * For other integral-type like short, there is no separate / or % operator in Java bytecode.
+     * The arguments will be up-casted to e.g. int (so, the / or % will be of int type).
+     * 
+     * <p>Default: false.
+     */
+    public boolean enableDivisionByZeroChecking = false ;
 	
 	private EngineConfiguration() {
 		

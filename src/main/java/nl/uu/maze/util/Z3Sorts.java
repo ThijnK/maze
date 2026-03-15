@@ -145,7 +145,7 @@ public class Z3Sorts {
             throw new UnsupportedOperationException("Unsupported type: " + sootType);
         }
     }
-
+    
     /**
      * Determine the SootUp type for the given Java class.
      * 
