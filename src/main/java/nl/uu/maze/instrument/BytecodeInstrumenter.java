@@ -152,6 +152,9 @@ public class BytecodeInstrumenter {
 
     public Class<?> instrument2(String className) throws IOException, ClassNotFoundException {
     	List<ClassFileEntry> classesToInstrument = collectBinAndDependencies2(className) ;
+    	// debug:
+    	//List<String> clazzes = classesToInstrument.stream().map(cfe -> cfe.fullName).toList() ;
+    	//System.out.println(">>> classes to instrument: " + clazzes) ;
     	// instrument the classes in reverse order:
     	while (! classesToInstrument.isEmpty()) {
     		ClassFileEntry cf = classesToInstrument.removeLast() ;
@@ -159,8 +162,8 @@ public class BytecodeInstrumenter {
             ClassReader classReader = new ClassReader(cf.bytes);
             ClassWriter classWriter = new ClassWriter(ClassWriter.COMPUTE_FRAMES | ClassWriter.COMPUTE_MAXS);
             ClassVisitor classVisitor = new SymbolicTraceClassVisitor(classWriter, cf.resourcePath);
+            //System.out.println(">>> about to instrument: " + cf.fullName) ;
             classReader.accept(classVisitor, ClassReader.EXPAND_FRAMES);
-
             byte[] instrumentedBytes = classWriter.toByteArray();
             classLoader.addClass(cf.fullName, instrumentedBytes);
     	}

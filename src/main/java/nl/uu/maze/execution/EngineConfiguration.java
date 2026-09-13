@@ -107,6 +107,17 @@ public class EngineConfiguration {
     public boolean enableDivisionByZeroChecking = false ;
     
     /**
+     * If true, I/O methods that write to the environment will not be executed
+     * during symbolic execution. Instead it is modeled by a skip (no change in
+     * the current sym-state). Only I/O methods whose model are present in MAZE
+     * will be skipped like this. Check the package maze.model to see which models
+     * are present there.
+     * 
+     * <p>Default: true.
+     */
+    public boolean skipIOWriteMethods = true ;
+    
+    /**
      * When true, MAZE will generate random values for parameters of the constructor
      * and method under tests. This is only applicable in the test generation through
      * concrete-driven symbolic execution, where some parameters may be left unconstrained

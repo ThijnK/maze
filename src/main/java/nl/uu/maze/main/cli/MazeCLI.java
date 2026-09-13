@@ -129,6 +129,11 @@ public class MazeCLI implements Callable<Integer> {
     @Option(names = { "--check-divbyZero" }, description = "When true, MAZE will actively check expressions of the form x/y and x%y, whether a division or remainder by zero error can occur. (default: ${DEFAULT-VALUE})", defaultValue = "false", paramLabel = "<true|false>")
     private boolean enableDivisionByZeroChecking ;
     
+    @Option(names = { "--skip-IO-writes" }, description = "When true, MAZE skip selected IO write functions when it has to symbolically execute them (default: ${DEFAULT-VALUE})",
+    		          defaultValue = "true", 
+    		          paramLabel = "<true|false>")
+    private boolean skipIOWriteMethods ;
+       
     @Option(names = { "--max-array-size" }, description = "Maximum array size. (default: ${DEFAULT-VALUE})", defaultValue = "20", paramLabel = "<int>")
     private int max_array_size ;
     
@@ -172,6 +177,7 @@ public class MazeCLI implements Callable<Integer> {
             }
             EngineConfiguration.getInstance().allowCUTfieldschangeByReflection = this.allowCUTfieldschangeByReflection ;
             EngineConfiguration.getInstance().enableDivisionByZeroChecking = this.enableDivisionByZeroChecking ;
+            EngineConfiguration.getInstance().skipIOWriteMethods = this.skipIOWriteMethods ;
             EngineConfiguration.getInstance().minimalisticTestSuite = this.minimalisticTestSuite ;
             EngineConfiguration.getInstance().max_array_size = this.max_array_size ;
             EngineConfiguration.getInstance().pathLengthCoverage = this.pathLengthCoverage ;

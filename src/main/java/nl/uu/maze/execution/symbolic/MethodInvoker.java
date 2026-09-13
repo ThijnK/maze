@@ -15,11 +15,13 @@ import java.util.Optional;
 import nl.uu.maze.analysis.JavaAnalyzer;
 import nl.uu.maze.execution.ArgMap;
 import nl.uu.maze.execution.ArgMap.ObjectRef;
+import nl.uu.maze.execution.EngineConfiguration;
 import nl.uu.maze.execution.MethodType;
 import nl.uu.maze.execution.concrete.*;
 import nl.uu.maze.execution.symbolic.HeapObjects.*;
 import nl.uu.maze.model.ArithFunctions;
 import nl.uu.maze.model.BoxedPrimitivesMethods;
+import nl.uu.maze.model.IOOutputFunctions;
 import nl.uu.maze.transform.JavaToZ3Transformer;
 import nl.uu.maze.transform.JimpleToJavaTransformer;
 import nl.uu.maze.transform.JimpleToZ3Transformer;
@@ -124,7 +126,9 @@ public class MethodInvoker {
         	//System.out.println(">>> sym exec Math.pow") ;
         //	return Optional.empty();
         //}
-        
+        if(IOOutputFunctions.MODELof_PrintLn.executeModel(state, base, expr) != null && EngineConfiguration.getInstance().skipIOWriteMethods) {
+        	return Optional.empty();
+        }
         
         // If replaying a trace, do not symbolically execute java standard library
         // methods, because we do not have trace entries for those (not instrumented)
