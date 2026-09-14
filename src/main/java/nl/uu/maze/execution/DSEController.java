@@ -30,6 +30,7 @@ import nl.uu.maze.execution.concrete.ConcreteExecutor;
 import nl.uu.maze.execution.symbolic.*;
 import nl.uu.maze.generation.JUnitTestGenerator;
 import nl.uu.maze.instrument.*;
+import nl.uu.maze.search.SearchExecutionException;
 import nl.uu.maze.search.strategy.ConcreteSearchStrategy;
 import nl.uu.maze.search.strategy.DFS;
 import nl.uu.maze.search.strategy.SearchStrategy;
@@ -248,7 +249,6 @@ public class DSEController {
         
         logger.info("Running {} DSE on class: {}", concreteDriven ? "concrete-driven" : "symbolic-driven",
                 clazz.getSimpleName());
-        logger.info("Using search strategy: {}", searchStrategy.getName());
 
         logger.debug("Max depth: {}", maxDepth);
         logger.debug("Output path: {}", outPath);
@@ -257,9 +257,10 @@ public class DSEController {
         // Write test cases regardless of whether the execution was successful or not,
         // so that intermediate results are not lost
         try {
+            logger.info("Using search strategy: {}", searchStrategy.getName());
             run();
-        } finally {
-        	
+            // Resolve the final callback before publishing any success output.
+            int exploredCount = searchStrategy.getTotalExploredCount();
         	generator.writeToFile(outPath); 
             logger.info("#generated test-cases: {}", generator.getNumberOfGeneratedTestCases()) ;
             
@@ -268,7 +269,7 @@ public class DSEController {
             Long runtime_ = System.currentTimeMillis() - mystartTime ;
             
             
-        	logger.info("#items explored: " + searchStrategy.getTotalExploredCount()) ;
+            logger.info("#items explored: " + exploredCount) ;
         	int stmtTargets = CoverageTracker.getInstance().numberOfTargetStmts() ;
         	int stmtCovered = stmtTargets - CoverageTracker.getInstance().numberOfStillUnCoveredStmts() ;
         	int branchTargets = CoverageTracker.getInstance().numberOfTargetBranches() ;
@@ -310,7 +311,7 @@ public class DSEController {
                         	IOUtils.saveTxtToFile(file, CoverageTracker.getInstance().showPathCoverageInfo()) ;
                         }
                         catch(Exception e) {
-                        	logger.error("Failed to save the path-coverage info of " + classname) ;
+                            throw new IllegalStateException("Failed to save the path-coverage info of " + classname, e);
                         } ;
                         break ;
             }
@@ -348,7 +349,7 @@ public class DSEController {
                }
                String[] summaryContent = {
                		clazz.getName(),
-               		 "" + searchStrategy.getTotalExploredCount(),
+                     "" + exploredCount,
                		 "" + stmtTargets,
                		 "" + stmtCovered,
                		 "" + stmtCovRatio,
@@ -371,13 +372,19 @@ public class DSEController {
             	   IOUtils.saveTxtToFile(file, summary) ;
                }
                catch (Exception e) {
-            	   logger.error("Failed to save test summary of " + clazz.getName()) ;
+                   throw new IllegalStateException("Failed to save test summary of " + clazz.getName(), e);
                }
             }
+        } catch (Exception | LinkageError | AssertionError failure) {
+            logger.error("Run failed; generated tests are partial and must not be scored as a completed run.");
+            try {
+                generator.writeToFile(outPath);
+            } catch (Exception | LinkageError | AssertionError cleanup) {
+                failure.addSuppressed(cleanup);
+            }
+            throw failure;
         }
     }
-    
-    
 
     /**
      * Run the dynamic symbolic execution engine on the current class.
@@ -425,6 +432,8 @@ public class DSEController {
                     strategy.reset();
                     logger.info("Processing method: {}", method.getName());
                     runConcreteDriven(method, strategy);
+                } catch (SearchExecutionException e) {
+                    throw e;
                 } catch (Exception e) {
                     logger.error("Error processing method {}: {}", method.getName(), e.getMessage());
                     logger.debug("Error stack trace: ", e);

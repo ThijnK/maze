@@ -1,6 +1,8 @@
 package nl.uu.maze.main.cli;
 
+import java.nio.file.Path;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Callable;
 
 import org.slf4j.LoggerFactory;
@@ -10,9 +12,9 @@ import ch.qos.logback.classic.Level;
 import nl.uu.maze.execution.DSEController;
 import nl.uu.maze.execution.EngineConfiguration;
 import nl.uu.maze.main.cli.converters.*;
+import nl.uu.maze.search.SearchConfiguration;
+import nl.uu.maze.search.SearchSession;
 import nl.uu.maze.search.heuristic.SearchHeuristicFactory.ValidSearchHeuristic;
-import nl.uu.maze.search.strategy.SearchStrategy;
-import nl.uu.maze.search.strategy.SearchStrategyFactory;
 import nl.uu.maze.search.strategy.SearchStrategyFactory.ValidSearchStrategy;
 import nl.uu.maze.util.Z3ContextProvider;
 import picocli.CommandLine.Command;
@@ -35,7 +37,7 @@ public class MazeCLI implements Callable<Integer> {
 
     @Option(names = {"-n", "--class-name"}, description = "Fully qualified class to generate tests for", required = true, paramLabel = "<class>")
     private String className;
-    
+
     @Option(names = { "--indirect-target" }, description = "Fully qualified name of the indirectly targeted class whose coverage is to be tracked", paramLabel = "<class>")
     private String classToTrack;
 
@@ -56,16 +58,31 @@ public class MazeCLI implements Callable<Integer> {
     private Level logLevel;
 
     @Option(names = { "-s",
-            "--strategy" }, description = "One or multiple of the available search strategies (default: ${DEFAULT-VALUE}, options: ${COMPLETION-CANDIDATES})", defaultValue = "DFS", split = ",", arity = "1..*", paramLabel = "<name>")
-    private List<ValidSearchStrategy> searchStrategies;
+            "--strategy" }, description = "One or multiple of the available search strategies (default: ${DEFAULT-VALUE}, built-ins: ${COMPLETION-CANDIDATES}; or a full Java class name)", completionCandidates = StrategyNames.class, defaultValue = "DFS", split = ",", arity = "1..*", paramLabel = "<name>")
+    private List<String> searchStrategies;
 
     @Option(names = { "-u",
-            "--heuristic" }, description = "One or multiple of the available search heuristics to use for probabilistic search (default: ${DEFAULT-VALUE}, options: ${COMPLETION-CANDIDATES})", defaultValue = "UH", split = ",", arity = "1..*", paramLabel = "<name>")
-    private List<ValidSearchHeuristic> searchHeuristics;
+            "--heuristic" }, description = "One or multiple of the available search heuristics to use for probabilistic search (default: ${DEFAULT-VALUE}, built-ins: ${COMPLETION-CANDIDATES}; or a full Java class name)", completionCandidates = HeuristicNames.class, defaultValue = "UH", split = ",", arity = "1..*", paramLabel = "<name>")
+    private List<String> searchHeuristics;
 
     @Option(names = { "-w",
             "--weight" }, description = "Weights to use for the provided search heuristics (default: ${DEFAULT-VALUE})", defaultValue = "1.0", split = ",", arity = "1..*", converter = SearchHeuristicWeightConverter.class, paramLabel = "<double>")
     private List<Double> heuristicWeights;
+
+    @Option(names = "--plugin", description = "Extension or dependency JAR (repeatable)", paramLabel = "<jar>")
+    private List<Path> pluginJars = List.of();
+
+    @Option(names = "--search-config", description = "Search JSON file; cannot be combined with -s, -u or -w", paramLabel = "<json>")
+    private Path searchConfig;
+
+    @Spec private CommandSpec commandSpec;
+
+    public static final class StrategyNames extends java.util.ArrayList<String> {
+        public StrategyNames() { super(java.util.Arrays.stream(ValidSearchStrategy.values()).map(Enum::name).toList()); }
+    }
+    public static final class HeuristicNames extends java.util.ArrayList<String> {
+        public HeuristicNames() { super(java.util.Arrays.stream(ValidSearchHeuristic.values()).map(Enum::name).toList()); }
+    }
 
     @Option(names = { "-d",
             "--max-depth" }, description = "Maximum depth of the search (default: ${DEFAULT-VALUE})", defaultValue = "200", paramLabel = "<int>")
@@ -119,7 +136,7 @@ public class MazeCLI implements Callable<Integer> {
     @Option(names = "--max-violations", description = "Stop verification after this many violations, or unlimited (default: ${DEFAULT-VALUE})",
             defaultValue = "1", converter = ViolationLimitConverter.class, paramLabel = "<count|unlimited>")
     private int maxViolations;
-    
+
     @Option(names = { "--do-not-close-z3-context" }, description = "When true, will not close internal z3 context. ONLY USED FOR TESTING MAZE. (default: ${DEFAULT-VALUE})", defaultValue = "false", arity = "0..1", fallbackValue = "true", paramLabel = "<true|false>")
     private boolean leaveZ3ContextOpen ;
     
@@ -150,8 +167,6 @@ public class MazeCLI implements Callable<Integer> {
     
     
     
-    @Spec private CommandSpec commandSpec;
-
     int verificationLimit() {
         var parsed = commandSpec.commandLine().getParseResult();
         if (!verification && parsed.hasMatchedOption("--max-violations")) {
@@ -162,6 +177,8 @@ public class MazeCLI implements Callable<Integer> {
 
     @Override
     public Integer call() {
+        RunStatus status = null;
+        boolean contextClosed = false;
         try {
             // Set logging level
             Logger rootLogger = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
@@ -199,27 +216,50 @@ public class MazeCLI implements Callable<Integer> {
             timeBudget *= 1000L; // Convert to milliseconds
             testTimeout *= 1000L; // Convert to milliseconds
 
-            List<String> searchStrategies = this.searchStrategies.stream().map(ValidSearchStrategy::name)
-                    .toList();
-            List<String> searchHeuristics = this.searchHeuristics.stream().map(ValidSearchHeuristic::name)
-                    .toList();
-            SearchStrategy<?> strategy = SearchStrategyFactory.createStrategy(searchStrategies,
-                    searchHeuristics, heuristicWeights, timeBudget);
-
-            Long start = System.currentTimeMillis();
-            DSEController controller = new DSEController(classPath, concreteDriven, strategy,
-                    methodName, maxDepth, testTimeout, packageName, junitVersion.isJUnit4());
-            controller.run(className, classToTrack, timeBudget);
-            Long end = System.currentTimeMillis();
-            logger.info("Execution time: {} ms", end - start);
+            status = new RunStatus(Path.of(outPath), className, concreteDriven,
+                    Map.of("strategies", searchStrategies, "heuristics", searchHeuristics,
+                            "weights", heuristicWeights, "plugins", pluginJars.stream().map(Path::toString).toList(),
+                            "configFile", searchConfig == null ? "" : searchConfig.toString()));
+            boolean explicitHeuristics = commandSpec.commandLine().getParseResult().hasMatchedOption("-u")
+                    || commandSpec.commandLine().getParseResult().hasMatchedOption("-w");
+            if (searchConfig != null && (explicitHeuristics
+                    || commandSpec.commandLine().getParseResult().hasMatchedOption("-s"))) {
+                throw new IllegalArgumentException("--search-config cannot be combined with -s, -u or -w");
+            }
+            SearchConfiguration configuration = searchConfig == null
+                    ? SearchConfiguration.fromCli(searchStrategies, searchHeuristics, heuristicWeights, explicitHeuristics)
+                    : SearchConfiguration.read(searchConfig);
+            status.configuration(configuration.describe());
+            long start = System.currentTimeMillis();
+            try (SearchSession session = new SearchSession(pluginJars)) {
+                var strategy = session.createStrategy(configuration, timeBudget, concreteDriven);
+                status.search(session.describe());
+                DSEController controller = new DSEController(classPath, concreteDriven, strategy,
+                        methodName, maxDepth, testTimeout, packageName, junitVersion.isJUnit4());
+                controller.run(className, classToTrack, timeBudget);
+            }
+            if (!leaveZ3ContextOpen) {
+                Z3ContextProvider.close();
+                contextClosed = true;
+            }
+            status.finish(null);
+            logger.info("Execution time: {} ms", System.currentTimeMillis() - start);
             return 0;
-        } catch (Exception e) {
+        } catch (Exception | LinkageError | AssertionError e) {
+            if (status != null) {
+                try { status.finish(e); }
+                catch (Exception cleanup) { e.addSuppressed(cleanup); }
+            }
             logger.error("An error occurred: {}: {}", e.getClass().getName(), e.getMessage());
             logger.error("Error stack trace: ", e);
             return 1;
         } finally {
-            if (!leaveZ3ContextOpen) 
-            	Z3ContextProvider.close();
+            if (!leaveZ3ContextOpen && !contextClosed) {
+                try { Z3ContextProvider.close(); }
+                catch (RuntimeException | LinkageError cleanup) {
+                    logger.error("Failed to close Z3 after an unsuccessful run", cleanup);
+                }
+            }
         }
     }
 }

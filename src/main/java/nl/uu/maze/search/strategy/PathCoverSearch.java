@@ -87,7 +87,7 @@ public class PathCoverSearch extends SearchStrategy<SymbolicState> {
 		int pl = EngineConfiguration.getInstance().pathLengthCoverage ;
     	if (! (pl == -1 || pl > 0)) {
     		logger.error("Strategy PathCoverSearch requires engine-configuration pathLengthCoverage to be -1 or >0");
-    		throw new Error() ;
+            throw new IllegalArgumentException("PathCoverSearch requires --path-length-coverage=-1 or a positive length");
     	}
 	}
 	

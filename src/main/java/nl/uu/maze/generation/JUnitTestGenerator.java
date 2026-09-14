@@ -943,7 +943,7 @@ public class JUnitTestGenerator {
             logger.info("JUnit test cases written to {}/{}{}{}/{}.java", currentDir, path,
                     !testPackageName.isEmpty() ? "/" : "", testPackageName.replace(".", "/"), testClassName);
         } catch (Exception e) {
-            logger.error("Failed to generate JUnit test cases: {}", e.getMessage());
+            throw new IllegalStateException("Failed to write generated JUnit test cases to " + path, e);
         }
     }
 
