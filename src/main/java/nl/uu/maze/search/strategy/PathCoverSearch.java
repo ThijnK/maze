@@ -132,7 +132,6 @@ public class PathCoverSearch extends SearchStrategy<SymbolicState> {
 		  case TARGET_PARTIALLY_COVERED : priority.offer(target) ; break ;		
 		  default : theRest.offer(target) ; break ;
 		}
-		target.setIteration(iteration);		
 		count++ ;
 	}
 	

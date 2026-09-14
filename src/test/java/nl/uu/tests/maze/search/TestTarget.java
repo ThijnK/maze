@@ -8,7 +8,6 @@ import sootup.core.graph.StmtGraph;
 import sootup.core.jimple.common.stmt.Stmt;
 
 class TestTarget implements SearchTarget {
-    private int iteration;
     private int waitingTime;
 
     @Override public Stmt getStmt() { return null; }
@@ -20,8 +19,6 @@ class TestTarget implements SearchTarget {
     @Override public List<Integer> getBranchHistory() { return List.of(); }
     @Override public int getCallDepth() { return 0; }
     @Override public Pair<Stmt, StmtGraph<?>>[] getCallStack() { return null; }
-    @Override public void setIteration(int value) { iteration = value; }
-    @Override public int getIteration() { return iteration; }
     @Override public void setWaitingTime(int value) { waitingTime = value; }
     @Override public int getWaitingTime() { return waitingTime; }
 }

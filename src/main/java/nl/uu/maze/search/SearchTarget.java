@@ -62,25 +62,12 @@ public interface SearchTarget {
     Pair<Stmt, StmtGraph<?>>[] getCallStack();
 
     /**
-     * Sets the shared arrival-iteration observation. Keep private scheduling state
-     * in the strategy instance; another owner may overwrite this value.
-     */
-    void setIteration(int iteration);
-
-    /**
-     * Returns the shared arrival-iteration observation, not an owner-specific clock.
-     */
-    int getIteration();
-
-    /**
-     * Sets the waiting time of the target, which is the number of iterations since
-     * it was added to the search strategy.
+     * Sets the waiting time in search iterations for heuristic evaluation.
      */
     void setWaitingTime(int age);
 
     /**
-     * Returns the shared waiting-time observation. PS sets it from its private
-     * arrival clock immediately before heuristic scoring.
+     * Returns the waiting time supplied by the strategy for heuristic evaluation.
      */
     int getWaitingTime();
 }

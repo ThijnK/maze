@@ -224,7 +224,7 @@ rejected before exploration.
 | `getNewCoverageDepths()` | History of depths where new code was covered. |
 | `getBranchHistory()` | Integer-encoded branch history along the recorded path. |
 | `getCallDepth()`, `getCallStack()` | Call depth and statement/CFG frames for the current or recorded branch point. |
-| `getIteration()`, `getWaitingTime()` | Shared observations. PS maintains arrival times privately and sets waiting time immediately before scoring; do not use these fields as storage for your own scheduling state. |
+| `getWaitingTime()` | Waiting time in search iterations, set by PS immediately before heuristic evaluation. |
 
 Treat engine-owned graphs, constraints, collections, and coverage as observations.
 Copy data you intend to change. The existing public analysis and coverage services

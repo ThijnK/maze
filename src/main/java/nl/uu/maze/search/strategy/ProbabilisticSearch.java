@@ -61,7 +61,6 @@ public class ProbabilisticSearch<T extends SearchTarget> extends SearchStrategy<
         targets.add(target);
         arrivals.compute(target, (key, previous) -> new Arrival(iteration,
                 previous == null ? 1 : previous.occurrences() + 1));
-        target.setIteration(iteration);
         this.count++ ;
     }
 

@@ -135,7 +135,7 @@ public final class ArtifactCheck {
                 public <T extends SearchTarget> double calculateWeight(T t) {
                     java.util.Objects.requireNonNull(t.getStmt());
                     java.util.Objects.requireNonNull(t.getCFG());
-                    t.getPrevStmt(); t.getDepth(); t.getCallDepth(); t.getIteration(); t.getWaitingTime();
+                    t.getPrevStmt(); t.getDepth(); t.getCallDepth(); t.getWaitingTime();
                     t.getBranchHistory().size(); t.getNewCoverageDepths().size();
                     for (var frame : t.getCallStack()) { frame.first(); frame.second(); }
                     t.getConstraints().stream().mapToDouble(c -> c.getEstimatedCost()).sum();
