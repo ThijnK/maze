@@ -390,6 +390,13 @@ public class SymbolicState implements SearchTarget {
         engineConstraints.add(new SingleConstraint(this, constraint));
     }
 
+    /** JVM boolean values use the int sort in Jimple, but only zero and one are legal inputs. */
+    public void addBooleanDomainConstraint(Expr<?> value) {
+        int width = Z3Sorts.getInstance().getIntBitSize();
+        addEngineConstraint(ctx().mkOr(ctx().mkEq(value, ctx().mkBV(0, width)),
+                ctx().mkEq(value, ctx().mkBV(1, width))));
+    }
+
     public void addEngineConstraint(PathConstraint constraint) {
         engineConstraints.add(constraint);
     }

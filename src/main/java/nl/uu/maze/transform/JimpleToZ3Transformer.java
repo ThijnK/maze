@@ -577,6 +577,9 @@ public class JimpleToZ3Transformer extends AbstractValueVisitor<Expr<?>> {
             // Create a new variable for the parameter
         	Sort sort = sorts.determineSort(sootType) ;
             param = ctx().mkConst(var,sort);
+            if (sootType instanceof PrimitiveType.BooleanType) {
+                state.addBooleanDomainConstraint(param);
+            }
             
             // WP adding new behavior:
             // When the parameter is floating-point like, we add a constrain that it should be
