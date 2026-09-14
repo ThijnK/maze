@@ -1,0 +1,17 @@
+name: maze-dev
+
+services:
+  dev:
+    image: maze-dev:local
+    build:
+      context: docker/dev
+    init: true
+    working_dir: /workspace
+    cpus: 4
+    mem_limit: 6g
+    volumes:
+      - .:/workspace
+      - maven-cache:/root/.m2
+
+volumes:
+  maven-cache:
