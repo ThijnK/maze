@@ -22,12 +22,12 @@ public class CobaMazeVerificationMode {
 		String sp = " " ;
 
 		String argz =   "--classpath=" + cobabenchPath + "/target/classes"
-				      + sp + "--classname=" + CUT 
-				      + sp + "--indirectTarget=cobabench.SomeCUT"
+				      + sp + "--class-name=" + CUT
+				      + sp + "--indirect-target=cobabench.SomeCUT"
 				      + sp + "--output-path=" + cobabenchPath + "/src/test/java/"
 				      + sp + "-s=BFS"
-				      + sp + "--verificationMode=1" 
-				      + sp + "--minimalistic-suite=true"
+				      + sp + "--verification=true"
+				      + sp + "--minimization=true"
 				      + sp + "-b=60"				      
 				      + sp
 				      ;

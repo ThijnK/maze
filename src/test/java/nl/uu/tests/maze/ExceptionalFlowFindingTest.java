@@ -63,8 +63,8 @@ public class ExceptionalFlowFindingTest {
 	void test_finding_exceptional_flow() throws IOException {
 
 		String argz =   "--classpath=" + binClassesDir
-				      + sp + "--classname=" + CUT.getName()
-				      + sp + "--output-path=" + outputDir 
+				      + sp + "--class-name=" + CUT.getName()
+				      + sp + "--output-path=" + outputDir
 				      + sp + "--do-not-close-z3-context=true" // don't close z3 context, or else the next tests will crash
 				      + sp
 				      ;
@@ -92,9 +92,9 @@ public class ExceptionalFlowFindingTest {
 	void test_finding_division_by_zero() throws IOException {
 
 		String argz =   "--classpath=" + binClassesDir
-				      + sp + "--classname=" + CUT.getName()
-				      + sp + "--output-path=" + outputDir 
-				      + sp + "--check-divbyZero"
+				      + sp + "--class-name=" + CUT.getName()
+				      + sp + "--output-path=" + outputDir
+				      + sp + "--check-division-by-zero"
 				      + sp + "--do-not-close-z3-context=true" // don't close z3 context, or else the next tests will crash
 				      + sp
 				      ;
@@ -113,10 +113,10 @@ public class ExceptionalFlowFindingTest {
 	void test_replay_division_by_zero() throws IOException {
 
 		String argz =   "--classpath=" + binClassesDir
-				      + sp + "--classname=" + CUT2.getName()
-				      + sp + "--output-path=" + outputDir 
+				      + sp + "--class-name=" + CUT2.getName()
+				      + sp + "--output-path=" + outputDir
 				      + sp + "-C=true" // concrete driven to test replay
-				      + sp + "--check-divbyZero"
+				      + sp + "--check-division-by-zero"
 				      + sp + "--do-not-close-z3-context=true" // don't close z3 context, or else the next tests will crash
 				      + sp
 				      ;

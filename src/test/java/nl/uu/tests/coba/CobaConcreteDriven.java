@@ -50,7 +50,7 @@ public class CobaConcreteDriven {
 		String sp = " " ;
 
 		String argz =   "--classpath=" + cobabenchPath + "/target/classes"
-				      + sp + "--classname=" + CUT 
+				      + sp + "--class-name=" + CUT
 				      + sp + "--output-path=" + cobabenchPath + "/src/test/java/"
 				     // + sp + "-j=JUnit4"
 				      //+ sp + "-s=RPS -u=UH " 
@@ -59,8 +59,8 @@ public class CobaConcreteDriven {
 				      + sp + "--random-seeding"
 				      + sp + "-b=60"
 				      //+ sp + "--max-depth=50"
-				      + sp + "--constrain-FP-params-to-normal-numbers=true"
-				      //+ sp + "--surpress-regression-oracles=false"
+				      + sp + "--constrain-fp-params-to-normal-numbers=true"
+				      //+ sp + "--suppress-regression-oracles=false"
 				      //+ sp + "--propagate-unexpected-exceptions=true"
 				      + sp
 				      ;

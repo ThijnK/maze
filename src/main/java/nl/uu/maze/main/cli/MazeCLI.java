@@ -17,6 +17,8 @@ import nl.uu.maze.search.strategy.SearchStrategyFactory.ValidSearchStrategy;
 import nl.uu.maze.util.Z3ContextProvider;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
+import picocli.CommandLine.Spec;
+import picocli.CommandLine.Model.CommandSpec;
 
 /**
  * Main class for the MAZE application that provides a command-line interface
@@ -31,11 +33,10 @@ public class MazeCLI implements Callable<Integer> {
             "--classpath" }, description = "Path to compiled classes", required = true, paramLabel = "<path>")
     private String classPath;
 
-    @Option(names = { "-n",
-            "--classname" }, description = "Fully qualified name of the class to generate tests for", required = true, paramLabel = "<class>")
+    @Option(names = {"-n", "--class-name"}, description = "Fully qualified class to generate tests for", required = true, paramLabel = "<class>")
     private String className;
     
-    @Option(names = { "--indirectTarget" }, description = "Fully qualified name of the indirectly targeted class whose coverage is to be tracked", paramLabel = "<class>")
+    @Option(names = { "--indirect-target" }, description = "Fully qualified name of the indirectly targeted class whose coverage is to be tracked", paramLabel = "<class>")
     private String classToTrack;
 
     @Option(names = { "-o",
@@ -83,63 +84,82 @@ public class MazeCLI implements Callable<Integer> {
     private JUnitVersion junitVersion;
 
     @Option(names = { "-C",
-            "--concrete-driven" }, description = "Use concrete-driven DSE instead of symbolic-driven DSE (default: ${DEFAULT-VALUE})", defaultValue = "false", paramLabel = "<true|false>")
+            "--concrete-driven" }, description = "Use concrete-driven DSE instead of symbolic-driven DSE (default: ${DEFAULT-VALUE})", defaultValue = "false", arity = "0..1", fallbackValue = "true", paramLabel = "<true|false>")
     private boolean concreteDriven;
     
-    @Option(names = { "--random-seeding" }, description = "When true: use random values to for unconstrained constructor/method parameters in concrete-driven DSE (default: ${DEFAULT-VALUE})", defaultValue = "false", paramLabel = "<true|false>")
+    @Option(names = { "--random-seeding" }, description = "When true: use random values to for unconstrained constructor/method parameters in concrete-driven DSE (default: ${DEFAULT-VALUE})", defaultValue = "false", arity = "0..1", fallbackValue = "true", paramLabel = "<true|false>")
     private boolean useRandomSeeding;
     
-    @Option(names = { "--minimalistic-suite" }, description = "When true: only tests that add new stmt or branch coverage are generated (default: ${DEFAULT-VALUE})", defaultValue = "false", paramLabel = "<true|false>")
+    @Option(names = { "--minimization" }, description = "When true: only tests that add instruction, branch, or configured path coverage are retained (default: ${DEFAULT-VALUE})", defaultValue = "false", arity = "0..1", fallbackValue = "true", paramLabel = "<true|false>")
     private boolean minimalisticTestSuite;
     
-    @Option(names = { "--path-length-cov" }, description = "If non-zero, the length of elementary paths to cover. If -1, prime paths. (default: ${DEFAULT-VALUE})", defaultValue = "0", paramLabel = "<int>")
+    @Option(names = { "--path-length-coverage" }, description = "If non-zero, the length of elementary paths to cover. If -1, prime paths. (default: ${DEFAULT-VALUE})", defaultValue = "0", paramLabel = "<int>")
     private int pathLengthCoverage;
     
-    @Option(names = { "--target-path-aging"}, description = "Set target path aging before being dropped. If -1 target paths don't age. If -0, CUT size is used as aging param. (default: ${DEFAULT-VALUE})", defaultValue = "-1", paramLabel = "<int>")
+    @Option(names = { "--target-path-aging"}, description = "Set target path aging before being dropped. If -1 target paths don't age. If 0, CUT size is used as aging param. (default: ${DEFAULT-VALUE})", defaultValue = "-1", paramLabel = "<int>")
     private int targetPathAging;
     
-    @Option(names = { "--allow-CUTfieldschange-by-reflection" }, 
-    		description = "When true will allow MAZE to change the CUT fields using reflection (default: ${DEFAULT-VALUE})", defaultValue = "false", paramLabel = "<true|false>")
+    @Option(names = { "--allow-field-changes-by-reflection" },
+            description = "When true will allow MAZE to change the CUT fields using reflection (default: ${DEFAULT-VALUE})", defaultValue = "false", arity = "0..1", fallbackValue = "true", paramLabel = "<true|false>")
     private boolean allowCUTfieldschangeByReflection ;
 
-    @Option(names = { "--constrain-FP-params-to-normal-numbers" }, description = "When true will constrain the symbolic solver to generate normal numbers for floating-point-like methods parameters (default: ${DEFAULT-VALUE})", defaultValue = "false", paramLabel = "<true|false>")
+    @Option(names = { "--constrain-fp-params-to-normal-numbers" }, description = "When true will constrain the symbolic solver to generate normal numbers for floating-point-like methods parameters (default: ${DEFAULT-VALUE})", defaultValue = "false", arity = "0..1", fallbackValue = "true", paramLabel = "<true|false>")
     private boolean constrainFPNumberParametersToNormalNumbers ;
     
-    @Option(names = { "--surpress-regression-oracles" }, description = "When true generated regression oracles in the test-cases will be commented out (default: ${DEFAULT-VALUE})", defaultValue = "false", paramLabel = "<true|false>")
+    @Option(names = { "--suppress-regression-oracles" }, description = "When true generated regression oracles in the test-cases will be commented out (default: ${DEFAULT-VALUE})", defaultValue = "false", arity = "0..1", fallbackValue = "true", paramLabel = "<true|false>")
     private boolean surpressRegressionOracles ;
     
-    @Option(names = { "--propagate-unexpected-exceptions" }, description = "When true, when a test throws an exception that is not declared as expected exception by the method under test, it will be propagated. So, it will not be asserted as an expected exception by the test oracle. Note that this means the test will then fail (a potential bug is found by Maze) (default: ${DEFAULT-VALUE})", defaultValue = "false", paramLabel = "<true|false>")
+    @Option(names = { "--propagate-unexpected-exceptions" }, description = "When true, when a test throws an exception that is not declared as expected exception by the method under test, it will be propagated. So, it will not be asserted as an expected exception by the test oracle. Note that this means the test will then fail (a potential bug is found by Maze) (default: ${DEFAULT-VALUE})", defaultValue = "false", arity = "0..1", fallbackValue = "true", paramLabel = "<true|false>")
     private boolean propagateUnexpectedExceptions ;
     
-    @Option(names = { "--verificationMode" }, description = "if >0, MAZE will stop after finding that number of unexpected exceptions thrown by CUT. Only violating tests are generated. (default: ${DEFAULT-VALUE})", defaultValue = "0", paramLabel = "<int>")
-    private int verificationMode ;
+    @Option(names = "--verification", description = "Generate only violation tests (default: ${DEFAULT-VALUE})",
+            defaultValue = "false", arity = "0..1", fallbackValue = "true", paramLabel = "<true|false>")
+    private boolean verification;
+
+    @Option(names = "--max-violations", description = "Stop verification after this many violations, or unlimited (default: ${DEFAULT-VALUE})",
+            defaultValue = "1", converter = ViolationLimitConverter.class, paramLabel = "<count|unlimited>")
+    private int maxViolations;
     
-    @Option(names = { "--do-not-close-z3-context" }, description = "When true, will not close internal z3 context. ONLY USED FOR TESTING MAZE. (default: ${DEFAULT-VALUE})", defaultValue = "false", paramLabel = "<true|false>")
+    @Option(names = { "--do-not-close-z3-context" }, description = "When true, will not close internal z3 context. ONLY USED FOR TESTING MAZE. (default: ${DEFAULT-VALUE})", defaultValue = "false", arity = "0..1", fallbackValue = "true", paramLabel = "<true|false>")
     private boolean leaveZ3ContextOpen ;
     
-    @Option(names = { "--check-divbyZero" }, description = "When true, MAZE will actively check expressions of the form x/y and x%y, whether a division or remainder by zero error can occur. (default: ${DEFAULT-VALUE})", defaultValue = "false", paramLabel = "<true|false>")
+    @Option(names = { "--check-division-by-zero" }, description = "Search for division and remainder by zero. (default: ${DEFAULT-VALUE})", defaultValue = "false", arity = "0..1", fallbackValue = "true", paramLabel = "<true|false>")
     private boolean enableDivisionByZeroChecking ;
     
     @Option(names = { "--max-array-size" }, description = "Maximum array size. (default: ${DEFAULT-VALUE})", defaultValue = "20", paramLabel = "<int>")
     private int max_array_size ;
     
-    @Option(names = { "--export-jimple" }, description = "If 1, will export the Jimple code of every target method to a file. If -1 will print it to log.info. (default: ${DEFAULT-VALUE})", defaultValue = "0", paramLabel = "<1|-1|0>")
-    private int exportJimple ;
+    @Option(names = "--export-jimple", description = "Destination for Jimple code (default: ${DEFAULT-VALUE})",
+            defaultValue = "none", converter = ExportDestination.Converter.class, paramLabel = "<none|file|log>")
+    private ExportDestination exportJimple ;
     
-    @Option(names = { "--export-HCFG" }, description = "If 1, will export the high-level CFG of every target method to a dot-file. If -1 will print it to log info. (default: ${DEFAULT-VALUE})", defaultValue = "0", paramLabel = "<1|-1|0>")
-    private int exportHCFG ;
+    @Option(names = "--export-hcfg", description = "Destination for high-level CFGs in DOT format (default: ${DEFAULT-VALUE})",
+            defaultValue = "none", converter = ExportDestination.Converter.class, paramLabel = "<none|file|log>")
+    private ExportDestination exportHCFG ;
     
-    @Option(names = { "--export-target-paths" }, description = "If 1, will export the target paths of every target method to a file. If -1 will print them to log info. (default: ${DEFAULT-VALUE})", defaultValue = "0", paramLabel = "<1|-1|0>")
-    private int exportTargetPaths ;
+    @Option(names = "--export-target-paths", description = "Destination for target paths (default: ${DEFAULT-VALUE})",
+            defaultValue = "none", converter = ExportDestination.Converter.class, paramLabel = "<none|file|log>")
+    private ExportDestination exportTargetPaths ;
     
-    @Option(names = { "--export-pathcov" }, description = "If 1, will export path coverage info to a file. If -1 will print it to log info. (default: ${DEFAULT-VALUE})", defaultValue = "0", paramLabel = "<1|-1|0>")
-    private int exportPathCovInfo ;
+    @Option(names = "--export-path-coverage", description = "Destination for path-coverage information (default: ${DEFAULT-VALUE})",
+            defaultValue = "none", converter = ExportDestination.Converter.class, paramLabel = "<none|file|log>")
+    private ExportDestination exportPathCovInfo ;
     
-    @Option(names = { "--export-summary" }, description = "If true, will export basic test statistics to a csv file. (default: ${DEFAULT-VALUE})", defaultValue = "false", paramLabel = "<true|false>")
+    @Option(names = { "--export-summary" }, description = "If true, will export basic test statistics to a csv file. (default: ${DEFAULT-VALUE})", defaultValue = "false", arity = "0..1", fallbackValue = "true", paramLabel = "<true|false>")
     private boolean exportSummary ;
     
     
     
+    @Spec private CommandSpec commandSpec;
+
+    int verificationLimit() {
+        var parsed = commandSpec.commandLine().getParseResult();
+        if (!verification && parsed.hasMatchedOption("--max-violations")) {
+            throw new IllegalArgumentException("--max-violations requires --verification=true");
+        }
+        return verification ? maxViolations : 0;
+    }
+
     @Override
     public Integer call() {
         try {
@@ -153,8 +173,9 @@ public class MazeCLI implements Callable<Integer> {
             EngineConfiguration.getInstance().constrainFPNumberParametersToNormalNumbers = this.constrainFPNumberParametersToNormalNumbers ;
             EngineConfiguration.getInstance().surpressRegressionOracles = this.surpressRegressionOracles ;
             EngineConfiguration.getInstance().propagateUnexpectedExceptions = this.propagateUnexpectedExceptions ;
-            EngineConfiguration.getInstance().verificationMode = this.verificationMode ;
-            if (verificationMode != 0) {
+            int verificationLimit = verificationLimit();
+            EngineConfiguration.getInstance().verificationMode = verificationLimit;
+            if (verificationLimit != 0) {
             	// if verification mode is on, propagateUnexpectedExceptions is also set to true:
             	EngineConfiguration.getInstance().propagateUnexpectedExceptions = true ;
             }
@@ -165,10 +186,10 @@ public class MazeCLI implements Callable<Integer> {
             EngineConfiguration.getInstance().pathLengthCoverage = this.pathLengthCoverage ;
             EngineConfiguration.getInstance().targetPathAging = this.targetPathAging ;
 
-            EngineConfiguration.getInstance().exportJimple = this.exportJimple ;
-            EngineConfiguration.getInstance().exportHCFG = this.exportHCFG ;
-            EngineConfiguration.getInstance().exportTargetPaths = this.exportTargetPaths ;
-            EngineConfiguration.getInstance().exportPathCovInfo = this.exportPathCovInfo ;
+            EngineConfiguration.getInstance().exportJimple = this.exportJimple.engineValue() ;
+            EngineConfiguration.getInstance().exportHCFG = this.exportHCFG.engineValue() ;
+            EngineConfiguration.getInstance().exportTargetPaths = this.exportTargetPaths.engineValue() ;
+            EngineConfiguration.getInstance().exportPathCovInfo = this.exportPathCovInfo.engineValue() ;
             EngineConfiguration.getInstance().exportSummary = this.exportSummary ;
 
             EngineConfiguration.getInstance().outPath = this.outPath ;            
