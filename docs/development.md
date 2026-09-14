@@ -137,25 +137,3 @@ by root because the development container runs as root.
 If Docker cannot connect to its daemon, make sure the Docker engine is running
 and your selected Docker context points to it. `docker --version` only checks
 that the client is installed.
-
-### Public-image pulls with Docker Desktop on macOS
-
-If you use Docker Desktop on macOS and public-image pulls stall, try a temporary
-client configuration with Docker Desktop's bundled plugins. This retries the build
-without using or changing your saved registry credentials:
-
-```sh
-maze_docker_config=$(mktemp -d)
-maze_docker_endpoint=$(docker context inspect --format '{{.Endpoints.docker.Host}}')
-printf '%s\n' '{"cliPluginsExtraDirs":["/Applications/Docker.app/Contents/Resources/cli-plugins"]}' \
-  > "$maze_docker_config/config.json"
-
-docker --config "$maze_docker_config" --host "$maze_docker_endpoint" \
-  compose build --builder default dev
-
-rm "$maze_docker_config/config.json"
-rmdir "$maze_docker_config"
-```
-
-This fallback is for public images on Docker Desktop for macOS. It intentionally
-provides no registry authentication and does not alter global Docker settings.
