@@ -24,14 +24,18 @@ public abstract class SearchHeuristic {
      * @throws IllegalArgumentException if weight is not positive
      */
     public SearchHeuristic(double weight) {
-        if (weight <= 0) {
-            throw new IllegalArgumentException("Weight must be positive");
+        if (!Double.isFinite(weight) || weight <= 0) {
+            throw new IllegalArgumentException("Weight must be finite and positive");
         }
 
         this.weight = weight;
     }
 
     public abstract String getName();
+
+    /** Called by the owning strategy when pending work is reset. History may be retained. */
+    public void reset() {
+    }
 
     /**
      * Calculates the weight of a target based on this heuristic.
