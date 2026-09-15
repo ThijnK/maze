@@ -466,9 +466,14 @@ The project is organized into the following main packages:
 - `nl.uu.maze.examples`: Example classes for testing and demonstration purposes
 - `nl.uu.maze.benchmarks`: Benchmark classes for evaluating and comparing search strategies
 
-## ▊▎Benchmarking Framework
+## ▊▎Benchmarking Frameworks
 
-An accompanying benchmarking framework for MAZE is provided [here](https://github.com/ThijnK/JUGE) to measure performance (e.g. time to generate tests, code coverage, and mutation kill rate). The framework can be used to study the performance of MAZE search strategies, also to compare them to other testing tools. Developers implementing new search strategies may want to use this framework. The framework is a fork of the [JUGE](https://github.com/JUnitContest/JUGE) benchmarking framework, which is designed for evaluating test generation tools for the SBFT tool competitions. The fork is specifically set up to benchmark MAZE.
+Two accompanying benchmarking frameworks for MAZE are provided
+to measure performance (e.g. time to generate tests, code coverage, error detection).
+
+### BM Framework-1: Unit Testing Generation
+
+The benchmarking framework is provided [here](https://github.com/ThijnK/JUGE) to measure performance (e.g. time to generate tests, code coverage, and mutation kill rate). The framework can be used to study the performance of MAZE search strategies, also to compare them to other testing tools. Developers implementing new search strategies may want to use this framework. The framework is a fork of the [JUGE](https://github.com/JUnitContest/JUGE) benchmarking framework, which is designed for evaluating Java unit-test generation tools for the SBFT tool competitions. The fork is specifically set up to benchmark MAZE.
 Further instructions and details on the benchmarking process can be found [there](https://github.com/ThijnK/JUGE).
 
 
@@ -506,6 +511,10 @@ More information about the reasoning behind the design of each subject can be fo
 
 Samples of generated tests for the above benchmark classes can be found in [src/test/java/nl/uu/maze/generated/benchmarks](/src/test/java/nl/uu/tests/maze/generated/benchmarks/). These were generated using BFS with 30 second time budget.
 These tests achieve an overall 90% instruction coverage and 85% branch coverage.
+
+### BM Framework-2: Verification
+
+The benchmarking framework is provided [here](https://github.com/wooshrow/java-svcomp-t). It evaluates MAZE against verification tasks from the SV-COMP (International Competition on Software Verification) dataset. 
 
 ## ▊▎Troubleshooting
 

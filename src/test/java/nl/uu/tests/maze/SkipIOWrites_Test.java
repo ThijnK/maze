@@ -58,7 +58,7 @@ public class SkipIOWrites_Test {
 				      + sp + "--output-path=" + outputDir 
 				      + sp + "--do-not-close-z3-context=true" // don't close z3 context, or else the next tests will crash
 				      + sp + "--skip-IO-writes=false"
-				      //+ sp + "--export-jimple=-1"
+				      + sp + "--export-jimple=-1"
 				      + sp
 				      ;
 	    int exitCode = new CommandLine(new MazeCLI()).execute(argz.split(" ") );

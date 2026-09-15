@@ -3,7 +3,7 @@ package nl.uu.tests.maze.CUTs;
 public class CUT_withConsolePrint {
 	
 	public static int foo(int x) {
-		// The code below will translate to DynamicInvoke in the bytecode, which
+		// The code below will translate to DynamicInvoke in the bytecode (java 9 or above), which
 		// currently MAZE cannot handle. Such an invoke handles string concat (as below),
 		// and lambda expr. This requires runtime method linkage, which  requires
 		// qiute some effort. Handling this is TODO.
