@@ -8,7 +8,7 @@ public class CUT_withConsolePrint {
 		// and lambda expr. This requires runtime method linkage, which  requires
 		// qiute some effort. Handling this is TODO.
 		//
-		//System.out.println(">> input x: " + x) ;
+		//System.out.println(">> input x: " + x + " === oh btw 2x=" + (2*x)) ;
 		
 		System.out.println("START foo") ;
 		

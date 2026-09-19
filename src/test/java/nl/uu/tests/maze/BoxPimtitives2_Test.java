@@ -62,6 +62,7 @@ public class BoxPimtitives2_Test {
 				      + sp + "--output-path=" + outputDir 
 				      + sp + "--do-not-close-z3-context=true" // don't close z3 context, or else the next tests will crash
 				      + sp + "--constrain-FP-params-to-normal-numbers=true"
+				      + sp + "--export-jimple=-1"
 				      + sp
 				      ;
 	    int exitCode = new CommandLine(new MazeCLI()).execute(argz.split(" ") );

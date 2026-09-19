@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.objectweb.asm.ClassVisitor;
+import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
@@ -61,6 +62,13 @@ public class DependencyCollectingVisitor extends ClassVisitor {
                 } else {
                     addDependency(type);
                 }
+            }
+            
+            // WP adding this, so that in a try{ ... } catch(E e) { .. } type E is also added
+            // as dependency
+            @Override
+            public void visitTryCatchBlock(Label start, Label end, Label handler, String type) {
+            	addDependency(type) ;
             }
         };
     }

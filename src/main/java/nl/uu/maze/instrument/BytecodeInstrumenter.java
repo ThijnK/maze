@@ -145,27 +145,61 @@ public class BytecodeInstrumenter {
     * <p>The new instrumenter2 below isn't fully correct either. (1) It instruments (and loads) classes
     * simply in the order of combined inheritence-and-use-dependency, rather than just inheritence 
     * dependency, and (2) inner classes are instrumented in no particular order, which can be a problem
-    * if there are inheritance relations among them.
+    * if there are inheritance relations among them. For now this is handled by putting a class that fails
+    * the instrumentation or loading back in the queue, to be retried later after other classes in the
+    * queue have been processed.
     * 
-    * <p>For now this works in most cases. TODO: fix this.
+    * <p>For now this works in most cases. In some cases (e.g. see jbmc-regression/Exceptions examples)
+    * the CUT may still fail to be instrumented. For now we will then just load the class uninstrumented.
+    * For symbolic-driven this means we may lose stmt-coverage info. For concrete-driven this is a 
+    * problem. 
+    * TODO: fix this.
     */ 
 
     public Class<?> instrument2(String className) throws IOException, ClassNotFoundException {
     	List<ClassFileEntry> classesToInstrument = collectBinAndDependencies2(className) ;
     	// debug:
     	//List<String> clazzes = classesToInstrument.stream().map(cfe -> cfe.fullName).toList() ;
-    	//System.out.println(">>> classes to instrument: " + clazzes) ;
+    	//System.err.println(">>> classes to instrument: " + clazzes) ;
     	// instrument the classes in reverse order:
+    	Integer maxNumberOfRetry = null ;
     	while (! classesToInstrument.isEmpty()) {
     		ClassFileEntry cf = classesToInstrument.removeLast() ;
     		// Then instrument
-            ClassReader classReader = new ClassReader(cf.bytes);
+    		ClassReader classReader = new ClassReader(cf.bytes);
             ClassWriter classWriter = new ClassWriter(ClassWriter.COMPUTE_FRAMES | ClassWriter.COMPUTE_MAXS);
             ClassVisitor classVisitor = new SymbolicTraceClassVisitor(classWriter, cf.resourcePath);
-            //System.out.println(">>> about to instrument: " + cf.fullName) ;
-            classReader.accept(classVisitor, ClassReader.EXPAND_FRAMES);
-            byte[] instrumentedBytes = classWriter.toByteArray();
-            classLoader.addClass(cf.fullName, instrumentedBytes);
+            //System.err.println(">>> about to instrument: " + cf.fullName) ;
+            try {
+               classReader.accept(classVisitor, ClassReader.EXPAND_FRAMES);
+               byte[] instrumentedBytes = classWriter.toByteArray();
+               //System.err.println(">>> instrumented : " + cf.fullName) ;
+               classLoader.addClass(cf.fullName, instrumentedBytes);
+               //System.err.println(">>> loaded: " + cf.fullName) ;
+            }
+            catch(Throwable e) {
+            	//System.err.println(">>> FAILED to instrument: " + cf.fullName) ;
+            	if (maxNumberOfRetry == null) {
+            		//System.err.println(">>> putting back in worklist: " + cf.fullName) ; 
+            		logger.warn("Failed to instrument " + cf.fullName + ", but putting it back in the queue.");
+            		classesToInstrument.add(0,cf) ;
+            		maxNumberOfRetry = classesToInstrument.size() ;
+            	}
+            	else if (maxNumberOfRetry == 0) {
+            		//System.err.println(">>> max num of reload reached.") ;
+            	    classLoader.addClass(cf.fullName, cf.bytes);
+                    //System.err.println(">>> loaded UNINSTRUMENTED: " + cf.fullName) ;
+                    logger.warn("Multiple FAILED attempts to instrument " + cf.fullName + ".  Loading UNINSTRUMENTED bytecode instead.");
+                    maxNumberOfRetry = null ;
+            	}
+            	else {
+            		//System.err.println(">>> putting back in worklist: " + cf.fullName ) ; 
+            		logger.warn("FAILED to instrument " + cf.fullName + ", but putting it back in the queue.");
+            		// add cf back to to the list, but at the head (so, will be the last to instrument)
+            		classesToInstrument.add(0,cf) ;
+            		maxNumberOfRetry-- ;
+            	}
+            }   
     	}
     	// Find the main class in the class loader and return it
         return classLoader.findClass(className);
@@ -184,7 +218,10 @@ public class BytecodeInstrumenter {
      * 
      * <p>The bytecodes are returned in a list, in the order of the dependencies,
      * such that a class C appear before all classes it depends on. 
-     * NOTE: the ordering does not necerssarily respect inheritence ordering; TODO.
+     * NOTE: the ordering does not necessarily respect inheritence ordering; this
+     * may lead to a problem when loading the classes. But it is also a bit hard 
+     * to figure out the correct ordering in the list. For now this is handled
+     * in {@link #instrument2(String)} by rescheduling the loads.
      * 
      * @param className   full class name
      * @return Bytecode of the given class, its inner classes, and its dependencies.

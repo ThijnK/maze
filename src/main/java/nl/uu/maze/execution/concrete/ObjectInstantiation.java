@@ -62,6 +62,21 @@ public class ObjectInstantiation {
         if (clazz.equals(Long.class)) {
         	return new ExecutionResult((Long) 0L, null, false) ;
         }
+        if (clazz.equals(Short.class)) {
+        	return new ExecutionResult((Short) (short) 0, null, false) ;
+        }
+        if (clazz.equals(Boolean.class)) {
+        	return new ExecutionResult((Boolean) false, null, false) ;
+        }
+        if (clazz.equals(Float.class)) {
+        	return new ExecutionResult((Float) 0f, null, false) ;
+        }
+        if (clazz.equals(Double.class)) {
+        	return new ExecutionResult((Double) 0D, null, false) ;
+        }
+        if (clazz.equals(Character.class)) {
+        	return new ExecutionResult((Character) 'A', null, false) ;
+        }
         
         // Try to create an instance using one of the constructors
         Constructor<?>[] ctors = clazz.getDeclaredConstructors();
