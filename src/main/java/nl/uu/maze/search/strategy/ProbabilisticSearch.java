@@ -3,12 +3,14 @@ package nl.uu.maze.search.strategy;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.IdentityHashMap;
+import java.util.Map;
 import java.util.Random;
 
+import nl.uu.maze.search.SearchMode;
 import nl.uu.maze.execution.EngineConfiguration;
 import nl.uu.maze.search.SearchTarget;
 import nl.uu.maze.search.heuristic.SearchHeuristic;
-import nl.uu.maze.util.HCFG.HCFGPath;
 
 /**
  * Probabilistic Search (PS) strategy.
@@ -33,6 +35,8 @@ public class ProbabilisticSearch<T extends SearchTarget> extends SearchStrategy<
      */
     private static final int MAX_TARGETS_TO_CONSIDER = 1000;
     private final List<T> targets = new ArrayList<>();
+    private record Arrival(int iteration, int occurrences) {}
+    private final Map<T, Arrival> arrivals = new IdentityHashMap<>();
     private final List<SearchHeuristic> heuristics;
     private int iteration = 0;
 
@@ -41,6 +45,11 @@ public class ProbabilisticSearch<T extends SearchTarget> extends SearchStrategy<
             throw new IllegalArgumentException("At least one heuristic must be provided");
         }
         this.heuristics = heuristics;
+    }
+
+    @Override
+    public boolean supportsMode(SearchMode mode) {
+        return heuristics.stream().allMatch(heuristic -> heuristic.supportsMode(mode));
     }
 
     public String getName() {
@@ -56,13 +65,23 @@ public class ProbabilisticSearch<T extends SearchTarget> extends SearchStrategy<
     @Override
     public void add(T target) {
         targets.add(target);
-        target.setIteration(iteration);
+        arrivals.compute(target, (key, previous) -> new Arrival(iteration,
+                previous == null ? 1 : previous.occurrences() + 1));
         this.count++ ;
     }
 
     @Override
     public void remove(T target) {
-        targets.remove(target);
+        int index = targets.indexOf(target);
+        if (index >= 0) {
+            // List removal uses equality; release metadata for the actual removed object.
+            release(targets.remove(index));
+        }
+    }
+
+    private void release(T target) {
+        arrivals.computeIfPresent(target, (key, arrival) -> arrival.occurrences() == 1
+                ? null : new Arrival(arrival.iteration(), arrival.occurrences() - 1));
     }
 
     @Override
@@ -79,6 +98,8 @@ public class ProbabilisticSearch<T extends SearchTarget> extends SearchStrategy<
     @Override
     public void reset() {
         targets.clear();
+        arrivals.clear();
+        heuristics.forEach(SearchHeuristic::reset);
     }
 
     @Override
@@ -95,7 +116,12 @@ public class ProbabilisticSearch<T extends SearchTarget> extends SearchStrategy<
     public T weightedProbabilisticSelect() {
         // If only one or zero targets, skip the calculations
         if (targets.size() <= 1) {
-            return targets.isEmpty() ? null : targets.removeFirst();
+            if (targets.isEmpty()) {
+                return null;
+            }
+            T selected = targets.removeFirst();
+            release(selected);
+            return selected;
         }
 
         // Cap the number of targets to consider for efficiency
@@ -131,7 +157,7 @@ public class ProbabilisticSearch<T extends SearchTarget> extends SearchStrategy<
                 double sumWeights = 0;
                 for (int j = 0; j < effectiveSize; j++) {
                     T target = targets.get(originalIndices[j]);
-                    target.setWaitingTime(iteration - target.getIteration());
+                    target.setWaitingTime(iteration - arrivals.get(target).iteration());
                     targetWeights[i][j] = heuristics.get(i).calculateWeight(target);
                     sumWeights += targetWeights[i][j];
                 }
@@ -156,7 +182,7 @@ public class ProbabilisticSearch<T extends SearchTarget> extends SearchStrategy<
             SearchHeuristic heuristic = heuristics.getFirst();
             for (int j = 0; j < effectiveSize; j++) {
                 T target = targets.get(originalIndices[j]);
-                target.setWaitingTime(iteration - target.getIteration());
+                target.setWaitingTime(iteration - arrivals.get(target).iteration());
                 compositeWeights[j] = heuristic.calculateWeight(target);
                 totalWeight += compositeWeights[j];
             }
@@ -174,6 +200,7 @@ public class ProbabilisticSearch<T extends SearchTarget> extends SearchStrategy<
             targets.set(actualIndex, targets.get(lastIndex));
         }
         targets.removeLast();
+        release(selected);
         return selected;
     }
 

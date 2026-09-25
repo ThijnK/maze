@@ -58,13 +58,14 @@ public class BoxPimtitives2_Test {
 	void testIntLike() throws IOException {
 
 		String argz =   "--classpath=" + binClassesDir
-				      + sp + "--classname=" + CUT.getName()
-				      + sp + "--output-path=" + outputDir 
+				      + sp + "--class-name=" + CUT.getName()
+				      + sp + "--output-path=" + outputDir
 				      + sp + "--do-not-close-z3-context=true" // don't close z3 context, or else the next tests will crash
-				      + sp + "--constrain-FP-params-to-normal-numbers=true"
+				      + sp + "--constrain-fp-params-to-normal-numbers=true"
 				      + sp
 				      ;
 	    int exitCode = new CommandLine(new MazeCLI()).execute(argz.split(" ") );
+        assertEquals(0, exitCode);
 	    
 	    
 	    assertTrue(interceptor.anyMatch(msg -> msg.contains("#generated") && msg.contains("18"))) ;
@@ -109,13 +110,14 @@ public class BoxPimtitives2_Test {
 	void testFloatLike() throws IOException {
 
 		String argz =   "--classpath=" + binClassesDir
-				      + sp + "--classname=" + CUT2.getName()
-				      + sp + "--output-path=" + outputDir 
+				      + sp + "--class-name=" + CUT2.getName()
+				      + sp + "--output-path=" + outputDir
 				      + sp + "--do-not-close-z3-context=true" // don't close z3 context, or else the next tests will crash
-				      + sp + "--constrain-FP-params-to-normal-numbers=true"
+				      + sp + "--constrain-fp-params-to-normal-numbers=true"
 				      + sp
 				      ;
 	    int exitCode = new CommandLine(new MazeCLI()).execute(argz.split(" ") );
+        assertEquals(0, exitCode);
 	    
 	    
 	    assertTrue(interceptor.anyMatch(msg -> msg.contains("#generated") && msg.contains("12"))) ;

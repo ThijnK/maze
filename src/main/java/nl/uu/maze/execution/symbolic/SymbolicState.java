@@ -115,10 +115,6 @@ public class SymbolicState implements SearchTarget {
     private TargetPath targetpath = null ;
     
     /**
-     * The iteration at which this state was added to the search strategy.
-     */
-    private int iteration = -1;
-    /**
      * The waiting time of this state as the number of iterations since it was added
      * to the search strategy.
      * This is used to determine the priority of this state in some search
@@ -390,6 +386,13 @@ public class SymbolicState implements SearchTarget {
         engineConstraints.add(new SingleConstraint(this, constraint));
     }
 
+    /** JVM boolean values use the int sort in Jimple, but only zero and one are legal inputs. */
+    public void addBooleanDomainConstraint(Expr<?> value) {
+        int width = Z3Sorts.getInstance().getIntBitSize();
+        addEngineConstraint(ctx().mkOr(ctx().mkEq(value, ctx().mkBV(0, width)),
+                ctx().mkEq(value, ctx().mkBV(1, width))));
+    }
+
     public void addEngineConstraint(PathConstraint constraint) {
         engineConstraints.add(constraint);
     }
@@ -472,14 +475,6 @@ public class SymbolicState implements SearchTarget {
     	return this.targetpath = sigma ;
     }
     
-
-    public int getIteration() {
-        return iteration;
-    }
-
-    public void setIteration(int iteration) {
-        this.iteration = iteration;
-    }
 
     public void setWaitingTime(int waitingTime) {
         this.waitingTime = waitingTime;

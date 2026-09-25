@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import com.microsoft.z3.Model;
 
+import nl.uu.maze.search.SearchMode;
 import nl.uu.maze.execution.concrete.PathConditionCandidate;
 import nl.uu.maze.execution.symbolic.PathConstraint;
 import nl.uu.maze.execution.symbolic.SymbolicState;
@@ -126,6 +127,11 @@ public class ConcreteSearchStrategy extends SearchStrategy<PathConditionCandidat
         }
         exploredPaths.addAll(prefixes);
         return false;
+    }
+
+    @Override
+    public boolean supportsMode(SearchMode mode) {
+        return mode == SearchMode.CONCRETE && strategy.supportsMode(mode);
     }
 
     @Override

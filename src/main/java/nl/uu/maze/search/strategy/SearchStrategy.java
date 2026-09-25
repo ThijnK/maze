@@ -5,6 +5,7 @@ import java.util.Collection;
 import nl.uu.maze.execution.concrete.PathConditionCandidate;
 import nl.uu.maze.execution.symbolic.SymbolicState;
 import nl.uu.maze.search.SearchTarget;
+import nl.uu.maze.search.SearchMode;
 
 /**
  * Root interface for search strategy hierarchy
@@ -12,14 +13,24 @@ import nl.uu.maze.search.SearchTarget;
 public abstract class SearchStrategy<T extends SearchTarget> {
 	
 	/**
-	 * Keeping track the total number of explored search targets.
+	 * Cumulative target additions. Built-ins commonly retain this across resets;
+	 * it does not count distinct targets or completed executions.
 	 */
-	int count = 0 ;
+	protected int count = 0 ;
 	
     /**
      * Returns the full name of this search strategy.
      */
     public abstract String getName();
+
+    /**
+     * Declares whether this instance can run in the given execution mode.
+     * Configuration checks this before exploration. Override for mode-specific
+     * implementations; the default supports both modes through SearchTarget.
+     */
+    public boolean supportsMode(SearchMode mode) {
+        return true;
+    }
 
     /**
      * Add a search target to the search strategy.
@@ -81,14 +92,15 @@ public abstract class SearchStrategy<T extends SearchTarget> {
     public abstract int size();
     
 	/**
-	 * Return the total number of search targets explored so far.
+	 * Return the cumulative addition count (or a subclass-defined statistic).
 	 */
     public int getTotalExploredCount() {
     	return count ;
     }
 
     /**
-     * Reset the search strategy to its initial state.
+     * Clear pending work and reset owned components. Implementations may retain
+     * statistics, random-generator state, or learned history.
      */
     public abstract void reset();
 

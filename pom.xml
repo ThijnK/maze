@@ -19,6 +19,12 @@
     </properties>
 
     <dependencies>
+        <!-- Strict search configuration parsing; JSON stays behind SearchOptions. -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.20.2</version>
+        </dependency>
         <!-- JUnit 5 for test suite -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
