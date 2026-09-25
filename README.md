@@ -12,7 +12,12 @@ MAZE (Multi-strategy Automated Symbolic Execution) generates JUnit tests from co
 
 ## Getting started
 
-Clone the repository, then choose the Docker or local build below:
+MAZE can also be packaged with matching Z3 native libraries and a launcher, so
+users only need Java 21. See [Linux packages](docs/distributions.md) for the archive
+contents, Docker usage, and release validation. These packages are built locally
+until a release publishes them.
+
+To build from source, clone the repository and choose Docker or a local build:
 
 ```sh
 git clone https://github.com/ThijnK/maze.git

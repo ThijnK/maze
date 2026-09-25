@@ -96,6 +96,21 @@ counterexamples, and verifies file/log export destinations. The printed director
 is inside the container; capture stdout if you need a persistent validation log. See the
 [author guide](search-extensions.md) for the same build/run workflow by hand.
 
+## Benchmark integration and release checks
+
+The JUGE adapter still needs to forward plugin JARs and search configuration into
+its execution environment in both modes. Experiment identity must preserve
+configuration and instance order, including repeated strategies. Generation and
+metrics aggregation must require a successful process exit and a fresh, matching
+completion record, as described in [experiment records](search-extensions.md#failures-and-experiment-records).
+Validate the integration with a built-in baseline, an external strategy, and an
+external heuristic in both modes. A deliberately failing extension and stale
+outputs must be excluded from scoring.
+
+The [distribution guide](distributions.md) describes packaging and checking the
+exact downloadable archive in a fresh Java container without Z3. Development
+container tests alone do not validate the archive or other operating systems.
+
 ## Everyday commands
 
 Open a shell with the toolchain and checkout available:

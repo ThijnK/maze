@@ -46,6 +46,8 @@ On Linux the native library setting is, for example,
 Do not put MAZE or its dependencies into `research.jar`: they are supplied by
 MAZE's parent classloader. If your extension needs another library, pass its JAR
 with another `--plugin`. The subject's `--classpath` is separate.
+MAZE rejects a requested implementation class if more than one supplied JAR
+defines it.
 
 The two complete examples are:
 
