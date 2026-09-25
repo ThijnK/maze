@@ -2,6 +2,7 @@ package nl.uu.maze.search.strategy;
 
 import java.util.Collection;
 
+import nl.uu.maze.search.SearchMode;
 import nl.uu.maze.execution.symbolic.SymbolicState;
 
 /**
@@ -16,6 +17,11 @@ public class SymbolicSearchStrategy extends SearchStrategy<SymbolicState> {
 
     public SymbolicSearchStrategy(SearchStrategy<SymbolicState> strategy) {
         this.strategy = strategy;
+    }
+
+    @Override
+    public boolean supportsMode(SearchMode mode) {
+        return mode == SearchMode.SYMBOLIC && strategy.supportsMode(mode);
     }
 
     @Override

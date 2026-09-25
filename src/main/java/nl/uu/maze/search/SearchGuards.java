@@ -30,6 +30,9 @@ final class SearchGuards {
     static <T extends SearchTarget> SearchStrategy<T> strategy(SearchStrategy<T> delegate, String identity) {
         return new SearchStrategy<>() {
             @Override public String getName() { return call(identity, "getName", delegate::getName); }
+            @Override public boolean supportsMode(SearchMode mode) {
+                return call(identity, "supportsMode", () -> delegate.supportsMode(mode));
+            }
             @Override public void add(T target) { run(identity, "add", () -> delegate.add(target)); }
             @Override public void add(Collection<T> targets) { run(identity, "add(Collection)", () -> delegate.add(targets)); }
             @Override public void remove(T target) { run(identity, "remove", () -> delegate.remove(target)); }
@@ -53,6 +56,9 @@ final class SearchGuards {
     static SearchHeuristic heuristic(SearchHeuristic delegate, String identity) {
         return new SearchHeuristic(delegate.weight) {
             @Override public String getName() { return call(identity, "getName", delegate::getName); }
+            @Override public boolean supportsMode(SearchMode mode) {
+                return call(identity, "supportsMode", () -> delegate.supportsMode(mode));
+            }
             @Override public <T extends SearchTarget> double calculateWeight(T target) {
                 return call(identity, "calculateWeight", () -> delegate.calculateWeight(target));
             }

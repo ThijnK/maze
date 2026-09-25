@@ -25,6 +25,14 @@ public final class ArtifactCheck {
             success(mode + "-strategy", concrete, List.of("--plugin", "research.jar", "-s", "research.DepthSearch"));
             success(mode + "-heuristic", concrete, List.of("--plugin", "research.jar", "-s", "PS", "-u", "research.DepthWindowHeuristic"));
             success(mode + "-composed", concrete, List.of("--plugin", "research.jar", "--search-config", "search.json"));
+            String compatible = concrete ? "Concrete" : "Symbolic";
+            String incompatible = concrete ? "Symbolic" : "Concrete";
+            success(mode + "-restricted-strategy", concrete, List.of("--plugin", "fixtures.jar", "-s", "fixture." + compatible + "Only"));
+            success(mode + "-restricted-heuristic", concrete, List.of("--plugin", "fixtures.jar", "-s", "PS", "-u", "fixture." + compatible + "Heuristic"));
+            modeFailure(mode + "-incompatible-strategy", concrete,
+                    List.of("--plugin", "fixtures.jar", "-s", "BFS,fixture." + incompatible + "Only"), "$.strategies[1]");
+            modeFailure(mode + "-incompatible-heuristic", concrete,
+                    List.of("--plugin", "fixtures.jar", "-s", "PS", "-u", "fixture." + incompatible + "Heuristic"), "$.strategies[0].options.heuristics[0]");
             success(mode + "-dependency", concrete, List.of("--plugin", "fixtures.jar", "--plugin", "helper.jar", "-s", "PS", "-u", "fixture.WithDependency"));
             failure(mode + "-callback", concrete, List.of("--plugin", "fixtures.jar", "-s", "fixture.FailingSearch", "--verification=true"), "deliberate strategy failure", true);
             failure(mode + "-heuristic-callback", concrete, List.of("--plugin", "fixtures.jar", "-s", "PS", "-u", "fixture.FailingHeuristic", "--verification=true"), "deliberate heuristic failure", true);
@@ -43,7 +51,7 @@ public final class ArtifactCheck {
         failure("config-conflict", false, List.of("--search-config", "search.json", "-s", "BFS"), "cannot be combined", false);
         failure("heuristic-conflict", false, List.of("--search-config", "search.json", "-u", "UH"), "cannot be combined", false);
         failure("weight-conflict", false, List.of("--search-config", "search.json", "-w", "1"), "cannot be combined", false);
-        failure("pcs-concrete", true, List.of("-s", "PCS"), "symbolic-driven mode only", false);
+        failure("pcs-concrete", true, List.of("-s", "PCS", "--path-length-coverage=1"), "does not support concrete-driven mode", false);
         Path unwritableTests = Path.of("target/failures/output-write");
         Files.createDirectories(unwritableTests.resolve("SmokeSubjectTest.java"));
         failureAt(unwritableTests, false, List.of("-s", "BFS"), "Failed to write generated JUnit test cases", false);
@@ -77,6 +85,14 @@ public final class ArtifactCheck {
             require(status.path("search").path("plugins").get(0).path("sha256").asText().length() == 64, "missing JAR hash");
         }
         checks++;
+    }
+    static void modeFailure(String name, boolean concrete, List<String> extra, String location) throws Exception {
+        failure(name, concrete, extra, "does not support " + (concrete ? "concrete" : "symbolic") + "-driven mode", false);
+        Path output = Path.of("target/failures", name);
+        require(Files.readString(log(output)).contains(location), "missing incompatible component location");
+        try (var files = Files.walk(output)) {
+            require(files.noneMatch(p -> p.toString().endsWith(".java")), "incompatible search generated tests");
+        }
     }
     static void failure(String name, boolean concrete, List<String> extra, String diagnostic, boolean partial) throws Exception {
         failureAt(Path.of("target/failures", name), concrete, extra, diagnostic, partial);
@@ -152,6 +168,20 @@ public final class ArtifactCheck {
                 }
             }
             """, "fixture-classes", "maze.jar");
+        for (String mode : List.of("Symbolic", "Concrete")) {
+            String targetType = mode.equals("Symbolic")
+                    ? "nl.uu.maze.execution.symbolic.SymbolicState"
+                    : "nl.uu.maze.execution.concrete.PathConditionCandidate";
+            String declaration = "public boolean supportsMode(SearchMode mode) { return mode == SearchMode."
+                    + mode.toUpperCase(Locale.ROOT) + "; }";
+            compile("fixture/" + mode + "Only", imports + "public class " + mode + "Only extends BFS<" + targetType
+                    + "> { public " + mode + "Only(SearchOptions o) {} " + declaration
+                    + " public void add(" + targetType + " target) { super.add(target); } }", "fixture-classes", "maze.jar");
+            compile("fixture/" + mode + "Heuristic", imports + "public class " + mode + "Heuristic extends SearchHeuristic {"
+                    + " public " + mode + "Heuristic(double w, SearchOptions o) { super(w); } " + declaration
+                    + " public String getName() { return \"restricted\"; } public <T extends SearchTarget> double calculateWeight(T t) {"
+                    + " return ((" + targetType + ") t).getDepth() + 1; } }", "fixture-classes", "maze.jar");
+        }
         jar("fixtures.jar", "fixture-classes");
     }
     static void compile(String name, String source, String output, String classpath) throws Exception {

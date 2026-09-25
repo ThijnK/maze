@@ -1,6 +1,7 @@
 package nl.uu.maze.search.heuristic;
 
 import nl.uu.maze.search.SearchTarget;
+import nl.uu.maze.search.SearchMode;
 
 /**
  * Search heuristics that are used in probabilistic search to determine a
@@ -32,6 +33,15 @@ public abstract class SearchHeuristic {
     }
 
     public abstract String getName();
+
+    /**
+     * Declares whether this instance can score targets in the given execution mode.
+     * Configuration checks this before exploration. Override for mode-specific
+     * implementations; the default supports both modes through SearchTarget.
+     */
+    public boolean supportsMode(SearchMode mode) {
+        return true;
+    }
 
     /** Called by the owning strategy when pending work is reset. History may be retained. */
     public void reset() {

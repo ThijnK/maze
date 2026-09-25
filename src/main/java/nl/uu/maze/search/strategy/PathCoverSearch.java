@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import nl.uu.maze.execution.EngineConfiguration;
+import nl.uu.maze.search.SearchMode;
 import nl.uu.maze.execution.symbolic.CoverageTracker;
 import nl.uu.maze.execution.symbolic.SymbolicExecutor;
 import nl.uu.maze.execution.symbolic.SymbolicState;
@@ -95,6 +96,11 @@ public class PathCoverSearch extends SearchStrategy<SymbolicState> {
 	public String getName() {
 		return "PathCoverSearch" ;
 	}
+
+    @Override
+    public boolean supportsMode(SearchMode mode) {
+        return mode == SearchMode.SYMBOLIC;
+    }
 	
 	@Override
     public boolean requiresPathTargetingAndTracking() {

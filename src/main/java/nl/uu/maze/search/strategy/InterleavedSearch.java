@@ -6,6 +6,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import nl.uu.maze.search.SearchMode;
 import nl.uu.maze.search.SearchTarget;
 
 /**
@@ -40,6 +41,11 @@ public class InterleavedSearch<T extends SearchTarget> extends SearchStrategy<T>
         } else {
             this.timeSlice = 1000; // Default time slice if no budget is set
         }
+    }
+
+    @Override
+    public boolean supportsMode(SearchMode mode) {
+        return strategies.stream().allMatch(strategy -> strategy.supportsMode(mode));
     }
 
     public String getName() {

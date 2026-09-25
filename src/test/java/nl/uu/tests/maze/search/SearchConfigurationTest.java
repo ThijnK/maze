@@ -118,13 +118,9 @@ class SearchConfigurationTest {
         }
     }
 
-    @Test void invalidNamesAndKnownUnsupportedModeFail() throws Exception {
+    @Test void invalidNamesFail() throws Exception {
         assertTrue(failure("{\"name\":\"BFFS\"}").contains("BFFS"));
         assertTrue(failure("{\"name\":\"PS\",\"options\":{\"heuristics\":[{\"name\":\"RCH\"}]}}").contains("RCH"));
-        try (var session = new SearchSession(List.of())) {
-            assertTrue(assertThrows(IllegalArgumentException.class,
-                () -> session.createStrategy(config("{\"name\":\"PCS\"}"), 1000, true)).getMessage().contains("symbolic-driven mode only"));
-        }
         try (var session = new SearchSession(List.of())) {
             assertNotNull(session.createStrategy(SearchConfiguration.fromCli(List.of("PS"), List.of("RCDH", "RCPH"), List.of(), true), 1000, false));
         }

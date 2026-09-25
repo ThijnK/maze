@@ -7,6 +7,7 @@ import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.Random;
 
+import nl.uu.maze.search.SearchMode;
 import nl.uu.maze.execution.EngineConfiguration;
 import nl.uu.maze.search.SearchTarget;
 import nl.uu.maze.search.heuristic.SearchHeuristic;
@@ -44,6 +45,11 @@ public class ProbabilisticSearch<T extends SearchTarget> extends SearchStrategy<
             throw new IllegalArgumentException("At least one heuristic must be provided");
         }
         this.heuristics = heuristics;
+    }
+
+    @Override
+    public boolean supportsMode(SearchMode mode) {
+        return heuristics.stream().allMatch(heuristic -> heuristic.supportsMode(mode));
     }
 
     public String getName() {

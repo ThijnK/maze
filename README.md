@@ -299,7 +299,7 @@ Enable this experimental mode with `--concrete-driven` or `-C`. It works one met
 3. Select a candidate, negate its final branch condition, and solve for inputs that may take a different path. Previously explored or unsatisfiable candidates can be discarded.
 4. Repeat until the pending work or execution budget is exhausted.
 
-The strategy selects branch candidates rather than live symbolic states. All shipped strategies except PCS can run in this mode, although their usefulness can differ; RPS was designed around symbolic execution trees.
+The strategy selects branch candidates rather than live symbolic states. All shipped strategies except PCS can run in this mode, although their usefulness can differ; RPS was designed around symbolic execution trees. Built-in and external strategies and heuristics declare mode restrictions through `supportsMode`; MAZE rejects incompatible configurations before exploration. See [execution-mode compatibility](docs/search-extensions.md#execution-mode-compatibility).
 
 ### Library handling and limitations
 

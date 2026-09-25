@@ -180,6 +180,7 @@ wrong types, and unread options stop the run instead of substituting another sea
 | Callback | Contract |
 | --- | --- |
 | `getName()` | Human-readable label; not an instance identifier. |
+| `supportsMode(mode)` | Defaults to true for both `SearchMode.SYMBOLIC` and `SearchMode.CONCRETE`. Declare any mode restriction; MAZE checks it after construction and before exploration. |
 | `add(target)` | Add pending work; increment protected `count` if following built-in statistics. Collection addition defaults to repeated single addition. |
 | `next()` | Select and remove the next target. `null` means exhausted, not a temporary yield. |
 | `remove(target)` | Remove that target from pending work. |
@@ -208,15 +209,48 @@ nonnegative scores, with larger values favoring selection. The constructor's
 PS skips scoring with zero or one pending target, and samples at most 1,000 targets
 per selection. Do not depend on being called once per engine step or every target.
 
+## Execution-mode compatibility
+
+Strategies and heuristics using the shared `SearchTarget` contract support both
+execution modes by default. A mode-specific implementation overrides the same
+method on `SearchStrategy` or `SearchHeuristic`, for example:
+
+```java
+@Override
+public boolean supportsMode(nl.uu.maze.search.SearchMode mode) {
+    return mode == nl.uu.maze.search.SearchMode.SYMBOLIC;
+}
+```
+
+MAZE checks every configured strategy and heuristic, including heuristics loaded
+through `SearchOptions`, before exploration. One incompatible component rejects
+the entire configuration, with its class and configuration location in the error.
+Interleaving and PS support a mode only when all their components support it.
+A custom strategy that constructs components itself should likewise combine their
+mode declarations. A declaration may depend on constructor options, but must remain
+stable for the instance's lifetime.
+
+PCS declares symbolic-only support through this same method. Mode checks happen
+after construction, so constructor validation (including PCS's path-coverage
+requirement) can fail first. This is configuration-time validation, not proof that
+plugin code is correct: an incorrect declaration or an unsafe cast can still fail
+at runtime, where MAZE reports the callback failure and stops the run.
+
 ## What an extension can observe
+
+Extensions can use the documented `SearchTarget` observations in both execution
+modes. PCS additionally depends on symbolic-specific path-targeting machinery:
+it reads and changes target paths, uses high-level CFGs, and updates the coverage
+tracker's set of feasible target paths. Those operations are outside the shared
+`SearchTarget` contract. Their public Java classes are accessible from a plugin
+JAR, but PCS's state-specific operations require a symbolic-specific implementation.
 
 Use the `SearchTarget` interface in shared-mode implementations. Symbolic targets
 are live symbolic states; concrete targets snapshot a branch point on a previously
 executed path. After concrete selection the engine applies negation and may reject
 a candidate as already explored or unsatisfiable. Selection does not guarantee
 execution. Do not cast to `SymbolicState` if your implementation must work in both
-modes. Shipped PCS is an existing symbolic-only exception; concrete requests are
-rejected before exploration.
+modes. Declare mode restrictions with `supportsMode` as described above.
 
 | Observation | Meaning and use |
 | --- | --- |

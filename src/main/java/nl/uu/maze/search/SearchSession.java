@@ -11,7 +11,6 @@ import nl.uu.maze.search.heuristic.SearchHeuristic;
 import nl.uu.maze.search.heuristic.SearchHeuristicFactory;
 import nl.uu.maze.search.heuristic.SearchHeuristicFactory.ValidSearchHeuristic;
 import nl.uu.maze.search.strategy.InterleavedSearch;
-import nl.uu.maze.search.strategy.PathCoverSearch;
 import nl.uu.maze.search.strategy.SearchStrategy;
 import nl.uu.maze.search.strategy.SearchStrategyFactory;
 import nl.uu.maze.search.strategy.SearchStrategyFactory.ValidSearchStrategy;
@@ -40,46 +39,53 @@ public final class SearchSession implements AutoCloseable {
             long timeBudget, boolean concreteDriven) {
         if (constructed) throw new IllegalStateException("A search session constructs one search configuration");
         constructed = true;
+        SearchMode mode = concreteDriven ? SearchMode.CONCRETE : SearchMode.SYMBOLIC;
         var strategies = new ArrayList<SearchStrategy<SearchTarget>>();
         for (var component : configuration.strategies()) {
-            SearchOptions options = options(component);
+            SearchOptions options = options(component, mode);
             ValidSearchStrategy builtin = alias(ValidSearchStrategy.class, component.name());
-            if (concreteDriven && (builtin == ValidSearchStrategy.PCS || builtin == ValidSearchStrategy.PathCoverSearch)) {
-                throw SearchConfiguration.error(component.location(), "PCS/PathCoverSearch supports symbolic-driven mode only");
-            }
             @SuppressWarnings("unchecked")
             SearchStrategy<SearchTarget> strategy = builtin == null
                     ? (SearchStrategy<SearchTarget>) plugins.construct(component.name(), SearchStrategy.class,
                             new Class<?>[] { SearchOptions.class }, new Object[] { options }, component.location())
                     : SearchStrategyFactory.createBuiltin(builtin, () -> options.getHeuristicsOrUniform("heuristics"));
-            if (concreteDriven && (Object) strategy instanceof PathCoverSearch) {
-                throw SearchConfiguration.error(component.location(), "PCS/PathCoverSearch supports symbolic-driven mode only");
-            }
+            var guarded = SearchGuards.strategy(strategy, identity(component, strategy));
+            requireMode(guarded.supportsMode(mode), mode, identity(component, strategy));
             record(component, strategy, options);
-            strategies.add(SearchGuards.strategy(strategy, identity(component, strategy)));
+            strategies.add(guarded);
         }
         return strategies.size() == 1 ? strategies.getFirst()
                 : SearchGuards.strategy(new InterleavedSearch<>(strategies, timeBudget), "$.strategies (InterleavedSearch)");
     }
 
-    private SearchOptions options(SearchConfiguration.Component component) {
-        return new SearchOptions(component.options(), component.location() + ".options", this::heuristics);
+    private SearchOptions options(SearchConfiguration.Component component, SearchMode mode) {
+        return new SearchOptions(component.options(), component.location() + ".options",
+                components -> heuristics(components, mode));
     }
 
-    private List<SearchHeuristic> heuristics(List<SearchConfiguration.Component> components) {
+    private List<SearchHeuristic> heuristics(List<SearchConfiguration.Component> components, SearchMode mode) {
         var result = new ArrayList<SearchHeuristic>();
         for (var component : components) {
-            SearchOptions options = options(component);
+            SearchOptions options = options(component, mode);
             ValidSearchHeuristic builtin = alias(ValidSearchHeuristic.class, component.name());
             SearchHeuristic heuristic = builtin == null
                     ? (SearchHeuristic) plugins.construct(component.name(), SearchHeuristic.class,
                             new Class<?>[] { double.class, SearchOptions.class },
                             new Object[] { component.weight(), options }, component.location())
                     : SearchHeuristicFactory.createHeuristic(component.name(), component.weight());
+            var guarded = SearchGuards.heuristic(heuristic, identity(component, heuristic));
+            requireMode(guarded.supportsMode(mode), mode, identity(component, heuristic));
             record(component, heuristic, options);
-            result.add(SearchGuards.heuristic(heuristic, identity(component, heuristic)));
+            result.add(guarded);
         }
         return List.copyOf(result);
+    }
+
+    private static void requireMode(boolean supported, SearchMode mode, String identity) {
+        if (!supported) {
+            String name = mode == SearchMode.CONCRETE ? "concrete-driven" : "symbolic-driven";
+            throw SearchConfiguration.error(identity, "does not support " + name + " mode");
+        }
     }
 
     private static <E extends Enum<E>> E alias(Class<E> type, String name) {

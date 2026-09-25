@@ -5,6 +5,7 @@ import java.util.Collection;
 import nl.uu.maze.execution.concrete.PathConditionCandidate;
 import nl.uu.maze.execution.symbolic.SymbolicState;
 import nl.uu.maze.search.SearchTarget;
+import nl.uu.maze.search.SearchMode;
 
 /**
  * Root interface for search strategy hierarchy
@@ -21,6 +22,15 @@ public abstract class SearchStrategy<T extends SearchTarget> {
      * Returns the full name of this search strategy.
      */
     public abstract String getName();
+
+    /**
+     * Declares whether this instance can run in the given execution mode.
+     * Configuration checks this before exploration. Override for mode-specific
+     * implementations; the default supports both modes through SearchTarget.
+     */
+    public boolean supportsMode(SearchMode mode) {
+        return true;
+    }
 
     /**
      * Add a search target to the search strategy.
