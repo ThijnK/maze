@@ -440,7 +440,7 @@ For MAZE's design and formal semantics, see [Kroon, T., *Evaluating Search Strat
 
 The [MAZE fork of JUGE](https://github.com/ThijnK/JUGE) measures generation time, coverage, and mutation kill rate, and supports comparison with other test-generation tools. It is based on the [JUGE framework](https://github.com/JUnitContest/JUGE) used for the SBFT tool competitions. Setup and experiment instructions live in that repository.
 
-Its adapter still needs extension-argument forwarding and completion/failure gating before external strategies can be benchmarked reliably. Until that integration is verified, use the [direct artifact workflow](docs/search-extensions.md); the current JUGE integration does not establish benchmark parity for extensions.
+The [companion JUGE integration](https://github.com/ThijnK/JUGE/blob/thijn/maze-external-search/docs/MAZE.md) accepts named experiments using a separate MAZE Linux package, external JARs, and the same search configuration documented here. It runs built-in and external strategies or heuristics through generation, coverage, mutation analysis, and aggregation in both modes. Failed or stale runs are excluded from scoring. Use that integration branch until it is merged; older adapters do not support this workflow.
 
 ### Benchmark subjects and generated tests
 

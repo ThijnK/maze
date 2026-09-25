@@ -282,6 +282,9 @@ a fresh output directory. Argument parsing can fail before an invocation starts;
 a leftover file alone never proves success. Never score partial output or reuse an
 old success CSV. Ordinary successful CSV columns remain unchanged.
 
-For comparisons, run MAZE directly with the commands above. The JUGE adapter still
-needs extension-argument forwarding and completion/failure handling before it can
-benchmark these extensions reliably.
+For comparisons, run MAZE directly with the commands above or use the
+[companion JUGE integration](https://github.com/ThijnK/JUGE/blob/thijn/maze-external-search/docs/MAZE.md).
+JUGE accepts named experiments containing MAZE arguments, so the same plugin JARs
+and search JSON work there without changes to MAZE. It records each configuration
+separately and requires fresh successful completion before metrics or aggregation.
+Use the linked integration branch until it is merged.

@@ -98,14 +98,14 @@ is inside the container; capture stdout if you need a persistent validation log.
 
 ## Benchmark integration and release checks
 
-The JUGE adapter still needs to forward plugin JARs and search configuration into
-its execution environment in both modes. Experiment identity must preserve
-configuration and instance order, including repeated strategies. Generation and
-metrics aggregation must require a successful process exit and a fresh, matching
-completion record, as described in [experiment records](search-extensions.md#failures-and-experiment-records).
-Validate the integration with a built-in baseline, an external strategy, and an
-external heuristic in both modes. A deliberately failing extension and stale
-outputs must be excluded from scoring.
+The [companion JUGE integration](https://github.com/ThijnK/JUGE/blob/thijn/maze-external-search/docs/MAZE.md) lives in its own repository.
+Its Docker checks cover a built-in baseline, an external strategy, and an external
+heuristic in both modes through generation, JaCoCo coverage, PIT mutation analysis,
+and transcript aggregation, using two target classes per configuration. Adapter
+checks also cover composed configurations and rejection of failed/stale output.
+Keep those checks passing when changing experiment records or CLI arguments.
+The full benchmark corpus and R statistical scoring need separate validation;
+the small integration checks do not establish their results.
 
 The [distribution guide](distributions.md) describes packaging and checking the
 exact downloadable archive in a fresh Java container without Z3. Development
