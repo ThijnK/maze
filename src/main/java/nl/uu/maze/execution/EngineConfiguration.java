@@ -10,6 +10,9 @@ import picocli.CommandLine.Option;
  * <p>
  */
 public class EngineConfiguration {
+    /** Maximum trace entries and symbolic steps per test-candidate history replay. */
+    public int maxReplaySteps = 10000;
+
 	
 	/**
 	 * If true, the symbolic solver will add a constraint to every method

@@ -2,6 +2,7 @@ package nl.uu.maze.execution;
 
 import java.io.File;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -77,7 +78,12 @@ public class DSEController {
     private JavaSootMethod ctorSoot;
     private StmtGraph<?> ctorCfg;
     private long timeBudget;
-    private long overallDeadline;
+    private long overallDeadline = Long.MAX_VALUE;
+    private final Map<String, Integer> replayAborts = new java.util.LinkedHashMap<>();
+
+    public Map<String, Integer> getReplayAborts() {
+        return Map.copyOf(replayAborts);
+    }
     private long executionDeadline;
     /**
      * Map of init states used in concrete-driven execution, indexed by the hash
@@ -518,6 +524,8 @@ public class DSEController {
                 	generator.addMethodTestCase(state.getMethod(), ctorSoot, argMap.get());           	
                 }
             }
+        } catch (ReplayBudget.Exceeded e) {
+            recordReplayAbort(state.getMethod(), e);
         } catch (Exception e) {
             logger.error("Error generating test case for method {}: {}, {}", state.getMethod().getName(), e.getClass().getName(), e.getMessage());
             logger.info("Error stack trace: ", e);
@@ -738,15 +746,16 @@ public class DSEController {
                 // caught by the search strategy
                 
                 if (isNew) {
-                	var history = rerunToGetHistory(method, argMap) ;
-                	//System.out.println("history: " + history.getHistory()) ;
-                	boolean hasNewCov = CoverageTracker.getInstance().registerCoveregeByTesting(finalState.get(), history) ;
-                	// add the test case; however if MAZE is configured to only add
-                	// a test when contributes to new coverage, then we do so:
-                	if (hasNewCov || ! EngineConfiguration.getInstance().minimalisticTestSuite)
-                    	// For the first concrete execution, argMap is populated by the concrete
-                    	// executor
-                    	generator.addMethodTestCase(method, ctorSoot, argMap);
+                    try {
+                        var history = rerunToGetHistory(method, argMap);
+                        boolean hasNewCov = CoverageTracker.getInstance().registerCoveregeByTesting(finalState.get(), history);
+                        if (hasNewCov || !EngineConfiguration.getInstance().minimalisticTestSuite) {
+                            // The concrete executor has already populated argMap.
+                            generator.addMethodTestCase(method, ctorSoot, argMap);
+                        }
+                    } catch (ReplayBudget.Exceeded e) {
+                        recordReplayAbort(method, e);
+                    }
                 }
             }
 
@@ -766,6 +775,11 @@ public class DSEController {
             argMap = validator.evaluate(pair.getFirst(), pair.getSecond().returnToRootCaller(), false);
             
         }
+    }
+
+    private void recordReplayAbort(JavaSootMethod method, ReplayBudget.Exceeded limit) {
+        replayAborts.merge(limit.reason(), 1, Integer::sum);
+        logger.debug("Discarding bounded candidate for {}: {}", method.getName(), limit.reason());
     }
     
     /**
@@ -792,61 +806,70 @@ public class DSEController {
         //System.out.println(">>> concrete exec " + javaMethod.getName() + ": " + argMap.getArgsNames()) ;
     	// run concretely to obtain the trace:
     	
-        concrete.execute(ctor,instrumentedJavaMethod,argMap) ; // note: the ctor is already instrumented!
-        
-        // System.out.println(">>> trace to REPLAY: " + TraceManager.traceEntries) ;
-        // now run symbolically to obtain the sequence of instructions
-        
-        // construct the initial symbolic state:
-        SymbolicState initState ;
-        // For static methods, start at the target method
-        if (method.isStatic()) {
-            initState = new SymbolicState(method, analyzer.getCFG(method));
-            initState.switchToMethodState();
-        }
-        else {
-            initState = new SymbolicState(ctorSoot,ctorCfg);
-        }
+        try (ReplayBudget budget = ReplayBudget.open(EngineConfiguration.getInstance().maxReplaySteps, overallDeadline)) {
+            var result = concrete.execute(ctor, instrumentedJavaMethod, argMap);
+            // Unwrap only the reflection call. The CUT owns any further exception causes,
+            // which can legitimately form a cycle or describe an error it already handled.
+            Throwable failure = result.exception();
+            if (failure instanceof InvocationTargetException invocation) failure = invocation.getTargetException();
+            if (failure instanceof ReplayBudget.Exceeded limit) throw limit;
+            if (failure instanceof StackOverflowError) throw new ReplayBudget.Exceeded("stack_overflow");
 
-        InstructionHistory history = new InstructionHistory() ;
-        JavaSootMethod M = null ; 
-    	//StmtGraph cfg = null ;
-        SymbolicState currentSymbolicState = initState ;
-        boolean replayModeOn = true ;
-        // replay the execution step by step, until we get to a final state, 
-        // which is not a constructor state:
-        while (currentSymbolicState.isCtorState() || !currentSymbolicState.isFinalState()) {
-        	JavaSootMethod M_ = currentSymbolicState.getMethod() ;
-        	if (M==null || M_ != M) {
-        		history.addMethodSwitch(M_);
-        		M = M_ ;
-        		//cfg = currentSymbolicState.getCFG() ;
-        	}
-        	history.addInstruction(currentSymbolicState.getStmt());
-        	
-            // Symbolically execute the statement of the current symbolic state
-        	// System.out.println("### cur stmt: " + currentSymbolicState.getStmt()) ;
-            List<SymbolicState> newStates = symbolic.step(currentSymbolicState,replayModeOn) ;
-            if (newStates.isEmpty()) {
-            	break ;
+            // System.out.println(">>> trace to REPLAY: " + TraceManager.traceEntries) ;
+            // now run symbolically to obtain the sequence of instructions
+
+            // construct the initial symbolic state:
+            SymbolicState initState ;
+            // For static methods, start at the target method
+            if (method.isStatic()) {
+                initState = new SymbolicState(method, analyzer.getCFG(method));
+                initState.switchToMethodState();
             }
-            if (newStates.size() > 1) {
-            	logger.warn("Replaying a concrete execution leads to a symbolic state with multiple successors! Executed instr: " + currentSymbolicState.getStmt());            	
+            else {
+                initState = new SymbolicState(ctorSoot,ctorCfg);
             }
-            SymbolicState nextState = newStates.getFirst() ; 
-            if (currentSymbolicState.isCtorState()) {
-            	if (nextState.isFinalState()) {
-            		if (nextState.isExceptionThrown())
-            			break ;
-            		nextState.switchToMethodState();
-            		nextState.setMethod(method, analyzer.getCFG(method));
-            	}
+
+            InstructionHistory history = new InstructionHistory() ;
+            JavaSootMethod M = null ;
+            //StmtGraph cfg = null ;
+            SymbolicState currentSymbolicState = initState ;
+            boolean replayModeOn = true ;
+            // replay the execution step by step, until we get to a final state,
+            // which is not a constructor state:
+            while (currentSymbolicState.isCtorState() || !currentSymbolicState.isFinalState()) {
+                budget.replayStep();
+                JavaSootMethod M_ = currentSymbolicState.getMethod() ;
+                if (M==null || M_ != M) {
+                    history.addMethodSwitch(M_);
+                    M = M_ ;
+                    //cfg = currentSymbolicState.getCFG() ;
+                }
+                history.addInstruction(currentSymbolicState.getStmt());
+
+                // Symbolically execute the statement of the current symbolic state
+                // System.out.println("### cur stmt: " + currentSymbolicState.getStmt()) ;
+                List<SymbolicState> newStates = symbolic.step(currentSymbolicState,replayModeOn) ;
+                if (newStates.isEmpty()) {
+                    break ;
+                }
+                if (newStates.size() > 1) {
+                    logger.warn("Replaying a concrete execution leads to a symbolic state with multiple successors! Executed instr: " + currentSymbolicState.getStmt());
+                }
+                SymbolicState nextState = newStates.getFirst() ;
+                if (currentSymbolicState.isCtorState()) {
+                    if (nextState.isFinalState()) {
+                        if (nextState.isExceptionThrown())
+                            break ;
+                        nextState.switchToMethodState();
+                        nextState.setMethod(method, analyzer.getCFG(method));
+                    }
+                }
+                //if (nextState == currentSymbolicState)
+                //	break ;
+                currentSymbolicState = nextState ;
             }
-            //if (nextState == currentSymbolicState) 
-            //	break ;
-            currentSymbolicState = nextState ;
+            return history ;
         }
-        return history ;
     }
     
     /**

@@ -232,6 +232,20 @@ Verification mode generates tests only for discovered violations. Default genera
 
 MAZE is a **bounded verification tool**. Time, depth, and other limits restrict exploration; finding no violation within those bounds does not establish that the program is bug-free.
 
+### Candidate replay limits
+
+`--max-replay-steps` (default `10000`, positive integer) caps both recorded branch
+trace entries and symbolic instructions while reconstructing a candidate's test
+history. Reconstruction also respects the run's existing time budget. Candidates
+that exceed these bounds or exhaust the concrete stack are discarded before test
+or coverage registration; other candidates remain eligible in both execution
+modes. Completion JSON records the limits and discarded-candidate counts.
+
+This applies only to test-history reconstruction. The search strategies, symbolic
+search depth and minimization rules retain their existing implementations. Raising
+the limit permits longer candidate histories at a higher resource cost. It is a cooperative limit on history reconstruction, not a process watchdog
+for arbitrary code or external calls; configure an external timeout where needed.
+
 ### Reproducible random seeds
 
 Use `--seed=12345` to seed MAZE's random generators and record that seed in the
@@ -380,6 +394,7 @@ Use `java -jar maze.jar --help` for the complete CLI and aliases. These tables c
 | `--check-division-by-zero` | `false` | Actively search for division and remainder by zero. |
 | `--time-budget`, `-b` | No budget | Search time budget. |
 | `--max-depth`, `-d` | `200` | Exploration depth limit. |
+| `--max-replay-steps` | `10000` | Positive integer capping trace entries and symbolic steps separately per candidate replay; see [replay limits](#candidate-replay-limits). |
 | `--max-array-size` | `20` | Maximum generated array size. |
 | `--constrain-fp-params-to-normal-numbers` | `false` | Restrict floating-point parameters to normal numbers. |
 | `--strategy`, `-s` | `DFS` | One or more shipped names or external class names. |

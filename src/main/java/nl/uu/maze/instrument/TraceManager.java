@@ -60,6 +60,7 @@ public class TraceManager {
      * @param value      The value of the branch
      */
     public static void recordTraceEntry(String methodSig, BranchType branchType, int value) {
+        nl.uu.maze.execution.ReplayBudget.traceEntry();
         TraceEntry entry = new TraceEntry(methodSig, branchType, value);
         traceEntries.computeIfAbsent(methodSig, k -> new LinkedList<>()).add(entry);
     }

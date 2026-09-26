@@ -88,6 +88,9 @@ public class MazeCLI implements Callable<Integer> {
             "--max-depth" }, description = "Maximum depth of the search (default: ${DEFAULT-VALUE})", defaultValue = "200", paramLabel = "<int>")
     private int maxDepth;
 
+    @Option(names = "--max-replay-steps", description = "Maximum trace entries and symbolic steps per candidate replay (default: ${DEFAULT-VALUE})", defaultValue = "10000")
+    private int maxReplaySteps;
+
     @Option(names = { "-b",
             "--time-budget" }, description = "Time budget for the search in seconds (default: ${DEFAULT-VALUE})", defaultValue = "no budget", paramLabel = "<long>", converter = TimeBudgetConverter.class)
     private long timeBudget;
@@ -225,6 +228,9 @@ public class MazeCLI implements Callable<Integer> {
                             "weights", heuristicWeights, "plugins", pluginJars.stream().map(Path::toString).toList(),
                             "configFile", searchConfig == null ? "" : searchConfig.toString()));
             status.seed(seed);
+            if (maxReplaySteps < 1) throw new IllegalArgumentException("--max-replay-steps must be positive");
+            EngineConfiguration.getInstance().maxReplaySteps = maxReplaySteps;
+            status.replay(maxReplaySteps, Map.of());
             boolean explicitHeuristics = commandSpec.commandLine().getParseResult().hasMatchedOption("-u")
                     || commandSpec.commandLine().getParseResult().hasMatchedOption("-w");
             if (searchConfig != null && (explicitHeuristics
@@ -241,7 +247,11 @@ public class MazeCLI implements Callable<Integer> {
                 status.search(session.describe());
                 DSEController controller = new DSEController(classPath, concreteDriven, strategy,
                         methodName, maxDepth, testTimeout, packageName, junitVersion.isJUnit4());
-                controller.run(className, classToTrack, timeBudget);
+                try {
+                    controller.run(className, classToTrack, timeBudget);
+                } finally {
+                    status.replay(maxReplaySteps, controller.getReplayAborts());
+                }
             }
             if (!leaveZ3ContextOpen) {
                 Z3ContextProvider.close();

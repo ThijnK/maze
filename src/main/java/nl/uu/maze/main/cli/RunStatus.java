@@ -37,6 +37,11 @@ final class RunStatus {
         write();
     }
 
+    void replay(int limit, Map<String, Integer> aborted) throws IOException {
+        data.put("candidateReplay", Map.of("maxTraceEntries", limit, "maxSymbolicSteps", limit, "aborted", aborted));
+        write();
+    }
+
     void seed(Long seed) throws IOException {
         data.put("seed", seed);
         write();
