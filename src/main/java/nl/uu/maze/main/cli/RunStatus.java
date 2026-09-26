@@ -37,6 +37,11 @@ final class RunStatus {
         write();
     }
 
+    void seed(Long seed) throws IOException {
+        data.put("seed", seed);
+        write();
+    }
+
     void configuration(java.util.List<Map<String, Object>> configuration) throws IOException {
         data.put("configuration", configuration);
         write();

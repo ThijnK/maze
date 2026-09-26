@@ -232,6 +232,14 @@ Verification mode generates tests only for discovered violations. Default genera
 
 MAZE is a **bounded verification tool**. Time, depth, and other limits restrict exploration; finding no violation within those bounds does not establish that the program is bug-free.
 
+### Reproducible random seeds
+
+Use `--seed=12345` to seed MAZE's random generators and record that seed in the
+completion JSON. Omit it for nondeterministic seeds. Different repetitions should
+use different seeds. Within an invocation, generators currently start from the
+same seed; this does not create independent per-strategy streams. Time-bounded
+runs can still differ because of scheduling and solver timing.
+
 ### Read run results
 
 Use `--export-summary=true` for a CSV of test-generation statistics. Each CLI invocation also writes `<class-name>-run-status.json`, recording its configuration, implementation identities, and `running`, `failed`, or `completed` outcome.
@@ -367,6 +375,7 @@ Use `java -jar maze.jar --help` for the complete CLI and aliases. These tables c
 | --- | --- | --- |
 | `--concrete-driven`, `-C` | `false` | Use concrete-driven execution. |
 | `--random-seeding` | `false` | Use random unconstrained parameter values in concrete-driven execution. |
+| `--seed` | Nondeterministic | Seed MAZE's random generators with a Java `long`; see [random seeds](#reproducible-random-seeds). |
 | `--allow-field-changes-by-reflection` | `false` | Allow MAZE to change subject fields through reflection. |
 | `--check-division-by-zero` | `false` | Actively search for division and remainder by zero. |
 | `--time-budget`, `-b` | No budget | Search time budget. |

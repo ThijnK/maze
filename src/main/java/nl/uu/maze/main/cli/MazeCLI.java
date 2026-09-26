@@ -106,6 +106,9 @@ public class MazeCLI implements Callable<Integer> {
     
     @Option(names = { "--random-seeding" }, description = "When true: use random values to for unconstrained constructor/method parameters in concrete-driven DSE (default: ${DEFAULT-VALUE})", defaultValue = "false", arity = "0..1", fallbackValue = "true", paramLabel = "<true|false>")
     private boolean useRandomSeeding;
+
+    @Option(names = "--seed", description = "Seed for MAZE random generators (default: nondeterministic)", paramLabel = "<long>")
+    private Long seed;
     
     @Option(names = { "--minimization" }, description = "When true: only tests that add instruction, branch, or configured path coverage are retained (default: ${DEFAULT-VALUE})", defaultValue = "false", arity = "0..1", fallbackValue = "true", paramLabel = "<true|false>")
     private boolean minimalisticTestSuite;
@@ -187,6 +190,7 @@ public class MazeCLI implements Callable<Integer> {
             // first copy options that need to be inspected during DSE runs to a dedicated configuration
             // info (acting like global vars).
             EngineConfiguration.getInstance().randomSeedingInConcreteDriven = this.useRandomSeeding ;
+            EngineConfiguration.getInstance().globalRandomSeed = seed;
             EngineConfiguration.getInstance().constrainFPNumberParametersToNormalNumbers = this.constrainFPNumberParametersToNormalNumbers ;
             EngineConfiguration.getInstance().surpressRegressionOracles = this.surpressRegressionOracles ;
             EngineConfiguration.getInstance().propagateUnexpectedExceptions = this.propagateUnexpectedExceptions ;
@@ -220,6 +224,7 @@ public class MazeCLI implements Callable<Integer> {
                     Map.of("strategies", searchStrategies, "heuristics", searchHeuristics,
                             "weights", heuristicWeights, "plugins", pluginJars.stream().map(Path::toString).toList(),
                             "configFile", searchConfig == null ? "" : searchConfig.toString()));
+            status.seed(seed);
             boolean explicitHeuristics = commandSpec.commandLine().getParseResult().hasMatchedOption("-u")
                     || commandSpec.commandLine().getParseResult().hasMatchedOption("-w");
             if (searchConfig != null && (explicitHeuristics
