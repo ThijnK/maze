@@ -10,6 +10,14 @@ public final class CliArtifactCheck {
     private static int checks;
 
     public static void main(String[] args) throws Exception {
+        ArtifactCheck.compile("DefaultSubject", """
+            public class DefaultSubject {
+                public static int classify(int value) { return value > 0 ? 1 : 0; }
+            }
+            """, "target/classes", "maze.jar");
+        for (boolean concrete : List.of(false, true)) {
+            defaultPackage(concrete);
+        }
         ArtifactCheck.compile("example/ViolationSubject", """
             package example;
             public class ViolationSubject {
@@ -41,6 +49,16 @@ public final class CliArtifactCheck {
             checks++;
         }
         System.out.println("CLI artifact checks passed: " + checks);
+    }
+
+    private static void defaultPackage(boolean concrete) throws Exception {
+        Path output = Path.of("target/generated-tests", "default-package-" + (concrete ? "concrete" : "symbolic"));
+        int exit = ArtifactCheck.launch(output, concrete, "DefaultSubject", List.of("--strategy=BFS"));
+        require(exit == 0, "default-package generation failed: " + Files.readString(ArtifactCheck.log(output)));
+        var status = ArtifactCheck.JSON.readTree(output.resolve("DefaultSubject-run-status.json").toFile());
+        require(status.path("outcome").asText().equals("completed"), "default-package run not completed");
+        require(Files.exists(output.resolve("DefaultSubjectTest.java")), "default-package suite missing");
+        checks++;
     }
 
     private static void verify(String name, boolean concrete, List<String> options, int expected) throws Exception {
