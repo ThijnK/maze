@@ -13,6 +13,8 @@ class ReplayBudgetTest {
         var instrumenter = new BytecodeInstrumenter("target/classes");
         var subject = instrumenter.instrument2("nl.uu.maze.benchmarks.AckermannPeter");
         var method = subject.getMethod("compute", long.class, long.class);
+        // Match DSEController's replay setup; earlier tests may leave concrete traces.
+        TraceManager.clearEntries();
         try (var budget = ReplayBudget.open(64, Long.MAX_VALUE)) {
             var result = new ConcreteExecutor().execute((Constructor<?>) null, method, new Object[0], new Object[]{1L, 100L});
             assertTrue(result.isException(), "A candidate beyond the trace bound must be aborted");
