@@ -26,7 +26,7 @@ import picocli.CommandLine.Model.CommandSpec;
  * Main class for the MAZE application that provides a command-line interface
  * (CLI) for generating tests using dynamic symbolic execution (DSE).
  */
-@Command(name = "maze", mixinStandardHelpOptions = true, version = "maze 1.0", descriptionHeading = "%nDescription:%n", description = "Generate tests for the specified Java class using dynamic symbolic execution (DSE).", optionListHeading = "%nOptions:%n", sortOptions = false)
+@Command(name = "maze", mixinStandardHelpOptions = true, versionProvider = MazeVersionProvider.class, descriptionHeading = "%nDescription:%n", description = "Generate tests for the specified Java class using dynamic symbolic execution (DSE).", optionListHeading = "%nOptions:%n", sortOptions = false)
 public class MazeCLI implements Callable<Integer> {
 	
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(MazeCLI.class);

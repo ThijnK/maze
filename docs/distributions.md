@@ -7,11 +7,14 @@ Maven and a separate Z3 installation are unnecessary.
 
 Packages currently target Linux ARM64 and x86-64 with glibc. The archive checks
 use Ubuntu 24.04 in Docker; x86-64 is checked under emulation on Apple Silicon.
-This does not establish support for macOS, Windows, or Alpine Linux. On macOS,
-use Docker with the package matching the container's architecture.
+These are Linux packages, not native macOS, Windows, or Alpine Linux packages.
+On macOS or Windows, use [Docker Desktop](https://docs.docker.com/desktop/)
+with Linux containers and a package
+matching the container's architecture. Java and Z3 then run inside the container.
 
-Archives are built locally by the commands below. They are not published
-automatically, and there is no dedicated MAZE runtime image.
+Download packages and checksums from [GitHub Releases](https://github.com/ThijnK/maze/releases).
+The commands below describe building and validating packages locally.
+There is no dedicated MAZE runtime image.
 
 ## Use an archive
 
@@ -28,7 +31,17 @@ docker run --rm -it -v "$PWD:/experiment" -w /experiment \
 ./maze --help
 ```
 
-Run this from the extracted directory. Mount additional research directories as
+On Windows, run the equivalent command from PowerShell in the extracted directory:
+
+```powershell
+docker run --rm -it --mount "type=bind,source=$($PWD.Path),target=/experiment" --workdir /experiment eclipse-temurin:21-jdk-noble bash
+```
+
+Inside the container, run `./maze --help` and the examples from the package README.
+A JDK is included in this image, so you can compile your subject's Java sources
+with `javac` there too. MAZE itself expects compiled classes.
+
+Run these commands from the extracted directory. Mount additional research directories as
 needed. Set `JDK_JAVA_OPTIONS` for JVM options such as `-ea` or `-Xmx2g`.
 
 ## Build a candidate
@@ -67,7 +80,7 @@ docker run --rm --network none \
   -v "$PWD/target/distributions:/downloads:ro" \
   -v "$PWD/distribution:/checks:ro" \
   maven:3.9.16-eclipse-temurin-21-noble@sha256:a972570be789ee5c9fa23446a8914ac7327560b5c022f662cfa9452aef829f18 \
-  sh /checks/verify.sh /downloads/maze-1.1.1-linux-arm64.tar.gz
+  sh /checks/verify.sh /downloads/maze-1.2.0-linux-arm64.tar.gz
 ```
 
 Use `--platform linux/amd64` for both pull and run, and the `amd64` archive name,

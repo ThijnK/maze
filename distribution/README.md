@@ -6,6 +6,11 @@ Linux with glibc (validated on Ubuntu 24.04), and the architecture named in the 
 (`arm64` or `amd64`). Use a JDK if you also want to compile subjects or extensions.
 You do not need Maven or a separate Z3 installation.
 
+MAZE reads compiled `.class` files. Build your project first, or compile a source
+file with `javac -d classes path/to/MyClass.java`. Set `--classpath` to the output
+root (such as `classes` or Maven's `target/classes`) and `--class-name` to the Java
+class name, including its package and without a `.java` or `.class` suffix.
+
 From the extracted directory:
 
 ```sh

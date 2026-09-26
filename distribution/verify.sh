@@ -23,5 +23,13 @@ if [ "$#" -ne 1 ] || [ ! -x "$1/maze" ]; then
 fi
 home_dir=$1
 "$home_dir/maze" --help > /dev/null
+package_name=$(basename "$home_dir")
+expected_version=${package_name#maze-}
+expected_version=${expected_version%-linux-*}
+actual_version=$("$home_dir/maze" --version)
+if [ "$actual_version" != "maze $expected_version" ]; then
+    echo "Package version mismatch: expected maze $expected_version, got $actual_version" >&2
+    exit 1
+fi
 javac -cp "$home_dir/maze.jar" -d . "$check_source"
 java -cp "$home_dir/maze.jar:." ReleaseCheck "$home_dir"

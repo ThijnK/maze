@@ -22,17 +22,24 @@ Choose a setup based on what you want to do:
 
 The Linux package is the simplest setup for running MAZE: unpack the archive for your architecture and run its launcher. You need Java 21 or newer; use a JDK if you also want to compile subjects or extensions. Maven and a separate Z3 installation are unnecessary.
 
-**Packages are not published yet.** They have been built and tested locally; when published, they will be available under [GitHub Releases](https://github.com/ThijnK/maze/releases). For now, use the Docker setup below or [build a package](docs/distributions.md#build-a-candidate).
+Download **v1.2.0** for [Linux ARM64](https://github.com/ThijnK/maze/releases/download/v1.2.0/maze-1.2.0-linux-arm64.tar.gz) or [Linux x86-64](https://github.com/ThijnK/maze/releases/download/v1.2.0/maze-1.2.0-linux-amd64.tar.gz). Checksums and release notes are on [GitHub Releases](https://github.com/ThijnK/maze/releases/tag/v1.2.0).
 
-From an unpacked package:
+MAZE takes **compiled Java classes**, not `.java` source files. If your project has
+not been compiled yet, build it first (for example with Maven or Gradle), or use
+`javac` for a single class. `--classpath` names the root of the compiled classes,
+and `--class-name` is the Java name, such as `com.example.MyClass`, without `.class`.
+
+From an unpacked package, with your subject source available:
 
 ```sh
 ./maze --help
+mkdir -p subject/classes
+javac -d subject/classes subject/src/com/example/MyClass.java
 ./maze --classpath subject/classes --class-name com.example.MyClass \
   --output-path generated --strategy BFS --time-budget 30
 ```
 
-Packages target Linux ARM64 and x86-64 with glibc. On macOS, run the Linux package inside a Java Docker container; see [package setup and Docker usage](docs/distributions.md#use-an-archive). Native macOS and Windows packages are not provided.
+**Platform support:** Linux ARM64 and x86-64 with glibc. On macOS or Windows, use the package in a [Java Docker container](docs/distributions.md#use-an-archive); select Linux-container mode in Docker Desktop on Windows.
 
 ### Develop with Docker
 
@@ -49,24 +56,26 @@ This builds the toolchain image and packages MAZE, skipping tests. The executabl
 
 ```sh
 docker compose run --rm dev bash
-java -jar target/maze-1.1.1-jar-with-dependencies.jar --help
+java -jar target/maze-1.2.0-jar-with-dependencies.jar --help
 ```
 
 The shell opens in `/workspace`, with your checkout mounted there. Edit files on your host and rerun Maven to rebuild. The [development guide](docs/development-guide.md) covers the development workflow, tests, project structure, troubleshooting, and optional local setup.
 
-### Run MAZE
-
-A normal invocation needs compiled subject classes, a fully qualified class name, and an output directory. The examples below use **`maze.jar` as a placeholder for the executable JAR** from your build:
+Inside the development shell, compile your subject and run the built JAR:
 
 ```sh
-java -jar maze.jar \
+mkdir -p subject/classes
+javac -d subject/classes subject/src/com/example/MyClass.java
+java -jar target/maze-1.2.0-jar-with-dependencies.jar \
   --classpath subject/classes --class-name com.example.MyClass \
   --output-path generated --strategy BFS --time-budget 30
 ```
 
-**When using a package, replace `java -jar maze.jar` with `./maze`.** The launcher configures the bundled Z3 libraries. For examples that enable Java assertions with `java -ea -jar maze.jar`, use `JDK_JAVA_OPTIONS=-ea ./maze` instead. In a source build, the development container supplies Z3; a local build needs the native library setup described in the development guide.
+For a local build, use the same commands in your host shell after configuring the dependencies in the development guide.
 
 ## Using MAZE
+
+The examples below use `java -jar maze.jar`, where `maze.jar` stands for the executable JAR from your build. **With a package, use `./maze` instead** so the launcher configures the bundled Z3 libraries. Where an example uses `java -ea -jar maze.jar` to enable assertions, the package equivalent is `JDK_JAVA_OPTIONS=-ea ./maze`.
 
 ### Generate tests for a class
 
@@ -239,7 +248,7 @@ A search strategy chooses which pending execution target to explore next. MAZE o
 
 #### Symbolic-driven execution
 
-This is the default. MAZE starts with symbolic states for the target methods in a shared worklist:
+This is MAZE’s default mode. It follows **execution-generated testing (EGT)**: state-forking symbolic execution, often described as **KLEE-style** execution. See the [EGT paper](https://www.doc.ic.ac.uk/~cristic/papers/egt-spin-05.pdf) and [KLEE](https://www.usenix.org/legacy/events/osdi08/tech/full_papers/cadar/cadar_html/). MAZE starts with symbolic states for the target methods in a shared worklist:
 
 1. Select a state from the worklist and symbolically execute its next instruction. A branch can produce multiple successor states.
 2. When a path reaches the end of a method, solve its constraints with Z3. Satisfiable constraints yield concrete inputs and a JUnit test with regression oracles.
@@ -251,7 +260,7 @@ When code cannot be executed symbolically—for example, an unavailable library 
 
 #### Concrete-driven execution
 
-Enable this experimental mode with `--concrete-driven` or `-C`. It works one method at a time:
+This mode follows **concolic execution/testing**, also used in **whitebox fuzzing**: execute a concrete input, collect path constraints, and solve for another input. See [automated whitebox fuzz testing](https://www.microsoft.com/en-us/research/publication/automated-whitebox-fuzz-testing/). Enable MAZE’s experimental implementation with `--concrete-driven` or `-C`. It works one method at a time:
 
 1. Execute the instrumented method with concrete inputs, recording a trace.
 2. Replay that trace symbolically to obtain its path constraints. For a new path, generate a test and add its branch-point candidates to the worklist. For constraints `[c1, c2, c3]`, these correspond to prefixes `[c1]`, `[c1, c2]`, and `[c1, c2, c3]`.
