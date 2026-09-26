@@ -250,8 +250,18 @@ public class MazeCLI implements Callable<Integer> {
                 try { status.finish(e); }
                 catch (Exception cleanup) { e.addSuppressed(cleanup); }
             }
-            logger.error("An error occurred: {}: {}", e.getClass().getName(), e.getMessage());
-            logger.error("Error stack trace: ", e);
+            if (e instanceof ClassNotFoundException) {
+                commandSpec.commandLine().getErr().printf(
+                        "Error: Could not load a required class: %s%n"
+                        + "Check --class-name and --indirect-target, and ensure --classpath '%s' "
+                        + "contains the compiled classes and their dependencies. "
+                        + "Use Java class names without .java or .class suffixes.%n",
+                        e.getMessage(), classPath);
+                logger.debug("Class lookup failed", e);
+            } else {
+                logger.error("An error occurred: {}: {}", e.getClass().getName(), e.getMessage());
+                logger.error("Error stack trace: ", e);
+            }
             return 1;
         } finally {
             if (!leaveZ3ContextOpen && !contextClosed) {

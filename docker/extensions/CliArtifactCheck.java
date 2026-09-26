@@ -17,6 +17,10 @@ public final class CliArtifactCheck {
             """, "target/classes", "maze.jar");
         for (boolean concrete : List.of(false, true)) {
             defaultPackage(concrete);
+            for (boolean quiet : List.of(false, true)) {
+                missingClass(concrete, false, quiet);
+                missingClass(concrete, true, quiet);
+            }
         }
         ArtifactCheck.compile("example/ViolationSubject", """
             package example;
@@ -58,6 +62,26 @@ public final class CliArtifactCheck {
         var status = ArtifactCheck.JSON.readTree(output.resolve("DefaultSubject-run-status.json").toFile());
         require(status.path("outcome").asText().equals("completed"), "default-package run not completed");
         require(Files.exists(output.resolve("DefaultSubjectTest.java")), "default-package suite missing");
+        checks++;
+    }
+
+    private static void missingClass(boolean concrete, boolean indirect, boolean quiet) throws Exception {
+        String missing = quiet ? "DoesNotExist" : "example.DoesNotExist";
+        Path output = Path.of("target/input-checks", (concrete ? "concrete" : "symbolic")
+                + (indirect ? "-indirect" : "-target") + (quiet ? "-quiet" : ""));
+        String target = indirect ? "example.SmokeSubject" : missing;
+        var args = new ArrayList<>(List.of("--log-level=" + (quiet ? "OFF" : "INFO")));
+        if (indirect) args.addAll(List.of("--indirect-target", missing));
+        int exit = ArtifactCheck.launch(output, concrete, target, args);
+        String log = Files.readString(ArtifactCheck.log(output));
+        require(exit != 0, "missing class accepted");
+        require(log.contains("Error:") && log.contains(missing) && log.contains("--classpath"),
+                "missing actionable class diagnostic: " + log);
+        require(!log.contains("ClassNotFoundException") && !log.contains("\tat "),
+                "expected input error printed a raw stack trace: " + log);
+        var status = ArtifactCheck.JSON.readTree(output.resolve(target + "-run-status.json").toFile());
+        require(status.path("outcome").asText().equals("failed"), "missing class recorded as success");
+        require(!Files.exists(output.resolve(target + "-test-summary.csv")), "failed input published metrics");
         checks++;
     }
 
