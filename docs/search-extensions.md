@@ -8,11 +8,14 @@ Extensions run as trusted Java code in MAZE's JVM.
 
 ## Build and run the complete examples
 
-First [build MAZE](../README.md#getting-started) to obtain its
-`jar-with-dependencies` artifact. The [development container](development.md)
+If you have a Linux package, follow its included README to compile and run the
+bundled examples. The API and lifecycle below apply to both packages and source builds.
+
+For a source build, first [build MAZE](../README.md#develop-with-docker) to obtain its
+`jar-with-dependencies` artifact. The [development container](development-guide.md)
 includes Java 21, Maven, and matching Z3 4.13.3 Java bindings and native libraries,
 so you do not need to install or configure them separately. For a local setup,
-follow the README's [prerequisites](../README.md#prerequisites).
+follow [Build locally](development-guide.md#build-locally).
 
 If you use Docker, open a shell from the repository root:
 

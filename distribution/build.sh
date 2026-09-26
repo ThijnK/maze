@@ -26,7 +26,7 @@ chmod 755 "$stage/$name/maze"
 printf '%s\n' "$architecture" > "$stage/$name/architecture"
 # Keep source-build links usable when the guide is read outside a checkout.
 sed -e 's|(../README.md#|(https://github.com/ThijnK/maze#|g' \
-    -e 's|(development.md)|(https://github.com/ThijnK/maze/blob/main/docs/development.md)|g' \
+    -e 's|(development-guide.md|(https://github.com/ThijnK/maze/blob/main/docs/development-guide.md|g' \
     docs/search-extensions.md > "$stage/$name/docs/search-extensions.md"
 cp -R examples/search-extensions "$stage/$name/examples/"
 # Refuse an artifact compiled against a different Z3 binding than the bundled natives.

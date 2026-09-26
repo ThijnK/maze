@@ -12,104 +12,59 @@ MAZE (Multi-strategy Automated Symbolic Execution) generates JUnit tests from co
 
 ## Getting started
 
-MAZE can also be packaged with matching Z3 native libraries and a launcher, so
-users only need Java 21. See [Linux packages](docs/distributions.md) for the archive
-contents, Docker usage, and release validation. These packages are built locally
-until a release publishes them.
+Choose a setup based on what you want to do:
 
-To build from source, clone the repository and choose Docker or a local build:
+- **Run MAZE or write an external search extension:** use a packaged release. It includes MAZE, its Java dependencies, matching Z3 native libraries, and a launcher.
+- **Develop MAZE:** use the Docker development environment. It supplies Java, Maven, and Z3 while keeping them off your host.
+- **Build on your host:** follow the optional [local-build instructions](docs/development-guide.md#build-locally). This requires configuring Java, Maven, and Z3 yourself.
+
+### Run a packaged release
+
+The Linux package is the simplest setup for running MAZE: unpack the archive for your architecture and run its launcher. You need Java 21 or newer; use a JDK if you also want to compile subjects or extensions. Maven and a separate Z3 installation are unnecessary.
+
+**Packages are not published yet.** They have been built and tested locally; when published, they will be available under [GitHub Releases](https://github.com/ThijnK/maze/releases). For now, use the Docker setup below or [build a package](docs/distributions.md#build-a-candidate).
+
+From an unpacked package:
+
+```sh
+./maze --help
+./maze --classpath subject/classes --class-name com.example.MyClass \
+  --output-path generated --strategy BFS --time-budget 30
+```
+
+Packages target Linux ARM64 and x86-64 with glibc. On macOS, run the Linux package inside a Java Docker container; see [package setup and Docker usage](docs/distributions.md#use-an-archive). Native macOS and Windows packages are not provided.
+
+### Develop with Docker
+
+With Docker running and Docker Compose available, clone MAZE and build it:
 
 ```sh
 git clone https://github.com/ThijnK/maze.git
 cd maze
-```
-
-### Build with Docker
-
-With Docker running and Docker Compose available, build MAZE with these two commands. The container includes Java 21, Maven, and matching Z3 4.13.3 Java bindings and native libraries, so you do not need to install or configure them separately:
-
-```sh
 docker compose build dev
 docker compose run --rm dev mvn -DskipTests package
 ```
 
-The first command builds the toolchain image; the second compiles and packages MAZE, skipping its tests. The executable JAR is now in `target/`.
-
-To run the examples below inside the container, open a shell:
+This builds the toolchain image and packages MAZE, skipping tests. The executable is `target/maze-<version>-jar-with-dependencies.jar`. Open a shell to run it:
 
 ```sh
 docker compose run --rm dev bash
+java -jar target/maze-1.1.1-jar-with-dependencies.jar --help
 ```
 
-The shell opens in `/workspace`, with your checkout mounted there. Follow [Run MAZE](#run-maze) below. See the [development guide](docs/development.md) for Docker configuration and troubleshooting.
-
-### Build locally
-
-#### Prerequisites
-
-- JDK 21 or higher; the development container uses JDK 21.
-- Apache Maven.
-- Z3 4.13.3, with Java bindings and native libraries for the same release and architecture.
-
-#### Installing Z3
-
-Download the matching binary archive from the [Z3 releases](https://github.com/Z3Prover/z3/releases), such as `z3-4.13.3-x64-win.zip` for Windows x64, and extract it. Install its Java binding in your local Maven repository:
-
-```sh
-mvn install:install-file \
-  -Dfile="/path/to/z3/bin/com.microsoft.z3.jar" \
-  -DgroupId=com.microsoft -DartifactId=z3 -Dversion=4.13.3 \
-  -Dpackaging=jar -DgeneratePom=true
-```
-
-Replace the file path with yours; on Windows, it might be `C:\Program Files\z3\bin\com.microsoft.z3.jar`. The version must match MAZE's `pom.xml` and the native libraries you will load.
-
-The JVM must also be able to find Z3's native libraries:
-
-- **Windows:** set `Z3_HOME` to the extracted directory and add `%Z3_HOME%\bin` to `PATH`.
-- **Linux:** add the directory containing `libz3.so` and `libz3java.so` to `LD_LIBRARY_PATH`, for example `export LD_LIBRARY_PATH="/path/to/z3/bin${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"`.
-- **macOS:** you may need to place the matching Z3 `.dylib` files in the directory from which you launch Java.
-
-If Maven reports that it cannot find `com.microsoft:z3:jar:4.13.3`, check that the binding is installed in your local Maven repository under the version declared in `pom.xml`.
-
-<details>
-<summary>Building Z3 from source on Windows</summary>
-
-If the binary distribution does not work for your setup, clone [Z3](https://github.com/Z3Prover/z3) and run these commands in its repository:
-
-```sh
-python scripts/mk_make.py --java -x
-cd build
-nmake
-```
-
-`-x` selects x64; omit it for x86. `nmake` and the required C++ build tools are available through Visual Studio Installer. After building, install `build/com.microsoft.z3.jar` in Maven and configure the native library location as above. Use sources matching MAZE's Z3 dependency.
-
-</details>
-
-#### Build the JAR
-
-From MAZE's repository root:
-
-```sh
-mvn -DskipTests package
-```
+The shell opens in `/workspace`, with your checkout mounted there. Edit files on your host and rerun Maven to rebuild. The [development guide](docs/development-guide.md) covers the development workflow, tests, project structure, troubleshooting, and optional local setup.
 
 ### Run MAZE
 
-The executable is `target/maze-<version>-jar-with-dependencies.jar`. It contains MAZE and its Java dependencies; Z3's native libraries remain a runtime prerequisite. In the examples below, **`maze.jar` stands for the path to that executable JAR**.
-
-```sh
-java -jar maze.jar --help
-```
-
-A normal invocation needs a directory of compiled subject classes, a fully qualified class name, and an output directory:
+A normal invocation needs compiled subject classes, a fully qualified class name, and an output directory. The examples below use **`maze.jar` as a placeholder for the executable JAR** from your build:
 
 ```sh
 java -jar maze.jar \
   --classpath subject/classes --class-name com.example.MyClass \
   --output-path generated --strategy BFS --time-budget 30
 ```
+
+**When using a package, replace `java -jar maze.jar` with `./maze`.** The launcher configures the bundled Z3 libraries. For examples that enable Java assertions with `java -ea -jar maze.jar`, use `JDK_JAVA_OPTIONS=-ea ./maze` instead. In a source build, the development container supplies Z3; a local build needs the native library setup described in the development guide.
 
 ## Using MAZE
 
@@ -274,11 +229,15 @@ Use `--export-summary=true` for a CSV of test-generation statistics. Each CLI in
 
 Search failures stop the run with a nonzero exit. Already generated tests are retained as partial output, without a normal success CSV or verification PASS. For automated comparisons, require both a zero exit and a new matching completion record; see [experiment records](docs/search-extensions.md#failures-and-experiment-records).
 
-## How exploration works
+## Search strategies and heuristics
+
+Even small programs can have many paths. Search determines which ones receive attention within the available budget. DFS may spend its time exploring loop iterations before reaching other logic; BFS can spread exploration across shallower states.
+
+### How exploration works
 
 A search strategy chooses which pending execution target to explore next. MAZE offers two execution modes, with different kinds of pending work.
 
-### Symbolic-driven execution
+#### Symbolic-driven execution
 
 This is the default. MAZE starts with symbolic states for the target methods in a shared worklist:
 
@@ -290,7 +249,7 @@ Multiple methods are explored together. `--max-depth` bounds exploration depth, 
 
 When code cannot be executed symbolically—for example, an unavailable library method—MAZE can execute it with concrete inputs and incorporate observed return values and side effects into the symbolic state. This combination of symbolic and concrete execution is why the approach is called *dynamic symbolic execution* (DSE).
 
-### Concrete-driven execution
+#### Concrete-driven execution
 
 Enable this experimental mode with `--concrete-driven` or `-C`. It works one method at a time:
 
@@ -301,15 +260,11 @@ Enable this experimental mode with `--concrete-driven` or `-C`. It works one met
 
 The strategy selects branch candidates rather than live symbolic states. All shipped strategies except PCS can run in this mode, although their usefulness can differ; RPS was designed around symbolic execution trees. Built-in and external strategies and heuristics declare mode restrictions through `supportsMode`; MAZE rejects incompatible configurations before exploration. See [execution-mode compatibility](docs/search-extensions.md#execution-mode-compatibility).
 
-### Library handling and limitations
+#### Library handling and limitations
 
-By default, standard-library calls use concrete execution. Supplying library bytecode on the subject classpath can allow symbolic execution of that code, but complex library internals can also make exploration harder. Older setups used JDK 8's `rt.jar` for this; Java 9 and later use modules rather than that archive. MAZE itself still requires the JDK listed under [prerequisites](#prerequisites).
+By default, standard-library calls use concrete execution. Supplying library bytecode on the subject classpath can allow symbolic execution of that code, but complex library internals can also make exploration harder. Older setups used JDK 8's `rt.jar` for this; Java 9 and later use modules rather than that archive. MAZE itself requires Java 21 or newer.
 
 Known unsupported constructs include `invokedynamic` (used by lambdas and method references), static fields and initializers, and enums. If exploration takes too long, set a time budget, reduce maximum depth, or choose a different search strategy.
-
-## Search strategies and heuristics
-
-Even small programs can have many paths. Search determines which ones receive attention within the available budget. DFS may spend its time exploring loop iterations before reaching other logic; BFS can spread exploration across shallower states.
 
 ### Shipped strategies
 
@@ -468,58 +423,6 @@ The original benchmark set contains 20 classes under test, covering recursion, l
 - [`StringUtils`](src/main/java/nl/uu/maze/benchmarks/StringUtils.java): Class that provides various utility methods for strings, such as reversing a string, checking for palindromes, and finding really specific substrings (e.g., alternating digits and letters).
 
 [Sample generated tests](src/test/java/nl/uu/tests/maze/generated/benchmarks/) for these subjects were produced using BFS with a 30-second budget. The reported results for that sample are 90% instruction coverage and 85% branch coverage; these are results for that benchmark set, not a coverage guarantee for arbitrary programs.
-
-## Working on MAZE
-
-The [development guide](docs/development.md) covers building and testing in Docker, including checks of external strategies and heuristics against the packaged JAR.
-
-### Run the tests
-
-These checks are for development and are not required before using MAZE:
-
-```sh
-docker compose run --rm dev mvn clean verify
-docker compose run --rm dev sh docker/smoke/verify.sh \
-  target/maze-1.1.1-jar-with-dependencies.jar
-```
-
-`verify` builds, packages, and tests MAZE. The smoke check then uses the packaged JAR to generate tests in both execution modes, compiles those tests, and runs them. For a local build, run `mvn clean verify` directly.
-
-### Run from Maven or Eclipse
-
-To run the application through Maven from the repository root:
-
-```sh
-mvn exec:java -Dexec.args="--help"
-```
-
-In Eclipse, import the checkout through **File → Import → Maven → Existing Maven Projects**. The entry point is `nl.uu.maze.main.Application`.
-
-### Project structure
-
-- `nl.uu.maze.main`: Application entry point and command-line interface
-- `nl.uu.maze.analysis`: Java program analysis utilities
-- `nl.uu.maze.execution`: Core DSE execution engine
-  - `nl.uu.maze.execution.concrete`: Concrete execution components
-  - `nl.uu.maze.execution.symbolic`: Symbolic execution components
-- `nl.uu.maze.generation`: Test case generation
-- `nl.uu.maze.instrument`: Bytecode instrumentation
-- `nl.uu.maze.search`: Search strategies and heuristics
-- `nl.uu.maze.transform`: Transformers between Java, Z3, and Jimple (SootUp IR)
-- `nl.uu.maze.util`: Utility classes
-- `nl.uu.maze.examples`: Example classes for testing and demonstration purposes
-- `nl.uu.maze.benchmarks`: Benchmark classes for evaluating and comparing search strategies
-
-### Dependencies
-
-- [SootUp](https://soot-oss.github.io/SootUp/latest/) for Java bytecode analysis and transformation.
-- [Z3 Theorem Prover](https://github.com/Z3Prover/z3) for constraint solving.
-- [ASM](https://asm.ow2.io/) for bytecode manipulation.
-- [JavaPoet](https://github.com/square/javapoet) for Java source code generation.
-- [Logback](https://logback.qos.ch/) for logging.
-- [JUnit 5](https://junit.org/junit5/) for testing.
-- [Picocli](https://picocli.info/) for command-line argument parsing.
-- Jackson for strict search-configuration parsing and experiment records.
 
 ## License
 
