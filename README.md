@@ -22,7 +22,7 @@ Choose a setup based on what you want to do:
 
 The Linux package is the simplest setup for running MAZE: unpack the archive for your architecture and run its launcher. You need Java 21 or newer; use a JDK if you also want to compile subjects or extensions. Maven and a separate Z3 installation are unnecessary.
 
-Download **v1.2.0** for [Linux ARM64](https://github.com/ThijnK/maze/releases/download/v1.2.0/maze-1.2.0-linux-arm64.tar.gz) or [Linux x86-64](https://github.com/ThijnK/maze/releases/download/v1.2.0/maze-1.2.0-linux-amd64.tar.gz). Checksums and release notes are on [GitHub Releases](https://github.com/ThijnK/maze/releases/tag/v1.2.0).
+Download **v1.2.1** for [Linux ARM64](https://github.com/ThijnK/maze/releases/download/v1.2.1/maze-1.2.1-linux-arm64.tar.gz) or [Linux x86-64](https://github.com/ThijnK/maze/releases/download/v1.2.1/maze-1.2.1-linux-amd64.tar.gz). Checksums and release notes are on [GitHub Releases](https://github.com/ThijnK/maze/releases/tag/v1.2.1).
 
 MAZE takes **compiled Java classes**, not `.java` source files. If your project has
 not been compiled yet, build it first (for example with Maven or Gradle), or use
@@ -56,7 +56,7 @@ This builds the toolchain image and packages MAZE, skipping tests. The executabl
 
 ```sh
 docker compose run --rm dev bash
-java -jar target/maze-1.2.0-jar-with-dependencies.jar --help
+java -jar target/maze-1.2.1-jar-with-dependencies.jar --help
 ```
 
 The shell opens in `/workspace`, with your checkout mounted there. Edit files on your host and rerun Maven to rebuild. The [development guide](docs/development-guide.md) covers the development workflow, tests, project structure, troubleshooting, and optional local setup.
@@ -66,7 +66,7 @@ Inside the development shell, compile your subject and run the built JAR:
 ```sh
 mkdir -p subject/classes
 javac -d subject/classes subject/src/com/example/MyClass.java
-java -jar target/maze-1.2.0-jar-with-dependencies.jar \
+java -jar target/maze-1.2.1-jar-with-dependencies.jar \
   --classpath subject/classes --class-name com.example.MyClass \
   --output-path generated --strategy BFS --time-budget 30
 ```

@@ -29,7 +29,7 @@ compile the examples, and run them against the packaged MAZE JAR:
 
 ```sh
 mkdir -p /tmp/my-maze-experiment
-cp target/maze-1.2.0-jar-with-dependencies.jar /tmp/my-maze-experiment/maze.jar
+cp target/maze-1.2.1-jar-with-dependencies.jar /tmp/my-maze-experiment/maze.jar
 cp -R examples/search-extensions/. /tmp/my-maze-experiment/
 cd /tmp/my-maze-experiment
 
@@ -87,7 +87,7 @@ generated JUnit tests:
 
 ```sh
 docker compose run --rm dev sh docker/extensions/verify.sh \
-  target/maze-1.2.0-jar-with-dependencies.jar
+  target/maze-1.2.1-jar-with-dependencies.jar
 ```
 
 ## Constructors and options

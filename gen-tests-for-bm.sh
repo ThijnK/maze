@@ -6,7 +6,7 @@ budget=30
 strategy=BFS
 depth=400
 #depth=200
-MAZE=./target/maze-1.2.0-jar-with-dependencies.jar
+MAZE=./target/maze-1.2.1-jar-with-dependencies.jar
 BM=(AckermannPeter
     BinarySearch
     BinaryTree

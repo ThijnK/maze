@@ -6,7 +6,7 @@
 
     <groupId>nl.uu</groupId>
     <artifactId>maze</artifactId>
-    <version>1.2.0</version>
+    <version>1.2.1</version>
 
     <name>maze</name>
     <description>Dynamic symbolic execution engine for automated test generation.</description>

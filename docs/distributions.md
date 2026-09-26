@@ -80,7 +80,7 @@ docker run --rm --network none \
   -v "$PWD/target/distributions:/downloads:ro" \
   -v "$PWD/distribution:/checks:ro" \
   maven:3.9.16-eclipse-temurin-21-noble@sha256:a972570be789ee5c9fa23446a8914ac7327560b5c022f662cfa9452aef829f18 \
-  sh /checks/verify.sh /downloads/maze-1.2.0-linux-arm64.tar.gz
+  sh /checks/verify.sh /downloads/maze-1.2.1-linux-arm64.tar.gz
 ```
 
 Use `--platform linux/amd64` for both pull and run, and the `amd64` archive name,
