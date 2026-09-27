@@ -22,7 +22,7 @@ Choose a setup based on what you want to do:
 
 The Linux package is the simplest setup for running MAZE: unpack the archive for your architecture and run its launcher. You need Java 21 or newer; use a JDK if you also want to compile subjects or extensions. Maven and a separate Z3 installation are unnecessary.
 
-Download **v1.2.1** for [Linux ARM64](https://github.com/ThijnK/maze/releases/download/v1.2.1/maze-1.2.1-linux-arm64.tar.gz) or [Linux x86-64](https://github.com/ThijnK/maze/releases/download/v1.2.1/maze-1.2.1-linux-amd64.tar.gz). Checksums and release notes are on [GitHub Releases](https://github.com/ThijnK/maze/releases/tag/v1.2.1).
+Download **v1.2.2** for [Linux ARM64](https://github.com/ThijnK/maze/releases/download/v1.2.2/maze-1.2.2-linux-arm64.tar.gz) or [Linux x86-64](https://github.com/ThijnK/maze/releases/download/v1.2.2/maze-1.2.2-linux-amd64.tar.gz). Checksums and release notes are on [GitHub Releases](https://github.com/ThijnK/maze/releases/tag/v1.2.2).
 
 MAZE takes **compiled Java classes**, not `.java` source files. If your project has
 not been compiled yet, build it first (for example with Maven or Gradle), or use
@@ -56,7 +56,7 @@ This builds the toolchain image and packages MAZE, skipping tests. The executabl
 
 ```sh
 docker compose run --rm dev bash
-java -jar target/maze-1.2.1-jar-with-dependencies.jar --help
+java -jar target/maze-1.2.2-jar-with-dependencies.jar --help
 ```
 
 The shell opens in `/workspace`, with your checkout mounted there. Edit files on your host and rerun Maven to rebuild. The [development guide](docs/development-guide.md) covers the development workflow, tests, project structure, troubleshooting, and optional local setup.
@@ -66,7 +66,7 @@ Inside the development shell, compile your subject and run the built JAR:
 ```sh
 mkdir -p subject/classes
 javac -d subject/classes subject/src/com/example/MyClass.java
-java -jar target/maze-1.2.1-jar-with-dependencies.jar \
+java -jar target/maze-1.2.2-jar-with-dependencies.jar \
   --classpath subject/classes --class-name com.example.MyClass \
   --output-path generated --strategy BFS --time-budget 30
 ```
@@ -278,6 +278,11 @@ This is MAZE’s default mode. It follows **execution-generated testing (EGT)**:
 
 Multiple methods are explored together. `--max-depth` bounds exploration depth, and `--time-budget` bounds runtime. With `--minimization=true`, MAZE retains tests that add coverage rather than a test for every completed path.
 
+Z3 constraint checks use the remaining run time as their solver timeout. Reaching
+that deadline ends search and retains completed tests; it does not classify the
+unfinished query as an infeasible path or a subject exception. Runs without a
+time budget leave solver checks unlimited.
+
 When code cannot be executed symbolically—for example, an unavailable library method—MAZE can execute it with concrete inputs and incorporate observed return values and side effects into the symbolic state. This combination of symbolic and concrete execution is why the approach is called *dynamic symbolic execution* (DSE).
 
 #### Concrete-driven execution
@@ -428,7 +433,7 @@ For MAZE's design and formal semantics, see [Kroon, T., *Evaluating Search Strat
 
 The [MAZE fork of JUGE](https://github.com/ThijnK/JUGE) measures generation time, coverage, and mutation kill rate, and supports comparison with other test-generation tools. It is based on the [JUGE framework](https://github.com/JUnitContest/JUGE) used for the SBFT tool competitions. Setup and experiment instructions live in that repository.
 
-The [companion JUGE integration](https://github.com/ThijnK/JUGE/blob/thijn/maze-external-search/docs/MAZE.md) accepts named experiments using a separate MAZE Linux package, external JARs, and the same search configuration documented here. It runs built-in and external strategies or heuristics through generation, coverage, mutation analysis, and aggregation in both modes. Failed or stale runs are excluded from scoring. Use that integration branch until it is merged; older adapters do not support this workflow.
+The [companion JUGE integration](https://github.com/ThijnK/JUGE/blob/master/docs/MAZE.md) accepts named experiments using a separate MAZE Linux package, external JARs, and the same search configuration documented here. It runs built-in and external strategies or heuristics through generation, coverage, mutation analysis, and aggregation in both modes. Failed or stale runs are excluded from scoring. Use the current JUGE fork; historical adapters do not support this workflow.
 
 ### Benchmark subjects and generated tests
 
