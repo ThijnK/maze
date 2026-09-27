@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Optional;
 import java.util.Map.Entry;
+import java.util.function.LongSupplier;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,12 +34,20 @@ public class SymbolicStateValidator {
 
     private final Solver solver;
     private final Z3ToJavaTransformer transformer;
+    private final LongSupplier deadline;
+    private boolean timeoutConfigured;
     /** Last created Z3 model */
     private Model model;
 
     public SymbolicStateValidator() {
+        this(() -> Long.MAX_VALUE);
+    }
+
+    /** Uses the owning run's absolute deadline; Long.MAX_VALUE means unlimited. */
+    public SymbolicStateValidator(LongSupplier deadline) {
         this.solver = ctx().mkSolver();
         this.transformer = new Z3ToJavaTransformer();
+        this.deadline = java.util.Objects.requireNonNull(deadline);
     }
 
     /**
@@ -49,15 +58,40 @@ public class SymbolicStateValidator {
      * @return An optional model if the path condition is satisfiable
      */
     public Optional<Model> validate(List<PathConstraint> pathConstraints) {
-        solver.add(pathConstraints.stream().map(PathConstraint::getConstraint).toArray(BoolExpr[]::new));
-        Status status = solver.check();
-        logger.debug("Path condition {}: {}", status.toString(), pathConstraints);
-        Optional<Model> model = Optional.empty();
-        if (status == Status.SATISFIABLE) {
-            model = Optional.ofNullable(solver.getModel());
+        try {
+            solver.add(pathConstraints.stream().map(PathConstraint::getConstraint).toArray(BoolExpr[]::new));
+            long end = deadline.getAsLong();
+            if (end != Long.MAX_VALUE) {
+                long remaining = end - System.currentTimeMillis();
+                if (remaining <= 0) throw new DeadlineExceeded();
+                Params parameters = ctx().mkParams();
+                parameters.add("timeout", (int) Math.min(remaining, Integer.MAX_VALUE));
+                solver.setParameters(parameters);
+                timeoutConfigured = true;
+            } else if (timeoutConfigured) {
+                Params parameters = ctx().mkParams();
+                parameters.add("timeout", 0);
+                solver.setParameters(parameters);
+                timeoutConfigured = false;
+            }
+            Status status = solver.check();
+            // A deadline is an engine stop, never evidence that a branch is infeasible.
+            if (end != Long.MAX_VALUE && (System.currentTimeMillis() >= end
+                    || (status == Status.UNKNOWN && "timeout".equals(solver.getReasonUnknown())))) {
+                throw new DeadlineExceeded();
+            }
+            logger.debug("Path condition {}: {}", status.toString(), pathConstraints);
+            return status == Status.SATISFIABLE ? Optional.ofNullable(solver.getModel()) : Optional.empty();
+        } finally {
+            solver.reset();
         }
-        solver.reset();
-        return model;
+    }
+
+    /** Bypasses CUT-exception handling and is consumed by the owning run controller. */
+    public static final class DeadlineExceeded extends Error {
+        private DeadlineExceeded() {
+            super("Time budget exceeded during constraint solving", null, false, false);
+        }
     }
 
     /**

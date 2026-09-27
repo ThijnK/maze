@@ -144,7 +144,7 @@ public class DSEController {
         this.analyzer = JavaAnalyzer.initialize(classPath, classLoader);
 
         this.concrete = new ConcreteExecutor();
-        this.validator = new SymbolicStateValidator();
+        this.validator = new SymbolicStateValidator(() -> overallDeadline);
         
         this.symbolic = new SymbolicExecutor(concrete, validator, analyzer);
         
@@ -264,7 +264,11 @@ public class DSEController {
         // so that intermediate results are not lost
         try {
             logger.info("Using search strategy: {}", searchStrategy.getName());
-            run();
+            try {
+                run();
+            } catch (SymbolicStateValidator.DeadlineExceeded deadline) {
+                logger.info("Time budget exceeded during constraint solving, stopping...");
+            }
             // Resolve the final callback before publishing any success output.
             int exploredCount = searchStrategy.getTotalExploredCount();
         	generator.writeToFile(outPath); 
