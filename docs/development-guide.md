@@ -47,12 +47,6 @@ unsatisfiable queries. A missing JNI library or incompatible binary fails the
 build. The matching Java binding is installed in the Maven image's reference
 repository, which seeds each Docker Maven cache at startup.
 
-The full test suite and packaged-JAR checks have been exercised on Linux ARM64
-through Docker Desktop on Apple Silicon. The Linux x86-64 distribution archive
-has also passed its checks under emulation, including Z3 loading, extension compilation, and generated-suite
-execution. The full Maven suite and broader packaged-JAR checks have not been
-run on x86-64.
-
 The default Compose limits are four CPUs and 6 GiB of memory. Make sure Docker
 has enough resources available, or adjust `compose.yaml` for your setup.
 
