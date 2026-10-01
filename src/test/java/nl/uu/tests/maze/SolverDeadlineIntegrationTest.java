@@ -40,8 +40,12 @@ class SolverDeadlineIntegrationTest {
         var status = new ObjectMapper().readTree(output.resolve(target + "-run-status.json").toFile());
         assertEquals("completed", status.path("outcome").asText(), status.toString());
         assertTrue(Files.readString(output.resolve("CUT_SolverDeadlineTest.java")).contains("factor("));
-        assertTrue(read(log).contains("Time budget exceeded during constraint solving"), () -> read(log));
+        if (concrete) assertTrue(read(log).contains("Time budget exceeded during constraint solving"), () -> read(log));
         assertFalse(read(log).contains("Exception thrown during symbolic execution"), () -> read(log));
+        if (!concrete) {
+            assertTrue(read(log).contains("Search deadline reached during constraint solving"), () -> read(log));
+            assertTrue(read(log).contains("Generating test cases for remaining states in search strategy"), () -> read(log));
+        }
     }
 
     private static String read(Path path) {

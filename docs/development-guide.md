@@ -35,7 +35,7 @@ docker compose build dev
 docker compose run --rm dev mvn -DskipTests package
 ```
 
-The build produces `target/maze-1.2.2-jar-with-dependencies.jar`.
+The build produces `target/maze-1.2.3-SNAPSHOT-jar-with-dependencies.jar`.
 
 The Dockerfile pins the official Maven/Java image by digest and checks the SHA-256
 of the Z3 archive for the selected architecture. It downloads from the official
@@ -61,7 +61,7 @@ docker compose run --rm dev bash
 Show command-line help:
 
 ```sh
-docker compose run --rm dev java -jar target/maze-1.2.2-jar-with-dependencies.jar --help
+docker compose run --rm dev java -jar target/maze-1.2.3-SNAPSHOT-jar-with-dependencies.jar --help
 ```
 
 Use the same pattern for ordinary MAZE invocations. Paths inside the checkout are
@@ -123,7 +123,7 @@ the separate end-to-end check:
 
 ```sh
 docker compose run --rm dev sh docker/smoke/verify.sh \
-  target/maze-1.2.2-jar-with-dependencies.jar
+  target/maze-1.2.3-SNAPSHOT-jar-with-dependencies.jar
 ```
 
 The smoke script cleans and compiles a separate example project, runs the
@@ -146,7 +146,7 @@ To check external extensions against the packaged artifact:
 
 ```sh
 docker compose run --rm dev sh docker/extensions/verify.sh \
-  target/maze-1.2.2-jar-with-dependencies.jar
+  target/maze-1.2.3-SNAPSHOT-jar-with-dependencies.jar
 ```
 
 This copies only the JAR, example sources/configuration, and validation sources

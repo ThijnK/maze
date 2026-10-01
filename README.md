@@ -278,7 +278,10 @@ This is MAZE’s default mode. It follows **execution-generated testing (EGT)**:
 
 Multiple methods are explored together. `--max-depth` bounds exploration depth, and `--time-budget` bounds runtime. With `--minimization=true`, MAZE retains tests that add coverage rather than a test for every completed path.
 
-Z3 constraint checks use the remaining run time as their solver timeout. Reaching
+Z3 constraint checks use the remaining phase time as their solver timeout.
+Symbolic exploration reserves the final 30% of the run budget for generating
+tests from pending paths; a solver timeout during exploration enters that phase
+rather than skipping it. Finalization still stops at the overall deadline. Reaching
 that deadline ends search and retains completed tests; it does not classify the
 unfinished query as an infeasible path or a subject exception. Runs without a
 time budget leave solver checks unlimited.
