@@ -6,9 +6,10 @@ public class CUT_ReplayLimits {
         return value + 1;
     }
 
+    // Far above the test's limit of 20 replay steps, since compilers lay out the loop differently.
     public static int bLong(int value) {
         int result = 0;
-        for (int i = 0; i < 4; i++) result += value;
+        for (int i = 0; i < 50; i++) result += value;
         return result;
     }
 
