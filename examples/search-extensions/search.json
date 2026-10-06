@@ -1,0 +1,10 @@
+{
+  "strategies": [
+    {"name": "research.DepthSearch", "options": {"preferDeep": false}},
+    {"name": "research.DepthSearch", "options": {"preferDeep": true}},
+    {"name": "PS", "options": {"heuristics": [
+      {"name": "QueryCost", "weight": 0.7},
+      {"name": "research.DepthWindowHeuristic", "weight": 0.3, "options": {"window": 20}}
+    ]}}
+  ]
+}

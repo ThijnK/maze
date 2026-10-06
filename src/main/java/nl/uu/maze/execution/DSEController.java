@@ -2,6 +2,7 @@ package nl.uu.maze.execution;
 
 import java.io.File;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -30,6 +31,7 @@ import nl.uu.maze.execution.concrete.ConcreteExecutor;
 import nl.uu.maze.execution.symbolic.*;
 import nl.uu.maze.generation.JUnitTestGenerator;
 import nl.uu.maze.instrument.*;
+import nl.uu.maze.search.SearchExecutionException;
 import nl.uu.maze.search.strategy.ConcreteSearchStrategy;
 import nl.uu.maze.search.strategy.DFS;
 import nl.uu.maze.search.strategy.SearchStrategy;
@@ -76,7 +78,13 @@ public class DSEController {
     private JavaSootMethod ctorSoot;
     private StmtGraph<?> ctorCfg;
     private long timeBudget;
-    private long overallDeadline;
+    private long overallDeadline = Long.MAX_VALUE;
+    private long solverDeadline = Long.MAX_VALUE;
+    private final Map<String, Integer> replayAborts = new java.util.LinkedHashMap<>();
+
+    public Map<String, Integer> getReplayAborts() {
+        return Map.copyOf(replayAborts);
+    }
     private long executionDeadline;
     /**
      * Map of init states used in concrete-driven execution, indexed by the hash
@@ -137,7 +145,7 @@ public class DSEController {
         this.analyzer = JavaAnalyzer.initialize(classPath, classLoader);
 
         this.concrete = new ConcreteExecutor();
-        this.validator = new SymbolicStateValidator();
+        this.validator = new SymbolicStateValidator(() -> solverDeadline);
         
         this.symbolic = new SymbolicExecutor(concrete, validator, analyzer);
         
@@ -248,7 +256,6 @@ public class DSEController {
         
         logger.info("Running {} DSE on class: {}", concreteDriven ? "concrete-driven" : "symbolic-driven",
                 clazz.getSimpleName());
-        logger.info("Using search strategy: {}", searchStrategy.getName());
 
         logger.debug("Max depth: {}", maxDepth);
         logger.debug("Output path: {}", outPath);
@@ -257,9 +264,14 @@ public class DSEController {
         // Write test cases regardless of whether the execution was successful or not,
         // so that intermediate results are not lost
         try {
-            run();
-        } finally {
-        	
+            logger.info("Using search strategy: {}", searchStrategy.getName());
+            try {
+                run();
+            } catch (SymbolicStateValidator.DeadlineExceeded deadline) {
+                logger.info("Time budget exceeded during constraint solving, stopping...");
+            }
+            // Resolve the final callback before publishing any success output.
+            int exploredCount = searchStrategy.getTotalExploredCount();
         	generator.writeToFile(outPath); 
             logger.info("#generated test-cases: {}", generator.getNumberOfGeneratedTestCases()) ;
             
@@ -268,7 +280,7 @@ public class DSEController {
             Long runtime_ = System.currentTimeMillis() - mystartTime ;
             
             
-        	logger.info("#items explored: " + searchStrategy.getTotalExploredCount()) ;
+            logger.info("#items explored: " + exploredCount) ;
         	int stmtTargets = CoverageTracker.getInstance().numberOfTargetStmts() ;
         	int stmtCovered = stmtTargets - CoverageTracker.getInstance().numberOfStillUnCoveredStmts() ;
         	int branchTargets = CoverageTracker.getInstance().numberOfTargetBranches() ;
@@ -310,7 +322,7 @@ public class DSEController {
                         	IOUtils.saveTxtToFile(file, CoverageTracker.getInstance().showPathCoverageInfo()) ;
                         }
                         catch(Exception e) {
-                        	logger.error("Failed to save the path-coverage info of " + classname) ;
+                            throw new IllegalStateException("Failed to save the path-coverage info of " + classname, e);
                         } ;
                         break ;
             }
@@ -348,7 +360,7 @@ public class DSEController {
                }
                String[] summaryContent = {
                		clazz.getName(),
-               		 "" + searchStrategy.getTotalExploredCount(),
+                     "" + exploredCount,
                		 "" + stmtTargets,
                		 "" + stmtCovered,
                		 "" + stmtCovRatio,
@@ -371,19 +383,26 @@ public class DSEController {
             	   IOUtils.saveTxtToFile(file, summary) ;
                }
                catch (Exception e) {
-            	   logger.error("Failed to save test summary of " + clazz.getName()) ;
+                   throw new IllegalStateException("Failed to save test summary of " + clazz.getName(), e);
                }
             }
+        } catch (Exception | LinkageError | AssertionError failure) {
+            logger.error("Run failed; generated tests are partial and must not be scored as a completed run.");
+            try {
+                generator.writeToFile(outPath);
+            } catch (Exception | LinkageError | AssertionError cleanup) {
+                failure.addSuppressed(cleanup);
+            }
+            throw failure;
         }
     }
-    
-    
 
     /**
      * Run the dynamic symbolic execution engine on the current class.
      */
     private void run() throws Exception {
         overallDeadline = timeBudget > 0 ? System.currentTimeMillis() + timeBudget : Long.MAX_VALUE;
+        solverDeadline = overallDeadline;
 
         // Concrete-driven is run one method at a time, while symbolic-driven is run on
         // all methods at once
@@ -425,6 +444,8 @@ public class DSEController {
                     strategy.reset();
                     logger.info("Processing method: {}", method.getName());
                     runConcreteDriven(method, strategy);
+                } catch (SearchExecutionException e) {
+                    throw e;
                 } catch (Exception e) {
                     logger.error("Error processing method {}: {}", method.getName(), e.getMessage());
                     logger.debug("Error stack trace: ", e);
@@ -439,7 +460,16 @@ public class DSEController {
 
             SymbolicSearchStrategy strategy = searchStrategy.toSymbolic();
             initializeSymbolic(strategy);
-            runSymbolicDriven(strategy, ctorSoot);
+            solverDeadline = executionDeadline;
+            try {
+                runSymbolicDriven(strategy, ctorSoot);
+            } catch (SymbolicStateValidator.DeadlineExceeded deadline) {
+                // An exploration timeout is not the overall run deadline. Pending
+                // paths may still produce tests using the reserved finalization time.
+                logger.info("Search deadline reached during constraint solving; finalizing pending paths");
+            } finally {
+                solverDeadline = overallDeadline;
+            }
 
             // If any unfinished states are still in the strategy, generate test cases
             Collection<SymbolicState> states = strategy.getAll();
@@ -509,6 +539,8 @@ public class DSEController {
                 	generator.addMethodTestCase(state.getMethod(), ctorSoot, argMap.get());           	
                 }
             }
+        } catch (ReplayBudget.Exceeded e) {
+            recordReplayAbort(state.getMethod(), e);
         } catch (Exception e) {
             logger.error("Error generating test case for method {}: {}, {}", state.getMethod().getName(), e.getClass().getName(), e.getMessage());
             logger.info("Error stack trace: ", e);
@@ -550,126 +582,127 @@ public class DSEController {
     private Optional<SymbolicState> runSymbolicDriven(SymbolicSearchStrategy searchStrategy,
             JavaSootMethod targetMethod) {
     	
-        SymbolicState current;
-              
-        while ((current = searchStrategy.next()) != null) {
-        	
-            // stop the search if the engine is configured to add only coverage-
-            // contributing tests, and all coverage targets are already covered.
-            if (EngineConfiguration.getInstance().minimalisticTestSuite
-            	&&  CoverageTracker.getInstance().allCoverageTargetsCompleted()) {
-            	return concreteDriven ? Optional.of(current) : Optional.empty();
-            }
-            // stop the search if the engine is configured to do the verificagion-mode, 
-            // with k>0, and it has generated k test-cases with violations:
-            if (EngineConfiguration.getInstance().verificationMode > 0 &&
-            		generator.getNumberOfViolationFound() >= EngineConfiguration.getInstance().verificationMode) {
-            	return concreteDriven ? Optional.of(current) : Optional.empty();
-            }
-            	
-        	
-            // Check if we are over the time budget
-            if (System.currentTimeMillis() >= executionDeadline) {
-                if (concreteDriven) {
-                    return Optional.of(current);
-                }
+        SymbolicState current = null;
+        try {
 
-                // Check if number of states in search strategy is small compared to the time
-                // left before overall deadline
-                // If so, we can keep going for a bit longer
-                long remainingTime = overallDeadline - System.currentTimeMillis();
-                if (searchStrategy.size() * 8L > remainingTime) {
-                    logger.info("Time budget exceeded during symbolic-driven execution, stopping...");
+            while ((current = searchStrategy.next()) != null) {
+
+                // stop the search if the engine is configured to add only coverage-
+                // contributing tests, and all coverage targets are already covered.
+                if (EngineConfiguration.getInstance().minimalisticTestSuite
+                    &&  CoverageTracker.getInstance().allCoverageTargetsCompleted()) {
+                    return concreteDriven ? Optional.of(current) : Optional.empty();
+                }
+                // stop the search if the engine is configured to do the verificagion-mode,
+                // with k>0, and it has generated k test-cases with violations:
+                if (EngineConfiguration.getInstance().verificationMode > 0 &&
+                        generator.getNumberOfViolationFound() >= EngineConfiguration.getInstance().verificationMode) {
                     return concreteDriven ? Optional.of(current) : Optional.empty();
                 }
 
-                logger.info("Extending time budget for symbolic-driven execution...");
-                executionDeadline = System.currentTimeMillis() + remainingTime / 2;
-            }
-            
 
-            logger.debug("Current state: {}", current);
-            if (!current.isCtorState() && current.isFinalState() || current.getDepth() >= maxDepth) {
-                // For concrete-driven, we only care about one final state, so we can stop
-                if (concreteDriven) {
-                    return Optional.of(current);
-                } else if (!current.isInfeasible()) {
-                    // For symblic-driven, generate test case
-                	generateTestCase(current.returnToRootCaller());
-                }
-                continue;
-            }
-            
-            //System.out.println(">>> about to exec: " + current.getStmt()) ;
-            //System.out.println("** STATE: " + current) ;
-            
-            // Symbolically execute the statement of the current symbolic state
-            List<SymbolicState> newStates = symbolic.step(current, concreteDriven);   
-            
-            //System.out.println("** AFTER, #next: " + newStates.size()) ;
-            //System.out.println("** AFTER: " + current) ;
-            
-            
-            // For ctor states, check for final states from which we can switch to the
-            // target method(s)
-            if (current.isCtorState()) {
-                for (SymbolicState state : newStates) {
-                    if (state.isFinalState()) {
-                        // If the state is an exception-throwing state, generate test case and stop
-                        // exploring (i.e., don't go into the target method)
-                        if (state.isExceptionThrown() || state.isInfeasible()) {
-                            if (concreteDriven) {
-                                return Optional.of(state);
-                            } else if (!clazz.isEnum() && !state.isInfeasible()) {
-                                generateTestCase(state);
-                            }
-                            continue;
-                        }
-
-                        // Since ctor is now done, we can switch to the target method
-                        state.switchToMethodState();
-
-                        // For concrete-driven, store this final ctor state for reuse and switch to the
-                        // single target method being replayed right now
-                        if (concreteDriven) {
-                            initStates.put(TraceManager.hashCode(state.getMethodSignature()), state.clone());
-                            state.setMethod(targetMethod, analyzer.getCFG(targetMethod));
-                        }
-                        // For symbolic-driven, we can switch to any of the target methods
-                        else {
-                            for (int i = 0; i < nonStaticMuts.size(); i++) {
-                                JavaSootMethod target = nonStaticMuts.get(i);
-                                target.getExceptionSignatures() ;
-                                // Clone state, except for the last one
-                                SymbolicState newState = i == nonStaticMuts.size() - 1 ? state : state.clone();
-                                
-                                // add the branch-hist of the constructor to indirect branch-hist of the new state:
-                                HCFG hcfg = CoverageTracker.getInstance().getHCFG(state.getMethod()) ;
-                                if (hcfg != null) {
-                                	newState.getIndirectBranchHistories().add(new Pair<>(hcfg,state.getBranchHistory())) ;
-                                	newState.getBranchHistory().clear() ;
-                                }
-                                
-                                newState.setMethod(target, analyzer.getCFG(target));
-                                searchStrategy.add(newState);
-
-                            }
-                            continue;
-                        }
+                // Check if we are over the time budget
+                if (System.currentTimeMillis() >= executionDeadline) {
+                    if (concreteDriven) {
+                        return Optional.of(current);
                     }
 
-                    searchStrategy.add(state);
+                    // Keep the current state available to unfinished-path generation.
+                    // Exploration must not borrow the reserved finalization budget.
+                    searchStrategy.add(current);
+                    logger.info("Time budget exceeded during symbolic-driven execution, stopping...");
+                    return Optional.empty();
+                }
+
+
+                logger.debug("Current state: {}", current);
+                if (!current.isCtorState() && current.isFinalState() || current.getDepth() >= maxDepth) {
+                    // For concrete-driven, we only care about one final state, so we can stop
+                    if (concreteDriven) {
+                        return Optional.of(current);
+                    } else if (!current.isInfeasible()) {
+                        // For symblic-driven, generate test case
+                        generateTestCase(current.returnToRootCaller());
+                    }
+                    continue;
+                }
+
+                //System.out.println(">>> about to exec: " + current.getStmt()) ;
+                //System.out.println("** STATE: " + current) ;
+
+                // Symbolically execute the statement of the current symbolic state
+                List<SymbolicState> newStates = symbolic.step(current, concreteDriven);
+
+                //System.out.println("** AFTER, #next: " + newStates.size()) ;
+                //System.out.println("** AFTER: " + current) ;
+
+
+                // For ctor states, check for final states from which we can switch to the
+                // target method(s)
+                if (current.isCtorState()) {
+                    for (SymbolicState state : newStates) {
+                        if (state.isFinalState()) {
+                            // If the state is an exception-throwing state, generate test case and stop
+                            // exploring (i.e., don't go into the target method)
+                            if (state.isExceptionThrown() || state.isInfeasible()) {
+                                if (concreteDriven) {
+                                    return Optional.of(state);
+                                } else if (!clazz.isEnum() && !state.isInfeasible()) {
+                                    generateTestCase(state);
+                                }
+                                continue;
+                            }
+
+                            // Since ctor is now done, we can switch to the target method
+                            state.switchToMethodState();
+
+                            // For concrete-driven, store this final ctor state for reuse and switch to the
+                            // single target method being replayed right now
+                            if (concreteDriven) {
+                                initStates.put(TraceManager.hashCode(state.getMethodSignature()), state.clone());
+                                state.setMethod(targetMethod, analyzer.getCFG(targetMethod));
+                            }
+                            // For symbolic-driven, we can switch to any of the target methods
+                            else {
+                                for (int i = 0; i < nonStaticMuts.size(); i++) {
+                                    JavaSootMethod target = nonStaticMuts.get(i);
+                                    target.getExceptionSignatures() ;
+                                    // Clone state, except for the last one
+                                    SymbolicState newState = i == nonStaticMuts.size() - 1 ? state : state.clone();
+
+                                    // add the branch-hist of the constructor to indirect branch-hist of the new state:
+                                    HCFG hcfg = CoverageTracker.getInstance().getHCFG(state.getMethod()) ;
+                                    if (hcfg != null) {
+                                        newState.getIndirectBranchHistories().add(new Pair<>(hcfg,state.getBranchHistory())) ;
+                                        newState.getBranchHistory().clear() ;
+                                    }
+
+                                    newState.setMethod(target, analyzer.getCFG(target));
+                                    searchStrategy.add(newState);
+
+                                }
+                                continue;
+                            }
+                        }
+
+                        searchStrategy.add(state);
+                    }
+                }
+                // For non-ctor states, we can simply add the new states to the search strategy
+                else {
+                    searchStrategy.add(newStates);
                 }
             }
-            // For non-ctor states, we can simply add the new states to the search strategy
-            else {
-            	searchStrategy.add(newStates);
-            }
-        }
 
+        } catch (SymbolicStateValidator.DeadlineExceeded deadline) {
+            // next() removed this candidate before the solver ran. Keep it for
+            // finalization; a timeout does not establish infeasibility.
+            if (!concreteDriven && current != null) searchStrategy.add(current);
+            throw deadline;
+        }
         return Optional.empty();
     }
-    
+
 
     /** Run symbolic-driven DSE to replay a concrete execution. */
     public Optional<SymbolicState> runSymbolicReplay(JavaSootMethod method) {
@@ -729,15 +762,16 @@ public class DSEController {
                 // caught by the search strategy
                 
                 if (isNew) {
-                	var history = rerunToGetHistory(method, argMap) ;
-                	//System.out.println("history: " + history.getHistory()) ;
-                	boolean hasNewCov = CoverageTracker.getInstance().registerCoveregeByTesting(finalState.get(), history) ;
-                	// add the test case; however if MAZE is configured to only add
-                	// a test when contributes to new coverage, then we do so:
-                	if (hasNewCov || ! EngineConfiguration.getInstance().minimalisticTestSuite)
-                    	// For the first concrete execution, argMap is populated by the concrete
-                    	// executor
-                    	generator.addMethodTestCase(method, ctorSoot, argMap);
+                    try {
+                        var history = rerunToGetHistory(method, argMap);
+                        boolean hasNewCov = CoverageTracker.getInstance().registerCoveregeByTesting(finalState.get(), history);
+                        if (hasNewCov || !EngineConfiguration.getInstance().minimalisticTestSuite) {
+                            // The concrete executor has already populated argMap.
+                            generator.addMethodTestCase(method, ctorSoot, argMap);
+                        }
+                    } catch (ReplayBudget.Exceeded e) {
+                        recordReplayAbort(method, e);
+                    }
                 }
             }
 
@@ -757,6 +791,11 @@ public class DSEController {
             argMap = validator.evaluate(pair.getFirst(), pair.getSecond().returnToRootCaller(), false);
             
         }
+    }
+
+    private void recordReplayAbort(JavaSootMethod method, ReplayBudget.Exceeded limit) {
+        replayAborts.merge(limit.reason(), 1, Integer::sum);
+        logger.debug("Discarding bounded candidate for {}: {}", method.getName(), limit.reason());
     }
     
     /**
@@ -783,61 +822,70 @@ public class DSEController {
         //System.out.println(">>> concrete exec " + javaMethod.getName() + ": " + argMap.getArgsNames()) ;
     	// run concretely to obtain the trace:
     	
-        concrete.execute(ctor,instrumentedJavaMethod,argMap) ; // note: the ctor is already instrumented!
-        
-        // System.out.println(">>> trace to REPLAY: " + TraceManager.traceEntries) ;
-        // now run symbolically to obtain the sequence of instructions
-        
-        // construct the initial symbolic state:
-        SymbolicState initState ;
-        // For static methods, start at the target method
-        if (method.isStatic()) {
-            initState = new SymbolicState(method, analyzer.getCFG(method));
-            initState.switchToMethodState();
-        }
-        else {
-            initState = new SymbolicState(ctorSoot,ctorCfg);
-        }
+        try (ReplayBudget budget = ReplayBudget.open(EngineConfiguration.getInstance().maxReplaySteps, solverDeadline)) {
+            var result = concrete.execute(ctor, instrumentedJavaMethod, argMap);
+            // Unwrap only the reflection call. The CUT owns any further exception causes,
+            // which can legitimately form a cycle or describe an error it already handled.
+            Throwable failure = result.exception();
+            if (failure instanceof InvocationTargetException invocation) failure = invocation.getTargetException();
+            if (failure instanceof ReplayBudget.Exceeded limit) throw limit;
+            if (failure instanceof StackOverflowError) throw new ReplayBudget.Exceeded("stack_overflow");
 
-        InstructionHistory history = new InstructionHistory() ;
-        JavaSootMethod M = null ; 
-    	//StmtGraph cfg = null ;
-        SymbolicState currentSymbolicState = initState ;
-        boolean replayModeOn = true ;
-        // replay the execution step by step, until we get to a final state, 
-        // which is not a constructor state:
-        while (currentSymbolicState.isCtorState() || !currentSymbolicState.isFinalState()) {
-        	JavaSootMethod M_ = currentSymbolicState.getMethod() ;
-        	if (M==null || M_ != M) {
-        		history.addMethodSwitch(M_);
-        		M = M_ ;
-        		//cfg = currentSymbolicState.getCFG() ;
-        	}
-        	history.addInstruction(currentSymbolicState.getStmt());
-        	
-            // Symbolically execute the statement of the current symbolic state
-        	// System.out.println("### cur stmt: " + currentSymbolicState.getStmt()) ;
-            List<SymbolicState> newStates = symbolic.step(currentSymbolicState,replayModeOn) ;
-            if (newStates.isEmpty()) {
-            	break ;
+            // System.out.println(">>> trace to REPLAY: " + TraceManager.traceEntries) ;
+            // now run symbolically to obtain the sequence of instructions
+
+            // construct the initial symbolic state:
+            SymbolicState initState ;
+            // For static methods, start at the target method
+            if (method.isStatic()) {
+                initState = new SymbolicState(method, analyzer.getCFG(method));
+                initState.switchToMethodState();
             }
-            if (newStates.size() > 1) {
-            	logger.warn("Replaying a concrete execution leads to a symbolic state with multiple successors! Executed instr: " + currentSymbolicState.getStmt());            	
+            else {
+                initState = new SymbolicState(ctorSoot,ctorCfg);
             }
-            SymbolicState nextState = newStates.getFirst() ; 
-            if (currentSymbolicState.isCtorState()) {
-            	if (nextState.isFinalState()) {
-            		if (nextState.isExceptionThrown())
-            			break ;
-            		nextState.switchToMethodState();
-            		nextState.setMethod(method, analyzer.getCFG(method));
-            	}
+
+            InstructionHistory history = new InstructionHistory() ;
+            JavaSootMethod M = null ;
+            //StmtGraph cfg = null ;
+            SymbolicState currentSymbolicState = initState ;
+            boolean replayModeOn = true ;
+            // replay the execution step by step, until we get to a final state,
+            // which is not a constructor state:
+            while (currentSymbolicState.isCtorState() || !currentSymbolicState.isFinalState()) {
+                budget.replayStep();
+                JavaSootMethod M_ = currentSymbolicState.getMethod() ;
+                if (M==null || M_ != M) {
+                    history.addMethodSwitch(M_);
+                    M = M_ ;
+                    //cfg = currentSymbolicState.getCFG() ;
+                }
+                history.addInstruction(currentSymbolicState.getStmt());
+
+                // Symbolically execute the statement of the current symbolic state
+                // System.out.println("### cur stmt: " + currentSymbolicState.getStmt()) ;
+                List<SymbolicState> newStates = symbolic.step(currentSymbolicState,replayModeOn) ;
+                if (newStates.isEmpty()) {
+                    break ;
+                }
+                if (newStates.size() > 1) {
+                    logger.warn("Replaying a concrete execution leads to a symbolic state with multiple successors! Executed instr: " + currentSymbolicState.getStmt());
+                }
+                SymbolicState nextState = newStates.getFirst() ;
+                if (currentSymbolicState.isCtorState()) {
+                    if (nextState.isFinalState()) {
+                        if (nextState.isExceptionThrown())
+                            break ;
+                        nextState.switchToMethodState();
+                        nextState.setMethod(method, analyzer.getCFG(method));
+                    }
+                }
+                //if (nextState == currentSymbolicState)
+                //	break ;
+                currentSymbolicState = nextState ;
             }
-            //if (nextState == currentSymbolicState) 
-            //	break ;
-            currentSymbolicState = nextState ;
+            return history ;
         }
-        return history ;
     }
     
     /**

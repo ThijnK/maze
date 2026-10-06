@@ -66,8 +66,8 @@ public class FloatNormalAndSpecialValuesGenerationTest {
 	void test_generation_Infinity_NaN() throws IOException {
 
 		String argz =   "--classpath=" + binClassesDir
-				      + sp + "--classname=" + CUT.getName() 
-				      + sp + "--output-path=" + outputDir 
+				      + sp + "--class-name=" + CUT.getName()
+				      + sp + "--output-path=" + outputDir
 				      + sp + "--do-not-close-z3-context=true" // don't close z3 context, or else the next tests will crash
 				      //+ sp + "-b=60"
 				      + sp
@@ -100,10 +100,10 @@ public class FloatNormalAndSpecialValuesGenerationTest {
 	void test_supress_generation_of_Infinity_NaN() throws IOException {
 
 		String argz =   "--classpath=" + binClassesDir
-				      + sp + "--classname=" + CUT.getName()
-				      + sp + "--output-path=" + outputDir 
+				      + sp + "--class-name=" + CUT.getName()
+				      + sp + "--output-path=" + outputDir
 				      + sp + "--do-not-close-z3-context=true" // don't close z3 context, or else the next tests will crash
-				      + sp + "--constrain-FP-params-to-normal-numbers=true"
+				      + sp + "--constrain-fp-params-to-normal-numbers=true"
 				      + sp
 				      ;
 	    int exitCode = new CommandLine(new MazeCLI()).execute(argz.split(" ") );

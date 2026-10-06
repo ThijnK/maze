@@ -6,7 +6,7 @@
 
     <groupId>nl.uu</groupId>
     <artifactId>maze</artifactId>
-    <version>1.1.2</version>
+    <version>1.2.3</version>
 
     <name>maze</name>
     <description>Dynamic symbolic execution engine for automated test generation.</description>
@@ -19,6 +19,12 @@
     </properties>
 
     <dependencies>
+        <!-- Strict search configuration parsing; JSON stays behind SearchOptions. -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.20.2</version>
+        </dependency>
         <!-- JUnit 5 for test suite -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
@@ -102,6 +108,7 @@
                     <archive>
                         <manifest>
                             <mainClass>nl.uu.maze.main.Application</mainClass>
+                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
                         </manifest>
                     </archive>
                 </configuration>
@@ -115,6 +122,7 @@
                     <archive>
                         <manifest>
                             <mainClass>nl.uu.maze.main.Application</mainClass>
+                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
                         </manifest>
                     </archive>
                     <descriptorRefs>
@@ -169,6 +177,7 @@
                 </executions>
                 <configuration>
                     <mainClass>nl.uu.maze.main.Application</mainClass>
+                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
                 </configuration>
             </plugin>
 

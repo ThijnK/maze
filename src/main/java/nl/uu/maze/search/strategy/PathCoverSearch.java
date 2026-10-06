@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import nl.uu.maze.execution.EngineConfiguration;
+import nl.uu.maze.search.SearchMode;
 import nl.uu.maze.execution.symbolic.CoverageTracker;
 import nl.uu.maze.execution.symbolic.SymbolicExecutor;
 import nl.uu.maze.execution.symbolic.SymbolicState;
@@ -87,7 +88,7 @@ public class PathCoverSearch extends SearchStrategy<SymbolicState> {
 		int pl = EngineConfiguration.getInstance().pathLengthCoverage ;
     	if (! (pl == -1 || pl > 0)) {
     		logger.error("Strategy PathCoverSearch requires engine-configuration pathLengthCoverage to be -1 or >0");
-    		throw new Error() ;
+            throw new IllegalArgumentException("PathCoverSearch requires --path-length-coverage=-1 or a positive length");
     	}
 	}
 	
@@ -95,6 +96,11 @@ public class PathCoverSearch extends SearchStrategy<SymbolicState> {
 	public String getName() {
 		return "PathCoverSearch" ;
 	}
+
+    @Override
+    public boolean supportsMode(SearchMode mode) {
+        return mode == SearchMode.SYMBOLIC;
+    }
 	
 	@Override
     public boolean requiresPathTargetingAndTracking() {
@@ -132,7 +138,6 @@ public class PathCoverSearch extends SearchStrategy<SymbolicState> {
 		  case TARGET_PARTIALLY_COVERED : priority.offer(target) ; break ;		
 		  default : theRest.offer(target) ; break ;
 		}
-		target.setIteration(iteration);		
 		count++ ;
 	}
 	

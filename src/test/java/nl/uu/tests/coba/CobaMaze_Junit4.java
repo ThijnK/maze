@@ -62,7 +62,7 @@ public class CobaMaze_Junit4 {
 		String sp = " " ;
 
 		String argz =   "--classpath=" + cobabenchPath + "/target/classes"
-				      + sp + "--classname=" + CUT 
+				      + sp + "--class-name=" + CUT
 				      + sp + "--output-path=" + cobabenchPath + "/src/test/java/"
 				      //+ sp + "-C"
 				      + sp + "-j=JUnit4"
@@ -74,22 +74,22 @@ public class CobaMaze_Junit4 {
 				      + sp + "-s=PCS"
 				      
 				      
-				      + sp + "--minimalistic-suite=true"
-				      + sp + "--path-length-cov=1"
+				      + sp + "--minimization=true"
+				      + sp + "--path-length-coverage=1"
 				      + sp + "--target-path-aging=0"
 				      + sp + "-b=60"
 				      //+ sp + "-l=DEBUG" // log level
 				      //+ sp + "--max-depth=100"
 				      + sp + "--max-array-size=10"
-				      + sp + "--constrain-FP-params-to-normal-numbers=true"
-				      + sp + "--check-divbyZero"
-				      //+ sp + "--surpress-regression-oracles=false"
+				      + sp + "--constrain-fp-params-to-normal-numbers=true"
+				      + sp + "--check-division-by-zero"
+				      //+ sp + "--suppress-regression-oracles=false"
 				      //+ sp + "--propagate-unexpected-exceptions=true"
-				      + sp + "--export-jimple=-1"
-				      + sp + "--export-HCFG=-1"
-				      //+ sp + "--export-target-paths=-1" 
-				      //+ sp + "--export-pathcov=-1" 		
-				      //+ sp + "--export-summary=true" 	
+				      + sp + "--export-jimple=log"
+				      + sp + "--export-hcfg=log"
+				      //+ sp + "--export-target-paths=log"
+				      //+ sp + "--export-path-coverage=log"
+				      //+ sp + "--export-summary=true"
 				      
 				      + sp
 				      ;

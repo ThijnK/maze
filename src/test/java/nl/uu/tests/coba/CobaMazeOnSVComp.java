@@ -33,7 +33,7 @@ public class CobaMazeOnSVComp {
 		String sp = " " ;
 
 		String argz =   "--classpath=" + cobabenchPath + "/target/classes"
-				      + sp + "--classname=" + CUT 
+				      + sp + "--class-name=" + CUT
 				      + sp + "--output-path=" + cobabenchPath + "/src/test/java/"
 				      // + sp + "-j=JUnit4"
 				      //+ sp + "-s=RPS -u=UH " 
@@ -41,12 +41,12 @@ public class CobaMazeOnSVComp {
 				      + sp + "-s=COS"
 				      //+ sp + "-s=BFS"
 				      //+ sp + "--concrete-driven=true"
-				      + sp + "--minimalistic-suite=true"
+				      + sp + "--minimization=true"
 				      + sp + "-b=120"
 				      // + sp + "-l=OFF" // logging
 				      //+ sp + "--max-depth=2000"
-				      + sp + "--constrain-FP-params-to-normal-numbers=true"
-				      //+ sp + "--surpress-regression-oracles=false"
+				      + sp + "--constrain-fp-params-to-normal-numbers=true"
+				      //+ sp + "--suppress-regression-oracles=false"
 				      //+ sp + "--propagate-unexpected-exceptions=true"
 				      + sp
 				      ;

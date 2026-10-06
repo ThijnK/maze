@@ -24,26 +24,25 @@ public class SearchHeuristicFactory {
      * @throws NumberFormatException    If the weight is not a valid double
      */
     public static SearchHeuristic createHeuristic(String name, double weight) {
-        return switch (name.trim()) {
-            case "Uniform", "UniformHeuristic", "UH" -> new UniformHeuristic(weight);
-            case "DistanceToUncovered", "DistanceToUncoveredHeuristic", "DTUH" ->
+        return switch (ValidSearchHeuristic.valueOf(name.trim())) {
+            case Uniform, UniformHeuristic, UH -> new UniformHeuristic(weight);
+            case DistanceToUncovered, DistanceToUncoveredHeuristic, DTUH ->
                 new DistanceToUncoveredHeuristic(weight);
-            case "RecentCoverageDensity", "RecentCoverageDensityHeuristic", "RCDH" ->
+            case RecentCoverageDensity, RecentCoverageDensityHeuristic, RCDH ->
                 new RecentCoverageDensityHeuristic(weight);
-            case "RecentCoverageProximity", "RecentCoverageProximityHeuristic", "RCPH" ->
+            case RecentCoverageProximity, RecentCoverageProximityHeuristic, RCPH ->
                 new RecentCoverageProximityHeuristic(weight);
-            case "QueryCost", "QueryCostHeuristic", "QCH" -> new QueryCostHeuristic(weight);
-            case "SmallestDepth", "SmallestDepthHeuristic", "SDH" -> new DepthHeuristic(weight, false);
-            case "GreatestDepth", "GreatestDepthHeuristic", "GDH" -> new DepthHeuristic(weight, true);
-            case "SmallestCallDepth", "SmallestCallDepthHeuristic", "SCDH" ->
+            case QueryCost, QueryCostHeuristic, QCH -> new QueryCostHeuristic(weight);
+            case SmallestDepth, SmallestDepthHeuristic, SDH -> new DepthHeuristic(weight, false);
+            case GreatestDepth, GreatestDepthHeuristic, GDH -> new DepthHeuristic(weight, true);
+            case SmallestCallDepth, SmallestCallDepthHeuristic, SCDH ->
                 new CallDepthHeuristic(weight, false);
-            case "GreatestCallDepth", "GreatestCallDepthHeuristic", "GCDH" ->
+            case GreatestCallDepth, GreatestCallDepthHeuristic, GCDH ->
                 new CallDepthHeuristic(weight, true);
-            case "ShortestWaitingTime", "ShortestWaitingTimeHeuristic", "SWTH" ->
+            case ShortestWaitingTime, ShortestWaitingTimeHeuristic, SWTH ->
                 new WaitingTimeHeuristic(weight, false);
-            case "LongestWaitingTime", "LongestWaitingTimeHeuristic", "LWTH" ->
+            case LongestWaitingTime, LongestWaitingTimeHeuristic, LWTH ->
                 new WaitingTimeHeuristic(weight, true);
-            default -> throw new IllegalArgumentException("Unknown search heuristic: " + name);
         };
     }
 
@@ -64,28 +63,25 @@ public class SearchHeuristicFactory {
             return List.of(new UniformHeuristic(1.0));
         }
 
+        if (weights.size() > names.size()) {
+            throw new IllegalArgumentException("More weights than heuristics");
+        }
         for (int i = 0; i < names.size(); i++) {
-            try {
-                double weight = weights.size() >= i + 1 ? weights.get(i) : 1.0;
-                if (weight <= 0) {
-                    throw new IllegalArgumentException("Weight must be positive");
-                }
-                heuristics.add(createHeuristic(names.get(i), weight));
-            } catch (IllegalArgumentException e) {
-                logger.warn("Unknown search heuristic: {}, skipping", names.get(i));
-            }
+            double weight = i < weights.size() ? weights.get(i) : 1.0;
+            heuristics.add(createHeuristic(names.get(i), weight));
         }
         return heuristics;
     }
 
     /**
      * Enum representing the valid search heuristics.
-     * This enum is used for validation in the command line interface.
+     * Used by the exhaustive constructor switch and command-line completion.
      */
     public enum ValidSearchHeuristic {
         Uniform, UniformHeuristic, UH,
         DistanceToUncovered, DistanceToUncoveredHeuristic, DTUH,
-        RecentCoverage, RecentCoverageHeuristic, RCH,
+        RecentCoverageDensity, RecentCoverageDensityHeuristic, RCDH,
+        RecentCoverageProximity, RecentCoverageProximityHeuristic, RCPH,
         QueryCost, QueryCostHeuristic, QCH,
         SmallestDepth, SmallestDepthHeuristic, SDH,
         GreatestDepth, GreatestDepthHeuristic, GDH,

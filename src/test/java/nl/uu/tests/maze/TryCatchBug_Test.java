@@ -53,11 +53,11 @@ public class TryCatchBug_Test {
 	void test0() throws IOException {
 
 		String argz =   "--classpath=" + binClassesDir
-				      + sp + "--classname=" + CUT.getName()
+				      + sp + "--class-name=" + CUT.getName()
 				      + sp + "--output-path=" + outputDir 
 				      + sp + "--do-not-close-z3-context=true" // don't close z3 context, or else the next tests will crash
-				      + sp + "--constrain-FP-params-to-normal-numbers=true"
-				      + sp + "--check-divbyZero=true"
+				      + sp + "--constrain-fp-params-to-normal-numbers=true"
+				      + sp + "--check-division-by-zero=true"
 				      //+ sp + "--verificationMode=1"
 				      + sp
 				      ;

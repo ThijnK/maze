@@ -9,14 +9,14 @@ public class CUT_NumericCasting {
 	public String intToFloat(int x) {
 		float x_ = (float) x ;
 		if (-4.33 < x_ && x_ < -3.33)
-			return "xLTGT intToFloatSuccess: " + x_ ;
+			return "xLTGT intToFloatSuccess" ;
 		return "else-branch" ;
 	}
 	
 	public String intToFloat_xy(int x, float y) {
 		float x_ = (float) x ;
 		if (y < x_ && x_ < y+1)
-			return"xy_LTGT intToFloatSuccess: " + x_ ;
+			return"xy_LTGT intToFloatSuccess"  ;
 		return "else-branch" ;
 	}
 	
@@ -26,7 +26,7 @@ public class CUT_NumericCasting {
 	public String floatToInt_LT(float x) {
 		int x_ = (int) x ;
 		if (x_ < -4 )
-			return "xLT floatToIntSuccess: " + x + "-->" + x_ ;
+			return "xLT floatToIntSuccess" ;
 		return "else-branch" ;
 	}
 	
@@ -34,7 +34,7 @@ public class CUT_NumericCasting {
 	public String floatToInt_GT(float x) {
 		int x_ = (int) x ;
 		if (x_ > -4)
-			return "xGT floatToIntSuccess: " + x + "-->" + x_ ;
+			return "xGT floatToIntSuccess"  ;
 		return "xGT else-branch" ;
 	}
 	
@@ -42,21 +42,21 @@ public class CUT_NumericCasting {
 	public String floatToInt_LTGT(float x) {
 		int x_ = (int) x ;
 		if (-6 < x_ && x_ < -4 )
-			return "xLTGT floatToIntSuccess: " + x + "-->" + x_ ;
+			return "xLTGT floatToIntSuccess"  ;
 		return "else-branch" ;
 	}
 	
 	public String floatToInt_xy_LT(float x, int y) {
 		int x_ = (int) x ;
 		if (x_ < y+4)
-			return "xy_LT floatToIntSuccess: " + x + "-->" + x_ ;
+			return "xy_LT floatToIntSuccess" ;
 		return "else-branch" ;
 	}
 	
 	public String floatToInt_xy_GT(float x, int y) {
 		int x_ = (int) x ;
 		if (x_ > y)
-			return "xy_GT floatToIntSuccess: " + x + "-->" + x_ ;
+			return "xy_GT floatToIntSuccess"  ;
 		return "else-branch" ;
 	}
 	
@@ -66,7 +66,7 @@ public class CUT_NumericCasting {
 	public String floatToInt_xy_LTGT(float x, int y) {
 		int x_ = (int) x ;
 		if (y < x_ && x_ < y+2)
-			return "xy_LTGT floatToIntSuccess: " + x + "-->" + x_ ;
+			return "xy_LTGT floatToIntSuccess" ;
 		return "else-branch" ;
 	}
 	

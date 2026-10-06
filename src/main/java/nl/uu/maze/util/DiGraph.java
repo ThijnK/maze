@@ -412,7 +412,12 @@ public class DiGraph<NodeLabel,EdgeLabel,NodeProperty,EdgeProperty> {
 	 * graph will be printed to the console.
 	 */
 	public void saveAsDot(String fname) throws IOException {
-		asDot().saveToFile(fname);
+		var dot = asDot();
+		if (fname == null) {
+			System.out.println(dot);
+		} else {
+			dot.saveToFile(fname);
+		}
 	}
 	
 	

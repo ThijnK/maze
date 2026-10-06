@@ -528,6 +528,9 @@ public class SymbolicHeap {
             } else {
                 // Create a symbolic value for the field
                 newValue = ctx().mkConst(varName + "_" + fieldName, sorts.determineSort(fieldType));
+                if (fieldType instanceof sootup.core.types.PrimitiveType.BooleanType) {
+                    state.addBooleanDomainConstraint(newValue);
+                }
             }
             // Set the field to the new value
             obj.setField(fieldName, newValue, fieldType);
@@ -620,6 +623,10 @@ public class SymbolicHeap {
             }
         } else {
             value = arrObj.getElem(index);
+        }
+
+        if (arrObj.getType().getBaseType() instanceof sootup.core.types.PrimitiveType.BooleanType) {
+            state.addBooleanDomainConstraint(value);
         }
 
         // If it's an array of references, need to find potential aliases for the

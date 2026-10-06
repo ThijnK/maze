@@ -1,0 +1,25 @@
+#!/bin/sh
+set -eu
+
+# Resolve resources relative to this launcher, without changing the subject's cwd.
+maze_home=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+if [ "$(uname -s)" != Linux ]; then
+    echo "This MAZE package is for Linux. Run it in a Linux container or use a package for your OS." >&2
+    exit 1
+fi
+case "$(uname -m)" in
+    aarch64|arm64) architecture=arm64 ;;
+    x86_64) architecture=amd64 ;;
+    *) echo "Unsupported architecture: $(uname -m)" >&2; exit 1 ;;
+esac
+if [ "$(cat "$maze_home/architecture")" != "$architecture" ]; then
+    echo "This MAZE package does not match the container or host architecture ($architecture)." >&2
+    exit 1
+fi
+export LD_LIBRARY_PATH="$maze_home/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+if [ -n "${JAVA_HOME:-}" ]; then
+    java_command=$JAVA_HOME/bin/java
+else
+    java_command=java
+fi
+exec "$java_command" -Djava.library.path="$maze_home/lib" -jar "$maze_home/maze.jar" "$@"

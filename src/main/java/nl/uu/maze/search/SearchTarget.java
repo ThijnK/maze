@@ -62,24 +62,12 @@ public interface SearchTarget {
     Pair<Stmt, StmtGraph<?>>[] getCallStack();
 
     /**
-     * Sets the iteration at which the target was added to the search strategy.
-     */
-    void setIteration(int iteration);
-
-    /**
-     * Returns the iteration at which the target entered the search strategy.
-     */
-    int getIteration();
-
-    /**
-     * Sets the waiting time of the target, which is the number of iterations since
-     * it was added to the search strategy.
+     * Sets the waiting time in search iterations for heuristic evaluation.
      */
     void setWaitingTime(int age);
 
     /**
-     * Returns the waiting time of the target, which is the number of iterations
-     * since it was added to the search strategy.
+     * Returns the waiting time supplied by the strategy for heuristic evaluation.
      */
     int getWaitingTime();
 }

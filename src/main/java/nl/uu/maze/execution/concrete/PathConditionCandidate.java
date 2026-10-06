@@ -40,9 +40,6 @@ public class PathConditionCandidate implements SearchTarget {
      * constraints.
      */
     private final int subIndex;
-    /** The iteration at which the candidate was added to the search strategy. */
-    private int iteration = -1;
-
     /**
      * The waiting time of this candidate as the number of iterations since it was
      * added to the search strategy.
@@ -100,14 +97,6 @@ public class PathConditionCandidate implements SearchTarget {
 
     public Pair<Stmt, StmtGraph<?>>[] getCallStack() {
         return constraints.get(index).getCallStack();
-    }
-
-    public void setIteration(int iteration) {
-        this.iteration = iteration;
-    }
-
-    public int getIteration() {
-        return iteration;
     }
 
     public void setWaitingTime(int waitingTime) {

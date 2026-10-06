@@ -55,7 +55,7 @@ public class StringHandling_Test {
 	void test1() throws IOException {
 
 		String argz =   "--classpath=" + binClassesDir
-				      + sp + "--classname=" + CUT.getName()
+				      + sp + "--class-name=" + CUT.getName()
 				      + sp + "--output-path=" + outputDir 
 				      + sp + "--do-not-close-z3-context=true" // don't close z3 context, or else the next tests will crash
 				      + sp

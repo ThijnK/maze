@@ -62,8 +62,8 @@ public class OraclesGenerationTest {
 	void test_oraclesEnabled_unexpectedExceptionNotPropagated() throws IOException {
 
 		String argz =   "--classpath=" + binClassesDir
-				      + sp + "--classname=" + CUT.getName() 
-				      + sp + "--output-path=" + outputDir 
+				      + sp + "--class-name=" + CUT.getName()
+				      + sp + "--output-path=" + outputDir
 				      + sp + "--do-not-close-z3-context=true" // don't close z3 context, or else the next tests will crash
 				      + sp
 				      ;
@@ -87,10 +87,10 @@ public class OraclesGenerationTest {
 	void test_oraclesDisabled_unexpectedExceptionNotPropagated() throws IOException {
 
 		String argz =   "--classpath=" + binClassesDir
-				      + sp + "--classname=" + CUT.getName() 
-				      + sp + "--output-path=" + outputDir 
+				      + sp + "--class-name=" + CUT.getName()
+				      + sp + "--output-path=" + outputDir
 				      + sp + "--do-not-close-z3-context=true"
-				      + sp + "--surpress-regression-oracles=true"
+				      + sp + "--suppress-regression-oracles=true"
 				      + sp
 				      ;
 	    int exitCode = new CommandLine(new MazeCLI()).execute(argz.split(" ") );
@@ -120,8 +120,8 @@ public class OraclesGenerationTest {
 	void test_oraclesEnabled_unexpectedExceptionPropagated() throws IOException {
 
 		String argz =   "--classpath=" + binClassesDir
-				      + sp + "--classname=" + CUT.getName() 
-				      + sp + "--output-path=" + outputDir 
+				      + sp + "--class-name=" + CUT.getName()
+				      + sp + "--output-path=" + outputDir
 				      + sp + "--do-not-close-z3-context=true"
 				      + sp + "--propagate-unexpected-exceptions=true"
 				      + sp
@@ -152,10 +152,10 @@ public class OraclesGenerationTest {
 	void test_oraclesDisabled_unexpectedExceptionPropagated() throws IOException {
 
 			String argz =   "--classpath=" + binClassesDir
-					      + sp + "--classname=" + CUT.getName() 
-					      + sp + "--output-path=" + outputDir 
+					      + sp + "--class-name=" + CUT.getName()
+					      + sp + "--output-path=" + outputDir
 					      + sp + "--do-not-close-z3-context=true"
-					      + sp + "--surpress-regression-oracles=true"
+					      + sp + "--suppress-regression-oracles=true"
 					      + sp + "--propagate-unexpected-exceptions=true"
 					      + sp
 					      ;

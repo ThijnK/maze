@@ -12,6 +12,25 @@ import java.util.List;
 
 public class DiGraph_Test {
 	
+    @Test
+    void dotExportSupportsBothConsoleAndFile(@org.junit.jupiter.api.io.TempDir java.nio.file.Path directory) throws IOException {
+        var graph = mk_G();
+        String expected = graph.asDot().toString();
+        var destination = directory.resolve("graph.dot");
+        graph.saveAsDot(destination.toString());
+        assertEquals(expected, java.nio.file.Files.readString(destination));
+
+        var captured = new java.io.ByteArrayOutputStream();
+        var original = System.out;
+        try (var console = new java.io.PrintStream(captured, true, java.nio.charset.StandardCharsets.UTF_8)) {
+            System.setOut(console);
+            graph.saveAsDot(null);
+        } finally {
+            System.setOut(original);
+        }
+        assertEquals(expected + System.lineSeparator(), captured.toString(java.nio.charset.StandardCharsets.UTF_8));
+    }
+
 	DiGraph<String,String,String,String> mk_G() {
 		DiGraph<String,String,String,String> G = new DiGraph<>() ;
 		DiGraphNode<String,String> st = G.addNode("start") ;

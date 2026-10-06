@@ -27,7 +27,7 @@ public class SkipIOWrites_Test {
 	
 	String binClassesDir = "./target/test-classes" ;
 	String outputDir = "./tmp" ;	
-	Class CUT     = CUT_withConsolePrint.class ;
+	Class<CUT_withConsolePrint> CUT = CUT_withConsolePrint.class ;
 	String sp = " " ;
 	
 	LoggerInterceptor interceptor ;
@@ -54,13 +54,14 @@ public class SkipIOWrites_Test {
 	void test_no_skip() throws IOException {
 
 		String argz =   "--classpath=" + binClassesDir
-				      + sp + "--classname=" + CUT.getName()
+				      + sp + "--class-name=" + CUT.getName()
 				      + sp + "--output-path=" + outputDir 
 				      + sp + "--do-not-close-z3-context=true" // don't close z3 context, or else the next tests will crash
 				      + sp + "--skip-IO-writes=false"
-				      + sp + "--export-jimple=-1"
+				      + sp + "--export-jimple=log"
 				      + sp
 				      ;
+		
 	    int exitCode = new CommandLine(new MazeCLI()).execute(argz.split(" ") );
 	    
 	    assertTrue(interceptor.anyMatch(msg -> msg.contains("#generated") && msg.contains("1"))) ;
@@ -73,11 +74,12 @@ public class SkipIOWrites_Test {
 	void test_skip() throws IOException {
 
 		String argz =   "--classpath=" + binClassesDir
-				      + sp + "--classname=" + CUT.getName()
+				      + sp + "--class-name=" + CUT.getName()
 				      + sp + "--output-path=" + outputDir 
 				      + sp + "--do-not-close-z3-context=true" // don't close z3 context, or else the next tests will crash
 				      + sp
 				      ;
+		
 	    int exitCode = new CommandLine(new MazeCLI()).execute(argz.split(" ") );
 	    
 	    assertTrue(interceptor.anyMatch(msg -> msg.contains("#generated") && msg.contains("3"))) ;
